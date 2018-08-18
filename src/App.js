@@ -1,33 +1,17 @@
 import React, { Component } from 'react';
-import { applyMiddleware, createStore, combineReducers } from 'redux';
 import { Provider } from 'react-redux';
-import logger from 'redux-logger';
-import { BrowserRouter as Router, Route, Switch, Redirect } from 'react-router-dom';
 
-import BillCreation from './components/billcreate/billcreation';
-import billCreationReducer from './reducers/billcreate/billcreation-reducer';
+import SmartComponent from './components/smart/smartComponent';
+import { getStore } from './store';
 
-const middleware = applyMiddleware(logger);
-
-const theReducers = combineReducers({
-  billCreationReducer: billCreationReducer
-});
-
-const myStore = createStore(theReducers, middleware,
-              window.__REDUX_DEVTOOLS_EXTENSION__ && window.__REDUX_DEVTOOLS_EXTENSION__());
+const myStore = getStore();
 
 class App extends Component {
   render() {
     return (
-      <div>
-          <Router>
-              <Provider store={myStore}>
-                  <div>
-                      <Route exact path='/billcreation' component={BillCreation} />                      
-                  </div>
-              </Provider>   
-          </Router>  
-      </div>
+        <Provider store={myStore}>
+            <SmartComponent />
+        </Provider>   
     );
   }
 }
