@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { Grid, Row, Col, FormGroup, ControlLabel, FormControl, HelpBlock } from 'react-bootstrap';
 import _ from 'lodash';
-import { validateCName, validateFGName } from '../utils/validation';
+import { validateCName, validateFGName } from '../../utilities/validation';
 
 class Demo extends Component{
     constructor(props) {
