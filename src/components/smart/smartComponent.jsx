@@ -5,6 +5,7 @@ import Header from '../header/header';
 import Home from '../home/home';
 import LoginPage from '../login/login';
 import Demo from '../demo/demo';
+import Picture from '../profilePic/ProfilePic';
 
 import { isAuthenticated } from '../../utilities/authUtils';
 
@@ -29,6 +30,7 @@ export default class SmartComponent extends Component {
                         <div className='page-content'>
                             <Route exact path='/' component={Home} />
                             <Route path='/demo' component={Demo} />
+                            <Route path='/picture' component={Picture} />
                         </div>
                     </div>
                 </Router>
