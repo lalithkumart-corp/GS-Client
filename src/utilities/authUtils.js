@@ -1,9 +1,10 @@
 import cookie from 'react-cookies';
+import { getAccessToken} from '../core/storage';
 
 export let isAuthenticated = () => {
     let isAuthenticated = false;
-    let accessToken = cookie.load('accessToken') || '';
-    if(accessToken != '')
+    let accessToken = getAccessToken();    
+    if(accessToken != null)
         isAuthenticated = true;
     return isAuthenticated;
 }
