@@ -8,7 +8,7 @@ class BillCreation extends Component{
     render(){
         return(
             <div>
-                Hello World
+                Bill Creation Page
             </div>            
         )
     }

@@ -7,7 +7,7 @@ import { ClipLoader } from 'react-spinners';
 import axios from 'axios';
 import { toast } from 'react-toastify';
 import { storeAccessToken, getAccessToken } from '../../core/storage';
-
+import history from '../../history';
 import './login.css';
 
 export default class LoginPage extends Component {
@@ -81,7 +81,7 @@ export default class LoginPage extends Component {
                     let data = successResp.data;
                     let accessToken = data.id;
                     storeAccessToken(accessToken);
-                    this.props.history.push('/');
+                    history.push('/');
                 },
                 (errorResponse) => {
                     toast.error('Error while login into application...');
@@ -92,6 +92,11 @@ export default class LoginPage extends Component {
                 (exception) => {
                     toast.error('Exception occured while login into application');
                     console.log('Dei maaapla, Error da, ', exception);
+                }
+            )
+            .finally(
+                () => {
+                    this.setState({loading: false});
                 }
             )
     }
