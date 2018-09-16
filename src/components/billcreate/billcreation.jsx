@@ -60,14 +60,12 @@ class BillCreation extends Component{
     bindMethods() {
         this.setRef = this.setRef.bind(this);
         this.capture = this.capture.bind(this);
-        this.showCameraView = this.showCameraView.bind(this);
+        this.toggleCamera = this.toggleCamera.bind(this);
     }
 
     setRef(webcam) {
         this.webcam = webcam;
     }
-    
-    
 
     /* START: Action/Event listeners */
     onTouched() {
@@ -78,10 +76,10 @@ class BillCreation extends Component{
     }
     capture() {
         const imageSrc = this.webcam.getScreenshot();
-        this.setState({imageSrc: imageSrc, cameraStatus: 'off', showPreview: true, canRecapture: true   });
+        this.setState({imageSrc: imageSrc, camera: 'off', showPreview: true, canRecapture: true   });
     }
-    showCameraView() {
-        this.setState({cameraStatus: 'on', showPreview: false, canRecapture: false});
+    toggleCamera() {
+        this.setState({camera: 'on', showPreview: false, canRecapture: false});
     }
     
     /* END: Action/Event listeners */
@@ -89,7 +87,7 @@ class BillCreation extends Component{
         return(
             <Grid>
                 <Col className="left-pane" xs={8} md={8}>
-                    <Row>                       
+                    <Row>
                         <Col xs={3} md={3}>
                             <FormGroup>
                                 <ControlLabel>Bill No</ControlLabel>
@@ -116,7 +114,7 @@ class BillCreation extends Component{
                                 />
                         </Col>
                     </Row>
-                    <Row>                    
+                    <Row>
                         <Col xs={6} md={6}>
                             <FormGroup>
                                 <ControlLabel>Customer Name</ControlLabel>
@@ -213,17 +211,21 @@ class BillCreation extends Component{
                                 />
                                 <FormControl.Feedback />
                             </FormGroup>
-                        </Col> 
+                        </Col>
                     </Row>
                 </Col>
                 <Col className="right-pane" xs={4} md={4}>
                     <Row>
                         <Col xs={12} md={12}>
-                            {this.state.cameraStatus !== 'off' && 
+                            {
+                                this.state.camera !== 'off' && 
                                 <div>
                                     <Webcam
                                         ref={this.setRef}
+                                        height='210'
+                                        width='280'
                                     />
+                                    <br></br>
                                     <button onClick={this.capture}>capture</button>
                                 </div>
                             }
@@ -233,10 +235,10 @@ class BillCreation extends Component{
                             }
                             {
                                 this.state.canRecapture &&
-                                <button onClick={this.showCameraView} > Re-Capture</button>
+                                <button onClick={this.toggleCamera}> Re-Capture </button>
                             }
                         </Col>
-                    </Row>                    
+                    </Row>
                 </Col>
             </Grid>
         )
