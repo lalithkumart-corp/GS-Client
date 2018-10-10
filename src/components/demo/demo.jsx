@@ -3,7 +3,9 @@ import { connect } from 'react-redux';
 import { Grid, Row, Col, FormGroup, ControlLabel, FormControl, HelpBlock } from 'react-bootstrap';
 import _ from 'lodash';
 import { validateCName, validateFGName } from '../../utilities/validation';
+import Autosuggest from 'react-autosuggest'; //https://react-autosuggest.js.org/
 
+const tmpSuggestions = [{id: 1, name: 'lalith'}]
 class Demo extends Component{
     constructor(props) {
         super(props);
@@ -16,11 +18,21 @@ class Demo extends Component{
                 fgname: {
                     val: '',
                     hasError: false
+                },
+                orn: {
+                    suggestions: tmpSuggestions,
+                    liveSuggestions: tmpSuggestions,
+                    inputVal: ''
                 }
             },
             value:'Hello world'
         };
         this.handleChange = this.handleChange.bind(this);
+        this.autosuggestionControls.onSuggestionsFetchRequested = this.autosuggestionControls.onSuggestionsFetchRequested.bind(this);
+        this.autosuggestionControls.onSuggestionsClearRequested = this.autosuggestionControls.onSuggestionsClearRequested.bind(this);
+        this.autosuggestionControls.onValChange = this.autosuggestionControls.onValChange.bind(this);
+        this.autosuggestionControls.getSuggestionValue = this.autosuggestionControls.getSuggestionValue.bind(this);
+        this.autosuggestionControls.getInputProps = this.autosuggestionControls.getInputProps.bind(this);
     }
 
     validationEngine(formData) {
@@ -63,7 +75,7 @@ class Demo extends Component{
     handleSubmitForm() {
         let newState = { ...this.state };
         _.each(newState.formData, (aFormInput, index) => {
-            aFormInput.onSubmit = true;            
+            aFormInput.onSubmit = true;
         });
         newState.formData = this.validationEngine(newState.formData);
         newState.hasFormErrors = this.hasAnyFormErrors(newState.formData);
@@ -74,6 +86,47 @@ class Demo extends Component{
             */
         }
         this.setState(newState);
+
+    }
+
+    autosuggestionControls = {
+        getInputProps: (identifier) => {
+            let obj = {
+                value: this.state.formData[identifier].inputVal,
+                placeholder: 'Type something dude',
+                onChange: this.autosuggestionControls.onValChange
+            };
+            return obj;            
+        },
+        renderSuggestion: ({suggestion, identifier}) => {
+            return (
+                <div>
+                    {suggestion.name}
+                </div>
+            )
+        },
+        onValChange: (event, {newValue}) => {
+            let newState = { ...this.state };
+            newState.formData.orn.inputVal = newValue;
+            this.setState(newState);
+        },
+        onSuggestionsFetchRequested: ({value, identifier}) => {
+            let newState = { ...this.state };
+            let buffer = newState.formData[identifier].suggestions;
+            let filteredBuffer = [];
+            _.each(buffer, (val, index) => {
+                if(val.name.indexOf(value) == 0)
+                    filteredBuffer.push(val);
+            });
+            newState.formData[identifier].liveSuggestions = filteredBuffer;
+            this.setState(newState);
+        },
+        onSuggestionsClearRequested() {
+
+        },
+        getSuggestionValue({suggestion, identifier}) {
+            return suggestion.name;
+        }
 
     }
 
@@ -113,13 +166,23 @@ class Demo extends Component{
                             />
                             <FormControl.Feedback />
                             {this.state.formData.fgname.hasError && <HelpBlock>{this.state.formData.fgname.errorText}</HelpBlock>}
-                            </FormGroup>
+                        </FormGroup>
+                    </Col>
+                </Row>
+                <Row>
+                    <Col xs={6} md={6}>
+                        <Autosuggest
+                            suggestions={this.state.formData.orn.liveSuggestions}
+                            onSuggestionsFetchRequested={(e) => this.autosuggestionControls.onSuggestionsFetchRequested( {...e, identifier: 'orn'})}
+                            onSuggestionsClearRequested={(e) => this.autosuggestionControls.onSuggestionsClearRequested({...e, identifier: 'orn'})}
+                            getSuggestionValue={(e) => this.autosuggestionControls.getSuggestionValue({suggestion: {...e}, identifier: 'orn'})}
+                            renderSuggestion={(e) => this.autosuggestionControls.renderSuggestion({suggestion: {...e}, identifier: 'orn'})}
+                            inputProps={this.autosuggestionControls.getInputProps('orn')}
+                        />
                     </Col>
                 </Row>
             </Grid>
         )
     }
-
 }
-
 export default Demo;
