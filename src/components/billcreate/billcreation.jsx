@@ -6,53 +6,69 @@ import 'react-datepicker/dist/react-datepicker.css';
 import './billcreation.css';
 import moment from 'moment';
 import Webcam from 'react-webcam';
+import Autosuggest, { ItemAdapter } from 'react-bootstrap-autosuggest' //https://affinipay.github.io/react-bootstrap-autosuggest/#playground
+import _ from 'lodash';
+import axios from "axios";
+import { PLEDGEBOOK_METADATA } from '../../core/sitemap';
 
 class BillCreation extends Component{
     constructor(props){
         super(props);
         this.state = {
+            camera: 'off', //temprary
             showPreview: false,            
             formData: {
                 date: {
-                    val: moment()
+                    inputVal: moment()
                 },
                 billseries: {
-                    val: 'B',
+                    inputVal: 'B',
                     hasError: false 
                 },
                 billno: {
-                    val: '',
+                    inputVal: '',
                     hasError: false
                 },
                 cname: {
-                    val: '',
-                    hasError: false
+                    inputVal: '',
+                    hasError: false,
+                    list: ['Loading...']
                 },
                 fgname: {
-                    val: '',
-                    hasError: false
+                    inputVal: '',
+                    hasError: false,
+                    list: ['Loading...']
                 },
                 address: {
-                    val: '',
-                    hasError: false
+                    inputVal: '',
+                    hasError: false,
+                    list: ['Loading...']
                 },
                 place: {
-                    val: '',
-                    hasError: false
+                    inputVal: '',
+                    hasError: false,
+                    list: ['Loading...']
                 },
                 city: {
-                    val: '',
-                    hasError: false
+                    inputVal: '',
+                    hasError: false,
+                    list: ['Loading...']
                 },
                 pincode: {
-                    val: '',
-                    hasError: false
+                    inputVal: '',
+                    hasError: false,
+                    list: ['Loading...']              
                 },
                 mobile: {
-                    val: '',
-                    hasError: false
+                    inputVal: '',
+                    hasError: false,
+                    list: ['Loading...']
+                },
+                orn: {                    
+                    inputVal: '',
+                    list: ['Loading...']
                 }
-            }
+            },
         };
         this.bindMethods();
     }
@@ -61,10 +77,35 @@ class BillCreation extends Component{
         this.setRef = this.setRef.bind(this);
         this.capture = this.capture.bind(this);
         this.toggleCamera = this.toggleCamera.bind(this);
+        this.autuSuggestionControls.onChange = this.autuSuggestionControls.onChange.bind(this);
     }
 
     setRef(webcam) {
         this.webcam = webcam;
+    }
+
+    componentDidMount() {
+        this.fetchMetaData();
+    }
+
+    fetchMetaData() {
+        axios.get(PLEDGEBOOK_METADATA + '?identifiers=["customerNames", "fgNames", "address", "place", "city", "pincode", "mobile"]')
+            .then(
+                (successResp) => {                      
+                    let newState = {...this.state};
+                    let results = successResp.data;
+                    newState.formData.cname.list = results.customerNames;
+                    newState.formData.fgname.list = results.fgNames;
+                    newState.formData.address.list = results.address;
+                    newState.formData.place.list = results.place;
+                    newState.formData.city.list = results.city;
+                    newState.formData.pincode.list = results.pincode;
+                    this.setState(newState);
+                },
+                (errResp) => {
+                    
+                }
+            )
     }
 
     /* START: Action/Event listeners */
@@ -81,7 +122,15 @@ class BillCreation extends Component{
     toggleCamera() {
         this.setState({camera: 'on', showPreview: false, canRecapture: false});
     }
-    
+
+    autuSuggestionControls = {
+        onChange: (val, identifier) => {
+            let newState = {...this.state};
+            newState.formData[identifier].inputVal = val;
+            this.setState(newState);
+        }
+    }
+
     /* END: Action/Event listeners */
     render(){
         return(
@@ -92,10 +141,10 @@ class BillCreation extends Component{
                             <FormGroup>
                                 <ControlLabel>Bill No</ControlLabel>
                                 <InputGroup>
-                                    <InputGroup.Addon>{this.state.formData.billseries.val}</InputGroup.Addon>
+                                    <InputGroup.Addon>{this.state.formData.billseries.inputVal}</InputGroup.Addon>
                                     <FormControl
                                         type="text"
-                                        value={this.state.formData.billno.val}
+                                        value={this.state.formData.billno.inputVal}
                                         placeholder=""
                                         onChange={(e) => this.handleChange(e.target.value, "billno")}
                                         onFocus={(e) => this.onTouched('billno')}
@@ -106,7 +155,7 @@ class BillCreation extends Component{
                         </Col>
                         <Col xs={3} md={3} className="date-picker-container">
                             <DatePicker 
-                                selected={this.state.formData.date.val}
+                                selected={this.state.formData.date.inputVal}
                                 onChange={(e) => this.handleChange('date', e) }
                                 isClearable={true}
                                 showWeekNumbers
@@ -118,25 +167,24 @@ class BillCreation extends Component{
                         <Col xs={6} md={6}>
                             <FormGroup>
                                 <ControlLabel>Customer Name</ControlLabel>
-                                <FormControl
-                                    type="text"
-                                    value={this.state.formData.cname.val}
-                                    placeholder="Enter Customer name"
-                                    onChange={(e) => this.handleChange(e.target.value, "cname")}
-                                    onFocus={(e) => this.onTouched('cname')}
+                                <Autosuggest
+                                    datalist={this.state.formData.cname.list}
+                                    itemAdapter={CommonAdaptor.instance}
+                                    placeholder="Enter CustomerName"
+                                    value={this.state.formData.cname.inputVal}
+                                    onChange={ (val) => this.autuSuggestionControls.onChange(val, 'cname') }
                                 />
                                 <FormControl.Feedback />
                             </FormGroup>
                         </Col>
                         <Col xs={6} md={6}>
                             <FormGroup>
-                                <ControlLabel>Father/Guardian Name</ControlLabel>
-                                <FormControl
-                                    type="text"
-                                    value={this.state.formData.fgname.val}
-                                    placeholder="Enter Care of name"
-                                    onChange={(e) => this.handleChange(e.target.value, "fgname")}
-                                    onFocus={(e) => this.onTouched('fgname')}
+                                <ControlLabel>Father/Guardian Name</ControlLabel>                                
+                                <Autosuggest
+                                    datalist={this.state.formData.fgname.list}
+                                    placeholder="Enter CustomerName"
+                                    value={this.state.formData.fgname.inputVal}
+                                    onChange={ (val) => this.autuSuggestionControls.onChange(val, 'fgname') }
                                 />
                                 <FormControl.Feedback />
                             </FormGroup>
@@ -145,41 +193,38 @@ class BillCreation extends Component{
                     <Row>
                         <Col xs={12} md={12}>
                             <FormGroup>
-                                <ControlLabel>Address</ControlLabel>
-                                <FormControl
-                                    type="text"
-                                    value={this.state.formData.address.val}
-                                    placeholder="Enter Address"
-                                    onChange={(e) => this.handleChange(e.target.value, "address")}
-                                    onFocus={(e) => this.onTouched('address')}
+                                <ControlLabel>Address</ControlLabel>                                
+                                <Autosuggest
+                                    datalist={this.state.formData.address.list}
+                                    placeholder="Enter CustomerName"
+                                    value={this.state.formData.address.inputVal}
+                                    onChange={ (val) => this.autuSuggestionControls.onChange(val, 'address') }
                                 />
                                 <FormControl.Feedback />
                             </FormGroup>
-                        </Col>                            
+                        </Col>
                     </Row>
                     <Row>
                         <Col xs={6} md={6}>
                             <FormGroup>
-                                <ControlLabel>Place</ControlLabel>
-                                <FormControl
-                                    type="text"
-                                    value={this.state.formData.place.val}
-                                    placeholder="Enter Place"
-                                    onChange={(e) => this.handleChange(e.target.value, "place")}
-                                    onFocus={(e) => this.onTouched('place')}
+                                <ControlLabel>Place</ControlLabel>                                
+                                <Autosuggest
+                                    datalist={this.state.formData.place.list}
+                                    placeholder="Enter CustomerName"
+                                    value={this.state.formData.place.inputVal}
+                                    onChange={ (val) => this.autuSuggestionControls.onChange(val, 'place') }
                                 />
                                 <FormControl.Feedback />
                             </FormGroup>
                         </Col>
                         <Col xs={6} md={6}>
                             <FormGroup>
-                                <ControlLabel>City</ControlLabel>
-                                <FormControl
-                                    type="text"
-                                    value={this.state.formData.city.val}
-                                    placeholder="Enter City"
-                                    onChange={(e) => this.handleChange(e.target.value, "city")}
-                                    onFocus={(e) => this.onTouched('city')}
+                                <ControlLabel>City</ControlLabel>                               
+                                <Autosuggest
+                                    datalist={this.state.formData.city.list}
+                                    placeholder="Enter CustomerName"
+                                    value={this.state.formData.city.inputVal}
+                                    onChange={ (val) => this.autuSuggestionControls.onChange(val, 'city') }
                                 />
                                 <FormControl.Feedback />
                             </FormGroup>
@@ -189,12 +234,11 @@ class BillCreation extends Component{
                         <Col xs={6} md={6}>
                             <FormGroup>
                                 <ControlLabel>Pincode</ControlLabel>
-                                <FormControl
-                                    type="text"
-                                    value={this.state.formData.pincode.val}
-                                    placeholder="Enter pincode"
-                                    onChange={(e) => this.handleChange(e.target.value, "pincode")}
-                                    onFocus={(e) => this.onTouched('pincode')}
+                                <Autosuggest
+                                    datalist={this.state.formData.pincode.list}
+                                    placeholder="Enter CustomerName"
+                                    value={this.state.formData.pincode.inputVal}
+                                    onChange={ (val) => this.autuSuggestionControls.onChange(val, 'pincode') }
                                 />
                                 <FormControl.Feedback />
                             </FormGroup>
@@ -202,17 +246,16 @@ class BillCreation extends Component{
                         <Col xs={6} md={6}>
                             <FormGroup>
                                 <ControlLabel>Mobile</ControlLabel>
-                                <FormControl
-                                    type="text"
-                                    value={this.state.formData.mobile.val}
-                                    placeholder="Enter Mobile"
-                                    onChange={(e) => this.handleChange(e.target.value, "mobile")}
-                                    onFocus={(e) => this.onTouched('mobile')}
+                                <Autosuggest
+                                    datalist={this.state.formData.mobile.list}
+                                    placeholder="Enter CustomerName"
+                                    value={this.state.formData.mobile.inputVal}
+                                    onChange={ (val) => this.autuSuggestionControls.onChange(val, 'mobile') }
                                 />
                                 <FormControl.Feedback />
                             </FormGroup>
                         </Col>
-                    </Row>
+                    </Row>                    
                 </Col>
                 <Col className="right-pane" xs={4} md={4}>
                     <Row>
@@ -261,3 +304,15 @@ const mapDispatchToProps = (dispatch) => {
     };
 };
 export default connect(mapStateToProps, mapDispatchToProps)(BillCreation);
+
+
+class CommonAdaptor extends ItemAdapter {
+    renderItem(item) {
+        return (
+            <div className='list-item'>
+                <span>{item}</span>
+            </div>
+        )
+    }
+}
+CommonAdaptor.instance = new CommonAdaptor()
