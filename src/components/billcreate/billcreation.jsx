@@ -65,8 +65,11 @@ class BillCreation extends Component{
                     list: ['Loading...']
                 },
                 orn: {                    
-                    inputVal: '',
-                    list: ['Loading...']
+                    inputs: {
+                        1: {val: ''}
+                    },
+                    list: ['Loading...'],
+                    rowCount: 1
                 }
             },
         };
@@ -124,11 +127,100 @@ class BillCreation extends Component{
     }
 
     autuSuggestionControls = {
-        onChange: (val, identifier) => {
+        onChange: (val, identifier, options) => {
             let newState = {...this.state};
-            newState.formData[identifier].inputVal = val;
+            if(identifier == 'orn') {
+                let inputs = newState.formData[identifier].inputs;
+                inputs[options.serialNo] = inputs[options.serialNo] || {};
+                inputs[options.serialNo].val = val;
+            } else {
+                newState.formData[identifier].inputVal = val;
+            }            
             this.setState(newState);
         }
+    }
+
+    getOrnContainerDOM() {        
+        let getColGroup = () => {
+            return (
+                <colgroup>
+                    <col style={{width: '5%'}}/>
+                    <col style={{width: '35%'}}/>
+                    <col style={{width: '15%'}}/>
+                    <col style={{width: '15%'}}/>
+                    <col style={{width: '20%'}}/>
+                    <col style={{width: '10%'}}/>
+                </colgroup>
+            )
+        };
+        let getHeader = () => {
+            return (
+                <thead>
+                    <tr>
+                        <th>S.No</th>
+                        <th>Orn Name</th>
+                        <th>G-Wt</th>
+                        <th>N-Wt</th>
+                        <th>Specification</th>
+                        <th>Nos</th>
+                    </tr>
+                </thead>
+            );
+        };
+        let getARow = (serialNo) => {
+            return (
+                <tr>
+                    <td>{serialNo}</td>
+                    <td>
+                        <Autosuggest
+                            datalist={this.state.formData.cname.list}
+                            itemAdapter={CommonAdaptor.instance}
+                            placeholder="Enter Ornament"
+                            value={this.state.formData.orn.inputs[serialNo].val}
+                            onChange={ (val) => this.autuSuggestionControls.onChange(val, 'orn', serialNo) }
+                            onKeyUp={ (e) => whereToGoNext(e, serialNo) }
+                        />
+                    </td>
+                    <td><input type="text" className="orn-input-cell"/></td>
+                    <td><input type="text" className="orn-input-cell"/></td>
+                    <td><input type="text" className="orn-input-cell"/></td>
+                    <td><input type="text" className="orn-input-cell" onKeyUp={(e) => appendNewRow(e, serialNo)}/></td>
+                </tr>
+            )
+        };
+        let appendNewRow = (e, serialNo) => {            
+            if(e.keyCode == 13) {
+                let newState = {...this.state};
+                newState.formData.orn.rowCount += 1;   
+                newState.formData.orn.inputs[serialNo + 1] = {val: ''};
+                this.setState(newState);
+            }
+        }
+        let whereToGoNext = (e, serialNo) => {            
+            if(e.keyCode == 13 && e.target.value == '' && serialNo !== 1) {
+                let newState = { ...this.state };
+                newState.formData.orn.rowCount -= 1;
+                delete newState.formData.orn.inputs[serialNo];
+                this.setState(newState);
+            }
+        }
+        return (
+            <table>
+                {getColGroup()}
+                {getHeader()}
+                <tbody>
+                    {                        
+                        ( ()=> {
+                            let rows = [];
+                            for(let i = 0; i< this.state.formData.orn.rowCount; i++) {
+                                rows.push(getARow(i+1));
+                            }
+                            return rows;
+                        } )()
+                    }
+                </tbody>   
+            </table>
+        )
     }
 
     /* END: Action/Event listeners */
@@ -174,7 +266,6 @@ class BillCreation extends Component{
                                     value={this.state.formData.cname.inputVal}
                                     onChange={ (val) => this.autuSuggestionControls.onChange(val, 'cname') }
                                 />
-                                <FormControl.Feedback />
                             </FormGroup>
                         </Col>
                         <Col xs={6} md={6}>
@@ -255,7 +346,12 @@ class BillCreation extends Component{
                                 <FormControl.Feedback />
                             </FormGroup>
                         </Col>
-                    </Row>                    
+                    </Row>
+                    <Row>
+                        <Col className='ornament-dom-container'>
+                            {this.getOrnContainerDOM()}
+                        </Col>
+                    </Row>
                 </Col>
                 <Col className="right-pane" xs={4} md={4}>
                     <Row>

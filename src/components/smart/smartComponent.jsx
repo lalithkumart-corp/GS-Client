@@ -13,6 +13,7 @@ import Navbar from '../navbar/navbar';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import history from '../../history';
+import './smartComponent.css';
 
 import { isAuthenticated } from '../../utilities/authUtils';
 
