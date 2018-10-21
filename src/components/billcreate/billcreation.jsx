@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import { Grid, Row, Col, FormGroup, ControlLabel, FormControl, HelpBlock, InputGroup } from 'react-bootstrap';
+import { Grid, Row, Col, FormGroup, ControlLabel, FormControl, HelpBlock, InputGroup, Button } from 'react-bootstrap';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import './billcreation.css';
@@ -10,13 +10,55 @@ import Autosuggest, { ItemAdapter } from 'react-bootstrap-autosuggest' //https:/
 import _ from 'lodash';
 import axios from "axios";
 import { PLEDGEBOOK_METADATA } from '../../core/sitemap';
+import { Collapse } from 'react-collapse';
 
-class BillCreation extends Component{
+//let domOrders = ['billno', 'date', 'cname', 'fgname', 'address', 'place', 'city', 'pincode', 'mobile'];
+
+const ENTER_KEY = 13;
+const SPACE_KEY = 32;
+
+// let domOrders = [
+//     new DomNode('billno', true, 'date'),
+//     new DomNode('date', true, 'cname', 'datepicker'),
+//     new DomNode('cname', true, 'fgname', 'autosuggest'),
+//     new DomNode('fgname', true, 'address', 'autosuggest'),
+//     new DomNode('address', true, 'place', 'autosuggest'),
+//     new DomNode('place', true, 'city', 'autosuggest'),
+//     new DomNode('city', true, 'pincode', 'autosuggest'),
+//     new DomNode('pincode', true, 'mobile', 'autosuggest'),
+//     new DomNode('mobile', true, 'moreDetailsHeader', 'autosuggest'),
+//     new DomNode('moreDetailsHeader', true, 'orn1')
+// ];
+
+var domList = new SinglyList();
+domList.add('billno', {type: 'defaultInput', enabled: true});
+domList.add('date', {type: 'datePicker', enabled: true});
+domList.add('cname', {type: 'autosuggest', enabled: true});
+domList.add('fgname', {type: 'autosuggest', enabled: true});
+domList.add('address', {type: 'autosuggest', enabled: true});
+domList.add('place', {type: 'autosuggest', enabled: true});
+domList.add('city', {type: 'autosuggest', enabled: true});
+domList.add('pincode', {type: 'autosuggest', enabled: true});
+domList.add('mobile', {type: 'autosuggest', enabled: true});
+domList.add('moreDetailsHeader', {type: 'defaultInput', enabled: true});
+domList.add('ornItem1', {type: 'autosuggest', enabled: true});
+domList.add('ornGWt1', {type: 'defaultInput', enabled: true});
+domList.add('ornNWt1', {type: 'defaultInput', enabled: true});
+domList.add('ornSpec1', {type: 'defaultInput', enabled: true});
+domList.add('ornNos1', {type: 'defaultInput', enabled: true});
+domList.add('submitBtn', {type: 'defaultInput', enabled: true});
+
+class BillCreation extends Component {
     constructor(props){
         super(props);
+        this.domElmns = {
+            orn: {}
+        };
+        this.domOrders = domList;
         this.state = {
             camera: 'off', //temprary
-            showPreview: false,            
+            showPreview: false,  
+            showMoreInputs: false,          
             formData: {
                 date: {
                     inputVal: moment()
@@ -70,6 +112,12 @@ class BillCreation extends Component{
                     },
                     list: ['Loading...'],
                     rowCount: 1
+                },
+                moreDetails: {
+                    currInputKey: '',
+                    currInputVal: '',
+                    data: [],
+                    list: ['Aadhar card', 'Pan Card']
                 }
             },
         };
@@ -81,6 +129,7 @@ class BillCreation extends Component{
         this.capture = this.capture.bind(this);
         this.toggleCamera = this.toggleCamera.bind(this);
         this.autuSuggestionControls.onChange = this.autuSuggestionControls.onChange.bind(this);
+        this.toggleMoreInputs = this.toggleMoreInputs.bind(this);
     }
 
     setRef(webcam) {
@@ -118,12 +167,120 @@ class BillCreation extends Component{
     handleChange(identifier, params ) {
         
     }
+    handleKeyUp(e, options) {
+        if(e.keyCode == ENTER_KEY)
+            this.handleEnterKeyPress(e, options);
+        else if(e.keyCode == SPACE_KEY)
+            this.handleSpaceKeyPress(e, options);
+
+    }
+    async handleEnterKeyPress(e, options) {
+        if(options && options.isOrnNosInput)
+            await this.appendNewRow(e, options.nextSerialNo);
+        if(options && options.isOrnItemInput)
+            options = await this.checkOrnRowClearance(e, options);
+
+        console.log(this.domElmns);
+        this.transferFocus(e, options.currElmKey);
+    }
+    handleSpaceKeyPress(e, options) {
+        if(options && options.currElmKey == 'moreDetailsHeader')
+            this.toggleMoreInputs();
+    }
+
     capture() {
         const imageSrc = this.webcam.getScreenshot();
         this.setState({imageSrc: imageSrc, camera: 'off', showPreview: true, canRecapture: true   });
     }
     toggleCamera() {
         this.setState({camera: 'on', showPreview: false, canRecapture: false});
+    }
+
+    toggleMoreInputs() {
+        this.setState({showMoreInputs: !this.state.showMoreInputs});
+    }
+
+    transferFocus(e, currentElmKey) {
+        let nextElm = this.getNextElm(currentElmKey);       
+        console.log(this.domElmns.orn);
+        if(nextElm) {
+            if(nextElm.value.indexOf('orn') !== 0) { //If not Orn Input field
+                if(nextElm.type == 'autosuggest'){
+                    this.domElmns[nextElm.key].refs.input.focus();
+                } else if (nextElm.type == 'defaultInput'){
+                    this.domElmns[nextElm.key].focus();
+                }
+            } else { //Hanlding Orn Input fields
+                if(nextElm.type == 'autosuggest')
+                    this.domElmns.orn[nextElm.key].refs.input.focus();
+                else if (nextElm.type == 'defaultInput')
+                    this.domElmns.orn[nextElm.key].focus();
+            }
+        }            
+    }    
+
+    getNextElm(currElmKey) {
+        // let nextElmKey, nextElm;        
+        // nextElmKey = this.getNextElmKey(currElmKey);
+        
+        // _.each(this.domOrders, (anElm, index) => {
+        //     if(anElm.key == nextElmKey)
+        //         nextElm = anElm;
+        // });        
+        let currNode = domList.findNode(currElmKey);
+        let nextNode = currNode.next;
+        return nextNode;
+    }
+
+    // getNextElmKey(currElmKey) {        
+    //     let nextElmKey;
+    //     _.each(this.domOrders, (anElm, index) => {
+    //         if(anElm.key == currElmKey) {
+    //             nextElmKey = anElm.keyNext;
+    //             if(!anElm.enabled)
+    //                 nextElmKey = this.getNextElmKey(nextElmKey);
+    //             //TODO: Handle for orn input fields
+    //         }
+    //     });
+    //     return nextElmKey;
+    // }
+
+    async appendNewRow(e, nextSerialNo) {
+        if(e.keyCode == 13) {
+            let newState = {...this.state};
+            newState.formData.orn.rowCount += 1;   
+            newState.formData.orn.inputs[nextSerialNo] = {val: ''};
+
+            let currentSerialNo = nextSerialNo-1;
+            domList.insertAfter('ornNos'+currentSerialNo, 'ornItem'+nextSerialNo, {type: 'autosuggest', enabled: true});
+            domList.insertAfter('ornItem'+nextSerialNo, 'ornGWt'+nextSerialNo, {type: 'defaultInput', enabled: true});
+            domList.insertAfter('ornGWt'+nextSerialNo, 'ornNWt'+nextSerialNo, {type: 'defaultInput', enabled: true});
+            domList.insertAfter('ornNWt'+nextSerialNo, 'ornSpec'+nextSerialNo, {type: 'defaultInput', enabled: true});
+            domList.insertAfter('ornSpec'+nextSerialNo, 'ornNos'+nextSerialNo, {type: 'defaultInput', enabled: true});
+            
+            await this.setState(newState);
+        }
+    }
+
+    async checkOrnRowClearance(e, options) {
+        let serialNo = options.serialNo;
+        if(e.keyCode == 13 && e.target.value == '' && serialNo !== 1) {
+            let newState = { ...this.state };
+            newState.formData.orn.rowCount -= 1;
+            delete newState.formData.orn.inputs[serialNo];
+
+            domList.remove('ornItem'+serialNo);
+            domList.remove('ornGWt'+serialNo);
+            domList.remove('ornNWt'+serialNo);
+            domList.remove('ornSpec'+serialNo);
+            domList.remove('ornNos'+serialNo);            
+
+            await this.setState(newState);
+
+            options.currElmKey = 'ornNos'+(serialNo-1); //update current Element key
+
+            return options;
+        }
     }
 
     autuSuggestionControls = {
@@ -133,8 +290,40 @@ class BillCreation extends Component{
                 let inputs = newState.formData[identifier].inputs;
                 inputs[options.serialNo] = inputs[options.serialNo] || {};
                 inputs[options.serialNo].val = val;
+            } else if(identifier == 'moreDetails') {                
+                newState.formData.moreDetails.currInputKey = val;
             } else {
                 newState.formData[identifier].inputVal = val;
+            }
+            this.setState(newState);
+        }
+    }
+
+    inputControls = {
+        onChange: (e, val, identifier, options) => {
+            let newState = {...this.state};
+            switch(identifier) {
+                case 'aMoreDetailVal':
+                    newState.formData.moreDetails.currInputVal = val;
+                    break;
+            }
+            this.setState(newState);
+        },
+        onKeyUp: (e, val, identifier) => {
+            let newState = {...this.state};
+            let keyCode = e.keyCode;
+            if(keyCode == 13) {
+                switch(identifier) {
+                    case 'addingMoreData':
+                        let obj = {
+                            key: newState.formData.moreDetails.currInputKey,
+                            val: newState.formData.moreDetails.currInputVal
+                        }
+                        newState.formData.moreDetails.data.push(obj);
+                        newState.formData.moreDetails.currInputKey = '';
+                        newState.formData.moreDetails.currInputVal = '';
+                        break;                    
+                }
             }            
             this.setState(newState);
         }
@@ -177,33 +366,48 @@ class BillCreation extends Component{
                             itemAdapter={CommonAdaptor.instance}
                             placeholder="Enter Ornament"
                             value={this.state.formData.orn.inputs[serialNo].val}
-                            onChange={ (val) => this.autuSuggestionControls.onChange(val, 'orn', serialNo) }
-                            onKeyUp={ (e) => whereToGoNext(e, serialNo) }
+                            onChange={ (val) => this.autuSuggestionControls.onChange(val, 'orn', {serialNo: serialNo}) }
+                            ref = {(domElm) => { this.domElmns.orn['ornItem'+ serialNo] = domElm; }}
+                            // onKeyUp={ (e) => whereToGoNext(e, serialNo) }
+                            onKeyUp = {(e) => this.handleKeyUp(e, {currElmKey: 'ornItem'+ serialNo, isOrnItemInput: true,  serialNo: serialNo}) }
                         />
                     </td>
-                    <td><input type="text" className="orn-input-cell"/></td>
-                    <td><input type="text" className="orn-input-cell"/></td>
-                    <td><input type="text" className="orn-input-cell"/></td>
-                    <td><input type="text" className="orn-input-cell" onKeyUp={(e) => appendNewRow(e, serialNo)}/></td>
+                    <td>
+                        <input 
+                            type="text" 
+                            className="orn-input-cell" 
+                            ref= {(domElm) => {this.domElmns.orn['ornGWt' + serialNo] = domElm; }}
+                            onKeyUp = {(e) => this.handleKeyUp(e, {currElmKey: 'ornGWt'+ serialNo}) }
+                            />
+                    </td>
+                    <td>
+                        <input 
+                            type="text" 
+                            className="orn-input-cell"
+                            ref= {(domElm) => {this.domElmns.orn['ornNWt' + serialNo] = domElm; }}
+                            onKeyUp = {(e) => this.handleKeyUp(e, {currElmKey: 'ornNWt'+ serialNo}) }
+                            />
+                    </td>
+                    <td>
+                        <input 
+                            type="text" 
+                            className="orn-input-cell"
+                            ref= {(domElm) => {this.domElmns.orn['ornSpec' + serialNo] = domElm; }}
+                            onKeyUp = {(e) => this.handleKeyUp(e, {currElmKey: 'ornSpec'+ serialNo}) }
+                            />
+                    </td>
+                    <td>
+                        <input 
+                            type="text" 
+                            className="orn-input-cell" 
+                            ref= {(domElm) => {this.domElmns.orn['ornNos' + serialNo] = domElm; }}
+                            // onKeyUp={(e) => appendNewRow(e, serialNo+1)}
+                            onKeyUp = {(e) => this.handleKeyUp(e, {currElmKey: 'ornNos'+ serialNo, isOrnNosInput: true, nextSerialNo: serialNo+1}) }
+                            />
+                    </td>
                 </tr>
             )
-        };
-        let appendNewRow = (e, serialNo) => {            
-            if(e.keyCode == 13) {
-                let newState = {...this.state};
-                newState.formData.orn.rowCount += 1;   
-                newState.formData.orn.inputs[serialNo + 1] = {val: ''};
-                this.setState(newState);
-            }
-        }
-        let whereToGoNext = (e, serialNo) => {            
-            if(e.keyCode == 13 && e.target.value == '' && serialNo !== 1) {
-                let newState = { ...this.state };
-                newState.formData.orn.rowCount -= 1;
-                delete newState.formData.orn.inputs[serialNo];
-                this.setState(newState);
-            }
-        }
+        };                
         return (
             <table>
                 {getColGroup()}
@@ -223,6 +427,67 @@ class BillCreation extends Component{
         )
     }
 
+    getMoreElmnsContainer() {
+        let getAdderDom = () => {
+            return (
+                <Row>
+                    <Col xs={4} md={4}>
+                        <Autosuggest
+                            datalist={this.state.formData.moreDetails.list}
+                            placeholder="Enter key"
+                            value={this.state.formData.moreDetails.currInputKey}
+                            onChange={ (val) => this.autuSuggestionControls.onChange(val, 'moreDetails') }
+                        />
+                    </Col>
+                    <Col xs={4} md={4}>
+                        <input type='text' onChange={(e) => this.inputControls.onChange(null, e.target.value, 'aMoreDetailVal')} onKeyUp={(e) => this.inputControls.onKeyUp(e, null, 'addingMoreData')} value={this.state.formData.moreDetails.currInputVal}/>
+                    </Col>
+                </Row>
+            )
+        }
+        let getDisplayDom = () => {
+            return (
+                <span>
+                {
+                    (() => {
+                        let rows = [];
+                        for(let i=0; i<this.state.formData.moreDetails.data.length; i++) {
+                            rows.push(
+                                <Row>
+                                    <Col xs={4} md={4}>
+                                        {this.state.formData.moreDetails.data[i]['key']}
+                                    </Col>
+                                    <Col xs={4} md={4}>
+                                        {this.state.formData.moreDetails.data[i]['val']}
+                                    </Col>
+                                </Row>
+                            );
+                        }
+                        return rows;
+                    })()
+                }
+                </span>
+            )
+        }
+        return (
+            <span>
+                <div className='add-more-header'>
+                    <input type='text' 
+                        className='show-more'
+                        value={this.state.showMoreInputs ? 'Show Less <' : 'Add More >'}
+                        ref= {(domElm) => {this.domElmns.moreDetailsHeader = domElm; }}
+                        onKeyUp = { (e)=> {this.handleKeyUp(e, {currElmKey: 'moreDetailsHeader'})} }
+                        onClick={this.toggleMoreInputs}
+                        readOnly='true'/>
+                </div>
+                <Collapse isOpened={this.state.showMoreInputs}>
+                    {getAdderDom()}
+                    {getDisplayDom()}
+                </Collapse>
+            </span>
+        );
+    }
+
     /* END: Action/Event listeners */
     render(){
         return(
@@ -240,6 +505,8 @@ class BillCreation extends Component{
                                         placeholder=""
                                         onChange={(e) => this.handleChange(e.target.value, "billno")}
                                         onFocus={(e) => this.onTouched('billno')}
+                                        ref = {(domElm) => { this.domElmns.billNo = domElm; }}
+                                        onKeyUp = {(e) => this.handleKeyUp(e, {currElmKey: 'billno'}) }
                                     />
                                     <FormControl.Feedback />
                                 </InputGroup>
@@ -252,6 +519,8 @@ class BillCreation extends Component{
                                 isClearable={true}
                                 showWeekNumbers
                                 shouldCloseOnSelect={false}
+                                ref = {(domElm) => { this.domElmns.date = domElm; }}
+                                onKeyUp = {(e) => this.handleKeyUp(e, {currElmKey: 'date'}) }
                                 />
                         </Col>
                     </Row>
@@ -265,6 +534,8 @@ class BillCreation extends Component{
                                     placeholder="Enter CustomerName"
                                     value={this.state.formData.cname.inputVal}
                                     onChange={ (val) => this.autuSuggestionControls.onChange(val, 'cname') }
+                                    ref = {(domElm) => { this.domElmns.cname = domElm; }}
+                                    onKeyUp = {(e) => this.handleKeyUp(e, {currElmKey: 'cname'}) }
                                 />
                             </FormGroup>
                         </Col>
@@ -272,10 +543,13 @@ class BillCreation extends Component{
                             <FormGroup>
                                 <ControlLabel>Father/Guardian Name</ControlLabel>                                
                                 <Autosuggest
+                                    className='fgname-autosuggest'
                                     datalist={this.state.formData.fgname.list}
                                     placeholder="Enter CustomerName"
                                     value={this.state.formData.fgname.inputVal}
                                     onChange={ (val) => this.autuSuggestionControls.onChange(val, 'fgname') }
+                                    ref = {(domElm) => { this.domElmns.fgname = domElm; }}
+                                    onKeyUp = {(e) => this.handleKeyUp(e, {currElmKey: 'fgname'}) }
                                 />
                                 <FormControl.Feedback />
                             </FormGroup>
@@ -287,9 +561,11 @@ class BillCreation extends Component{
                                 <ControlLabel>Address</ControlLabel>                                
                                 <Autosuggest
                                     datalist={this.state.formData.address.list}
-                                    placeholder="Enter CustomerName"
+                                    placeholder="Enter Address"
                                     value={this.state.formData.address.inputVal}
                                     onChange={ (val) => this.autuSuggestionControls.onChange(val, 'address') }
+                                    ref = {(domElm) => { this.domElmns.address = domElm; }}
+                                    onKeyUp = {(e) => this.handleKeyUp(e, {currElmKey: 'address'}) }
                                 />
                                 <FormControl.Feedback />
                             </FormGroup>
@@ -301,9 +577,11 @@ class BillCreation extends Component{
                                 <ControlLabel>Place</ControlLabel>                                
                                 <Autosuggest
                                     datalist={this.state.formData.place.list}
-                                    placeholder="Enter CustomerName"
+                                    placeholder="Enter Place"
                                     value={this.state.formData.place.inputVal}
                                     onChange={ (val) => this.autuSuggestionControls.onChange(val, 'place') }
+                                    ref = {(domElm) => { this.domElmns.place = domElm; }}
+                                    onKeyUp = {(e) => this.handleKeyUp(e, {currElmKey: 'place'}) }
                                 />
                                 <FormControl.Feedback />
                             </FormGroup>
@@ -313,9 +591,11 @@ class BillCreation extends Component{
                                 <ControlLabel>City</ControlLabel>                               
                                 <Autosuggest
                                     datalist={this.state.formData.city.list}
-                                    placeholder="Enter CustomerName"
+                                    placeholder="Enter City"
                                     value={this.state.formData.city.inputVal}
                                     onChange={ (val) => this.autuSuggestionControls.onChange(val, 'city') }
+                                    ref = {(domElm) => { this.domElmns.city = domElm; }}
+                                    onKeyUp = {(e) => this.handleKeyUp(e, {currElmKey: 'city'}) }
                                 />
                                 <FormControl.Feedback />
                             </FormGroup>
@@ -327,9 +607,11 @@ class BillCreation extends Component{
                                 <ControlLabel>Pincode</ControlLabel>
                                 <Autosuggest
                                     datalist={this.state.formData.pincode.list}
-                                    placeholder="Enter CustomerName"
+                                    placeholder="Enter Pincode"
                                     value={this.state.formData.pincode.inputVal}
                                     onChange={ (val) => this.autuSuggestionControls.onChange(val, 'pincode') }
+                                    ref = {(domElm) => { this.domElmns.pincode = domElm; }}
+                                    onKeyUp = {(e) => this.handleKeyUp(e, {currElmKey: 'pincode'}) }
                                 />
                                 <FormControl.Feedback />
                             </FormGroup>
@@ -339,17 +621,33 @@ class BillCreation extends Component{
                                 <ControlLabel>Mobile</ControlLabel>
                                 <Autosuggest
                                     datalist={this.state.formData.mobile.list}
-                                    placeholder="Enter CustomerName"
+                                    placeholder="Enter Mobile No."
                                     value={this.state.formData.mobile.inputVal}
                                     onChange={ (val) => this.autuSuggestionControls.onChange(val, 'mobile') }
+                                    ref = {(domElm) => { this.domElmns.mobile = domElm; }}
+                                    onKeyUp = {(e) => this.handleKeyUp(e, {currElmKey: 'mobile'}) }
                                 />
                                 <FormControl.Feedback />
                             </FormGroup>
                         </Col>
                     </Row>
                     <Row>
+                        {this.getMoreElmnsContainer()}
+                    </Row>
+                    <Row>
                         <Col className='ornament-dom-container'>
                             {this.getOrnContainerDOM()}
+                        </Col>                        
+                    </Row>
+                    <Row>
+                        <Col xsOffset={4} xs={3} md={3} mdOffset={4} className='submit-container'>
+                            <input 
+                                type="button"
+                                className='add-bill-button'
+                                ref={(domElm) => {this.domElmns.submitBtn = domElm}}
+                                onKeyUp= { (e) => this.handleKeyUp(e, {currElmKey:'submitBtn'})}
+                                value='Add Bill'
+                                />
                         </Col>
                     </Row>
                 </Col>
@@ -412,3 +710,80 @@ class CommonAdaptor extends ItemAdapter {
     }
 }
 CommonAdaptor.instance = new CommonAdaptor()
+
+
+
+class DoublyLinkedList {
+    constructor(key, enabled, keyNext, type) {
+        this.key = key;
+        this.enabled = enabled || true;
+        this.keyNext = keyNext;
+        this.type = type || 'input';
+    }
+    add() {
+
+    }
+    insertAfter() {
+
+    }
+}
+
+
+function Node(value, params) {
+    this.value = value;
+    this.key = value;
+    this.type = params.type;
+    this.enabled = params.enabled;
+    this.next = null;
+}
+
+function SinglyList() {
+    this._length = 0;
+    this.head = null;
+    this.add = (value, params) => {
+        let node = new Node(value, params);
+        let currentNode = this.head;
+        this._length++;
+
+        if (!currentNode) {// 1st use-case: an empty list 
+            this.head = node;
+        } else {
+            while (currentNode.next) {// 2nd use-case: a non-empty list
+                currentNode = currentNode.next;
+            }
+            currentNode.next = node;
+        }
+        //return node;
+    }
+    this.insertAfter = (identifier, value, params) => {
+        let node = new Node(value, params);
+        let currentNode = this.head;
+        this._length++;
+
+        while(currentNode.value !== identifier) {
+            currentNode = currentNode.next;
+        }
+        
+        node.next = currentNode.next;
+        currentNode.next = node;
+    }
+
+    this.findNode = (value) => {
+        let currentNode = this.head;
+        while(currentNode.value !== value) {
+            currentNode = currentNode.next;
+        }
+        return currentNode;
+    }
+
+    this.remove = (identifier) => {        
+        let currentNode = this.head;
+        let previousNode = null;
+        while(currentNode.value !== identifier) {
+            previousNode = currentNode;
+            currentNode = currentNode.next;
+        }
+        previousNode.next = currentNode.next;
+        this._length--;
+    }
+}
