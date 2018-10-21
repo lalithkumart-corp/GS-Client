@@ -12,25 +12,11 @@ import axios from "axios";
 import { PLEDGEBOOK_METADATA } from '../../core/sitemap';
 import { Collapse } from 'react-collapse';
 
-//let domOrders = ['billno', 'date', 'cname', 'fgname', 'address', 'place', 'city', 'pincode', 'mobile'];
-
+import { SinglyLinkedList } from '../../utilities/singlyLinkedList';
 const ENTER_KEY = 13;
 const SPACE_KEY = 32;
 
-// let domOrders = [
-//     new DomNode('billno', true, 'date'),
-//     new DomNode('date', true, 'cname', 'datepicker'),
-//     new DomNode('cname', true, 'fgname', 'autosuggest'),
-//     new DomNode('fgname', true, 'address', 'autosuggest'),
-//     new DomNode('address', true, 'place', 'autosuggest'),
-//     new DomNode('place', true, 'city', 'autosuggest'),
-//     new DomNode('city', true, 'pincode', 'autosuggest'),
-//     new DomNode('pincode', true, 'mobile', 'autosuggest'),
-//     new DomNode('mobile', true, 'moreDetailsHeader', 'autosuggest'),
-//     new DomNode('moreDetailsHeader', true, 'orn1')
-// ];
-
-var domList = new SinglyList();
+var domList = new SinglyLinkedList();
 domList.add('billno', {type: 'defaultInput', enabled: true});
 domList.add('date', {type: 'datePicker', enabled: true});
 domList.add('cname', {type: 'autosuggest', enabled: true});
@@ -180,7 +166,6 @@ class BillCreation extends Component {
         if(options && options.isOrnItemInput)
             options = await this.checkOrnRowClearance(e, options);
 
-        console.log(this.domElmns);
         this.transferFocus(e, options.currElmKey);
     }
     handleSpaceKeyPress(e, options) {
@@ -201,8 +186,7 @@ class BillCreation extends Component {
     }
 
     transferFocus(e, currentElmKey) {
-        let nextElm = this.getNextElm(currentElmKey);       
-        console.log(this.domElmns.orn);
+        let nextElm = this.getNextElm(currentElmKey);
         if(nextElm) {
             if(nextElm.value.indexOf('orn') !== 0) { //If not Orn Input field
                 if(nextElm.type == 'autosuggest'){
@@ -219,31 +203,11 @@ class BillCreation extends Component {
         }            
     }    
 
-    getNextElm(currElmKey) {
-        // let nextElmKey, nextElm;        
-        // nextElmKey = this.getNextElmKey(currElmKey);
-        
-        // _.each(this.domOrders, (anElm, index) => {
-        //     if(anElm.key == nextElmKey)
-        //         nextElm = anElm;
-        // });        
+    getNextElm(currElmKey) {    
         let currNode = domList.findNode(currElmKey);
         let nextNode = currNode.next;
         return nextNode;
     }
-
-    // getNextElmKey(currElmKey) {        
-    //     let nextElmKey;
-    //     _.each(this.domOrders, (anElm, index) => {
-    //         if(anElm.key == currElmKey) {
-    //             nextElmKey = anElm.keyNext;
-    //             if(!anElm.enabled)
-    //                 nextElmKey = this.getNextElmKey(nextElmKey);
-    //             //TODO: Handle for orn input fields
-    //         }
-    //     });
-    //     return nextElmKey;
-    // }
 
     async appendNewRow(e, nextSerialNo) {
         if(e.keyCode == 13) {
@@ -277,10 +241,9 @@ class BillCreation extends Component {
 
             await this.setState(newState);
 
-            options.currElmKey = 'ornNos'+(serialNo-1); //update current Element key
-
-            return options;
+            options.currElmKey = 'ornNos'+(serialNo-1); //update current Element key            
         }
+        return options;
     }
 
     autuSuggestionControls = {
@@ -401,7 +364,6 @@ class BillCreation extends Component {
                             type="text" 
                             className="orn-input-cell" 
                             ref= {(domElm) => {this.domElmns.orn['ornNos' + serialNo] = domElm; }}
-                            // onKeyUp={(e) => appendNewRow(e, serialNo+1)}
                             onKeyUp = {(e) => this.handleKeyUp(e, {currElmKey: 'ornNos'+ serialNo, isOrnNosInput: true, nextSerialNo: serialNo+1}) }
                             />
                     </td>
@@ -710,80 +672,3 @@ class CommonAdaptor extends ItemAdapter {
     }
 }
 CommonAdaptor.instance = new CommonAdaptor()
-
-
-
-class DoublyLinkedList {
-    constructor(key, enabled, keyNext, type) {
-        this.key = key;
-        this.enabled = enabled || true;
-        this.keyNext = keyNext;
-        this.type = type || 'input';
-    }
-    add() {
-
-    }
-    insertAfter() {
-
-    }
-}
-
-
-function Node(value, params) {
-    this.value = value;
-    this.key = value;
-    this.type = params.type;
-    this.enabled = params.enabled;
-    this.next = null;
-}
-
-function SinglyList() {
-    this._length = 0;
-    this.head = null;
-    this.add = (value, params) => {
-        let node = new Node(value, params);
-        let currentNode = this.head;
-        this._length++;
-
-        if (!currentNode) {// 1st use-case: an empty list 
-            this.head = node;
-        } else {
-            while (currentNode.next) {// 2nd use-case: a non-empty list
-                currentNode = currentNode.next;
-            }
-            currentNode.next = node;
-        }
-        //return node;
-    }
-    this.insertAfter = (identifier, value, params) => {
-        let node = new Node(value, params);
-        let currentNode = this.head;
-        this._length++;
-
-        while(currentNode.value !== identifier) {
-            currentNode = currentNode.next;
-        }
-        
-        node.next = currentNode.next;
-        currentNode.next = node;
-    }
-
-    this.findNode = (value) => {
-        let currentNode = this.head;
-        while(currentNode.value !== value) {
-            currentNode = currentNode.next;
-        }
-        return currentNode;
-    }
-
-    this.remove = (identifier) => {        
-        let currentNode = this.head;
-        let previousNode = null;
-        while(currentNode.value !== identifier) {
-            previousNode = currentNode;
-            currentNode = currentNode.next;
-        }
-        previousNode.next = currentNode.next;
-        this._length--;
-    }
-}
