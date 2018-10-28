@@ -5,6 +5,7 @@
 /*START: Custom styles for the Date Picker(to make it bigger font size looking */
 .date-picker-container {
     margin-top: 27px;
+    z-index: 3;
 }
 .react-datepicker {
     font-size: 1em;
@@ -70,6 +71,9 @@
 
 
 
+.add-more-header {
+    margin-bottom: 10px;
+}
 .add-more-header .show-more {
     color: #4db8e3;
     cursor: pointer;
