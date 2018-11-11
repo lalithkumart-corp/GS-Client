@@ -4,6 +4,8 @@ import { Provider } from 'react-redux';
 import SmartComponent from './components/smart/smartComponent';
 import { getStore } from './store';
 
+import './components/fontAwesomeIconManager';
+
 const myStore = getStore();
 
 class App extends Component {

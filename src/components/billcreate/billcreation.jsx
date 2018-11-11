@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import { Grid, Row, Col, FormGroup, ControlLabel, FormControl, HelpBlock, InputGroup, Button } from 'react-bootstrap';
+import { Grid, Row, Col, FormGroup, ControlLabel, FormControl, HelpBlock, InputGroup, Button, Glyphicon } from 'react-bootstrap';
 //import DatePicker from 'react-datepicker';
 import DatePicker from 'react-16-bootstrap-date-picker';
 import 'react-datepicker/dist/react-datepicker.css';
@@ -12,6 +12,7 @@ import _ from 'lodash';
 import axios from "axios";
 import { PLEDGEBOOK_METADATA } from '../../core/sitemap';
 import { Collapse } from 'react-collapse';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 import { DoublyLinkedList } from '../../utilities/doublyLinkedList';
 const ENTER_KEY = 13;
@@ -48,7 +49,26 @@ class BillCreation extends Component {
         this.state = {
             camera: 'off', //temprary
             showPreview: false,  
-            showMoreInputs: false,          
+            showMoreInputs: false, 
+            picture: {
+                holder: {
+                    show: true,
+                    imgSrc: '',
+                    confirmedImgSrc: '',
+                    defaultSrc: 'images/default.jpg'
+                },
+                camera: {
+                    show: false,
+                },
+                actions: {
+                    camera: true,
+                    capture: false,
+                    cancel: false,
+                    save: false,
+                    clear: false,
+                },
+                status: 'UNSAVED'
+            },         
             formData: {
                 date: {
                     inputVal: new Date().toISOString(),
@@ -128,11 +148,25 @@ class BillCreation extends Component {
     }
 
     bindMethods() {
-        this.setRef = this.setRef.bind(this);
-        this.capture = this.capture.bind(this);
-        this.toggleCamera = this.toggleCamera.bind(this);
+        this.setRef = this.setRef.bind(this);        
         this.autuSuggestionControls.onChange = this.autuSuggestionControls.onChange.bind(this);
         this.toggleMoreInputs = this.toggleMoreInputs.bind(this);
+        this.bindPictureMethods();
+    }
+
+    bindPictureMethods() {
+        this.picture.eventListeners.handleClick = this.picture.eventListeners.handleClick.bind(this);
+        this.picture.eventListeners.turnOn = this.picture.eventListeners.turnOn.bind(this);
+        this.picture.eventListeners.capture = this.picture.eventListeners.capture.bind(this);
+        this.picture.eventListeners.save = this.picture.eventListeners.save.bind(this);
+        this.picture.eventListeners.exit = this.picture.eventListeners.exit.bind(this);
+        this.picture.eventListeners.clear = this.picture.eventListeners.clear.bind(this);
+        this.picture.helpers.getImageForHolder = this.picture.helpers.getImageForHolder.bind(this);
+        this.picture.helpers.canShowCameraBtn = this.picture.helpers.canShowCameraBtn.bind(this);
+        this.picture.helpers.canShowCaptureBtn = this.picture.helpers.canShowCaptureBtn.bind(this);
+        this.picture.helpers.canShowClearBtn = this.picture.helpers.canShowClearBtn.bind(this);
+        this.picture.helpers.canShowCancelBtn = this.picture.helpers.canShowCancelBtn.bind(this);
+        this.picture.helpers.canshowSaveBtn = this.picture.helpers.canshowSaveBtn.bind(this);
     }
 
     setRef(webcam) {
@@ -208,12 +242,113 @@ class BillCreation extends Component {
         }
     }
 
-    capture() {
-        const imageSrc = this.webcam.getScreenshot();
-        this.setState({imageSrc: imageSrc, camera: 'off', showPreview: true, canRecapture: true   });
-    }
-    toggleCamera() {
-        this.setState({camera: 'on', showPreview: false, canRecapture: false});
+    picture= {
+        eventListeners: {
+            handleClick: (identifier) => {
+                switch(identifier) {
+                    case 'turnOn':
+                        this.picture.eventListeners.turnOn();
+                        break;
+                    case 'capture':
+                        this.picture.eventListeners.capture();
+                        break;
+                    case 'save':
+                        this.picture.eventListeners.save();
+                        break;
+                    case 'exit':
+                        this.picture.eventListeners.exit();
+                        break;
+                    case 'clear':
+                        this.picture.eventListeners.clear();
+                        break;
+                }
+            },
+            turnOn: () => {
+                let newState = {...this.state};
+                newState.picture.camera.show = true;
+                newState.picture.holder.show = false;
+                newState.picture.actions.camera = false;
+                newState.picture.actions.capture = true;
+                newState.picture.actions.cancel = true;
+                this.setState(newState);
+            },
+            capture: () => {                
+                const imageSrc = this.webcam.getScreenshot();
+                let newState = {...this.state};
+                newState.picture.camera.show = false;
+                newState.picture.holder.show = true;
+                newState.picture.holder.imgSrc = imageSrc;
+                this.setState(newState);
+            },
+            save: () => {
+                let newState = {...this.state};
+                newState.picture.confirmedImgSrc = newState.picture.imgSrc;
+                newState.picture.imgSrc = '';
+                newState.picture.status = 'SAVED';
+                this.setState(newState);
+            },
+            exit: () => {
+                let newState = {...this.state};
+                newState.picture.camera.show = false;
+                newState.picture.holder.show = true;
+                this.setState(newState);
+            },
+            clear: () => {
+                let newState = {...this.state};
+                newState.picture.holder.imgSrc = '';
+                newState.picture.holder.confirmedImgSrc = '';
+                newState.picture.camera.show = false;
+                newState.picture.holder.show = true;
+                newState.picture.status = 'UNSAVED';
+                this.setState(newState);
+            }
+        },
+        helpers: {
+            getImageForHolder: () => {
+                let imgPath = this.state.picture.holder.defaultSrc;
+                if(this.state.picture.holder.confirmedImgSrc)
+                    imgPath = this.state.picture.holder.confirmedImgSrc;
+                if(this.state.picture.holder.imgSrc)
+                    imgPath = this.state.picture.holder.imgSrc;
+                return imgPath;
+            },
+            canShowCameraBtn: () => {
+                let canShow = false;
+                if(!this.state.picture.camera.show)
+                    canShow = true;
+                return canShow;
+            },
+            canShowCaptureBtn: () => {
+                let canShow = false;
+                if(this.state.picture.camera.show)
+                    canShow = true;
+                return canShow;                    
+            },
+            canShowClearBtn: () => {
+                let canShow = false;
+                if(this.state.picture.holder.show &&
+                  (this.state.picture.holder.imgSrc ||
+                   this.state.picture.holder.confirmedImgSrc )) {
+                    canShow = true;
+                }
+                return canShow;
+            },
+            canShowCancelBtn: () => {
+                let canShow = false;
+                if(this.state.picture.camera.show)
+                    canShow = true;
+                return canShow;                
+            },
+            canshowSaveBtn: () => {
+                let canShow = false;
+                if(this.state.picture.holder.show &&
+                this.state.picture.holder.imgSrc &&
+                this.state.picture.status !== 'SAVED') {
+                    canShow = true;
+                }
+                return canShow;
+            }
+        }
     }
 
     toggleMoreInputs() {
@@ -775,31 +910,57 @@ class BillCreation extends Component {
                     <Row>
                         <Col xs={12} md={12}>
                             {
-                                this.state.camera !== 'off' && 
-                                <div>
-                                    <Webcam
-                                        ref={this.setRef}
-                                        height='210'
-                                        width='280'
-                                    />
-                                    <br></br>
-                                    <button onClick={this.capture}>capture</button>
+                                this.state.picture.holder.show &&
+                                <img src={this.picture.helpers.getImageForHolder()} />
+                            }
+                            {
+                                this.state.picture.camera.show &&
+                                <Webcam
+                                    ref={this.setRef}
+                                    height='210'
+                                    width='280'
+                                />
+                            }
+                            {
+                                <div className='action-container'>
+                                    <Button
+                                        className={this.picture.helpers.canShowCameraBtn()? '': 'hidden-btn'}                                 
+                                        onClick={(e) => this.picture.eventListeners.handleClick('turnOn')}
+                                        title='Turn On Camera'>
+                                        <FontAwesomeIcon icon="camera" />
+                                    </Button>
+                                    <Button
+                                        className={this.picture.helpers.canShowCaptureBtn()? '': 'hidden-btn'}
+                                        onClick={(e) => this.picture.eventListeners.handleClick('capture')}
+                                        title='Capture image'>
+                                        <FontAwesomeIcon icon="check" />
+                                    </Button>
+                                    <Button
+                                        className={this.picture.helpers.canshowSaveBtn()? '': 'hidden-btn'}
+                                        onClick={(e) => this.picture.eventListeners.handleClick('save')}
+                                        title='Save picture'>
+                                        <FontAwesomeIcon icon="save" />
+                                    </Button>
+                                    <Button
+                                        className={this.picture.helpers.canShowCancelBtn()? '': 'hidden-btn'}
+                                        onClick={(e) => this.picture.eventListeners.handleClick('exit')}
+                                        title='Exit'>
+                                        <FontAwesomeIcon icon="times" />
+                                    </Button>
+                                    <Button
+                                        className={this.picture.helpers.canShowClearBtn()? '': 'hidden-btn'}
+                                        onClick={(e) => this.picture.eventListeners.handleClick('clear')}
+                                        title='Clear picture'>
+                                        <FontAwesomeIcon icon="broom" />
+                                    </Button>
                                 </div>
-                            }
-                            {
-                                this.state.showPreview &&
-                                <img src={this.state.imageSrc} />
-                            }
-                            {
-                                this.state.canRecapture &&
-                                <button onClick={this.toggleCamera}> Re-Capture </button>
                             }
                         </Col>
                     </Row>
                 </Col>
             </Grid>
         )
-    }
+    }    
 }
 
 const mapStateToProps = (state) => { 
