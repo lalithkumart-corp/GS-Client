@@ -10,11 +10,13 @@ import Webcam from 'react-webcam';
 import Autosuggest, { ItemAdapter } from 'react-bootstrap-autosuggest' //https://affinipay.github.io/react-bootstrap-autosuggest/#playground
 import _ from 'lodash';
 import axios from "axios";
-import { PLEDGEBOOK_METADATA } from '../../core/sitemap';
+import { PLEDGEBOOK_METADATA, PLEDGEBOOK_ADD_RECORD } from '../../core/sitemap';
 import { Collapse } from 'react-collapse';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-
+import sh from 'shorthash';
 import { DoublyLinkedList } from '../../utilities/doublyLinkedList';
+import { buildRequestParams } from './helper';
+
 const ENTER_KEY = 13;
 const SPACE_KEY = 32;
 
@@ -23,15 +25,15 @@ domList.add('billno', {type: 'formControl', enabled: true});
 domList.add('amount', {type: 'formControl', enabled: true});
 //domList.add('date', {type: 'datePicker', enabled: true});
 domList.add('cname', {type: 'autosuggest', enabled: true});
-domList.add('fgname', {type: 'autosuggest', enabled: true});
+domList.add('gaurdianname', {type: 'autosuggest', enabled: true});
 domList.add('address', {type: 'autosuggest', enabled: true});
 domList.add('place', {type: 'autosuggest', enabled: true});
 domList.add('city', {type: 'autosuggest', enabled: true});
 domList.add('pincode', {type: 'autosuggest', enabled: true});
 domList.add('mobile', {type: 'autosuggest', enabled: true});
 domList.add('moreDetailsHeader', {type: 'defaultInput', enabled: true});
-domList.add('moreDetailsKey', {type: 'autosuggest', enabled: false});
-domList.add('moreDetailsValue', {type: 'formControl', enabled: false}); 
+domList.add('moreCustomerDetailField', {type: 'autosuggest', enabled: false});
+domList.add('moreCustomerDetailValue', {type: 'formControl', enabled: false});
 domList.add('ornItem1', {type: 'autosuggest', enabled: true});
 domList.add('ornGWt1', {type: 'defaultInput', enabled: true});
 domList.add('ornNWt1', {type: 'defaultInput', enabled: true});
@@ -92,7 +94,7 @@ class BillCreation extends Component {
                     hasError: false,
                     list: ['Loading...']
                 },
-                fgname: {
+                gaurdianname: {
                     inputVal: '',
                     hasError: false,
                     list: ['Loading...']
@@ -137,10 +139,14 @@ class BillCreation extends Component {
                     rowCount: 1
                 },
                 moreDetails: {
-                    currInputKey: '',
-                    currInputVal: '',
-                    data: [],
-                    list: ['Aadhar card', 'Pan Card']
+                    currCustomerInputKey: '',
+                    currCustomerInputField: '',
+                    currCustomerInputVal: '',
+                    customerInfo: [],
+                    currBillInputKey: '',
+                    currBillInputVal: '',
+                    billRemarks: '',
+                    list: ['Aadhar card', 'Pan Card', 'License Number', 'SBI Bank Account Number', 'Email']
                 }
             },
         };
@@ -153,7 +159,7 @@ class BillCreation extends Component {
         this.toggleMoreInputs = this.toggleMoreInputs.bind(this);
         this.bindPictureMethods();
     }
-
+s
     bindPictureMethods() {
         this.picture.eventListeners.handleClick = this.picture.eventListeners.handleClick.bind(this);
         this.picture.eventListeners.turnOn = this.picture.eventListeners.turnOn.bind(this);
@@ -178,17 +184,18 @@ class BillCreation extends Component {
     }
 
     fetchMetaData() {
-        axios.get(PLEDGEBOOK_METADATA + '?identifiers=["customerNames", "fgNames", "address", "place", "city", "pincode", "mobile"]')
+        axios.get(PLEDGEBOOK_METADATA + '?identifiers=["customerNames", "guardianNames", "address", "place", "city", "pincode", "mobile", "otherDetails"]')
             .then(
                 (successResp) => {                      
                     let newState = {...this.state};
                     let results = successResp.data;
                     newState.formData.cname.list = results.customerNames;
-                    newState.formData.fgname.list = results.fgNames;
+                    newState.formData.gaurdianname.list = results.guardianNames;
                     newState.formData.address.list = results.address;
                     newState.formData.place.list = results.place;
                     newState.formData.city.list = results.city;
                     newState.formData.pincode.list = results.pincode;
+                    newState.formData.moreDetails.list = results.otherDetails.map((anItem) => {return {key: anItem.key, value: anItem.displayText}});
                     this.setState(newState);
                 },
                 (errResp) => {
@@ -226,10 +233,12 @@ class BillCreation extends Component {
         } else if(options && options.isToAddMoreDetail) {
             await this.insertItemIntoMoreBucket();
         } else if(options && options.isMoreDetailInputKey){
-            if(this.state.formData.moreDetails.currInputKey == '')
+            if(this.state.formData.moreDetails.currCustomerInputField == '')
                 await this.updateDomList('disableMoreDetailValueDom');
             else
                 await this.updateDomList('enableMoreDetailValueDom');        
+        } else if(options && options.isSubmitBtn) {
+            this.handleSubmit();
         }
         this.transferFocus(e, options.currElmKey, options.traverseDirection);
     }
@@ -240,6 +249,24 @@ class BillCreation extends Component {
             this.toggleMoreInputs();
             this.transferFocus(e, options.currElmKey);
         }
+    }
+
+    handleSubmit() {
+        let requestParams = buildRequestParams(this.state);
+        axios.post(PLEDGEBOOK_ADD_RECORD, requestParams)
+            .then(
+                (successResp) => {
+                    console.log(successResp.data);
+                },
+                (errResp) => {
+                    console.log(errResp);
+                }
+            )
+            .catch(
+                (exception) => {
+                    console.log(exception);
+                }
+            )
     }
 
     picture= {
@@ -282,8 +309,8 @@ class BillCreation extends Component {
             },
             save: () => {
                 let newState = {...this.state};
-                newState.picture.confirmedImgSrc = newState.picture.imgSrc;
-                newState.picture.imgSrc = '';
+                newState.picture.holder.confirmedImgSrc = newState.picture.holder.imgSrc;
+                newState.picture.holder.imgSrc = '';
                 newState.picture.status = 'SAVED';
                 this.setState(newState);
             },
@@ -358,14 +385,14 @@ class BillCreation extends Component {
     updateDomList(identifier) {
         switch(identifier) {
             case 'addMoreDetailsInput':
-                domList.enable('moreDetailsKey');
-                domList.enable('moreDetailsValue');                
+                domList.enable('moreCustomerDetailField');
+                domList.enable('moreCustomerDetailValue');
                 break;
             case 'disableMoreDetailValueDom':
-                domList.disable('moreDetailsValue');
+                domList.disable('moreCustomerDetailValue');
                 break;
             case 'enableMoreDetailValueDom':
-                domList.enable('moreDetailsValue');
+                domList.enable('moreCustomerDetailValue');
                 break;
         }
     }
@@ -396,7 +423,7 @@ class BillCreation extends Component {
     getNextElm(currElmKey) {    
         let currNode = domList.findNode(currElmKey);                
         let nextNode = currNode.next;
-        if(!nextNode.enabled)
+        if(nextNode && !nextNode.enabled)
             nextNode = this.getNextElm(nextNode.key);        
         return nextNode;
     }
@@ -404,7 +431,7 @@ class BillCreation extends Component {
     getPrevElm(currElmKey) {        
         let currNode = domList.findNode(currElmKey);
         let prevNode = currNode.prev;
-        if(!prevNode.enabled)
+        if(prevNode && !prevNode.enabled)
             prevNode = this.getPrevElm(prevNode.key);        
         return prevNode;
     }
@@ -453,8 +480,9 @@ class BillCreation extends Component {
                 let inputs = newState.formData.orn.inputs;
                 inputs[options.serialNo] = inputs[options.serialNo] || {};
                 inputs[options.serialNo][identifier] = val;
-            } else if(identifier == 'moreDetails') {
-                newState.formData.moreDetails.currInputKey = val;
+            } else if(identifier == 'moreCustomerDetailsField') {                
+                newState.formData.moreDetails.currCustomerInputField = val;
+                newState.formData.moreDetails.currCustomerInputKey = this.getCustomerInputkey(val);                
             } else {
                 newState.formData[identifier].inputVal = val;
             }
@@ -466,8 +494,8 @@ class BillCreation extends Component {
         onChange: (e, val, identifier, options) => {
             let newState = {...this.state};
             switch(identifier) {
-                case 'aMoreDetailVal':
-                    newState.formData.moreDetails.currInputVal = val;
+                case 'moreCustomerDetailsValue':
+                    newState.formData.moreDetails.currCustomerInputVal = val;
                     break;
                 case 'ornGWt':
                 case 'ornNWt':
@@ -488,12 +516,12 @@ class BillCreation extends Component {
                 switch(identifier) {
                     case 'addingMoreData':
                         let obj = {
-                            key: newState.formData.moreDetails.currInputKey,
-                            val: newState.formData.moreDetails.currInputVal
+                            key: newState.formData.moreDetails.currCustomerInputField,
+                            val: newState.formData.moreDetails.currCustomerInputVal
                         }
-                        newState.formData.moreDetails.data.push(obj);
-                        newState.formData.moreDetails.currInputKey = '';
-                        newState.formData.moreDetails.currInputVal = '';
+                        newState.formData.moreDetails.customerInfo.push(obj);
+                        newState.formData.moreDetails.currCustomerInputField = '';
+                        newState.formData.moreDetails.currCustomerInputVal = '';
                         break;                    
                 }
             }            
@@ -501,15 +529,22 @@ class BillCreation extends Component {
         }
     }
 
+    submitListener() {
+        let request = buildRequestParams(this.state);
+    }
+
+    /* END: Action/Event listeners */
+
     async insertItemIntoMoreBucket() {
         let newState = {...this.state};
         let obj = {
-            key: newState.formData.moreDetails.currInputKey,
-            val: newState.formData.moreDetails.currInputVal
+            key: newState.formData.moreDetails.currCustomerInputKey,
+            field: newState.formData.moreDetails.currCustomerInputField,
+            val: newState.formData.moreDetails.currCustomerInputVal
         }
-        newState.formData.moreDetails.data.push(obj);
-        newState.formData.moreDetails.currInputKey = '';
-        newState.formData.moreDetails.currInputVal = '';
+        newState.formData.moreDetails.customerInfo.push(obj);
+        newState.formData.moreDetails.currCustomerInputField = '';
+        newState.formData.moreDetails.currCustomerInputVal = '';
         await this.setState(newState);
     }
 
@@ -622,49 +657,51 @@ class BillCreation extends Component {
     }
 
     getMoreElmnsContainer() {
-        let getAdderDom = () => {
-            return (
+        let getCustomerInforAdderDom = () => {
+            return (                
                 <Row>
-                    <Col xs={4} md={4}>
+                    <Col xs={12} className='font-weight-bold'>Customer Information</Col>                    
+                    <Col xs={6} md={6}>
                         <Autosuggest
                             datalist={this.state.formData.moreDetails.list}
                             placeholder="select any key"
-                            value={this.state.formData.moreDetails.currInputKey}
-                            onChange={ (val) => this.autuSuggestionControls.onChange(val, 'moreDetails') }
-                            onKeyUp={(e) => this.handleKeyUp(e, {currElmKey: 'moreDetailsKey', isMoreDetailInputKey: true})} 
-                            ref = {(domElm) => { this.domElmns.moreDetailsKey = domElm; }}
+                            itemAdapter={CustomerInfoAdaptor.instance}
+                            value={this.state.formData.moreDetails.currCustomerInputField}
+                            onChange={ (val) => this.autuSuggestionControls.onChange(val, 'moreCustomerDetailsField') }
+                            onKeyUp={(e) => this.handleKeyUp(e, {currElmKey: 'moreCustomerDetailField', isMoreDetailInputKey: true})} 
+                            ref = {(domElm) => { this.domElmns.moreCustomerDetailField = domElm; }}
                         />
                     </Col>
-                    <Col xs={4} md={4}>
+                    <Col xs={6} md={6}>
                         <FormGroup>
                             <FormControl
                                 type="text"
                                 placeholder="Enter text"
-                                onChange={(e) => this.inputControls.onChange(null, e.target.value, 'aMoreDetailVal')} 
-                                onKeyUp={(e) => this.handleKeyUp(e, {currElmKey: 'moreDetailsValue', isToAddMoreDetail: true, traverseDirection: 'backward'})} 
-                                value={this.state.formData.moreDetails.currInputVal}
-                                inputRef = {(domElm) => { this.domElmns.moreDetailsValue = domElm; }}
+                                onChange={(e) => this.inputControls.onChange(null, e.target.value, 'moreCustomerDetailsValue')} 
+                                onKeyUp={(e) => this.handleKeyUp(e, {currElmKey: 'moreCustomerDetailValue', isToAddMoreDetail: true, traverseDirection: 'backward'})} 
+                                value={this.state.formData.moreDetails.currCustomerInputVal}
+                                inputRef = {(domElm) => { this.domElmns.moreCustomerDetailValue = domElm; }}
                             />
                             <FormControl.Feedback />
                         </FormGroup>
-                    </Col>
+                    </Col>                    
                 </Row>
             )
         }
-        let getDisplayDom = () => {
+        let getCustomerInfoDisplayDom = () => {
             return (
                 <span>
                 {
                     (() => {
                         let rows = [];
-                        for(let i=0; i<this.state.formData.moreDetails.data.length; i++) {
+                        for(let i=0; i<this.state.formData.moreDetails.customerInfo.length; i++) {
                             rows.push(
                                 <Row>
-                                    <Col xs={4} md={4}>
-                                        {this.state.formData.moreDetails.data[i]['key']}
+                                    <Col xs={6} md={6}>
+                                        {this.state.formData.moreDetails.customerInfo[i]['field']}
                                     </Col>
-                                    <Col xs={4} md={4}>
-                                        {this.state.formData.moreDetails.data[i]['val']}
+                                    <Col xs={6} md={6}>
+                                        {this.state.formData.moreDetails.customerInfo[i]['val']}
                                     </Col>
                                 </Row>
                             );
@@ -675,6 +712,19 @@ class BillCreation extends Component {
                 </span>
             )
         }
+        let getBillRemarksDom = () => {
+            return (                
+                <Row className='bill-remarks-adder-dom'>
+                    <Col xs={12} md={12}>
+                        <FormGroup controlId="bill-remarks-textarea">
+                            <ControlLabel>Bill Remarks (or) Other additional information</ControlLabel>
+                            <FormControl componentClass="textarea" placeholder="Type here..." value={this.state.formData.moreDetails.billRemarks} />
+                        </FormGroup>
+                    </Col>
+                </Row>
+            )
+        }
+
         return (
             <span>
                 <div className='add-more-header'>
@@ -687,14 +737,25 @@ class BillCreation extends Component {
                         readOnly='true'/>
                 </div>
                 <Collapse isOpened={this.state.showMoreInputs}>
-                    {getAdderDom()}
-                    {getDisplayDom()}
+                    {getCustomerInforAdderDom()}
+                    {getCustomerInfoDisplayDom()}
+                    {getBillRemarksDom()}
                 </Collapse>
             </span>
         );
     }
 
-    /* END: Action/Event listeners */
+    getCustomerInputkey(val) {
+        let key = '';
+        _.each(this.state.formData.moreDetails.list, (anItem, index) => {
+            if(anItem.value == val)
+                key = anItem.key;
+        });        
+        if(!key)
+            key = sh.unique(val);
+        return key;
+    } 
+    
     render(){
         return(
             <Grid>
@@ -784,17 +845,17 @@ class BillCreation extends Component {
                         </Col>
                         <Col xs={6} md={6}>
                             <FormGroup
-                                validationState= {this.state.formData.fgname.hasError ? "error" :""}
+                                validationState= {this.state.formData.gaurdianname.hasError ? "error" :""}
                                 >
-                                <ControlLabel>Father/Guardian Name</ControlLabel>                                
+                                <ControlLabel>Guardian Name</ControlLabel>                                
                                 <Autosuggest
-                                    className='fgname-autosuggest'
-                                    datalist={this.state.formData.fgname.list}
+                                    className='gaurdianname-autosuggest'
+                                    datalist={this.state.formData.gaurdianname.list}
                                     placeholder="Enter CustomerName"
-                                    value={this.state.formData.fgname.inputVal}
-                                    onChange={ (val) => this.autuSuggestionControls.onChange(val, 'fgname') }
-                                    ref = {(domElm) => { this.domElmns.fgname = domElm; }}
-                                    onKeyUp = {(e) => this.handleKeyUp(e, {currElmKey: 'fgname'}) }
+                                    value={this.state.formData.gaurdianname.inputVal}
+                                    onChange={ (val) => this.autuSuggestionControls.onChange(val, 'gaurdianname') }
+                                    ref = {(domElm) => { this.domElmns.gaurdianname = domElm; }}
+                                    onKeyUp = {(e) => this.handleKeyUp(e, {currElmKey: 'gaurdianname'}) }
                                 />
                                 <FormControl.Feedback />
                             </FormGroup>
@@ -900,7 +961,7 @@ class BillCreation extends Component {
                                 type="button"
                                 className='add-bill-button'
                                 ref={(domElm) => {this.domElmns.submitBtn = domElm}}
-                                onKeyUp= { (e) => this.handleKeyUp(e, {currElmKey:'submitBtn'})}
+                                onKeyUp= { (e) => this.handleKeyUp(e, {currElmKey:'submitBtn', isSubmitBtn: true})}
                                 value='Add Bill'
                                 />
                         </Col>
@@ -991,3 +1052,22 @@ class CommonAdaptor extends ItemAdapter {
     }
 }
 CommonAdaptor.instance = new CommonAdaptor()
+
+class CustomerInfoAdaptor extends ItemAdapter {
+    // getInputValue(item) {
+    //     return item.val.toString();
+    // }
+    // renderSuggested(item) {
+    //     return <div className="suggested-list-item">
+    //       {item.key + ' - '} {item.value}
+    //     </div>
+    // }
+    renderItem(item) {
+        return (
+            <div className='list-item'>
+                <span>{item.value}</span>
+            </div>
+        )
+    }
+}
+CustomerInfoAdaptor.instance = new CustomerInfoAdaptor();

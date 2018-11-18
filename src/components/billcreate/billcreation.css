@@ -83,7 +83,9 @@
 .add-more-header .show-more:focus {
     color: #216ba5;
 }
-
+.bill-remarks-adder-dom {
+    margin-top: 15px;
+}
 
 .add-bill-button {
     color: #fff;
