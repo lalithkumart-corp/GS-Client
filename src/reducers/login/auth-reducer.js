@@ -4,11 +4,11 @@ let defaultState = {
     isAuthenticated: false,
     loading: false
 };
-export default function authReducer(state=defaultState, payload){
+export default function authReducer(state=defaultState, action){
     let newState = { ...state };
     if(isAuthenticated())
         newState = {...newState, isAuthenticated: true};
-    switch(payload.type){
+    switch(action.type){
         case 'ENABLE_LOADER':
             newState = {
                 ...newState,

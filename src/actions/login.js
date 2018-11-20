@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { storeAccessToken, getAccessToken } from '../core/storage';
+import { storeAccessToken } from '../core/storage';
 import { LOGIN } from '../core/sitemap';
 import { toast } from 'react-toastify';
 import history from '../history';
@@ -23,7 +23,7 @@ export const doAuthentication = (params) => {
                 // history.push('/billcreate'); // TIP: Enable this line, if want to land directly on 'billCreation' page after successfull Login
                 dispatch({
                     type: 'AUTH_SUCCESS',
-                    payload: {}
+                    data: {}
                 });
             },
             (errorResponse) => {
@@ -31,7 +31,7 @@ export const doAuthentication = (params) => {
                 console.log(errorResponse);
                 dispatch({
                     type: 'AUTH_ERROR',
-                    payload: {}
+                    data: {}
                 });
             }
         )
@@ -39,7 +39,7 @@ export const doAuthentication = (params) => {
             (exception) => {
                 dispatch({
                     type: 'AUTH_ERROR',
-                    payload: {}
+                    data: {}
                 });
                 toast.error('Exception occured while login into application');
                 console.log('Dei maaapla, Error da, ', exception);

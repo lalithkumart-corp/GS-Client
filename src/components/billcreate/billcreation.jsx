@@ -1,3 +1,10 @@
+/**
+ * TODO: Input fields valdation
+    - Fields value (do this in UI)
+    - Bill number should be unique (do this from backend)
+    - etc... (will add on the fly)
+ */
+
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { Grid, Row, Col, FormGroup, ControlLabel, FormControl, HelpBlock, InputGroup, Button, Glyphicon } from 'react-bootstrap';
@@ -14,6 +21,7 @@ import { PLEDGEBOOK_METADATA, PLEDGEBOOK_ADD_RECORD } from '../../core/sitemap';
 import { Collapse } from 'react-collapse';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import sh from 'shorthash';
+import { insertNewBill, updateClearEntriesFlag } from '../../actions/billCreation';
 import { DoublyLinkedList } from '../../utilities/doublyLinkedList';
 import { buildRequestParams } from './helper';
 
@@ -41,6 +49,26 @@ domList.add('ornSpec1', {type: 'autosuggest', enabled: true});
 domList.add('ornNos1', {type: 'defaultInput', enabled: true});
 domList.add('submitBtn', {type: 'defaultInput', enabled: true});
 
+const defaultPictureState = {
+    holder: {
+        show: true,
+        imgSrc: '',
+        confirmedImgSrc: '',
+        defaultSrc: 'images/default.jpg'
+    },
+    camera: {
+        show: false,
+    },
+    actions: {
+        camera: true,
+        capture: false,
+        cancel: false,
+        save: false,
+        clear: false,
+    },
+    status: 'UNSAVED'
+};
+
 class BillCreation extends Component {
     constructor(props){
         super(props);
@@ -49,28 +77,9 @@ class BillCreation extends Component {
         };
         this.domOrders = domList;
         this.state = {
-            camera: 'off', //temprary
             showPreview: false,  
             showMoreInputs: false, 
-            picture: {
-                holder: {
-                    show: true,
-                    imgSrc: '',
-                    confirmedImgSrc: '',
-                    defaultSrc: 'images/default.jpg'
-                },
-                camera: {
-                    show: false,
-                },
-                actions: {
-                    camera: true,
-                    capture: false,
-                    cancel: false,
-                    save: false,
-                    clear: false,
-                },
-                status: 'UNSAVED'
-            },         
+            picture: JSON.parse(JSON.stringify(defaultPictureState)),        
             formData: {
                 date: {
                     inputVal: new Date().toISOString(),
@@ -142,17 +151,15 @@ class BillCreation extends Component {
                     currCustomerInputKey: '',
                     currCustomerInputField: '',
                     currCustomerInputVal: '',
-                    customerInfo: [],
-                    currBillInputKey: '',
-                    currBillInputVal: '',
+                    customerInfo: [],                    
                     billRemarks: '',
                     list: ['Aadhar card', 'Pan Card', 'License Number', 'SBI Bank Account Number', 'Email']
                 }
             },
         };
-        this.bindMethods();
+        this.bindMethods();        
     }
-
+    
     bindMethods() {
         this.setRef = this.setRef.bind(this);        
         this.autuSuggestionControls.onChange = this.autuSuggestionControls.onChange.bind(this);
@@ -180,7 +187,7 @@ s
     }
 
     componentDidMount() {
-        this.fetchMetaData();
+        this.fetchMetaData();              
     }
 
     fetchMetaData() {
@@ -202,6 +209,33 @@ s
                     
                 }
             )
+    }
+
+    clearEntries() {        
+        if(!this.props.billCreation.clearEntries)
+            return;        
+        let newState = {...this.state};        
+        newState.picture = defaultPictureState;
+        _.each(newState.formData, (anItem, index) => {
+            if(index == 'orn') {
+                anItem.inputs = {1: {
+                    ornItem: '',
+                    ornGWt: '',
+                    ornNWt: '',
+                    ornSpec: '',
+                    ornNos: ''
+                }};
+                anItem.rowCount = 1;
+            } else if(index == 'moreDetails') {
+                anItem.currCustomerInputKey = anItem.currCustomerInputField = anItem.currCustomerInputVal = anItem.billRemarks = '';                
+                anItem.customerInfo = [];
+            } else {
+                anItem.hasError = false;
+                anItem.inputVal = '';
+            }            
+        });
+        this.setState(newState);
+        this.props.updateClearEntriesFlag(false);
     }
 
     /* START: Action/Event listeners */
@@ -251,22 +285,9 @@ s
         }
     }
 
-    handleSubmit() {
+    handleSubmit() {        
         let requestParams = buildRequestParams(this.state);
-        axios.post(PLEDGEBOOK_ADD_RECORD, requestParams)
-            .then(
-                (successResp) => {
-                    console.log(successResp.data);
-                },
-                (errResp) => {
-                    console.log(errResp);
-                }
-            )
-            .catch(
-                (exception) => {
-                    console.log(exception);
-                }
-            )
+        this.props.insertNewBill(requestParams);
     }
 
     picture= {
@@ -402,8 +423,7 @@ s
         if(direction == 'forward')
             nextElm = this.getNextElm(currentElmKey);
         else
-            nextElm = this.getPrevElm(currentElmKey);
-        
+            nextElm = this.getPrevElm(currentElmKey);        
         if(nextElm) {
             if(nextElm.value.indexOf('orn') !== 0) { //If not Orn Input field                
                 if(nextElm.type == 'autosuggest'){
@@ -446,8 +466,8 @@ s
             domList.insertAfter('ornNos'+currentSerialNo, 'ornItem'+nextSerialNo, {type: 'autosuggest', enabled: true});
             domList.insertAfter('ornItem'+nextSerialNo, 'ornGWt'+nextSerialNo, {type: 'defaultInput', enabled: true});
             domList.insertAfter('ornGWt'+nextSerialNo, 'ornNWt'+nextSerialNo, {type: 'defaultInput', enabled: true});
-            domList.insertAfter('ornNWt'+nextSerialNo, 'ornSpec'+nextSerialNo, {type: 'defaultInput', enabled: true});
-            domList.insertAfter('ornSpec'+nextSerialNo, 'ornNos'+nextSerialNo, {type: 'autosuggest', enabled: true});
+            domList.insertAfter('ornNWt'+nextSerialNo, 'ornSpec'+nextSerialNo, {type: 'autosuggest', enabled: true});
+            domList.insertAfter('ornSpec'+nextSerialNo, 'ornNos'+nextSerialNo, {type: 'defaultInput', enabled: true});
             
             await this.setState(newState);
         }
@@ -505,6 +525,9 @@ s
                 case 'billno':
                 case 'amount':
                     newState.formData[identifier].inputVal = val;
+                    break;
+                case 'billRemarks':
+                    newState.formData.moreDetails.billRemarks = val;
                     break;
             }            
             this.setState(newState);
@@ -588,6 +611,7 @@ s
                             onChange={ (val) => this.autuSuggestionControls.onChange(val, 'ornItem', {serialNo: serialNo}) }
                             ref = {(domElm) => { this.domElmns.orn['ornItem'+ serialNo] = domElm; }}
                             onKeyUp = {(e) => this.handleKeyUp(e, {currElmKey: 'ornItem'+ serialNo, isOrnItemInput: true,  serialNo: serialNo}) }
+                            readOnly={this.props.billCreation.loading}
                         />
                     </td>
                     <td>
@@ -599,6 +623,7 @@ s
                             ref= {(domElm) => {this.domElmns.orn['ornGWt' + serialNo] = domElm; }}
                             onKeyUp = {(e) => this.handleKeyUp(e, {currElmKey: 'ornGWt'+ serialNo}) }
                             onChange={ (e) => this.inputControls.onChange(null, e.target.value, 'ornGWt', {serialNo: serialNo}) }
+                            readOnly={this.props.billCreation.loading}
                             />
                     </td>
                     <td>
@@ -610,6 +635,7 @@ s
                             ref= {(domElm) => {this.domElmns.orn['ornNWt' + serialNo] = domElm; }}
                             onKeyUp = {(e) => this.handleKeyUp(e, {currElmKey: 'ornNWt'+ serialNo}) }
                             onChange={ (e) => this.inputControls.onChange(null, e.target.value, 'ornNWt', {serialNo: serialNo}) }
+                            readOnly={this.props.billCreation.loading}
                             />
                     </td>
                     <td>
@@ -621,6 +647,7 @@ s
                             ref= {(domElm) => {this.domElmns.orn['ornSpec' + serialNo] = domElm; }}
                             onKeyUp = {(e) => this.handleKeyUp(e, {currElmKey: 'ornSpec'+ serialNo}) }
                             onChange={ (val) => this.autuSuggestionControls.onChange(val, 'ornSpec', {serialNo: serialNo}) }
+                            readOnly={this.props.billCreation.loading}
                             />
                     </td>
                     <td>
@@ -632,6 +659,7 @@ s
                             ref= {(domElm) => {this.domElmns.orn['ornNos' + serialNo] = domElm; }}
                             onKeyUp = {(e) => this.handleKeyUp(e, {currElmKey: 'ornNos'+ serialNo, isOrnNosInput: true, nextSerialNo: serialNo+1}) }
                             onChange={ (e) => this.inputControls.onChange(null, e.target.value, 'ornNos', {serialNo: serialNo}) }
+                            readOnly={this.props.billCreation.loading}
                             />
                     </td>
                 </tr>
@@ -670,6 +698,7 @@ s
                             onChange={ (val) => this.autuSuggestionControls.onChange(val, 'moreCustomerDetailsField') }
                             onKeyUp={(e) => this.handleKeyUp(e, {currElmKey: 'moreCustomerDetailField', isMoreDetailInputKey: true})} 
                             ref = {(domElm) => { this.domElmns.moreCustomerDetailField = domElm; }}
+                            readOnly={this.props.billCreation.loading}
                         />
                     </Col>
                     <Col xs={6} md={6}>
@@ -681,6 +710,7 @@ s
                                 onKeyUp={(e) => this.handleKeyUp(e, {currElmKey: 'moreCustomerDetailValue', isToAddMoreDetail: true, traverseDirection: 'backward'})} 
                                 value={this.state.formData.moreDetails.currCustomerInputVal}
                                 inputRef = {(domElm) => { this.domElmns.moreCustomerDetailValue = domElm; }}
+                                readOnly={this.props.billCreation.loading}
                             />
                             <FormControl.Feedback />
                         </FormGroup>
@@ -718,7 +748,12 @@ s
                     <Col xs={12} md={12}>
                         <FormGroup controlId="bill-remarks-textarea">
                             <ControlLabel>Bill Remarks (or) Other additional information</ControlLabel>
-                            <FormControl componentClass="textarea" placeholder="Type here..." value={this.state.formData.moreDetails.billRemarks} />
+                            <FormControl componentClass="textarea" 
+                                placeholder="Type here..." 
+                                value={this.state.formData.moreDetails.billRemarks} 
+                                onChange={(e) => this.inputControls.onChange(null, e.target.value, "billRemarks")}
+                                readOnly={this.props.billCreation.loading}
+                                />
                         </FormGroup>
                     </Col>
                 </Row>
@@ -757,6 +792,7 @@ s
     } 
     
     render(){
+        this.clearEntries();
         return(
             <Grid>
                 <Col className="left-pane" xs={8} md={8}>
@@ -772,10 +808,12 @@ s
                                         type="text"
                                         value={this.state.formData.billno.inputVal}
                                         placeholder=""
+                                        className="bill-number-field"
                                         onChange={(e) => this.inputControls.onChange(null, e.target.value, "billno")}
                                         onFocus={(e) => this.onTouched('billno')}
                                         inputRef = {(domElm) => { this.domElmns.billno = domElm; }}
                                         onKeyUp = {(e) => this.handleKeyUp(e, {currElmKey: 'billno'}) }
+                                        readOnly={this.props.billCreation.loading}
                                     />
                                     <FormControl.Feedback />
                                 </InputGroup>
@@ -793,11 +831,13 @@ s
                                     <FormControl
                                         type="text"
                                         value={this.state.formData.amount.inputVal}
-                                        placeholder=""
+                                        placeholder="0.00"
+                                        className="principal-amt-field"
                                         onChange={(e) => this.inputControls.onChange(null, e.target.value, "amount")}
                                         onFocus={(e) => this.onTouched('amount')}
                                         inputRef={(domElm) => { this.domElmns.amount = domElm; }}
                                         onKeyUp = {(e) => this.handleKeyUp(e, {currElmKey: 'amount'}) }
+                                        readOnly={this.props.billCreation.loading}
                                     />
                                     <FormControl.Feedback />
                                 </InputGroup>
@@ -822,6 +862,7 @@ s
                                         onChange={(e) => this.inputControls.onChange(null, e.target.value, 'date') }
                                         ref = {(domElm) => { this.domElmns.date = domElm; }}
                                         onKeyUp = {(e) => this.handleKeyUp(e, {currElmKey: 'date'}) }
+                                        readOnly={this.props.billCreation.loading}
                                         />
                                 </FormGroup>
                         </Col>
@@ -840,6 +881,7 @@ s
                                     onChange={ (val) => this.autuSuggestionControls.onChange(val, 'cname') }
                                     ref = {(domElm) => { this.domElmns.cname = domElm; }}
                                     onKeyUp = {(e) => this.handleKeyUp(e, {currElmKey: 'cname'}) }
+                                    readOnly={this.props.billCreation.loading}
                                 />
                             </FormGroup>
                         </Col>
@@ -856,6 +898,7 @@ s
                                     onChange={ (val) => this.autuSuggestionControls.onChange(val, 'gaurdianname') }
                                     ref = {(domElm) => { this.domElmns.gaurdianname = domElm; }}
                                     onKeyUp = {(e) => this.handleKeyUp(e, {currElmKey: 'gaurdianname'}) }
+                                    readOnly={this.props.billCreation.loading}
                                 />
                                 <FormControl.Feedback />
                             </FormGroup>
@@ -874,6 +917,7 @@ s
                                     onChange={ (val) => this.autuSuggestionControls.onChange(val, 'address') }
                                     ref = {(domElm) => { this.domElmns.address = domElm; }}
                                     onKeyUp = {(e) => this.handleKeyUp(e, {currElmKey: 'address'}) }
+                                    readOnly={this.props.billCreation.loading}
                                 />
                                 <FormControl.Feedback />
                             </FormGroup>
@@ -892,6 +936,7 @@ s
                                     onChange={ (val) => this.autuSuggestionControls.onChange(val, 'place') }
                                     ref = {(domElm) => { this.domElmns.place = domElm; }}
                                     onKeyUp = {(e) => this.handleKeyUp(e, {currElmKey: 'place'}) }
+                                    readOnly={this.props.billCreation.loading}
                                 />
                                 <FormControl.Feedback />
                             </FormGroup>
@@ -908,6 +953,7 @@ s
                                     onChange={ (val) => this.autuSuggestionControls.onChange(val, 'city') }
                                     ref = {(domElm) => { this.domElmns.city = domElm; }}
                                     onKeyUp = {(e) => this.handleKeyUp(e, {currElmKey: 'city'}) }
+                                    readOnly={this.props.billCreation.loading}
                                 />
                                 <FormControl.Feedback />
                             </FormGroup>
@@ -926,6 +972,7 @@ s
                                     onChange={ (val) => this.autuSuggestionControls.onChange(val, 'pincode') }
                                     ref = {(domElm) => { this.domElmns.pincode = domElm; }}
                                     onKeyUp = {(e) => this.handleKeyUp(e, {currElmKey: 'pincode'}) }
+                                    readOnly={this.props.billCreation.loading}
                                 />
                                 <FormControl.Feedback />
                             </FormGroup>
@@ -942,6 +989,7 @@ s
                                     onChange={ (val) => this.autuSuggestionControls.onChange(val, 'mobile') }
                                     ref = {(domElm) => { this.domElmns.mobile = domElm; }}
                                     onKeyUp = {(e) => this.handleKeyUp(e, {currElmKey: 'mobile'}) }
+                                    readOnly={this.props.billCreation.loading}
                                 />
                                 <FormControl.Feedback />
                             </FormGroup>
@@ -961,7 +1009,8 @@ s
                                 type="button"
                                 className='add-bill-button'
                                 ref={(domElm) => {this.domElmns.submitBtn = domElm}}
-                                onKeyUp= { (e) => this.handleKeyUp(e, {currElmKey:'submitBtn', isSubmitBtn: true})}
+                                // onKeyUp= { (e) => this.handleKeyUp(e, {currElmKey:'submitBtn', isSubmitBtn: true})}
+                                onClick={(e) => this.handleSubmit()}
                                 value='Add Bill'
                                 />
                         </Col>
@@ -1026,20 +1075,11 @@ s
 
 const mapStateToProps = (state) => { 
     return {
-        billSettings: state.billSettings
+        billCreation: state.billCreation
     };
 };
-const mapDispatchToProps = (dispatch) => {
-    return {
-        addChat : (billDetail) => {
-            dispatch({
-                type: 'ADD_NEW_BILL',
-                billDetail: billDetail
-            });
-        }
-    };
-};
-export default connect(mapStateToProps, mapDispatchToProps)(BillCreation);
+
+export default connect(mapStateToProps, {insertNewBill, updateClearEntriesFlag})(BillCreation);
 
 
 class CommonAdaptor extends ItemAdapter {

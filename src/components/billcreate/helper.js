@@ -22,7 +22,7 @@ export const buildRequestParams = (thatState = {}) => {
 }
 
 const getOrnamentsData = (thatState) => {
-    return '';
+    return thatState.formData.orn.inputs;
 } 
 
 const getMoreData = (thatState) => {

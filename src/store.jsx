@@ -8,7 +8,7 @@ import authReducer from './reducers/login/auth-reducer';
 export const getStore = () => {
 
     const theReducers = combineReducers({
-        billCreationReducer: billCreationReducer,
+        billCreation: billCreationReducer,
         auth: authReducer
     });
 
