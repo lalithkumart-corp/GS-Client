@@ -1,16 +1,17 @@
 import React, { Component } from 'react';
-import { LOGIN } from '../../core/sitemap';
+import { connect } from 'react-redux';
+
 import { Grid, Row, Col, FormGroup, ControlLabel, FormControl, HelpBlock, ButtonToolbar, Button } from 'react-bootstrap';
 import { validateEmpty } from '../../utilities/validation';
 import _ from 'lodash';
 import { ClipLoader } from 'react-spinners';
-import axios from 'axios';
+
 import { toast } from 'react-toastify';
-import { storeAccessToken, getAccessToken } from '../../core/storage';
-import history from '../../history';
+
+import { doAuthentication, enableLoader } from '../../actions/login';
 import './login.css';
 
-export default class LoginPage extends Component {
+class LoginPage extends Component {
     constructor(props) {
         super(props);
         this.state = {
@@ -23,8 +24,7 @@ export default class LoginPage extends Component {
                     val: '',
                     hasError: false
                 }
-            },
-            loading: false
+            },            
         };
         this.bindMethods();
     }
@@ -60,8 +60,8 @@ export default class LoginPage extends Component {
         if(newState.hasFormErrors){
             toast.error('Please check the input fields...');
             this.setState(newState);
-        }else {
-            newState.loading = true;
+        }else {            
+            this.props.enableLoader();
             this.setState(newState);
             this.doAuth();
         }
@@ -75,30 +75,7 @@ export default class LoginPage extends Component {
             email: this.state.formData.email.val,
             password: this.state.formData.password.val,
         }
-        axios.post(LOGIN, params)
-            .then(
-                (successResp) => {
-                    let data = successResp.data;
-                    let accessToken = data.id;
-                    storeAccessToken(accessToken);
-                    history.push('/');
-                },
-                (errorResponse) => {
-                    toast.error('Error while login into application...');
-                    console.log(errorResponse);
-                }
-            )
-            .catch(
-                (exception) => {
-                    toast.error('Exception occured while login into application');
-                    console.log('Dei maaapla, Error da, ', exception);
-                }
-            )
-            .finally(
-                () => {
-                    this.setState({loading: false});
-                }
-            )
+        this.props.doAuthentication(params);
     }
 
     validationEngine(formData) {
@@ -170,7 +147,7 @@ export default class LoginPage extends Component {
                                             sizeUnit={"px"}
                                             size={18}
                                             color={'#123abc'}
-                                            loading={this.state.loading}
+                                            loading={this.props.auth.loading}
                                             />
                                     </Button>
                                 </ButtonToolbar>
@@ -182,3 +159,11 @@ export default class LoginPage extends Component {
         );
     }
 }
+
+const mapStateToProps = (state) => { 
+    return {
+        auth: state.auth
+    };
+};
+
+export default connect(mapStateToProps, {doAuthentication, enableLoader})(LoginPage);
