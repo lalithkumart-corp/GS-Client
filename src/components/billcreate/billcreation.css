@@ -87,6 +87,16 @@
 .add-more-header .show-more:focus {
     color: #216ba5;
 }
+.customer-info-display-row {
+    border-bottom: 1px dashed lightgray;
+    margin-left: 0;
+    margin-right: 0;
+    padding-top: 5px;
+}
+.customer-info-display-row > div {
+    padding-left: 0;
+    padding-right: 0;
+}
 .bill-remarks-adder-dom {
     margin-top: 15px;
 }
@@ -95,23 +105,34 @@
     margin-top: 20px;
     margin-bottom: 50px;
 }
-.add-bill-button {
-    color: #2196f3;
-    border: none;
-    background-color: transparent;
-    padding: 8px 16px;
-    line-height: 1.4em;
-    border-radius: 4px;
-    text-transform: uppercase;
-    transition: background-color 250ms cubic-bezier(0.4, 0, 0.2, 1) 0ms,box-shadow 250ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;
-    /* background-color: #337ab7;
-    border-color: #2e6da4; */
-}
-.add-bill-button:hover {
-    background-color: rgba(33, 150, 243, 0.08);
-    outline: none;
-}
 
 .hidden-btn {
     display: none;
 }
+
+.sub-actions-div {
+    padding-left: 0 !important;
+    text-align: right;
+}
+.sub-actions-div .icon {
+    color: #2196f3;
+    cursor: pointer;
+}
+.sub-actions-div .edit-icon {
+    padding-right: 10px;
+}
+/* START: Modal Css */
+.ReactModal__Overlay {
+    z-index: 4;
+}
+/* END: Modal Css */
+
+/* START: Picture */
+.pic-action-container {
+    margin-top: 15px;
+}
+.pic-action-container .icon{
+    color: #2196f3;
+    cursor: pointer;
+}
+/* END: Picture */

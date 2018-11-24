@@ -15,7 +15,7 @@ export const insertNewBill = (requestParams) => {
                         dispatch({
                             type: 'NEW_BILL_INSERTION_ERROR',
                             data: {msg: resp.data.ERROR}
-                        });                                                                   
+                        });                    
                     } else {
                         toast.success('Inserted the new bill into Pledgebook successfully'); //TODO: His this msg automatically after some timeout
                         dispatch({
@@ -45,6 +45,22 @@ export const updateClearEntriesFlag = (flag) => {
         dispatch({
             type: 'SET_CLEAR_FLAG',
             data: flag
+        });
+    }
+}
+
+export const showEditDetailModal = () => {
+    return (dispatch) => {
+        dispatch({
+            type: 'SHOW_EDIT_DETAIL_MODAL'
+        });
+    }
+}
+
+export const hideEditDetailModal = () => {
+    return (dispatch) => {
+        dispatch({
+            type: 'HIDE_EDIT_DETAIL_MODAL'
         });
     }
 }

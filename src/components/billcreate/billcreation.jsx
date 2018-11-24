@@ -21,7 +21,8 @@ import { PLEDGEBOOK_METADATA, PLEDGEBOOK_ADD_RECORD } from '../../core/sitemap';
 import { Collapse } from 'react-collapse';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import sh from 'shorthash';
-import { insertNewBill, updateClearEntriesFlag } from '../../actions/billCreation';
+import EditDetailsDialog from './editDetailsDialog';
+import { insertNewBill, updateClearEntriesFlag, showEditDetailModal, hideEditDetailModal } from '../../actions/billCreation';
 import { DoublyLinkedList } from '../../utilities/doublyLinkedList';
 import { buildRequestParams } from './helper';
 
@@ -164,6 +165,7 @@ class BillCreation extends Component {
         this.setRef = this.setRef.bind(this);        
         this.autuSuggestionControls.onChange = this.autuSuggestionControls.onChange.bind(this);
         this.toggleMoreInputs = this.toggleMoreInputs.bind(this);
+        this.updateItemInMoreDetail = this.updateItemInMoreDetail.bind(this);
         this.bindPictureMethods();
     }
 s
@@ -230,8 +232,10 @@ s
                 anItem.currCustomerInputKey = anItem.currCustomerInputField = anItem.currCustomerInputVal = anItem.billRemarks = '';                
                 anItem.customerInfo = [];
             } else {
-                anItem.hasError = false;
-                anItem.inputVal = '';
+                if(index !== 'date') {
+                    anItem.hasError = false;
+                    anItem.inputVal = '';
+                }
             }            
         });
         this.setState(newState);
@@ -288,6 +292,31 @@ s
     handleSubmit() {        
         let requestParams = buildRequestParams(this.state);
         this.props.insertNewBill(requestParams);
+    }
+
+    onEditDetailIconClick(index) {        
+        let newState = {...this.state};
+        newState.editModalContent = {
+            index: index,
+            obj: this.state.formData.moreDetails.customerInfo[index]
+        }
+        this.setState(newState);
+        this.props.showEditDetailModal();
+    }
+
+    async onDeleteDetailIconClick(index) {
+        let newState = {...this.state};        
+        newState.formData.moreDetails.customerInfo.splice(index, 1);
+        await this.setState(newState);
+        console.log(`DELETE - Index=${index} - Before Deletion -`,newState.formData.moreDetails.customerInfo, ` After deletion= `, newState.formData.moreDetails.customerInfo);
+    }
+
+    updateItemInMoreDetail(params) {
+        let newState = {...this.state};
+        debugger;
+        newState.formData.moreDetails.customerInfo[params.index] = params.obj;
+        this.setState(newState);
+        this.props.hideEditDetailModal();
     }
 
     picture= {
@@ -500,9 +529,10 @@ s
                 let inputs = newState.formData.orn.inputs;
                 inputs[options.serialNo] = inputs[options.serialNo] || {};
                 inputs[options.serialNo][identifier] = val;
-            } else if(identifier == 'moreCustomerDetailsField') {                
-                newState.formData.moreDetails.currCustomerInputField = val;
-                newState.formData.moreDetails.currCustomerInputKey = this.getCustomerInputkey(val);                
+            } else if(identifier == 'moreCustomerDetailsField') {
+                let anObj = this.parseCustomerDetailsVal(val);                
+                newState.formData.moreDetails.currCustomerInputField = anObj.value;
+                newState.formData.moreDetails.currCustomerInputKey = anObj.key;                
             } else {
                 newState.formData[identifier].inputVal = val;
             }
@@ -567,8 +597,9 @@ s
         }
         newState.formData.moreDetails.customerInfo.push(obj);
         newState.formData.moreDetails.currCustomerInputField = '';
-        newState.formData.moreDetails.currCustomerInputVal = '';
+        newState.formData.moreDetails.currCustomerInputVal = '';        
         await this.setState(newState);
+        console.log(newState.formData.moreDetails.customerInfo);
     }
 
     getOrnContainerDOM() {        
@@ -694,6 +725,7 @@ s
                             datalist={this.state.formData.moreDetails.list}
                             placeholder="select any key"
                             itemAdapter={CustomerInfoAdaptor.instance}
+                            valueIsItem={true}
                             value={this.state.formData.moreDetails.currCustomerInputField}
                             onChange={ (val) => this.autuSuggestionControls.onChange(val, 'moreCustomerDetailsField') }
                             onKeyUp={(e) => this.handleKeyUp(e, {currElmKey: 'moreCustomerDetailField', isMoreDetailInputKey: true})} 
@@ -726,12 +758,16 @@ s
                         let rows = [];
                         for(let i=0; i<this.state.formData.moreDetails.customerInfo.length; i++) {
                             rows.push(
-                                <Row>
+                                <Row className="customer-info-display-row">
                                     <Col xs={6} md={6}>
                                         {this.state.formData.moreDetails.customerInfo[i]['field']}
                                     </Col>
-                                    <Col xs={6} md={6}>
+                                    <Col xs={5} md={5}>
                                         {this.state.formData.moreDetails.customerInfo[i]['val']}
+                                    </Col>
+                                    <Col xs={1} md={1} className='sub-actions-div'>
+                                        <span className='icon edit-icon' onClick={(e) => this.onEditDetailIconClick(i)}><FontAwesomeIcon icon="edit" /></span>
+                                        <span className='icon' onClick={(e) => this.onDeleteDetailIconClick(i)}><FontAwesomeIcon icon="trash" /></span>
                                     </Col>
                                 </Row>
                             );
@@ -780,15 +816,16 @@ s
         );
     }
 
-    getCustomerInputkey(val) {
-        let key = '';
-        _.each(this.state.formData.moreDetails.list, (anItem, index) => {
-            if(anItem.value == val)
-                key = anItem.key;
-        });        
-        if(!key)
-            key = sh.unique(val);
-        return key;
+    parseCustomerDetailsVal(param={}) {
+        let obj = {};
+        if(typeof param == "string") {
+            obj.value = param;
+            obj.key = sh.unique(param);
+        } else if(typeof param == 'object') {
+            obj.value = param.value || '';
+            obj.key = param.key || '';
+        }
+        return obj;
     } 
     
     render(){
@@ -1007,7 +1044,7 @@ s
                         <Col xsOffset={4} xs={3} md={3} mdOffset={4} className='submit-container'>
                             <input 
                                 type="button"
-                                className='add-bill-button'
+                                className='gs-button'
                                 ref={(domElm) => {this.domElmns.submitBtn = domElm}}
                                 // onKeyUp= { (e) => this.handleKeyUp(e, {currElmKey:'submitBtn', isSubmitBtn: true})}
                                 onClick={(e) => this.handleSubmit()}
@@ -1027,47 +1064,48 @@ s
                                 this.state.picture.camera.show &&
                                 <Webcam
                                     ref={this.setRef}
-                                    height='210'
-                                    width='280'
+                                    height='170'
+                                    width='220'
                                 />
                             }
                             {
-                                <div className='action-container'>
-                                    <Button
-                                        className={this.picture.helpers.canShowCameraBtn()? '': 'hidden-btn'}                                 
+                                <div className='pic-action-container'>
+                                    <span
+                                        className={'gs-button rounded icon ' + (this.picture.helpers.canShowCameraBtn()? '': 'hidden-btn')}
                                         onClick={(e) => this.picture.eventListeners.handleClick('turnOn')}
                                         title='Turn On Camera'>
                                         <FontAwesomeIcon icon="camera" />
-                                    </Button>
-                                    <Button
-                                        className={this.picture.helpers.canShowCaptureBtn()? '': 'hidden-btn'}
+                                    </span>
+                                    <span
+                                        className={'gs-button rounded icon ' + (this.picture.helpers.canShowCaptureBtn()? '': 'hidden-btn')}
                                         onClick={(e) => this.picture.eventListeners.handleClick('capture')}
                                         title='Capture image'>
                                         <FontAwesomeIcon icon="check" />
-                                    </Button>
-                                    <Button
-                                        className={this.picture.helpers.canshowSaveBtn()? '': 'hidden-btn'}
+                                    </span>
+                                    <span
+                                        className={'gs-button rounded icon ' + (this.picture.helpers.canshowSaveBtn()? '': 'hidden-btn')}
                                         onClick={(e) => this.picture.eventListeners.handleClick('save')}
                                         title='Save picture'>
                                         <FontAwesomeIcon icon="save" />
-                                    </Button>
-                                    <Button
-                                        className={this.picture.helpers.canShowCancelBtn()? '': 'hidden-btn'}
+                                    </span>
+                                    <span
+                                        className={'gs-button rounded icon ' + (this.picture.helpers.canShowCancelBtn()? '': 'hidden-btn')}
                                         onClick={(e) => this.picture.eventListeners.handleClick('exit')}
                                         title='Exit'>
                                         <FontAwesomeIcon icon="times" />
-                                    </Button>
-                                    <Button
-                                        className={this.picture.helpers.canShowClearBtn()? '': 'hidden-btn'}
+                                    </span>
+                                    <span
+                                        className={'gs-button rounded icon ' + (this.picture.helpers.canShowClearBtn()? '': 'hidden-btn')}
                                         onClick={(e) => this.picture.eventListeners.handleClick('clear')}
                                         title='Clear picture'>
                                         <FontAwesomeIcon icon="broom" />
-                                    </Button>
+                                    </span>
                                 </div>
                             }
                         </Col>
                     </Row>
                 </Col>
+                <EditDetailsDialog {...this.state.editModalContent} update={this.updateItemInMoreDetail} />
             </Grid>
         )
     }    
@@ -1079,7 +1117,7 @@ const mapStateToProps = (state) => {
     };
 };
 
-export default connect(mapStateToProps, {insertNewBill, updateClearEntriesFlag})(BillCreation);
+export default connect(mapStateToProps, {insertNewBill, updateClearEntriesFlag, showEditDetailModal, hideEditDetailModal})(BillCreation);
 
 
 class CommonAdaptor extends ItemAdapter {
@@ -1095,13 +1133,23 @@ CommonAdaptor.instance = new CommonAdaptor()
 
 class CustomerInfoAdaptor extends ItemAdapter {
     // getInputValue(item) {
-    //     return item.val.toString();
+    //     return item.value.toString();
     // }
-    // renderSuggested(item) {
-    //     return <div className="suggested-list-item">
-    //       {item.key + ' - '} {item.value}
-    //     </div>
-    // }
+    
+    // Render middleware for dropdown items list
+    /* renderSuggested(item) {
+        return <div className="suggested-list-item">
+          {item.key + ' - '} {item.value}
+        </div>
+    }*/
+
+    // Render middleware for selected item 
+    /* renderSelected(){
+        return <div className="suggested-list-item">
+          {item.key + ' - '} {item.value}
+        </div>  
+    } */
+
     renderItem(item) {
         return (
             <div className='list-item'>

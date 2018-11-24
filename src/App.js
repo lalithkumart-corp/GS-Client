@@ -6,7 +6,10 @@ import { getStore } from './store';
 
 import './components/fontAwesomeIconManager';
 
+import './App.css';
+
 const myStore = getStore();
+
 
 class App extends Component {
   render() {

@@ -26,6 +26,18 @@ export default function billCreationReducer(state=defaultState, action) {
                 clearEntries: action.data
             }
             break;
+        case 'SHOW_EDIT_DETAIL_MODAL':
+            newState = {
+                ...newState,
+                showEditDetailModal: true
+            }
+            break;
+        case 'HIDE_EDIT_DETAIL_MODAL':
+            newState = {
+                ...newState,
+                showEditDetailModal: false
+            }
+            break;
     }
     return newState;
 }
