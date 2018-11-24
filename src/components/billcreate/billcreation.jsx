@@ -24,7 +24,7 @@ import sh from 'shorthash';
 import EditDetailsDialog from './editDetailsDialog';
 import { insertNewBill, updateClearEntriesFlag, showEditDetailModal, hideEditDetailModal } from '../../actions/billCreation';
 import { DoublyLinkedList } from '../../utilities/doublyLinkedList';
-import { buildRequestParams } from './helper';
+import { _getCustomerNameList, _getGaurdianNameList, _getAddressList, _getPlaceList, _getCityList, _getPincodeList, buildRequestParams } from './helper';
 
 const ENTER_KEY = 13;
 const SPACE_KEY = 32;
@@ -155,7 +155,8 @@ class BillCreation extends Component {
                     customerInfo: [],                    
                     billRemarks: '',
                     list: ['Aadhar card', 'Pan Card', 'License Number', 'SBI Bank Account Number', 'Email']
-                }
+                },
+                selectedCustomer: {}
             },
         };
         this.bindMethods();        
@@ -193,17 +194,17 @@ s
     }
 
     fetchMetaData() {
-        axios.get(PLEDGEBOOK_METADATA + '?identifiers=["customerNames", "guardianNames", "address", "place", "city", "pincode", "mobile", "otherDetails"]')
+        axios.get(PLEDGEBOOK_METADATA + '?identifiers=["all", "otherDetails"]')
             .then(
                 (successResp) => {                      
                     let newState = {...this.state};
-                    let results = successResp.data;
-                    newState.formData.cname.list = results.customerNames;
-                    newState.formData.gaurdianname.list = results.guardianNames;
-                    newState.formData.address.list = results.address;
-                    newState.formData.place.list = results.place;
-                    newState.formData.city.list = results.city;
-                    newState.formData.pincode.list = results.pincode;
+                    let results = successResp.data;                    
+                    newState.formData.cname.list = results.row;
+                    newState.formData.gaurdianname.list = _getGaurdianNameList(results.row);
+                    newState.formData.address.list = _getAddressList(results.row);
+                    newState.formData.place.list = _getPlaceList(results.row);
+                    newState.formData.city.list = _getCityList(results.row);
+                    newState.formData.pincode.list = _getPincodeList(results.row);
                     newState.formData.moreDetails.list = results.otherDetails.map((anItem) => {return {key: anItem.key, value: anItem.displayText}});
                     this.setState(newState);
                 },
@@ -212,7 +213,7 @@ s
                 }
             )
     }
-
+    
     clearEntries() {        
         if(!this.props.billCreation.clearEntries)
             return;        
@@ -533,6 +534,14 @@ s
                 let anObj = this.parseCustomerDetailsVal(val);                
                 newState.formData.moreDetails.currCustomerInputField = anObj.value;
                 newState.formData.moreDetails.currCustomerInputKey = anObj.key;                
+            } else if(identifier == "cname"){
+                if(typeof val == 'string') {
+                    newState.formData[identifier].inputVal = val;
+                    newState.selectedCustomer = {};
+                } else {
+                    newState.formData[identifier].inputVal = val.name || '';                
+                    newState.selectedCustomer = val;
+                }
             } else {
                 newState.formData[identifier].inputVal = val;
             }
@@ -912,8 +921,9 @@ s
                                 <ControlLabel>Customer Name</ControlLabel>
                                 <Autosuggest
                                     datalist={this.state.formData.cname.list}
-                                    itemAdapter={CommonAdaptor.instance}
+                                    itemAdapter={CustomerListAdaptor.instance}
                                     placeholder="Enter CustomerName"
+                                    valueIsItem={true}
                                     value={this.state.formData.cname.inputVal}
                                     onChange={ (val) => this.autuSuggestionControls.onChange(val, 'cname') }
                                     ref = {(domElm) => { this.domElmns.cname = domElm; }}
@@ -1130,6 +1140,44 @@ class CommonAdaptor extends ItemAdapter {
     }
 }
 CommonAdaptor.instance = new CommonAdaptor()
+
+class CustomerListAdaptor extends ItemAdapter {
+
+    /* itemMatchesInput(item, foldedValue) {
+        let matched = false;
+        let inputVal = '';
+        let dbVal = '';
+
+        if(foldedValue)
+            inputVal = foldedValue.toLowerCase();        
+        if(item && item.name)
+            dbVal = item.name.toLowerCase();
+        console.log(inputVal, dbVal);
+        if(inputVal && dbVal) {
+            if(dbVal.indexOf(inputVal) == 0)
+                matched = true;
+        }
+        console.log(matched);
+        return matched;
+    } */
+    getInputValue(item) {
+        if(typeof item == 'string')
+            return item.toString();
+        else        
+            return (item.name).toString();
+    }
+
+    renderItem(item) {
+        return (
+            <div className="customer-list-item" key={item.hashKey}>
+                <div><span>{item.name}  <span style={{"fontSize":"8px"}}>c/of</span> {item.gaurdianName}</span></div>
+                <div><span>{item.address}</span></div>
+                <div><span>{item.place}, {item.city} - {item.pincode}</span></div>
+            </div>
+        )
+    }
+}
+CustomerListAdaptor.instance = new CustomerListAdaptor();
 
 class CustomerInfoAdaptor extends ItemAdapter {
     // getInputValue(item) {

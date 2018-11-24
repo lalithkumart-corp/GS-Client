@@ -1,3 +1,4 @@
+import _ from 'lodash';
 
 export const buildRequestParams = (thatState = {}) => {
     let state = {...thatState}; //for preventing reference issue 
@@ -49,3 +50,51 @@ const getPicData = (thatState) => {
     return picData;
 }
 
+export const _getCustomerNameList = (records) => {
+    let list = [];
+    _.each(records, (aRecord, index) => {
+        if(list.indexOf(aRecord.name) == -1)
+            list.push(aRecord.name);
+    });
+    return list;
+}
+export const _getGaurdianNameList = (records) => {
+    let list = [];
+    _.each(records, (aRecord, index) => {
+        if(list.indexOf(aRecord.gaurdianName) == -1)
+            list.push(aRecord.gaurdianName);
+    });
+    return list;
+}
+export const _getAddressList = (records) => {
+    let list = [];
+    _.each(records, (aRecord, index) => {
+        if(list.indexOf(aRecord.address) == -1)
+            list.push(aRecord.address);
+    });
+    return list;
+}
+export const _getPlaceList = (records) => {
+    let list = [];
+    _.each(records, (aRecord, index) => {
+        if(list.indexOf(aRecord.place) == -1)
+            list.push(aRecord.place);
+    });
+    return list;
+}
+export const _getCityList = (records) => {
+    let list = [];
+    _.each(records, (aRecord, index) => {
+        if(list.indexOf(aRecord.city) == -1)
+            list.push(aRecord.city);
+    });
+    return list;
+}
+export const _getPincodeList = (records) => {
+    let list = [];
+    _.each(records, (aRecord, index) => {
+        if(list.indexOf(aRecord.pincode) == -1)
+            list.push(aRecord.pincode);
+    });
+    return list;
+}
