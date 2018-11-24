@@ -8,7 +8,7 @@ export const buildRequestParams = (thatState = {}) => {
         billNo: state.formData.billno.inputVal,
         amount: state.formData.amount.inputVal,
         cname: state.formData.cname.inputVal,
-        gaurdianName: state.formData.gaurdianname.inputVal,
+        gaurdianName: state.formData.gaurdianName.inputVal,
         address: state.formData.address.inputVal,
         place: state.formData.place.inputVal,
         city: state.formData.city.inputVal,
@@ -18,7 +18,8 @@ export const buildRequestParams = (thatState = {}) => {
         billRemarks: getBillRemarks(thatState),
         moreDetails: getMoreData(thatState),
         picture: getPicData(thatState)
-    }
+    }    
+    console.log('API request', params);
     return params;
 }
 

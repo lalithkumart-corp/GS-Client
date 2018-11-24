@@ -34,7 +34,7 @@ domList.add('billno', {type: 'formControl', enabled: true});
 domList.add('amount', {type: 'formControl', enabled: true});
 //domList.add('date', {type: 'datePicker', enabled: true});
 domList.add('cname', {type: 'autosuggest', enabled: true});
-domList.add('gaurdianname', {type: 'autosuggest', enabled: true});
+domList.add('gaurdianName', {type: 'autosuggest', enabled: true});
 domList.add('address', {type: 'autosuggest', enabled: true});
 domList.add('place', {type: 'autosuggest', enabled: true});
 domList.add('city', {type: 'autosuggest', enabled: true});
@@ -104,7 +104,7 @@ class BillCreation extends Component {
                     hasError: false,
                     list: ['Loading...']
                 },
-                gaurdianname: {
+                gaurdianName: {
                     inputVal: '',
                     hasError: false,
                     list: ['Loading...']
@@ -200,7 +200,7 @@ s
                     let newState = {...this.state};
                     let results = successResp.data;                    
                     newState.formData.cname.list = results.row;
-                    newState.formData.gaurdianname.list = _getGaurdianNameList(results.row);
+                    newState.formData.gaurdianName.list = _getGaurdianNameList(results.row);
                     newState.formData.address.list = _getAddressList(results.row);
                     newState.formData.place.list = _getPlaceList(results.row);
                     newState.formData.city.list = _getCityList(results.row);
@@ -233,7 +233,7 @@ s
                 anItem.currCustomerInputKey = anItem.currCustomerInputField = anItem.currCustomerInputVal = anItem.billRemarks = '';                
                 anItem.customerInfo = [];
             } else {
-                if(index !== 'date') {
+                if(index !== 'date' && index !== 'billseries') {
                     anItem.hasError = false;
                     anItem.inputVal = '';
                 }
@@ -251,8 +251,11 @@ s
         
     }
     handleClick(e, options) {
-        if(options && options.currElmKey == 'moreDetailsHeader') {
-            this.updateDomList('addMoreDetailsInput');
+        if(options && options.currElmKey == 'moreDetailsHeader') {            
+            if(this.state.showMoreInputs)
+                this.updateDomList('disableMoreDetailsInputElmns');                
+            else
+                this.updateDomList('enableMoreDetailsInputElmns');
             this.toggleMoreInputs();
             this.transferFocus(e, options.currElmKey);
         }
@@ -284,7 +287,7 @@ s
 
     handleSpaceKeyPress(e, options) {
         if(options && options.currElmKey == 'moreDetailsHeader') {
-            this.updateDomList('addMoreDetailsInput');
+            this.updateDomList('enableMoreDetailsInputElmns');
             this.toggleMoreInputs();
             this.transferFocus(e, options.currElmKey);
         }
@@ -299,7 +302,7 @@ s
         let newState = {...this.state};
         newState.editModalContent = {
             index: index,
-            obj: this.state.formData.moreDetails.customerInfo[index]
+            obj: this.getInputValFromCustomSources('moreDetails')[index]
         }
         this.setState(newState);
         this.props.showEditDetailModal();
@@ -309,16 +312,28 @@ s
         let newState = {...this.state};        
         newState.formData.moreDetails.customerInfo.splice(index, 1);
         await this.setState(newState);
-        console.log(`DELETE - Index=${index} - Before Deletion -`,newState.formData.moreDetails.customerInfo, ` After deletion= `, newState.formData.moreDetails.customerInfo);
     }
 
     updateItemInMoreDetail(params) {
         let newState = {...this.state};
-        debugger;
         newState.formData.moreDetails.customerInfo[params.index] = params.obj;
         this.setState(newState);
         this.props.hideEditDetailModal();
     }
+
+    // TODO: remove this, if not in use.
+    /* updateSelectedCustomer(params) {
+        let newState = {...this.state};
+        newState.formData.cname.inputVal = params.name || '';
+        newState.formData.gaurdianName.inputVal = params.gaurdianName || '';
+        newState.formData.address.inputVal = params.address || '';
+        newState.formData.place.inputVal = params.place || '';
+        newState.formData.city.inputVal = params.city || '';
+        newState.formData.pincode.inputVal = params.pincode || '';
+        newState.formData.mobile.inputVal = params.mobile || '';
+        newState.formData.moreDetails.customerInfo = params.otherDetails || [];
+        this.setState(newState);
+    }*/
 
     picture= {
         eventListeners: {
@@ -435,9 +450,13 @@ s
 
     updateDomList(identifier) {
         switch(identifier) {
-            case 'addMoreDetailsInput':
+            case 'enableMoreDetailsInputElmns':
                 domList.enable('moreCustomerDetailField');
                 domList.enable('moreCustomerDetailValue');
+                break;
+            case 'disableMoreDetailsInputElmns':
+                domList.disable('moreCustomerDetailField');
+                domList.disable('moreCustomerDetailValue');
                 break;
             case 'disableMoreDetailValueDom':
                 domList.disable('moreCustomerDetailValue');
@@ -484,6 +503,24 @@ s
         if(prevNode && !prevNode.enabled)
             prevNode = this.getPrevElm(prevNode.key);        
         return prevNode;
+    }
+
+    getInputValFromCustomSources(identifier) {
+        let returnVal;
+        if(identifier == 'moreDetails') {
+            returnVal = this.state.formData[identifier].customerInfo;
+        }else {
+            returnVal = this.state.formData[identifier].inputVal;        
+        }        
+        if(this.state.selectedCustomer) {       
+            
+            if(identifier == 'cname') identifier = 'name';
+            if(identifier == 'moreDetails') identifier = 'otherDetails'; 
+
+            returnVal = this.state.selectedCustomer[identifier] || returnVal;
+        }
+        return returnVal;
+
     }
 
     async appendNewRow(e, nextSerialNo) {
@@ -535,13 +572,20 @@ s
                 newState.formData.moreDetails.currCustomerInputField = anObj.value;
                 newState.formData.moreDetails.currCustomerInputKey = anObj.key;                
             } else if(identifier == "cname"){
-                if(typeof val == 'string') {
+                if(!val || typeof val == 'string') {
                     newState.formData[identifier].inputVal = val;
+                    // this.updateSelectedCustomer({name: val});
                     newState.selectedCustomer = {};
                 } else {
                     newState.formData[identifier].inputVal = val.name || '';                
+                    // this.updateSelectedCustomer(val);
                     newState.selectedCustomer = val;
                 }
+            } else if(identifier == "gaurdianName") {
+                let inputVal = val;
+                let selectedCustomer = newState.selectedCustomer || {};
+                if(inputVal != selectedCustomer.gaurdianName)
+                    newState.selectedCustomer = {};
             } else {
                 newState.formData[identifier].inputVal = val;
             }
@@ -764,15 +808,16 @@ s
                 <span>
                 {
                     (() => {
-                        let rows = [];
-                        for(let i=0; i<this.state.formData.moreDetails.customerInfo.length; i++) {
+                        let rows = [];                        
+                        let moreDetails = this.getInputValFromCustomSources('moreDetails');
+                        for(let i=0; i<moreDetails.length; i++) {
                             rows.push(
                                 <Row className="customer-info-display-row">
                                     <Col xs={6} md={6}>
-                                        {this.state.formData.moreDetails.customerInfo[i]['field']}
+                                        {moreDetails[i]['field']}
                                     </Col>
                                     <Col xs={5} md={5}>
-                                        {this.state.formData.moreDetails.customerInfo[i]['val']}
+                                        {moreDetails[i]['val']}
                                     </Col>
                                     <Col xs={1} md={1} className='sub-actions-div'>
                                         <span className='icon edit-icon' onClick={(e) => this.onEditDetailIconClick(i)}><FontAwesomeIcon icon="edit" /></span>
@@ -810,11 +855,12 @@ s
                 <div className='add-more-header'>
                     <input type='text' 
                         className='show-more'
-                        value={this.state.showMoreInputs ? 'Show Less <' : 'Add More >'}
+                        value={this.state.showMoreInputs ? 'Show Less' : 'Add More '}
                         ref= {(domElm) => {this.domElmns.moreDetailsHeader = domElm; }}
                         onKeyUp = { (e)=> {this.handleKeyUp(e, {currElmKey: 'moreDetailsHeader'})} }
                         onClick={(e) => {this.handleClick(e, {currElmKey: 'moreDetailsHeader'})}}
                         readOnly='true'/>
+                    <span className='horizontal-dashed-line'></span>
                 </div>
                 <Collapse isOpened={this.state.showMoreInputs}>
                     {getCustomerInforAdderDom()}
@@ -825,8 +871,10 @@ s
         );
     }
 
-    parseCustomerDetailsVal(param={}) {
+    parseCustomerDetailsVal(param) {
         let obj = {};
+        if(!param)
+            param = '';
         if(typeof param == "string") {
             obj.value = param;
             obj.key = sh.unique(param);
@@ -924,27 +972,28 @@ s
                                     itemAdapter={CustomerListAdaptor.instance}
                                     placeholder="Enter CustomerName"
                                     valueIsItem={true}
-                                    value={this.state.formData.cname.inputVal}
+                                    value={this.getInputValFromCustomSources('cname')}
                                     onChange={ (val) => this.autuSuggestionControls.onChange(val, 'cname') }
                                     ref = {(domElm) => { this.domElmns.cname = domElm; }}
-                                    onKeyUp = {(e) => this.handleKeyUp(e, {currElmKey: 'cname'}) }
+                                    onKeyUp = {(e) => this.handleKeyUp(e, {currElmKey: 'cname', isCustomerNameInput: true}) }
+                                    // onSelect = {(dontknow) => this.autuSuggestionControls.onInputSelect(dontknow, 'cname')}
                                     readOnly={this.props.billCreation.loading}
                                 />
                             </FormGroup>
                         </Col>
                         <Col xs={6} md={6}>
                             <FormGroup
-                                validationState= {this.state.formData.gaurdianname.hasError ? "error" :""}
+                                validationState= {this.state.formData.gaurdianName.hasError ? "error" :""}
                                 >
                                 <ControlLabel>Guardian Name</ControlLabel>                                
                                 <Autosuggest
                                     className='gaurdianname-autosuggest'
-                                    datalist={this.state.formData.gaurdianname.list}
+                                    datalist={this.state.formData.gaurdianName.list}
                                     placeholder="Enter CustomerName"
-                                    value={this.state.formData.gaurdianname.inputVal}
-                                    onChange={ (val) => this.autuSuggestionControls.onChange(val, 'gaurdianname') }
-                                    ref = {(domElm) => { this.domElmns.gaurdianname = domElm; }}
-                                    onKeyUp = {(e) => this.handleKeyUp(e, {currElmKey: 'gaurdianname'}) }
+                                    value={this.getInputValFromCustomSources('gaurdianName')}
+                                    onChange={ (val) => this.autuSuggestionControls.onChange(val, 'gaurdianName') }
+                                    ref = {(domElm) => { this.domElmns.gaurdianName = domElm; }}
+                                    onKeyUp = {(e) => this.handleKeyUp(e, {currElmKey: 'gaurdianName'}) }
                                     readOnly={this.props.billCreation.loading}
                                 />
                                 <FormControl.Feedback />
@@ -960,7 +1009,7 @@ s
                                 <Autosuggest
                                     datalist={this.state.formData.address.list}
                                     placeholder="Enter Address"
-                                    value={this.state.formData.address.inputVal}
+                                    value={this.getInputValFromCustomSources('address')}
                                     onChange={ (val) => this.autuSuggestionControls.onChange(val, 'address') }
                                     ref = {(domElm) => { this.domElmns.address = domElm; }}
                                     onKeyUp = {(e) => this.handleKeyUp(e, {currElmKey: 'address'}) }
@@ -979,7 +1028,7 @@ s
                                 <Autosuggest
                                     datalist={this.state.formData.place.list}
                                     placeholder="Enter Place"
-                                    value={this.state.formData.place.inputVal}
+                                    value={this.getInputValFromCustomSources('place')}
                                     onChange={ (val) => this.autuSuggestionControls.onChange(val, 'place') }
                                     ref = {(domElm) => { this.domElmns.place = domElm; }}
                                     onKeyUp = {(e) => this.handleKeyUp(e, {currElmKey: 'place'}) }
@@ -996,7 +1045,7 @@ s
                                 <Autosuggest
                                     datalist={this.state.formData.city.list}
                                     placeholder="Enter City"
-                                    value={this.state.formData.city.inputVal}
+                                    value={this.getInputValFromCustomSources('city')}
                                     onChange={ (val) => this.autuSuggestionControls.onChange(val, 'city') }
                                     ref = {(domElm) => { this.domElmns.city = domElm; }}
                                     onKeyUp = {(e) => this.handleKeyUp(e, {currElmKey: 'city'}) }
@@ -1015,7 +1064,7 @@ s
                                 <Autosuggest
                                     datalist={this.state.formData.pincode.list}
                                     placeholder="Enter Pincode"
-                                    value={this.state.formData.pincode.inputVal}
+                                    value={this.getInputValFromCustomSources('pincode')}
                                     onChange={ (val) => this.autuSuggestionControls.onChange(val, 'pincode') }
                                     ref = {(domElm) => { this.domElmns.pincode = domElm; }}
                                     onKeyUp = {(e) => this.handleKeyUp(e, {currElmKey: 'pincode'}) }
@@ -1032,7 +1081,7 @@ s
                                 <Autosuggest
                                     datalist={this.state.formData.mobile.list}
                                     placeholder="Enter Mobile No."
-                                    value={this.state.formData.mobile.inputVal}
+                                    value={this.getInputValFromCustomSources('mobile')}
                                     onChange={ (val) => this.autuSuggestionControls.onChange(val, 'mobile') }
                                     ref = {(domElm) => { this.domElmns.mobile = domElm; }}
                                     onKeyUp = {(e) => this.handleKeyUp(e, {currElmKey: 'mobile'}) }
