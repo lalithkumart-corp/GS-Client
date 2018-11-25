@@ -22,9 +22,9 @@ import { Collapse } from 'react-collapse';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import sh from 'shorthash';
 import EditDetailsDialog from './editDetailsDialog';
-import { insertNewBill, updateClearEntriesFlag, showEditDetailModal, hideEditDetailModal } from '../../actions/billCreation';
+import { insertNewBill, updateClearEntriesFlag, showEditDetailModal, hideEditDetailModal, getBillNoFromDB } from '../../actions/billCreation';
 import { DoublyLinkedList } from '../../utilities/doublyLinkedList';
-import { _getCustomerNameList, _getGaurdianNameList, _getAddressList, _getPlaceList, _getCityList, _getPincodeList, buildRequestParams } from './helper';
+import { getGaurdianNameList, getAddressList, getPlaceList, getCityList, getPincodeList, getMobileList, buildRequestParams, updateBillNumber, resetState, defaultPictureState } from './helper';
 
 const ENTER_KEY = 13;
 const SPACE_KEY = 32;
@@ -50,33 +50,13 @@ domList.add('ornSpec1', {type: 'autosuggest', enabled: true});
 domList.add('ornNos1', {type: 'defaultInput', enabled: true});
 domList.add('submitBtn', {type: 'defaultInput', enabled: true});
 
-const defaultPictureState = {
-    holder: {
-        show: true,
-        imgSrc: '',
-        confirmedImgSrc: '',
-        defaultSrc: 'images/default.jpg'
-    },
-    camera: {
-        show: false,
-    },
-    actions: {
-        camera: true,
-        capture: false,
-        cancel: false,
-        save: false,
-        clear: false,
-    },
-    status: 'UNSAVED'
-};
-
 class BillCreation extends Component {
     constructor(props){
         super(props);
         this.domElmns = {
             orn: {}
         };
-        this.domOrders = domList;
+        this.domOrders = domList;        
         this.state = {
             showPreview: false,  
             showMoreInputs: false, 
@@ -88,11 +68,11 @@ class BillCreation extends Component {
                     inputVal1: moment()
                 },
                 billseries: {
-                    inputVal: 'B',
+                    inputVal: props.billCreation.billSeries,
                     hasError: false 
                 },
                 billno: {
-                    inputVal: '',
+                    inputVal: props.billCreation.billNumber,
                     hasError: false
                 },
                 amount: {
@@ -190,7 +170,18 @@ s
     }
 
     componentDidMount() {
-        this.fetchMetaData();              
+        this.fetchMetaData();
+        this.props.getBillNoFromDB();
+    }
+
+    componentWillReceiveProps(nextProps) {
+        let newState = {...this.state};
+        newState = updateBillNumber(nextProps, newState);
+        if(nextProps.billCreation.clearEntries) {      
+            newState = resetState(nextProps, newState);
+            this.props.updateClearEntriesFlag(false);
+        }
+        this.setState(newState);
     }
 
     fetchMetaData() {
@@ -200,11 +191,12 @@ s
                     let newState = {...this.state};
                     let results = successResp.data;                    
                     newState.formData.cname.list = results.row;
-                    newState.formData.gaurdianName.list = _getGaurdianNameList(results.row);
-                    newState.formData.address.list = _getAddressList(results.row);
-                    newState.formData.place.list = _getPlaceList(results.row);
-                    newState.formData.city.list = _getCityList(results.row);
-                    newState.formData.pincode.list = _getPincodeList(results.row);
+                    newState.formData.gaurdianName.list = getGaurdianNameList(results.row);
+                    newState.formData.address.list = getAddressList(results.row);
+                    newState.formData.place.list = getPlaceList(results.row);
+                    newState.formData.city.list = getCityList(results.row);
+                    newState.formData.pincode.list = getPincodeList(results.row);
+                    newState.formData.mobile.list = getMobileList(results.row);
                     newState.formData.moreDetails.list = results.otherDetails.map((anItem) => {return {key: anItem.key, value: anItem.displayText}});
                     this.setState(newState);
                 },
@@ -239,8 +231,16 @@ s
                 }
             }            
         });
+        newState.selectedCustomer = {};
         this.setState(newState);
         this.props.updateClearEntriesFlag(false);
+    }
+
+    canAppendNewRow(options) {
+        let canAppend = false;
+        if(this.state.formData.orn.rowCount < options.nextSerialNo)
+            canAppend = true;
+        return canAppend;
     }
 
     /* START: Action/Event listeners */
@@ -268,7 +268,7 @@ s
 
     }
     async handleEnterKeyPress(e, options) {
-        if(options && options.isOrnNosInput) {
+        if(options && options.isOrnNosInput && (this.canAppendNewRow(options))) {            
             await this.appendNewRow(e, options.nextSerialNo);
         } else if(options && options.isOrnItemInput) {
             options = await this.checkOrnRowClearance(e, options);
@@ -279,7 +279,11 @@ s
                 await this.updateDomList('disableMoreDetailValueDom');
             else
                 await this.updateDomList('enableMoreDetailValueDom');        
-        } else if(options && options.isSubmitBtn) {
+        } else if(options && options.isGuardianNameInput) {
+            this.verifySelectedCustomerByGName();
+        } else if(options && options.isAddressInput) {
+            this.verifySelectedCustomerByAddr();
+        }else if(options && options.isSubmitBtn) {
             this.handleSubmit();
         }
         this.transferFocus(e, options.currElmKey, options.traverseDirection);
@@ -319,6 +323,35 @@ s
         newState.formData.moreDetails.customerInfo[params.index] = params.obj;
         this.setState(newState);
         this.props.hideEditDetailModal();
+    }
+
+    verifySelectedCustomerByGName() {
+        let newState = {...this.state};
+        if(!newState.formData.gaurdianName.hasTextUpdated)
+            return;
+        let gaurdianName = newState.formData.gaurdianName.inputVal || '';
+        gaurdianName = gaurdianName.toLowerCase();
+
+        let selectedCustomer = newState.selectedCustomer || {};
+        let selCustGuardianName = (selectedCustomer.gaurdianName || '').toLowerCase();
+        if((gaurdianName != selCustGuardianName)) {
+            newState.selectedCustomer = {};
+            this.setState(newState);
+        }
+    }
+
+    verifySelectedCustomerByAddr() {
+        let newState = {...this.state};
+        if(!newState.formData.address.hasTextUpdated)
+            return;        
+        let address = newState.formData.address.inputVal || '';
+        address = address.toLowerCase();
+        let selectedCustomer = newState.selectedCustomer || {};
+        let selCustAddress = (selectedCustomer.address || '').toLowerCase();
+        if((address != selCustAddress)) {
+            newState.selectedCustomer = {};
+            this.setState(newState);
+        }
     }
 
     // TODO: remove this, if not in use.
@@ -505,7 +538,7 @@ s
         return prevNode;
     }
 
-    getInputValFromCustomSources(identifier) {
+    getInputValFromCustomSources(identifier) {        
         let returnVal;
         if(identifier == 'moreDetails') {
             returnVal = this.state.formData[identifier].customerInfo;
@@ -578,16 +611,19 @@ s
                     newState.selectedCustomer = {};
                 } else {
                     newState.formData[identifier].inputVal = val.name || '';                
-                    // this.updateSelectedCustomer(val);
+                    // this.updateSelectedCustomer(val);                    
                     newState.selectedCustomer = val;
                 }
-            } else if(identifier == "gaurdianName") {
-                let inputVal = val;
+            /*} else if(identifier == "gaurdianName") {
+                newState.formData[identifier].inputVal = val;
+                let inputVal = val.toLowerCase();
                 let selectedCustomer = newState.selectedCustomer || {};
-                if(inputVal != selectedCustomer.gaurdianName)
-                    newState.selectedCustomer = {};
+                let selectedCustomerGName = (selectedCustomer.gaurdianName)?(selectedCustomer.gaurdianName.toLowerCase()):'';
+                if(inputVal != selectedCustomerGName)
+                    newState.selectedCustomer = {}; */
             } else {
                 newState.formData[identifier].inputVal = val;
+                newState.formData[identifier].hasTextUpdated = true;
             }
             this.setState(newState);
         }
@@ -886,7 +922,7 @@ s
     } 
     
     render(){
-        this.clearEntries();
+        // this.clearEntries();
         return(
             <Grid>
                 <Col className="left-pane" xs={8} md={8}>
@@ -993,7 +1029,7 @@ s
                                     value={this.getInputValFromCustomSources('gaurdianName')}
                                     onChange={ (val) => this.autuSuggestionControls.onChange(val, 'gaurdianName') }
                                     ref = {(domElm) => { this.domElmns.gaurdianName = domElm; }}
-                                    onKeyUp = {(e) => this.handleKeyUp(e, {currElmKey: 'gaurdianName'}) }
+                                    onKeyUp = {(e) => this.handleKeyUp(e, {currElmKey: 'gaurdianName', isGuardianNameInput: true}) }
                                     readOnly={this.props.billCreation.loading}
                                 />
                                 <FormControl.Feedback />
@@ -1012,7 +1048,7 @@ s
                                     value={this.getInputValFromCustomSources('address')}
                                     onChange={ (val) => this.autuSuggestionControls.onChange(val, 'address') }
                                     ref = {(domElm) => { this.domElmns.address = domElm; }}
-                                    onKeyUp = {(e) => this.handleKeyUp(e, {currElmKey: 'address'}) }
+                                    onKeyUp = {(e) => this.handleKeyUp(e, {currElmKey: 'address', isAddressInput: true}) }
                                     readOnly={this.props.billCreation.loading}
                                 />
                                 <FormControl.Feedback />
@@ -1176,7 +1212,7 @@ const mapStateToProps = (state) => {
     };
 };
 
-export default connect(mapStateToProps, {insertNewBill, updateClearEntriesFlag, showEditDetailModal, hideEditDetailModal})(BillCreation);
+export default connect(mapStateToProps, {insertNewBill, updateClearEntriesFlag, showEditDetailModal, hideEditDetailModal, getBillNoFromDB})(BillCreation);
 
 
 class CommonAdaptor extends ItemAdapter {

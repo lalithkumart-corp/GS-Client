@@ -38,6 +38,29 @@ export default function billCreationReducer(state=defaultState, action) {
                 showEditDetailModal: false
             }
             break;
+        case 'TRACK_Bill_NUMBER':
+            let lastBillNumber = action.data.lastBillNumber;
+            let billSeries = '';
+            let billNumber = null;            
+            if(typeof lastBillNumber == 'string') {
+                let splits = lastBillNumber.split('.');                
+                if(splits.length >1) {
+                    billSeries = splits[0];
+                    billNumber = parseInt(splits[1]);                
+                } else {
+                    billNumber = parseInt(splits[0]);
+                }
+            } else {
+                billNumber = lastBillNumber;
+            }
+            let nextBillNumber = ++billNumber;         
+            
+            newState = {
+                ...newState,
+                billSeries: billSeries,
+                billNumber: nextBillNumber
+            }
+            break;
     }
     return newState;
 }

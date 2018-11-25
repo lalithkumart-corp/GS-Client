@@ -23,8 +23,7 @@ class EditDetailsDialog extends Component {
             
         }
     }
-    componentWillReceiveProps(nextProps) {
-        debugger;
+    componentWillReceiveProps(nextProps) {        
         this.setState(nextProps);
     }
     bindMethods() {

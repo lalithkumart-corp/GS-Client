@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { PLEDGEBOOK_ADD_RECORD } from '../core/sitemap';
+import { PLEDGEBOOK_ADD_RECORD, GET_LAST_BILL_NO } from '../core/sitemap';
 import { toast } from 'react-toastify';
 
 export const insertNewBill = (requestParams) => {
@@ -17,13 +17,17 @@ export const insertNewBill = (requestParams) => {
                             data: {msg: resp.data.ERROR}
                         });                    
                     } else {
-                        toast.success('Inserted the new bill into Pledgebook successfully'); //TODO: His this msg automatically after some timeout
+                        toast.success('Inserted the new bill into Pledgebook successfully'); //TODO: Hide this msg automatically after some timeout
                         dispatch({
                             type: 'NEW_BILL_INSERTED_SUCCESSFULLY'
                         });
                         dispatch({
                             type: 'SET_CLEAR_FLAG',
                             data: true
+                        });
+                        dispatch({
+                            type: 'TRACK_Bill_NUMBER',
+                            data: {lastBillNumber: requestParams.billNo}
                         });
                     }
                     console.log(resp.data);
@@ -62,5 +66,27 @@ export const hideEditDetailModal = () => {
         dispatch({
             type: 'HIDE_EDIT_DETAIL_MODAL'
         });
+    }
+}
+
+export const getBillNoFromDB = () => {
+    return (dispatch) => {
+        axios.get(GET_LAST_BILL_NO)
+            .then(
+                (successResp) => {                    
+                    dispatch({
+                        type: 'TRACK_Bill_NUMBER',
+                        data: {lastBillNumber: successResp.data}
+                    })
+                },
+                (errResp) => {
+                    toast.error('Error in fetching th elast etered Bill number series');
+                }
+            )
+            .catch(
+                (e) => {
+                    toast.error('Exception occured in fetching th elast etered Bill number series');
+                }
+            )
     }
 }
