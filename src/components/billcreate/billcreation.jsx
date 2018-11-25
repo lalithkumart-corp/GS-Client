@@ -140,8 +140,26 @@ class BillCreation extends Component {
             },
         };
         this.bindMethods();        
+    }    
+
+    /* START: Lifecycle methods */
+    componentDidMount() {
+        this.fetchMetaData();
+        this.props.getBillNoFromDB();
     }
-    
+
+    componentWillReceiveProps(nextProps) {
+        let newState = {...this.state};
+        newState = updateBillNumber(nextProps, newState);
+        if(nextProps.billCreation.clearEntries) {      
+            newState = resetState(nextProps, newState);
+            this.props.updateClearEntriesFlag(false);
+        }
+        this.setState(newState);
+    }
+    /* END: Lifecycle methods */
+
+    /* START: "this" Binders */
     bindMethods() {
         this.setRef = this.setRef.bind(this);        
         this.autuSuggestionControls.onChange = this.autuSuggestionControls.onChange.bind(this);
@@ -164,26 +182,9 @@ s
         this.picture.helpers.canShowCancelBtn = this.picture.helpers.canShowCancelBtn.bind(this);
         this.picture.helpers.canshowSaveBtn = this.picture.helpers.canshowSaveBtn.bind(this);
     }
+    /* END: "this" Binders */
 
-    setRef(webcam) {
-        this.webcam = webcam;
-    }
-
-    componentDidMount() {
-        this.fetchMetaData();
-        this.props.getBillNoFromDB();
-    }
-
-    componentWillReceiveProps(nextProps) {
-        let newState = {...this.state};
-        newState = updateBillNumber(nextProps, newState);
-        if(nextProps.billCreation.clearEntries) {      
-            newState = resetState(nextProps, newState);
-            this.props.updateClearEntriesFlag(false);
-        }
-        this.setState(newState);
-    }
-
+    /* START: API accessors */
     fetchMetaData() {
         axios.get(PLEDGEBOOK_METADATA + '?identifiers=["all", "otherDetails"]')
             .then(
@@ -205,35 +206,127 @@ s
                 }
             )
     }
-    
-    clearEntries() {        
-        if(!this.props.billCreation.clearEntries)
-            return;        
-        let newState = {...this.state};        
-        newState.picture = defaultPictureState;
-        _.each(newState.formData, (anItem, index) => {
-            if(index == 'orn') {
-                anItem.inputs = {1: {
-                    ornItem: '',
-                    ornGWt: '',
-                    ornNWt: '',
-                    ornSpec: '',
-                    ornNos: ''
-                }};
-                anItem.rowCount = 1;
-            } else if(index == 'moreDetails') {
-                anItem.currCustomerInputKey = anItem.currCustomerInputField = anItem.currCustomerInputVal = anItem.billRemarks = '';                
-                anItem.customerInfo = [];
-            } else {
-                if(index !== 'date' && index !== 'billseries') {
-                    anItem.hasError = false;
-                    anItem.inputVal = '';
+    /* END: API accessors */
+
+    /* START: SETTERS */
+    setRef(webcam) {
+        this.webcam = webcam;
+    }
+    /* END: SETTERS */
+
+    /* START: GETTERS */
+    getNextElm(currElmKey) {    
+        let currNode = domList.findNode(currElmKey);                
+        let nextNode = currNode.next;
+        if(nextNode && !nextNode.enabled)
+            nextNode = this.getNextElm(nextNode.key);        
+        return nextNode;
+    }
+
+    getPrevElm(currElmKey) {        
+        let currNode = domList.findNode(currElmKey);
+        let prevNode = currNode.prev;
+        if(prevNode && !prevNode.enabled)
+            prevNode = this.getPrevElm(prevNode.key);        
+        return prevNode;
+    }
+
+    getInputValFromCustomSources(identifier) {        
+        let returnVal;
+        if(identifier == 'moreDetails') {
+            returnVal = this.state.formData[identifier].customerInfo;
+        }else {
+            returnVal = this.state.formData[identifier].inputVal;        
+        }        
+        if(this.state.selectedCustomer) {       
+            
+            if(identifier == 'cname') identifier = 'name';
+            if(identifier == 'moreDetails') identifier = 'otherDetails'; 
+
+            returnVal = this.state.selectedCustomer[identifier] || returnVal;
+        }
+        return returnVal;
+
+    }
+    /* END: GETTERS */
+
+    /* START: Helpers */
+    updateDomList(identifier) {
+        switch(identifier) {
+            case 'enableMoreDetailsInputElmns':
+                domList.enable('moreCustomerDetailField');
+                domList.enable('moreCustomerDetailValue');
+                break;
+            case 'disableMoreDetailsInputElmns':
+                domList.disable('moreCustomerDetailField');
+                domList.disable('moreCustomerDetailValue');
+                break;
+            case 'disableMoreDetailValueDom':
+                domList.disable('moreCustomerDetailValue');
+                break;
+            case 'enableMoreDetailValueDom':
+                domList.enable('moreCustomerDetailValue');
+                break;
+        }
+    }
+
+    transferFocus(e, currentElmKey, direction='forward') {
+        let nextElm;        
+        if(direction == 'forward')
+            nextElm = this.getNextElm(currentElmKey);
+        else
+            nextElm = this.getPrevElm(currentElmKey);        
+        if(nextElm) {
+            if(nextElm.value.indexOf('orn') !== 0) { //If not Orn Input field                
+                if(nextElm.type == 'autosuggest'){
+                    this.domElmns[nextElm.key].refs.input.focus();
+                }else if (nextElm.type == 'defaultInput' || nextElm.type == 'formControl'){                    
+                    this.domElmns[nextElm.key].focus();
                 }
-            }            
-        });
-        newState.selectedCustomer = {};
-        this.setState(newState);
-        this.props.updateClearEntriesFlag(false);
+            } else { //Hanlding Orn Input fields                
+                if(nextElm.type == 'autosuggest')
+                    this.domElmns.orn[nextElm.key].refs.input.focus();
+                else if (nextElm.type == 'defaultInput' || nextElm.type == 'formControl')
+                    this.domElmns.orn[nextElm.key].focus();
+            }
+        }            
+    }
+    
+    async appendNewRow(e, nextSerialNo) {
+        if(e.keyCode == 13) {
+            let newState = {...this.state};
+            newState.formData.orn.rowCount += 1;   
+            newState.formData.orn.inputs[nextSerialNo] = {ornItem: '', ornGWt: '', ornNWt: '', ornSpec: '', ornNos: ''};
+
+            let currentSerialNo = nextSerialNo-1;
+            domList.insertAfter('ornNos'+currentSerialNo, 'ornItem'+nextSerialNo, {type: 'autosuggest', enabled: true});
+            domList.insertAfter('ornItem'+nextSerialNo, 'ornGWt'+nextSerialNo, {type: 'defaultInput', enabled: true});
+            domList.insertAfter('ornGWt'+nextSerialNo, 'ornNWt'+nextSerialNo, {type: 'defaultInput', enabled: true});
+            domList.insertAfter('ornNWt'+nextSerialNo, 'ornSpec'+nextSerialNo, {type: 'autosuggest', enabled: true});
+            domList.insertAfter('ornSpec'+nextSerialNo, 'ornNos'+nextSerialNo, {type: 'defaultInput', enabled: true});
+            
+            await this.setState(newState);
+        }
+    }
+
+    async checkOrnRowClearance(e, options) {
+        let serialNo = options.serialNo;
+        if(e.keyCode == 13 && e.target.value == '' && serialNo !== 1) {
+            let newState = { ...this.state };
+            newState.formData.orn.rowCount -= 1;
+            delete newState.formData.orn.inputs[serialNo];
+
+            domList.remove('ornItem'+serialNo);
+            domList.remove('ornGWt'+serialNo);
+            domList.remove('ornNWt'+serialNo);
+            domList.remove('ornSpec'+serialNo);
+            domList.remove('ornNos'+serialNo);            
+
+            await this.setState(newState);
+
+            options.currElmKey = 'ornNos'+(serialNo-1); //update current Element key            
+        }
+        return options;
     }
 
     canAppendNewRow(options) {
@@ -242,6 +335,89 @@ s
             canAppend = true;
         return canAppend;
     }
+    updateItemInMoreDetail(params) {
+        let newState = {...this.state};
+        newState.formData.moreDetails.customerInfo[params.index] = params.obj;
+        this.setState(newState);
+        this.props.hideEditDetailModal();
+    }
+
+    verifySelectedCustomerByGName() {
+        let newState = {...this.state};
+        if(!newState.formData.gaurdianName.hasTextUpdated)
+            return;
+        let gaurdianName = newState.formData.gaurdianName.inputVal || '';
+        gaurdianName = gaurdianName.toLowerCase();
+
+        let selectedCustomer = newState.selectedCustomer || {};
+        let selCustGuardianName = (selectedCustomer.gaurdianName || '').toLowerCase();
+        if((gaurdianName != selCustGuardianName)) {
+            newState.selectedCustomer = {};
+            this.setState(newState);
+        }
+    }
+
+    verifySelectedCustomerByAddr() {
+        let newState = {...this.state};
+        if(!newState.formData.address.hasTextUpdated)
+            return;        
+        let address = newState.formData.address.inputVal || '';
+        address = address.toLowerCase();
+        let selectedCustomer = newState.selectedCustomer || {};
+        let selCustAddress = (selectedCustomer.address || '').toLowerCase();
+        if((address != selCustAddress)) {
+            newState.selectedCustomer = {};
+            this.setState(newState);
+        }
+    }
+
+    toggleMoreInputs() {
+        this.setState({showMoreInputs: !this.state.showMoreInputs});
+    }
+
+    async insertItemIntoMoreBucket() {
+        let newState = {...this.state};
+        let obj = {
+            key: newState.formData.moreDetails.currCustomerInputKey,
+            field: newState.formData.moreDetails.currCustomerInputField,
+            val: newState.formData.moreDetails.currCustomerInputVal
+        }
+        newState.formData.moreDetails.customerInfo.push(obj);
+        newState.formData.moreDetails.currCustomerInputField = '';
+        newState.formData.moreDetails.currCustomerInputVal = '';        
+        await this.setState(newState);        
+    }
+
+    parseCustomerDetailsVal(param) {
+        let obj = {};
+        if(!param)
+            param = '';
+        if(typeof param == "string") {
+            obj.value = param;
+            obj.key = sh.unique(param);
+        } else if(typeof param == 'object') {
+            obj.value = param.value || '';
+            obj.key = param.key || '';
+        }
+        return obj;
+    } 
+
+     // TODO: remove this, if not in use.
+    /* updateSelectedCustomer(params) {
+        let newState = {...this.state};
+        newState.formData.cname.inputVal = params.name || '';
+        newState.formData.gaurdianName.inputVal = params.gaurdianName || '';
+        newState.formData.address.inputVal = params.address || '';
+        newState.formData.place.inputVal = params.place || '';
+        newState.formData.city.inputVal = params.city || '';
+        newState.formData.pincode.inputVal = params.pincode || '';
+        newState.formData.mobile.inputVal = params.mobile || '';
+        newState.formData.moreDetails.customerInfo = params.otherDetails || [];
+        this.setState(newState);
+    }*/
+    /* END: Helpers */
+
+
 
     /* START: Action/Event listeners */
     onTouched() {
@@ -316,57 +492,7 @@ s
         let newState = {...this.state};        
         newState.formData.moreDetails.customerInfo.splice(index, 1);
         await this.setState(newState);
-    }
-
-    updateItemInMoreDetail(params) {
-        let newState = {...this.state};
-        newState.formData.moreDetails.customerInfo[params.index] = params.obj;
-        this.setState(newState);
-        this.props.hideEditDetailModal();
-    }
-
-    verifySelectedCustomerByGName() {
-        let newState = {...this.state};
-        if(!newState.formData.gaurdianName.hasTextUpdated)
-            return;
-        let gaurdianName = newState.formData.gaurdianName.inputVal || '';
-        gaurdianName = gaurdianName.toLowerCase();
-
-        let selectedCustomer = newState.selectedCustomer || {};
-        let selCustGuardianName = (selectedCustomer.gaurdianName || '').toLowerCase();
-        if((gaurdianName != selCustGuardianName)) {
-            newState.selectedCustomer = {};
-            this.setState(newState);
-        }
-    }
-
-    verifySelectedCustomerByAddr() {
-        let newState = {...this.state};
-        if(!newState.formData.address.hasTextUpdated)
-            return;        
-        let address = newState.formData.address.inputVal || '';
-        address = address.toLowerCase();
-        let selectedCustomer = newState.selectedCustomer || {};
-        let selCustAddress = (selectedCustomer.address || '').toLowerCase();
-        if((address != selCustAddress)) {
-            newState.selectedCustomer = {};
-            this.setState(newState);
-        }
-    }
-
-    // TODO: remove this, if not in use.
-    /* updateSelectedCustomer(params) {
-        let newState = {...this.state};
-        newState.formData.cname.inputVal = params.name || '';
-        newState.formData.gaurdianName.inputVal = params.gaurdianName || '';
-        newState.formData.address.inputVal = params.address || '';
-        newState.formData.place.inputVal = params.place || '';
-        newState.formData.city.inputVal = params.city || '';
-        newState.formData.pincode.inputVal = params.pincode || '';
-        newState.formData.mobile.inputVal = params.mobile || '';
-        newState.formData.moreDetails.customerInfo = params.otherDetails || [];
-        this.setState(newState);
-    }*/
+    }   
 
     picture= {
         eventListeners: {
@@ -477,122 +603,6 @@ s
         }
     }
 
-    toggleMoreInputs() {
-        this.setState({showMoreInputs: !this.state.showMoreInputs});
-    }
-
-    updateDomList(identifier) {
-        switch(identifier) {
-            case 'enableMoreDetailsInputElmns':
-                domList.enable('moreCustomerDetailField');
-                domList.enable('moreCustomerDetailValue');
-                break;
-            case 'disableMoreDetailsInputElmns':
-                domList.disable('moreCustomerDetailField');
-                domList.disable('moreCustomerDetailValue');
-                break;
-            case 'disableMoreDetailValueDom':
-                domList.disable('moreCustomerDetailValue');
-                break;
-            case 'enableMoreDetailValueDom':
-                domList.enable('moreCustomerDetailValue');
-                break;
-        }
-    }
-
-    transferFocus(e, currentElmKey, direction='forward') {
-        let nextElm;        
-        if(direction == 'forward')
-            nextElm = this.getNextElm(currentElmKey);
-        else
-            nextElm = this.getPrevElm(currentElmKey);        
-        if(nextElm) {
-            if(nextElm.value.indexOf('orn') !== 0) { //If not Orn Input field                
-                if(nextElm.type == 'autosuggest'){
-                    this.domElmns[nextElm.key].refs.input.focus();
-                }else if (nextElm.type == 'defaultInput' || nextElm.type == 'formControl'){                    
-                    this.domElmns[nextElm.key].focus();
-                }
-            } else { //Hanlding Orn Input fields                
-                if(nextElm.type == 'autosuggest')
-                    this.domElmns.orn[nextElm.key].refs.input.focus();
-                else if (nextElm.type == 'defaultInput' || nextElm.type == 'formControl')
-                    this.domElmns.orn[nextElm.key].focus();
-            }
-        }            
-    }
-
-    getNextElm(currElmKey) {    
-        let currNode = domList.findNode(currElmKey);                
-        let nextNode = currNode.next;
-        if(nextNode && !nextNode.enabled)
-            nextNode = this.getNextElm(nextNode.key);        
-        return nextNode;
-    }
-
-    getPrevElm(currElmKey) {        
-        let currNode = domList.findNode(currElmKey);
-        let prevNode = currNode.prev;
-        if(prevNode && !prevNode.enabled)
-            prevNode = this.getPrevElm(prevNode.key);        
-        return prevNode;
-    }
-
-    getInputValFromCustomSources(identifier) {        
-        let returnVal;
-        if(identifier == 'moreDetails') {
-            returnVal = this.state.formData[identifier].customerInfo;
-        }else {
-            returnVal = this.state.formData[identifier].inputVal;        
-        }        
-        if(this.state.selectedCustomer) {       
-            
-            if(identifier == 'cname') identifier = 'name';
-            if(identifier == 'moreDetails') identifier = 'otherDetails'; 
-
-            returnVal = this.state.selectedCustomer[identifier] || returnVal;
-        }
-        return returnVal;
-
-    }
-
-    async appendNewRow(e, nextSerialNo) {
-        if(e.keyCode == 13) {
-            let newState = {...this.state};
-            newState.formData.orn.rowCount += 1;   
-            newState.formData.orn.inputs[nextSerialNo] = {ornItem: '', ornGWt: '', ornNWt: '', ornSpec: '', ornNos: ''};
-
-            let currentSerialNo = nextSerialNo-1;
-            domList.insertAfter('ornNos'+currentSerialNo, 'ornItem'+nextSerialNo, {type: 'autosuggest', enabled: true});
-            domList.insertAfter('ornItem'+nextSerialNo, 'ornGWt'+nextSerialNo, {type: 'defaultInput', enabled: true});
-            domList.insertAfter('ornGWt'+nextSerialNo, 'ornNWt'+nextSerialNo, {type: 'defaultInput', enabled: true});
-            domList.insertAfter('ornNWt'+nextSerialNo, 'ornSpec'+nextSerialNo, {type: 'autosuggest', enabled: true});
-            domList.insertAfter('ornSpec'+nextSerialNo, 'ornNos'+nextSerialNo, {type: 'defaultInput', enabled: true});
-            
-            await this.setState(newState);
-        }
-    }
-
-    async checkOrnRowClearance(e, options) {
-        let serialNo = options.serialNo;
-        if(e.keyCode == 13 && e.target.value == '' && serialNo !== 1) {
-            let newState = { ...this.state };
-            newState.formData.orn.rowCount -= 1;
-            delete newState.formData.orn.inputs[serialNo];
-
-            domList.remove('ornItem'+serialNo);
-            domList.remove('ornGWt'+serialNo);
-            domList.remove('ornNWt'+serialNo);
-            domList.remove('ornSpec'+serialNo);
-            domList.remove('ornNos'+serialNo);            
-
-            await this.setState(newState);
-
-            options.currElmKey = 'ornNos'+(serialNo-1); //update current Element key            
-        }
-        return options;
-    }
-
     autuSuggestionControls = {
         onChange: (val, identifier, options) => {
             let newState = {...this.state};
@@ -675,22 +685,10 @@ s
         let request = buildRequestParams(this.state);
     }
 
-    /* END: Action/Event listeners */
+    /* END: Action/Event listeners */    
 
-    async insertItemIntoMoreBucket() {
-        let newState = {...this.state};
-        let obj = {
-            key: newState.formData.moreDetails.currCustomerInputKey,
-            field: newState.formData.moreDetails.currCustomerInputField,
-            val: newState.formData.moreDetails.currCustomerInputVal
-        }
-        newState.formData.moreDetails.customerInfo.push(obj);
-        newState.formData.moreDetails.currCustomerInputField = '';
-        newState.formData.moreDetails.currCustomerInputVal = '';        
-        await this.setState(newState);
-        console.log(newState.formData.moreDetails.customerInfo);
-    }
 
+    /* START: DOM Getter's */
     getOrnContainerDOM() {        
         let getColGroup = () => {
             return (
@@ -906,23 +904,9 @@ s
             </span>
         );
     }
-
-    parseCustomerDetailsVal(param) {
-        let obj = {};
-        if(!param)
-            param = '';
-        if(typeof param == "string") {
-            obj.value = param;
-            obj.key = sh.unique(param);
-        } else if(typeof param == 'object') {
-            obj.value = param.value || '';
-            obj.key = param.key || '';
-        }
-        return obj;
-    } 
+    /* END: DOM Getter's */    
     
-    render(){
-        // this.clearEntries();
+    render(){        
         return(
             <Grid>
                 <Col className="left-pane" xs={8} md={8}>
