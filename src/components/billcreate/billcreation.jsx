@@ -291,7 +291,7 @@ s
             }
         }            
     }
-    
+
     async appendNewRow(e, nextSerialNo) {
         if(e.keyCode == 13) {
             let newState = {...this.state};
@@ -436,14 +436,14 @@ s
             this.transferFocus(e, options.currElmKey);
         }
     }
-    handleKeyUp(e, options) {
+    handleKeyUp(e, options) {        
         if(e.keyCode == ENTER_KEY)
-            this.handleEnterKeyPress(e, options);
+            this.handleEnterKeyPress(e, options);        
         else if(e.keyCode == SPACE_KEY)
             this.handleSpaceKeyPress(e, options);
 
     }
-    async handleEnterKeyPress(e, options) {
+    async handleEnterKeyPress(e, options) {        
         if(options && options.isOrnNosInput && (this.canAppendNewRow(options))) {            
             await this.appendNewRow(e, options.nextSerialNo);
         } else if(options && options.isOrnItemInput) {
@@ -604,7 +604,7 @@ s
     }
 
     autuSuggestionControls = {
-        onChange: (val, identifier, options) => {
+        onChange: (val, identifier, options) => {            
             let newState = {...this.state};
             if(identifier.indexOf('orn') == 0) { //starts with 'orn'
                 let inputs = newState.formData.orn.inputs;
@@ -631,11 +631,15 @@ s
                 let selectedCustomerGName = (selectedCustomer.gaurdianName)?(selectedCustomer.gaurdianName.toLowerCase()):'';
                 if(inputVal != selectedCustomerGName)
                     newState.selectedCustomer = {}; */
-            } else {
+            } else {                
                 newState.formData[identifier].inputVal = val;
                 newState.formData[identifier].hasTextUpdated = true;
-            }
+            }            
             this.setState(newState);
+        },
+        inputSelect: (e) => {
+            debugger;
+            console.log(e);
         }
     }
 
@@ -718,7 +722,7 @@ s
         };
         let getARow = (serialNo) => {
             return (
-                <tr>
+                <tr key={serialNo+'-row'}>
                     <td>{serialNo}</td>
                     <td>
                         <Autosuggest
@@ -913,7 +917,7 @@ s
                     <Row>
                         <Col xs={3} md={3}>
                             <FormGroup
-                                validationState= {this.state.formData.billno.hasError ? "error" :""}
+                                validationState= {this.state.formData.billno.hasError ? "error" :null}
                                 >
                                 <ControlLabel>Bill No</ControlLabel>
                                 <InputGroup>
@@ -937,7 +941,7 @@ s
                         </Col>
                         <Col xs={3} md={3} >
                             <FormGroup
-                                validationState= {this.state.formData.amount.hasError ? "error" :""}
+                                validationState= {this.state.formData.amount.hasError ? "error" :null}
                                 >
                                 <ControlLabel>Pledge Amount</ControlLabel>
                                 <InputGroup>
@@ -968,7 +972,7 @@ s
                                 onKeyUp = {(e) => this.handleKeyUp(e, {currElmKey: 'date'}) }
                                 /> */}
                                 <FormGroup
-                                    validationState= {this.state.formData.date.hasError ? "error" :""}
+                                    validationState= {this.state.formData.date.hasError ? "error" :null}
                                     >
                                     <DatePicker
                                         id="example-datepicker" 
@@ -984,7 +988,7 @@ s
                     <Row>
                         <Col xs={6} md={6}>
                             <FormGroup
-                                validationState= {this.state.formData.cname.hasError ? "error" :""}
+                                validationState= {this.state.formData.cname.hasError ? "error" :null}
                                 >
                                 <ControlLabel>Customer Name</ControlLabel>
                                 <Autosuggest
@@ -993,17 +997,18 @@ s
                                     placeholder="Enter CustomerName"
                                     valueIsItem={true}
                                     value={this.getInputValFromCustomSources('cname')}
-                                    onChange={ (val) => this.autuSuggestionControls.onChange(val, 'cname') }
+                                    onChange={ (val) => {this.autuSuggestionControls.onChange(val, 'cname') }}
                                     ref = {(domElm) => { this.domElmns.cname = domElm; }}
                                     onKeyUp = {(e) => this.handleKeyUp(e, {currElmKey: 'cname', isCustomerNameInput: true}) }
                                     // onSelect = {(dontknow) => this.autuSuggestionControls.onInputSelect(dontknow, 'cname')}
+                                    // inputSelect = {(e) => this.autuSuggestionControls.inputSelect(e)}
                                     readOnly={this.props.billCreation.loading}
                                 />
                             </FormGroup>
                         </Col>
                         <Col xs={6} md={6}>
                             <FormGroup
-                                validationState= {this.state.formData.gaurdianName.hasError ? "error" :""}
+                                validationState= {this.state.formData.gaurdianName.hasError ? "error" :null}
                                 >
                                 <ControlLabel>Guardian Name</ControlLabel>                                
                                 <Autosuggest
@@ -1023,7 +1028,7 @@ s
                     <Row>
                         <Col xs={12} md={12}>
                             <FormGroup
-                                validationState= {this.state.formData.address.hasError ? "error" :""}
+                                validationState= {this.state.formData.address.hasError ? "error" :null}
                                 >
                                 <ControlLabel>Address</ControlLabel>                                
                                 <Autosuggest
@@ -1042,7 +1047,7 @@ s
                     <Row>
                         <Col xs={6} md={6}>
                             <FormGroup
-                                validationState= {this.state.formData.place.hasError ? "error" :""}
+                                validationState= {this.state.formData.place.hasError ? "error" :null}
                                 >
                                 <ControlLabel>Place</ControlLabel>                                
                                 <Autosuggest
@@ -1059,7 +1064,7 @@ s
                         </Col>
                         <Col xs={6} md={6}>
                             <FormGroup
-                                validationState= {this.state.formData.city.hasError ? "error" :""}
+                                validationState= {this.state.formData.city.hasError ? "error" :null}
                                 >
                                 <ControlLabel>City</ControlLabel>                               
                                 <Autosuggest
@@ -1078,7 +1083,7 @@ s
                     <Row>
                         <Col xs={6} md={6}>
                             <FormGroup
-                                validationState= {this.state.formData.pincode.hasError ? "error" :""}
+                                validationState= {this.state.formData.pincode.hasError ? "error" :null}
                                 >
                                 <ControlLabel>Pincode</ControlLabel>
                                 <Autosuggest
@@ -1095,7 +1100,7 @@ s
                         </Col>
                         <Col xs={6} md={6}>
                             <FormGroup
-                                validationState= {this.state.formData.mobile.hasError ? "error" :""}
+                                validationState= {this.state.formData.mobile.hasError ? "error" :null}
                                 >
                                 <ControlLabel>Mobile</ControlLabel>
                                 <Autosuggest
@@ -1229,6 +1234,47 @@ class CustomerListAdaptor extends ItemAdapter {
         console.log(matched);
         return matched;
     } */
+
+    // itemMatchesInput(item, foldedValue) {
+    //     debugger;
+    //     for (let text of this.getTextRepresentations(item)) {
+    //       if (text === foldedValue) {
+    //         return true
+    //       }
+    //     }
+    //     return false
+    //   }
+
+    itemInclusionRankForInput(item, foldedValue) {
+        let contains = false
+        for (let text of this.getTextRepresentations(item)) {
+            const index = text.indexOf(foldedValue)
+            if (index === 0)
+                return 0
+            
+            if (index > 0)
+                contains = true
+            
+        }
+        console.log('---------------Contains', contains);
+        return contains ? 1 : 2;
+    }  
+
+    itemIncludedByInput(item, foldedVal) {
+        //console.log(this);
+        //console.log(CustomerListAdaptor.instance);
+        //console.log(item);
+        let canInclude = false;
+        let customerName = item.name || '';
+        customerName = customerName.toLowerCase();
+        foldedVal = foldedVal.toLowerCase();
+        if(customerName.indexOf(foldedVal) == 0)
+            canInclude = true;
+        return canInclude;        
+    }
+    // itemMatchesInput(item, foldedVal) {
+    //     console.log(foldedVal);
+    // }
     getInputValue(item) {
         if(typeof item == 'string')
             return item.toString();
@@ -1238,10 +1284,10 @@ class CustomerListAdaptor extends ItemAdapter {
 
     renderItem(item) {
         return (
-            <div className="customer-list-item" key={item.hashKey}>
-                <div><span>{item.name}  <span style={{"fontSize":"8px"}}>c/of</span> {item.gaurdianName}</span></div>
-                <div><span>{item.address}</span></div>
-                <div><span>{item.place}, {item.city} - {item.pincode}</span></div>
+            <div className="customer-list-item" id={item.hashKey + '-parent'}>
+                <div id={item.hashKey+ '-1'}><span>{item.name}  <span style={{"fontSize":"8px"}}>c/of</span> {item.gaurdianName}</span></div>
+                <div id={item.hashKey+ '-2'}><span>{item.address}</span></div>
+                <div id={item.hashKey+ '-3'}><span>{item.place}, {item.city} - {item.pincode}</span></div>
             </div>
         )
     }
