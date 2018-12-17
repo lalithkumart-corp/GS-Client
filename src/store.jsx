@@ -4,12 +4,14 @@ import logger from 'redux-logger';
 
 import billCreationReducer from './reducers/billcreate/billcreation-reducer';
 import authReducer from './reducers/login/auth-reducer';
+import pledgeBookReducer from './reducers/pledgebook/reducer';
 
 export const getStore = () => {
 
     const theReducers = combineReducers({
         billCreation: billCreationReducer,
-        auth: authReducer
+        auth: authReducer,
+        pledgeBook: pledgeBookReducer
     });
 
     const middleware = applyMiddleware(reduxThunk, logger);
