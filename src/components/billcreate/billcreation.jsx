@@ -638,7 +638,6 @@ s
             this.setState(newState);
         },
         inputSelect: (e) => {
-            debugger;
             console.log(e);
         }
     }

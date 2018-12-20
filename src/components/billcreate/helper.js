@@ -42,8 +42,7 @@ export const buildRequestParams = (thatState = {}) => {
 }
 
 const _getBillNo = (state) => {
-    let billNo;
-    debugger;
+    let billNo;    
     if(state.formData.billseries.inputVal)
         billNo = state.formData.billseries.inputVal + '.' + state.formData.billno.inputVal;
     else

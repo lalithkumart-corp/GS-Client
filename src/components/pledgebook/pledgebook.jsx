@@ -24,31 +24,70 @@ class Pledgebook extends Component {
             pendingBillList :[],
             columns : [{
                     id: 'SNo',
-                    displayText: 'No'
+                    displayText: 'No',
+                    width: '4%',
+                    formatter: (column, columnIndex, row, rowIndex) => {
+                        let temp = row[column.id];
+                        return (
+                            <span>{++temp}</span>
+                        )
+                    }
                 },{
-                    id: 'BillNo',
-                    displayText: 'Bill No',                    
+                    id: 'Date',
+                    displayText: 'Date',
+                    width: '15%',
                     formatter: (column, columnIndex, row, rowIndex) => {
                         return (
-                            <span className='bill-no-cell' onClick={(e) => this.onBillNoClick({column, columnIndex, row, rowIndex})}>
+                            <span>{this.customDateFormatter(row[column.id])}</span>
+                        )
+                    }
+                },{
+                    id: 'BillNo',
+                    displayText: 'Bill No',
+                    isFilterable: true,
+                    filterCallback: this.filterCallbacks.billNo,
+                    className: 'pb-billno-col',
+                    formatter: (column, columnIndex, row, rowIndex) => {
+                        return (
+                            <span className='bill-no-cell' onClick={(e) => this.cellClickCallbacks.onBillNoClick({column, columnIndex, row, rowIndex})}>
                                 <b>{row[column.id]}</b>
                             </span>
                         )
-                    }
+                    },
+                    width: '5%'
+                },{
+                    id: 'Amount',
+                    displayText: 'Amount',
+                    width: '5%',
+                    isFilterable: true,
+                    filterCallback: this.filterCallbacks.onAmountChange,
+                    className: 'pb-amount-col'
                 }, {
                     id: 'Name',
-                    displayText: 'Customer Name'
+                    displayText: 'Customer Name',
+                    width: '20%',
+                    isFilterable: true,
+                    filterCallback: this.filterCallbacks.onCustNameChange,
+                    className: 'pb-customer-name-col'
                 }, {
                     id: 'GaurdianName',
-                    displayText: 'Gaurdian Name'
+                    displayText: 'Gaurdian Name',
+                    width: '20%',
+                    isFilterable: true,
+                    filterCallback: this.filterCallbacks.onGuardianNameChange,
+                    className: 'pb-guardian-name-col'
                 }, {
                     id: 'Address',
-                    displayText: 'Address'
+                    displayText: 'Address',
+                    width: '30%',
+                    isFilterable: true,
+                    filterCallback: this.filterCallbacks.onAddressChange,
+                    className: 'pb-address-col'
                 }]
         }
     }
 
-    componentDidMount() {        
+    componentDidMount() {
         this.props.getPendingBills({offsetStart: this.state.offsetStart || 0, offsetEnd: this.state.offsetEnd || 10, filters: {}});
     }
 
@@ -62,12 +101,42 @@ class Pledgebook extends Component {
         this.setState({modalIsOpen: false});
     }
 
-    onBillNoClick(params) {
-        // TODO:
+    cellClickCallbacks = {
+        onBillNoClick(params) {
+            // TODO:
+        }
+    }    
+
+    customDateFormatter(theDate) {
+        // TODO: format date accordingly
+        return theDate;
+    }
+
+    filterCallbacks = {
+        billNo: (e, col, colIndex) => {
+            let val = e.target.value;
+            // TODO:
+        },
+        onAmountChange: (e, col, colIndex) => {
+            let val = e.target.value;
+            // TODO:
+        },
+        onCustNameChange: (e, col, colIndex) => {
+            let val = e.target.value;
+            // TODO:
+        },
+        onGuardianNameChange: (e, col, colIndex) => {
+            let val = e.target.value;
+            // TODO:
+        },
+        onAddressChange: (e, col, colIndex) => {
+            let val = e.target.value;
+            // TODO:
+        }         
     }
 
     expandRow = {
-        renderer: (row) => {                
+        renderer: (row) => {
             return (
                 <div>
                     <p>{ `This Expand row is belong to rowKey ${row.text}` }</p>

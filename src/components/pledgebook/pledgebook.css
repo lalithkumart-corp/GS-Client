@@ -5,3 +5,7 @@
 .bill-no-cell:focus {
     color: #2196f3;
 }
+.inner-header.pb-billno-col input,
+.inner-header.pb-amount-col input {
+    width: 100px;
+}
