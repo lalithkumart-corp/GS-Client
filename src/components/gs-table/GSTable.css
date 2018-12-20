@@ -1,0 +1,11 @@
+.arrow-down,
+.arrow-right {
+    cursor: pointer;
+}
+.arrow-down:hover,
+.arrow-down:focus,
+.arrow-right:hover,
+.arrow-right:focus {
+    color: #2196f3;
+    outline: none;
+}

@@ -1,0 +1,7 @@
+.bill-no-cell {
+    cursor: pointer;
+}
+.bill-no-cell:hover,
+.bill-no-cell:focus {
+    color: #2196f3;
+}

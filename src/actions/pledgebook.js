@@ -1,9 +1,9 @@
 import axios from 'axios';
 import { GET_PENDING_BILLS } from '../core/sitemap';
 import { toast } from 'react-toastify';
-export const getPendingBills = (args) => {
+export const getPendingBills = (args) => {    
     return (dispatch) => {
-        axios.get(GET_PENDING_BILLS, args)
+        axios.get(`${GET_PENDING_BILLS}?args=${JSON.stringify(args)}`)
         .then(
             (successResp) => {                
                 dispatch({
