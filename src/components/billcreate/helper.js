@@ -24,7 +24,8 @@ export const buildRequestParams = (thatState = {}) => {
     let state = {...thatState}; //for preventing reference issue    
     let params = {
         date: state.formData.date.inputVal,
-        billNo: _getBillNo(thatState),
+        billSeries: state.formData.billseries.inputVal,
+        billNo: state.formData.billno.inputVal, //_getBillNo(thatState),
         amount: state.formData.amount.inputVal,
         cname: state.selectedCustomer.name || state.formData.cname.inputVal,
         gaurdianName: state.selectedCustomer.gaurdianName || state.formData.gaurdianName.inputVal,

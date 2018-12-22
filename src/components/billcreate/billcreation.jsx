@@ -849,7 +849,7 @@ s
                         let moreDetails = this.getInputValFromCustomSources('moreDetails');
                         for(let i=0; i<moreDetails.length; i++) {
                             rows.push(
-                                <Row className="customer-info-display-row">
+                                <Row className="customer-info-display-row" key={i}>
                                     <Col xs={6} md={6}>
                                         {moreDetails[i]['field']}
                                     </Col>
@@ -985,7 +985,7 @@ s
                         </Col>
                     </Row>
                     <Row>
-                        <Col xs={6} md={6}>
+                        <Col xs={6} md={6} className="customer-name-field-container">
                             <FormGroup
                                 validationState= {this.state.formData.cname.hasError ? "error" :null}
                                 >
@@ -994,7 +994,7 @@ s
                                     datalist={this.state.formData.cname.list}
                                     itemAdapter={CustomerListAdaptor.instance}
                                     placeholder="Enter CustomerName"
-                                    valueIsItem={true}
+                                    valueIsItem={true}                                    
                                     value={this.getInputValFromCustomSources('cname')}
                                     onChange={ (val) => {this.autuSuggestionControls.onChange(val, 'cname') }}
                                     ref = {(domElm) => { this.domElmns.cname = domElm; }}
@@ -1259,10 +1259,7 @@ class CustomerListAdaptor extends ItemAdapter {
         return contains ? 1 : 2;
     }  
 
-    itemIncludedByInput(item, foldedVal) {
-        //console.log(this);
-        //console.log(CustomerListAdaptor.instance);
-        //console.log(item);
+    itemIncludedByInput(item, foldedVal) {        
         let canInclude = false;
         let customerName = item.name || '';
         customerName = customerName.toLowerCase();
@@ -1281,12 +1278,17 @@ class CustomerListAdaptor extends ItemAdapter {
             return (item.name).toString();
     }
 
+    //Our custom method to form the react key value fr list items
+    getReactKey(item) {
+        return item.hashKey+'menu-item';
+    }
+
     renderItem(item) {
         return (
-            <div className="customer-list-item" id={item.hashKey + '-parent'}>
-                <div id={item.hashKey+ '-1'}><span>{item.name}  <span style={{"fontSize":"8px"}}>c/of</span> {item.gaurdianName}</span></div>
-                <div id={item.hashKey+ '-2'}><span>{item.address}</span></div>
-                <div id={item.hashKey+ '-3'}><span>{item.place}, {item.city} - {item.pincode}</span></div>
+            <div className="customer-list-item" id={item.hashKey + 'parent'}>
+                <div id={item.hashKey+ '1'}><span>{item.name}  <span style={{"fontSize":"8px"}}>c/of</span> {item.gaurdianName}</span></div>
+                <div id={item.hashKey+ '2'}><span>{item.address}</span></div>
+                <div id={item.hashKey+ '3'}><span>{item.place}, {item.city} - {item.pincode}</span></div>
             </div>
         )
     }

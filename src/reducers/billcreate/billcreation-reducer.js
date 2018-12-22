@@ -39,7 +39,8 @@ export default function billCreationReducer(state=defaultState, action) {
             }
             break;
         case 'TRACK_Bill_NUMBER':
-            let lastBillNumber = action.data.lastBillNumber;
+            
+        /*let lastBillNumber = action.data.lastBillNumber;
             let billSeries = '';
             let billNumber = null;            
             if(typeof lastBillNumber == 'string') {
@@ -53,8 +54,14 @@ export default function billCreationReducer(state=defaultState, action) {
             } else {
                 billNumber = lastBillNumber;
             }
-            let nextBillNumber = ++billNumber;         
-            
+            let nextBillNumber = ++billNumber;
+            */
+
+
+            let billSeries = action.data.billSeries;
+            let lastBillNumber = parseInt(action.data.lastBillNumber);
+            let nextBillNumber = ++lastBillNumber;
+            //TODO: If nextBillNumber is greater than 10,000, then increment the BillSeries and reset the BillNumber from 0
             newState = {
                 ...newState,
                 billSeries: billSeries,

@@ -81,12 +81,12 @@ class GSTable extends Component {
             let theDom = [];
             if(row._expanded) {
                 theDom.push(
-                    <span className='expand-icon arrow-down' onClick={(e) => this.onExpandIconClick(e, column, colIndex, row, rowIndex)}>
+                    <span key={"angle-down"} className='expand-icon arrow-down' onClick={(e) => this.onExpandIconClick(e, column, colIndex, row, rowIndex)}>
                         <FontAwesomeIcon icon="angle-down" />
                     </span>);
             } else {
                 theDom.push(
-                    <span className='expand-icon arrow-right' onClick={(e) => this.onExpandIconClick(e, column, colIndex, row, rowIndex)}>
+                    <span key={"angle-right"} className='expand-icon arrow-right' onClick={(e) => this.onExpandIconClick(e, column, colIndex, row, rowIndex)}>
                         <FontAwesomeIcon icon="angle-right" />
                     </span>)
             }
@@ -96,8 +96,8 @@ class GSTable extends Component {
 
     getFilterBox(column, colIndex) {
         return (
-            <th className={column.className + " inner-header a-cell"}>
-                <input type='text' value={column.filterVal} onChange={(e) => column.filterCallback(e, column, colIndex)}/>
+            <th key={colIndex+"-inner-header"} className={column.className + " inner-header a-cell"}>
+                <input type='text' value={undefined} onChange={(e) => column.filterCallback(e, column, colIndex)}/>
             </th>
         );
     }   
@@ -135,7 +135,7 @@ class GSTable extends Component {
                         let colgroups = [];
                         let columns = this.state.columns;
                         for(let i=0; i < columns.length; i++) {
-                            colgroups.push(<col style={{width: columns[i].width}}></col>)
+                            colgroups.push(<col key={i+"-colgroup"} style={{width: columns[i].width}}></col>)
                         }
                         return colgroups;
                     })()
@@ -148,7 +148,7 @@ class GSTable extends Component {
         let filterSectionDom = [];        
         if(this.canIncludeFilterSection()) {
             filterSectionDom.push(
-                <tr>
+                <tr key={"filter-section"}>
                     { 
                         ( () => {
                             let innerHeaderCells = [];
@@ -157,7 +157,7 @@ class GSTable extends Component {
                                 if(columns[h].isFilterable)
                                     innerHeaderCells.push(this.getFilterBox(columns[h], h))
                                 else
-                                    innerHeaderCells.push(<th></th>)
+                                    innerHeaderCells.push(<th key={h+"-inner-header"}></th>)
                             }
                             return innerHeaderCells;
                         } )()
@@ -174,7 +174,7 @@ class GSTable extends Component {
                             let columns = this.state.columns;
                             for(let i = 0; i< columns.length; i++) {
                                 headerCells.push(
-                                    <th className={columns[i].className + " header a-cell"}>
+                                    <th key={i+"-header"} className={columns[i].className + " header a-cell"}>
                                         {columns[i].displayText}
                                     </th>
                                 );
@@ -191,14 +191,14 @@ class GSTable extends Component {
         let makeARow = (aRowData, rowIndex) => {
             let columns = this.state.columns;
             return (
-                <tr className="a-row">
+                <tr key={rowIndex+"-row"} className="a-row">
                     {
                         ( () => {                            
                             let rowCells = [];
                             for(let i=0; i<columns.length; i++) {
                                 let formatter = columns[i].formatter;                                
                                 rowCells.push(
-                                    <td>
+                                    <td key={i+"-body"}>
                                         {formatter(columns[i], i, aRowData, rowIndex)}                                        
                                     </td>
                                 );
@@ -211,7 +211,7 @@ class GSTable extends Component {
         }
         let makeExpandedRow = (aRowData, rowIndex) => {            
             return (
-                <tr>
+                <tr key={rowIndex+"-expanded-row"}>
                     <td colSpan={this.state.columns.length}>
                         {this.state.expandRow.renderer(aRowData)}
                     </td>

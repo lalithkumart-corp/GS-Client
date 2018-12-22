@@ -43,6 +43,14 @@
 }
 /*END: Custom styles for the Date Picker(to make it bigger font size looking */
 
+.customer-name-field-container .dropdown-menu > li {
+    border-bottom: 1px dotted grey;
+    margin: 0 6px;
+}
+.customer-name-field-container .dropdown-menu > li > a {
+    padding: 3px 0;
+}
+
 .orn-input-cell {
     border: none;    
     width: calc(100% - 15px);

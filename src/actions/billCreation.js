@@ -27,7 +27,7 @@ export const insertNewBill = (requestParams) => {
                         });
                         dispatch({
                             type: 'TRACK_Bill_NUMBER',
-                            data: {lastBillNumber: requestParams.billNo}
+                            data: {billSeries: requestParams.billSeries, lastBillNumber: requestParams.billNo}
                         });
                     }
                     console.log(resp.data);
@@ -76,7 +76,7 @@ export const getBillNoFromDB = () => {
                 (successResp) => {                    
                     dispatch({
                         type: 'TRACK_Bill_NUMBER',
-                        data: {lastBillNumber: successResp.data}
+                        data: {billSeries: successResp.data.billSeries, lastBillNumber: successResp.data.billNo}
                     })
                 },
                 (errResp) => {
