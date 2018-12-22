@@ -1,8 +1,9 @@
 import React, { Component } from 'react';
-import BootstrapTable from 'react-bootstrap-table-next';
+// import BootstrapTable from 'react-bootstrap-table-next';
 import { getPendingBills } from '../../actions/pledgebook';
 import { parseResponse } from './helper';
 import { connect } from 'react-redux';
+import _ from 'lodash';
 
 import './pledgebook.css';
 import CommonModal from '../common-modal/commonModal.jsx';
@@ -143,11 +144,49 @@ class Pledgebook extends Component {
 
     expandRow = {
         renderer: (row) => {
+            let ornData = JSON.parse(row.Orn) || {};
             return (
-                <div>
-                    <p>{ `This Expand row is belong to rowKey ${row.text}` }</p>
-                    <p>You can render anything here, also you can add additional data on every row object</p>
-                    <p>expandRow.renderer callback will pass the origin row object to you</p>
+                <div className="orn-display-dom">
+                    <table>
+                        <colgroup>
+                            <col style={{width: "40%"}}></col>
+                            <col style={{width: "10%"}}></col>
+                            <col style={{width: "10%"}}></col>
+                            <col style={{width: "20%"}}></col>
+                            <col style={{width: "20%"}}></col>
+                        </colgroup>
+                        <thead>
+                            <tr>
+                                <td>Orn Name</td>
+                                <td>Gross Wt</td>
+                                <td>Net Wt</td>
+                                <td>Specs</td>
+                                <td>Qty</td>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {
+                                ( () => {
+                                    let rows = [];
+                                    _.each(ornData, (anOrnItem, index) => {
+                                        let className = "even";
+                                        if(index && index%2 !== 0)
+                                            className = "odd";
+                                        rows.push(
+                                            <tr className={className}>
+                                                <td>{anOrnItem.ornItem}</td>
+                                                <td>{anOrnItem.ornGWt}</td>
+                                                <td>{anOrnItem.ornNWt}</td>
+                                                <td>{anOrnItem.ornSpec}</td>
+                                                <td>{anOrnItem.ornNos}</td>
+                                            </tr>
+                                        )
+                                    });
+                                    return rows;
+                                })()
+                            }
+                        </tbody>
+                    </table>                   
                 </div>
             )
         },

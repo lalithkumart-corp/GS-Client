@@ -3,6 +3,7 @@ import { connect } from 'react-redux';
 import { Grid, Row, Col, FormGroup, ControlLabel, FormControl, HelpBlock, InputGroup, Button, } from 'react-bootstrap';
 import { hideEditDetailModal } from '../../actions/billCreation';
 import Modal from 'react-modal';
+import './editDetailsDialog.css';
 
 const customStyles = {
     content : {
@@ -56,12 +57,12 @@ class EditDetailsDialog extends Component {
             return <span></span>;
             
         return (
-            <div>
+            <div className='edit-detail-dialog'>
                 <Row>
-                    <Col xs={6} md={6}>
+                    <Col xs={4} md={4} title={this.state.obj.field}>
                         {this.state.obj.field}
                     </Col>
-                    <Col xs={6} md={6}>
+                    <Col xs={8} md={8}>
                     <FormGroup>
                             <FormControl
                                 type="text"

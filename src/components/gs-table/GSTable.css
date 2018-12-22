@@ -1,6 +1,9 @@
 .gs-table .expand-icon {
     font-size: 18px;
 }
+.gs-table .expanded-row {
+    background-color: white !important;
+}
 .arrow-down,
 .arrow-right {
     cursor: pointer;

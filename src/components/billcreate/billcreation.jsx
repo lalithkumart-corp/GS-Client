@@ -22,7 +22,7 @@ import { Collapse } from 'react-collapse';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import sh from 'shorthash';
 import EditDetailsDialog from './editDetailsDialog';
-import { insertNewBill, updateClearEntriesFlag, showEditDetailModal, hideEditDetailModal, getBillNoFromDB } from '../../actions/billCreation';
+import { insertNewBill, updateClearEntriesFlag, showEditDetailModal, hideEditDetailModal, getBillNoFromDB, disableReadOnlyMode } from '../../actions/billCreation';
 import { DoublyLinkedList } from '../../utilities/doublyLinkedList';
 import { getGaurdianNameList, getAddressList, getPlaceList, getCityList, getPincodeList, getMobileList, buildRequestParams, updateBillNumber, resetState, defaultPictureState } from './helper';
 
@@ -49,6 +49,7 @@ domList.add('ornNWt1', {type: 'defaultInput', enabled: true});
 domList.add('ornSpec1', {type: 'autosuggest', enabled: true});
 domList.add('ornNos1', {type: 'defaultInput', enabled: true});
 domList.add('submitBtn', {type: 'defaultInput', enabled: true});
+domList.add('updateBtn', {type: 'defaultInput', enabled: false});
 
 class BillCreation extends Component {
     constructor(props){
@@ -147,8 +148,10 @@ class BillCreation extends Component {
         this.fetchMetaData(); //TODO: Refactor it to store in cache and not make api call eact time
         if(!this.props.loadedInPledgebook) {            
             this.props.getBillNoFromDB();
+            this.props.disableReadOnlyMode();
         } else {
             this.updateFieldValuesInState(this.props.billData);
+            this.updateDomList('enableUpdateBtn');
         }
     }
 
@@ -236,7 +239,17 @@ s
         newState.formData.city.inputVal = data.City;
         newState.formData.pincode.inputVal = data.Pincode.toString();
         newState.formData.mobile.inputVal = data.Mobile.toString();
-        //TODO: update other dome elements
+        let ornObj = JSON.parse(data.Orn);        
+        newState.formData.orn.inputs = ornObj;
+        newState.formData.orn.rowCount = Object.keys(ornObj).length;
+        newState.formData.moreDetails.customerInfo = JSON.parse(data.OtherDetails) || [];    
+        
+        let buff = new Buffer(data.Image.data, "base64"); //.toString('base64');
+        let img = buff.toString('ascii');
+        img = img.substring(1);
+        img = img.substring(0, img.length-1);
+        newState.picture.holder.confirmedImgSrc = "data:image/webp;base64,"+ img;        
+        
         this.setState(newState);
     }
     /* END: SETTERS */
@@ -293,6 +306,10 @@ s
                 break;
             case 'enableMoreDetailValueDom':
                 domList.enable('moreCustomerDetailValue');
+                break;
+            case 'enableUpdateBtn':
+                domList.enable('submitBtn');
+                domList.enable('updateBtn');
                 break;
         }
     }
@@ -411,7 +428,8 @@ s
         }
         newState.formData.moreDetails.customerInfo.push(obj);
         newState.formData.moreDetails.currCustomerInputField = '';
-        newState.formData.moreDetails.currCustomerInputVal = '';        
+        newState.formData.moreDetails.currCustomerInputVal = '';
+        newState.formData.moreDetails.currCustomerInputKey = '';   
         await this.setState(newState);        
     }
 
@@ -938,7 +956,7 @@ s
     
     render(){        
         return(
-            <Grid>
+            <Grid className="bill-creation-container">
                 <Col className="left-pane" xs={8} md={8}>
                     <Row>
                         <Col xs={3} md={3}>
@@ -1239,7 +1257,7 @@ const mapStateToProps = (state) => {
     };
 };
 
-export default connect(mapStateToProps, {insertNewBill, updateClearEntriesFlag, showEditDetailModal, hideEditDetailModal, getBillNoFromDB})(BillCreation);
+export default connect(mapStateToProps, {insertNewBill, updateClearEntriesFlag, showEditDetailModal, hideEditDetailModal, getBillNoFromDB, disableReadOnlyMode})(BillCreation);
 
 
 class CommonAdaptor extends ItemAdapter {

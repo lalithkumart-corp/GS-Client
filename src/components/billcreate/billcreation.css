@@ -6,6 +6,14 @@
     padding-right: 0 !important;
 }
 
+.bill-creation-container .autosuggest .input-group {
+    width: 100%
+}
+
+.bill-creation-container .autosuggest .input-group-btn {
+    display: none;
+}
+
 /*START: Custom styles for the Date Picker(to make it bigger font size looking */
 .date-picker-container {
     margin-top: 27px;
@@ -156,3 +164,8 @@
     cursor: pointer;
 }
 /* END: Picture */
+
+.bill-creation-container input[readonly]{
+    background-color: #eee;
+    opacity: 1;
+}

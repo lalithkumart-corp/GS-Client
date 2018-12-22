@@ -9,3 +9,33 @@
 .inner-header.pb-amount-col input {
     width: 100px;
 }
+
+.orn-display-dom {
+    width: 50%;
+    margin-left: 2%;
+    margin-top: 10px;
+    margin-bottom: 25px;
+}
+.orn-display-dom thead tr {
+    border: 1px dashed;
+    background-color: grey;
+    color: white;
+}
+
+.orn-display-dom thead tr td {
+    padding: 4px 5px 4px 6px;
+    border-right: 1px dashed;   
+}
+
+.orn-display-dom tbody tr {
+    border: 1px dashed;
+}
+
+.orn-display-dom tbody tr td {
+    padding: 4px 5px 4px 6px;
+    border-right: 1px dashed;
+}
+
+.orn-display-dom tbody tr.even {
+    background-color: #f9f9f9;
+}

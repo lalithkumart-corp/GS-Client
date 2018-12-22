@@ -220,7 +220,7 @@ class GSTable extends Component {
         }
         let makeExpandedRow = (aRowData, rowIndex) => {            
             return (
-                <tr key={rowIndex+"-expanded-row"}>
+                <tr key={rowIndex+"-expanded-row"} className="expanded-row">
                     <td colSpan={this.state.columns.length}>
                         {this.state.expandRow.renderer(aRowData)}
                     </td>
