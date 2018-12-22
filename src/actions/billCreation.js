@@ -69,12 +69,28 @@ export const hideEditDetailModal = () => {
     }
 }
 
+export const enableReadOnlyMode = () => {
+    return (dispatch) => {
+        dispatch({
+            type: 'ENABLE_LOADING'
+        });
+    }
+}
+
+export const disableReadOnlyMode = () => {
+    return (dispatch) => {
+        dispatch({
+            type: 'DISABLE_LOADING'
+        });
+    }
+}
+
 export const getBillNoFromDB = () => {
     return (dispatch) => {
         axios.get(GET_LAST_BILL_NO)
             .then(
-                (successResp) => {                    
-                    dispatch({
+                (successResp) => {                                        
+                    dispatch({                        
                         type: 'TRACK_Bill_NUMBER',
                         data: {billSeries: successResp.data.billSeries, lastBillNumber: successResp.data.billNo}
                     })

@@ -18,9 +18,16 @@
     overflow: hidden;
 }
 .common-modal-content .close-icon{
-    right: 0;
-    position: absolute;
-    padding-right: 15px;
+    right: 5px;
+    position: absolute;    
     top: 6px;
-    cursor: pointer;
+    cursor: pointer;    
+    padding-right: 15px !important;
+    padding-left: 15px !important;    
+    z-index: 1;
+}
+
+.common-modal-content .close-icon:hover,
+.common-modal-content .close-icon:focus {
+    color: #2196f3;
 }

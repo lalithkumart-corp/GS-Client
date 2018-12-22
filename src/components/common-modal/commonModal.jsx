@@ -5,6 +5,7 @@
  * @file: commonModal.js
  */
 import React, {Component} from 'react';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import './commonModal.css';
 class CommonModal extends Component {
     constructor(props) {
@@ -12,10 +13,10 @@ class CommonModal extends Component {
         this.onModalClose = this.onModalClose.bind(this);
     }
     componentDidUpdate() {
-        // if(this.props.modalOpen)
-        //     $('body').addClass('ovHidden');
-        // else
-        //     $('body').removeClass('ovHidden');
+        if(this.props.modalOpen)
+            document.body.classList.add("no-scroll"); //$('body').addClass('ovHidden');
+        else
+            document.body.classList.remove("no-scroll"); //$('body').removeClass('ovHidden');
     }
     onModalClose() {
         this.props.handleClose();
@@ -27,7 +28,7 @@ class CommonModal extends Component {
                     <div className='common-modal-wrapper'>
                         <div className={this.props.secClass + ' common-modal-content'}>
                             <div className='header'>
-                                <span className='close-icon' onClick={this.onModalClose}><i className="fa fa-times"></i></span>
+                                <span className='close-icon gs-button rounded' onClick={this.onModalClose}><FontAwesomeIcon icon="times" /></span>
                             </div>
                             <div className='body'>
                                 {this.props.children}

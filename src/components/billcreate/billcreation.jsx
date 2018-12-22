@@ -144,14 +144,19 @@ class BillCreation extends Component {
 
     /* START: Lifecycle methods */
     componentDidMount() {
-        this.fetchMetaData();
-        this.props.getBillNoFromDB();
+        this.fetchMetaData(); //TODO: Refactor it to store in cache and not make api call eact time
+        if(!this.props.loadedInPledgebook) {            
+            this.props.getBillNoFromDB();
+        } else {
+            this.updateFieldValuesInState(this.props.billData);
+        }
     }
 
     componentWillReceiveProps(nextProps) {
         let newState = {...this.state};
-        newState = updateBillNumber(nextProps, newState);
-        if(nextProps.billCreation.clearEntries) {      
+        if(!this.props.loadedInPledgebook)
+            newState = updateBillNumber(nextProps, newState);
+        if(nextProps.billCreation.clearEntries) {
             newState = resetState(nextProps, newState);
             this.props.updateClearEntriesFlag(false);
         }
@@ -212,11 +217,33 @@ s
     setRef(webcam) {
         this.webcam = webcam;
     }
+    updateFieldValuesInState(data) {
+        let newState = {...this.state};
+        newState.formData.date.inputVal = data.Date;
+        let splits = data.BillNo.split('.');
+        if(splits.length > 1){
+            newState.formData.billseries.inputVal = data.BillNo.split('.')[0];
+            newState.formData.billno.inputVal = data.BillNo.split('.')[1];
+        } else {
+            newState.formData.billseries.inputVal = '';
+            newState.formData.billno.inputVal = data.BillNo;
+        }
+        newState.formData.amount.inputVal = data.Amount;
+        newState.formData.cname.inputVal = data.Name;
+        newState.formData.gaurdianName.inputVal = data.GaurdianName;
+        newState.formData.address.inputVal = data.Address;
+        newState.formData.place.inputVal = data.Place;
+        newState.formData.city.inputVal = data.City;
+        newState.formData.pincode.inputVal = data.Pincode.toString();
+        newState.formData.mobile.inputVal = data.Mobile.toString();
+        //TODO: update other dome elements
+        this.setState(newState);
+    }
     /* END: SETTERS */
 
     /* START: GETTERS */
     getNextElm(currElmKey) {    
-        let currNode = domList.findNode(currElmKey);                
+        let currNode = domList.findNode(currElmKey);
         let nextNode = currNode.next;
         if(nextNode && !nextNode.enabled)
             nextNode = this.getNextElm(nextNode.key);        
@@ -1125,14 +1152,26 @@ s
                     </Row>
                     <Row>
                         <Col xsOffset={4} xs={3} md={3} mdOffset={4} className='submit-container'>
-                            <input 
-                                type="button"
-                                className='gs-button'
-                                ref={(domElm) => {this.domElmns.submitBtn = domElm}}
-                                // onKeyUp= { (e) => this.handleKeyUp(e, {currElmKey:'submitBtn', isSubmitBtn: true})}
-                                onClick={(e) => this.handleSubmit()}
-                                value='Add Bill'
-                                />
+                            { !this.props.loadedInPledgebook &&
+                                <input 
+                                    type="button"
+                                    className='gs-button'
+                                    ref={(domElm) => {this.domElmns.submitBtn = domElm}}
+                                    // onKeyUp= { (e) => this.handleKeyUp(e, {currElmKey:'submitBtn', isSubmitBtn: true})}
+                                    onClick={(e) => this.handleSubmit()}
+                                    value='Add Bill'
+                                    />
+                            }
+                            {
+                                this.props.loadedInPledgebook &&
+                                <input 
+                                    type="button"
+                                    className='gs-button'
+                                    ref={(domElm) => {this.domElmns.updateBtn = domElm}}
+                                    onClick={(e) => this.handleUpdate()}
+                                    value='Update Bill'
+                                    />
+                            }
                         </Col>
                     </Row>
                 </Col>

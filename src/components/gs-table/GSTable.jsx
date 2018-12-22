@@ -38,7 +38,7 @@ class GSTable extends Component {
         if(props && props.columns) {
             if(props.expandRow && props.expandRow.renderer !== undefined) {
                 parsedCollection.expandRow = props.expandRow;
-                if(props.expandRow.showIndicator)
+                if(props.expandRow.showIndicator && !this.indicatorExistsAlready(props.columns))
                     props.columns.unshift({
                         id: '_expandIndicator',
                         displayText: '',
@@ -92,6 +92,15 @@ class GSTable extends Component {
             }
             return theDom;
         }
+    }
+
+    indicatorExistsAlready(columns) {
+        let exits = false;
+        _.each(columns, (aCol, index) => {
+            if(aCol.id == "_expandIndicator")
+                exits = true;
+        });
+        return exits;
     }
 
     getFilterBox(column, colIndex) {

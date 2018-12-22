@@ -31,7 +31,7 @@
   font-weight: bold;
 }
 
-.gs-button {
+.gs-button {  
   color: #2196f3;
   border: none;
   background-color: transparent;
@@ -43,6 +43,9 @@
   /* background-color: #337ab7;
   border-color: #2e6da4; */
 }
+.gs-button[disabled] {
+    color: grey;
+}
 .gs-button.rounded {
   border-radius: 50%;
   padding: 12px;
@@ -50,4 +53,8 @@
 .gs-button:hover {
   background-color: rgba(33, 150, 243, 0.08);
   outline: none;
+}
+
+.no-scroll {
+  overflow: hidden;
 }

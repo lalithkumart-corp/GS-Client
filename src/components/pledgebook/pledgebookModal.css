@@ -1,0 +1,10 @@
+.pledgebook-modal-container .button-container{
+    text-align: right;
+    padding-right: 45px;
+    margin-bottom: 20px;
+    font-weight: 500;
+}
+
+.pledgebook-modal-container {
+    background-color: white;
+}

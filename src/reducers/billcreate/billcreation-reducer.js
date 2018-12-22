@@ -1,6 +1,6 @@
 let defaultState = {loading: false};
 export default function billCreationReducer(state=defaultState, action) {
-    let newState = { ...state };
+    let newState = { ...state };    
     switch(action.type){
         case 'NEW_BILL_INSERTED_SUCCESSFULLY':
             newState = {
@@ -14,10 +14,16 @@ export default function billCreationReducer(state=defaultState, action) {
                 loading: false
             };
             break;
-        case 'ENABLE_LOADING':            
+        case 'ENABLE_LOADING':
             newState = {
                 ...newState,
                 loading: true
+            };
+            break;
+        case 'DISABLE_LOADING':
+            newState = {
+                ...newState,
+                loading: false
             };
             break;
         case 'SET_CLEAR_FLAG':

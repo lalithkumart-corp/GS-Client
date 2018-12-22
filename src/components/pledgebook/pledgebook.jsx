@@ -13,7 +13,7 @@ class Pledgebook extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            modalIsOpen: false,
+            PBmodalIsOpen: false,
             offsetStart: 0,
             offsetEnd: 10,
             filters: {
@@ -85,6 +85,11 @@ class Pledgebook extends Component {
                     className: 'pb-address-col'
                 }]
         }
+        this.bindMethods();
+    }
+    bindMethods() {
+        this.handleClose = this.handleClose.bind(this);
+        this.cellClickCallbacks.onBillNoClick = this.cellClickCallbacks.onBillNoClick.bind(this);
     }
 
     componentDidMount() {
@@ -98,12 +103,13 @@ class Pledgebook extends Component {
     }
 
     handleClose() {
-        this.setState({modalIsOpen: false});
+        this.setState({PBmodalIsOpen: false});
     }
 
     cellClickCallbacks = {
         onBillNoClick(params) {
             // TODO:
+            this.setState({PBmodalIsOpen: true, currentBillData: params.row});
         }
     }    
 
@@ -174,7 +180,7 @@ class Pledgebook extends Component {
                     rowData={this.state.pendingBillList}
                     expandRow = { this.expandRow }                    
                 />
-                <CommonModal modalOpen={this.state.modalIsOpen} handleClose={this.handleClose}>
+                <CommonModal modalOpen={this.state.PBmodalIsOpen} handleClose={this.handleClose}>
                     <PledgebookModal {...this.state} handleClose={this.handleClose}/>
                 </CommonModal>
             </div>
