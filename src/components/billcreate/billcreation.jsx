@@ -161,6 +161,7 @@ class BillCreation extends Component {
             newState = updateBillNumber(nextProps, newState);
         if(nextProps.billCreation.clearEntries) {
             newState = resetState(nextProps, newState);
+            this.updateDomList('disableMoreDetailsInputElmns'); 
             this.props.updateClearEntriesFlag(false);
         }
         this.setState(newState);
@@ -237,8 +238,8 @@ s
         newState.formData.address.inputVal = data.Address;
         newState.formData.place.inputVal = data.Place;
         newState.formData.city.inputVal = data.City;
-        newState.formData.pincode.inputVal = data.Pincode.toString();
-        newState.formData.mobile.inputVal = data.Mobile.toString();
+        newState.formData.pincode.inputVal = data.Pincode?(data.Pincode.toString()):"";
+        newState.formData.mobile.inputVal = (data.Mobile)?(data.Mobile.toString()):"";
         let ornObj = JSON.parse(data.Orn);        
         newState.formData.orn.inputs = ornObj;
         newState.formData.orn.rowCount = Object.keys(ornObj).length;
@@ -320,20 +321,26 @@ s
             nextElm = this.getNextElm(currentElmKey);
         else
             nextElm = this.getPrevElm(currentElmKey);        
-        if(nextElm) {
-            if(nextElm.value.indexOf('orn') !== 0) { //If not Orn Input field                
-                if(nextElm.type == 'autosuggest'){
-                    this.domElmns[nextElm.key].refs.input.focus();
-                }else if (nextElm.type == 'defaultInput' || nextElm.type == 'formControl'){                    
-                    this.domElmns[nextElm.key].focus();
+        try{
+            if(nextElm) {
+                if(nextElm.value.indexOf('orn') !== 0) { //If not Orn Input field                
+                    if(nextElm.type == 'autosuggest'){
+                        this.domElmns[nextElm.key].refs.input.focus();
+                    }else if (nextElm.type == 'defaultInput' || nextElm.type == 'formControl'){                    
+                        this.domElmns[nextElm.key].focus();
+                    }
+                } else { //Hanlding Orn Input fields                
+                    if(nextElm.type == 'autosuggest')
+                        this.domElmns.orn[nextElm.key].refs.input.focus();
+                    else if (nextElm.type == 'defaultInput' || nextElm.type == 'formControl')
+                        this.domElmns.orn[nextElm.key].focus();
                 }
-            } else { //Hanlding Orn Input fields                
-                if(nextElm.type == 'autosuggest')
-                    this.domElmns.orn[nextElm.key].refs.input.focus();
-                else if (nextElm.type == 'defaultInput' || nextElm.type == 'formControl')
-                    this.domElmns.orn[nextElm.key].focus();
             }
-        }            
+        } catch(e) {
+            //TODO: Remove this alert after completing development
+            alert("Exception occured in transferring focus...check console immediately");
+            console.log(e);
+        }
     }
 
     async appendNewRow(e, nextSerialNo) {
@@ -701,6 +708,7 @@ s
                     break;
                 case 'billno':
                 case 'amount':
+                case 'date':
                     newState.formData[identifier].inputVal = val;
                     break;
                 case 'billRemarks':
@@ -1021,7 +1029,7 @@ s
                                     <DatePicker
                                         id="example-datepicker" 
                                         value={this.state.formData.date.inputVal} 
-                                        onChange={(e) => this.inputControls.onChange(null, e.target.value, 'date') }
+                                        onChange={(dateVal) => this.inputControls.onChange(null, dateVal, 'date') }
                                         ref = {(domElm) => { this.domElmns.date = domElm; }}
                                         onKeyUp = {(e) => this.handleKeyUp(e, {currElmKey: 'date'}) }
                                         readOnly={this.props.billCreation.loading}

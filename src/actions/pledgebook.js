@@ -3,6 +3,7 @@ import { GET_PENDING_BILLS } from '../core/sitemap';
 import { toast } from 'react-toastify';
 export const getPendingBills = (args) => {    
     return (dispatch) => {
+        enableLoading();        
         axios.get(`${GET_PENDING_BILLS}?args=${JSON.stringify(args)}`)
         .then(
             (successResp) => {                
@@ -23,4 +24,13 @@ export const getPendingBills = (args) => {
             }
         )
     }
+}
+
+export const enableLoading = () => {
+    return (dispatch) => {
+        dispatch({
+            type: 'ENABLE_LOADING',
+            payload: true
+        });
+    }    
 }

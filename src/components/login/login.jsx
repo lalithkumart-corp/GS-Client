@@ -126,7 +126,7 @@ class LoginPage extends Component {
                                     >
                                     <ControlLabel>Password</ControlLabel>
                                     <FormControl
-                                        type="text"
+                                        type="password"
                                         value={this.state.formData.password.val}
                                         placeholder="Enter email"
                                         onChange={(e) => this.handleChange(e.target.value, 'password')}

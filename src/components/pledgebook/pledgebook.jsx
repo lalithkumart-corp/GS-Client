@@ -9,10 +9,12 @@ import './pledgebook.css';
 import CommonModal from '../common-modal/commonModal.jsx';
 import PledgebookModal from './pledgebookModal';
 import GSTable from '../gs-table/GSTable';
+import ReactPaginate from 'react-paginate';
 
 class Pledgebook extends Component {
     constructor(props) {
         super(props);
+        this.timeOut = 300;
         this.state = {
             PBmodalIsOpen: false,
             offsetStart: 0,
@@ -21,7 +23,12 @@ class Pledgebook extends Component {
                 cName: '',
                 gName: '',
                 address: '',
+                date: '',
+                billNo: '',
+                amount: '',
             },
+            selectedPageIndex: 0,
+            pageLimit: 10,
             pendingBillList :[],
             columns : [{
                     id: 'SNo',
@@ -91,16 +98,36 @@ class Pledgebook extends Component {
     bindMethods() {
         this.handleClose = this.handleClose.bind(this);
         this.cellClickCallbacks.onBillNoClick = this.cellClickCallbacks.onBillNoClick.bind(this);
+        this.handlePageCountChange = this.handlePageCountChange.bind(this);
+        this.getOffsets = this.getOffsets.bind(this);
     }
 
     componentDidMount() {
-        this.props.getPendingBills({offsetStart: this.state.offsetStart || 0, offsetEnd: this.state.offsetEnd || 10, filters: {}});
+        this.initiateFetchPledgebookAPI();
     }
 
     componentWillReceiveProps(nextProps) {
         let newState = {...this.state};
-        newState.pendingBillList = parseResponse(nextProps.pledgeBook.list);        
-        this.setState(newState);
+        newState.pendingBillList = parseResponse(nextProps.pledgeBook.list);
+        this.setState(newState);        
+    }
+
+    componentWillUpdate(newProps, newState, newContext) {
+        
+    }
+    
+    componentDidUpdate(prevProps, prevState){
+        
+    }    
+    // START: Listeners
+    async handlePageCountChange(e) {
+        let selectedPageLimit = e.target.value;        
+        await this.setState({pageLimit: selectedPageLimit});        
+        this.initiateFetchPledgebookAPI();
+    }
+    async handlePageClick(selectedPage) {
+        await this.setState({selectedPageIndex: selectedPage});        
+        this.initiateFetchPledgebookAPI();
     }
 
     handleClose() {
@@ -112,36 +139,90 @@ class Pledgebook extends Component {
             // TODO:
             this.setState({PBmodalIsOpen: true, currentBillData: params.row});
         }
+    }        
+
+    filterCallbacks = {
+        billNo: async (e, col, colIndex) => {
+            let val = e.target.value;
+            let newState = {...this.state};
+            newState.filters.billNo = val;            
+            await this.setState(newState);
+            this.initiateFetchPledgebookAPI();
+        },
+        onAmountChange: async (e, col, colIndex) => {
+            let val = e.target.value;
+            let newState = {...this.state};
+            newState.filters.amount = val;            
+            await this.setState(newState);
+            this.initiateFetchPledgebookAPI();            
+        },
+        onCustNameChange: async (e, col, colIndex) => {
+            let val = e.target.value;
+            let newState = {...this.state};
+            newState.filters.cName = val;            
+            await this.setState(newState);
+            this.initiateFetchPledgebookAPI();            
+        },
+        onGuardianNameChange: async (e, col, colIndex) => {
+            let val = e.target.value;
+            let newState = {...this.state};
+            newState.filters.gName = val;            
+            await this.setState(newState);
+            this.initiateFetchPledgebookAPI();            
+        },
+        onAddressChange: async (e, col, colIndex) => {
+            let val = e.target.value;
+            let newState = {...this.state};
+            newState.filters.address = val;            
+            await this.setState(newState);
+            this.initiateFetchPledgebookAPI();            
+        }         
     }    
 
+    // START: Helper's
+    getAPIParams() {
+        let offsets = this.getOffsets();
+        let filters = this.getFilters();
+        return {
+            offsetStart: offsets[0] || 0,
+            offsetEnd: offsets[1] || 10,
+            filters: filters
+        };
+    }
+    getOffsets() {        
+        let pageNumber = parseInt(this.state.selectedPageIndex);
+        let offsetStart = pageNumber * parseInt(this.state.pageLimit);
+        let offsetEnd = offsetStart + parseInt(this.state.pageLimit);
+        return [offsetStart, offsetEnd];
+    }
+
+    getFilters() {
+        return {            
+            date: this.state.filters.date,            
+            billNo: this.state.filters.billNo,
+            amount: this.state.filters.amount,
+            cName: this.state.filters.cName,
+            gName: this.state.filters.gName,
+            address: this.state.filters.address
+        }
+    }
+
+    getPageCount() {
+        let totalRecords = this.state.pendingBillList.length;
+        return (totalRecords/this.state.pageLimit);
+    }
+
+    initiateFetchPledgebookAPI() {    
+        clearTimeout(this.timer);
+        this.timer = setTimeout(() => {            
+            let params = this.getAPIParams();
+            this.props.getPendingBills(params);
+        }, this.timeOut);        
+    }
     customDateFormatter(theDate) {
         // TODO: format date accordingly
         return theDate;
     }
-
-    filterCallbacks = {
-        billNo: (e, col, colIndex) => {
-            let val = e.target.value;
-            // TODO:
-        },
-        onAmountChange: (e, col, colIndex) => {
-            let val = e.target.value;
-            // TODO:
-        },
-        onCustNameChange: (e, col, colIndex) => {
-            let val = e.target.value;
-            // TODO:
-        },
-        onGuardianNameChange: (e, col, colIndex) => {
-            let val = e.target.value;
-            // TODO:
-        },
-        onAddressChange: (e, col, colIndex) => {
-            let val = e.target.value;
-            // TODO:
-        }         
-    }
-
     expandRow = {
         renderer: (row) => {
             let ornData = JSON.parse(row.Orn) || {};
@@ -193,27 +274,29 @@ class Pledgebook extends Component {
         showIndicator: true,
         expandByColumnOnly: true
     }
+    // END: Helper's
 
-    rowEvents = {
-        onClick: (e, row, rowIndex) => {
-           // TODO;
-        }
-    }
-
-    render() {
+    render() {                    
         return (
-            <div>
-                {/* <BootstrapTable
-                    bootstrap4
-                    striped
-                    hover
-                    condensed
-                    keyField='SNo' 
-                    data={ this.state.pendingBillList } 
-                    columns={ this.state.columns2 }
-                    expandRow={ this.expandRow }
-                    rowEvents={ this.rowEvents }
-                /> */}
+            <div>               
+                 <select className="selectpicker" onChange={this.handlePageCountChange}>
+                    <option selected={this.state.pageLimit=="10" && "selected"}>10</option>
+                    <option selected={this.state.pageLimit=="25" && "selected"}>25</option>
+                    <option selected={this.state.pageLimit=="50" && "selected"}>50</option>
+                    <option selected={this.state.pageLimit=="100" && "selected"}>100</option>
+                    <option selected={this.state.pageLimit=="200" && "selected"}>200</option>
+                </select>
+                <ReactPaginate previousLabel={"<"}
+                       nextLabel={">"}
+                       breakLabel={"..."}
+                       breakClassName={"break-me"}
+                       pageCount={this.getPageCount()}
+                       marginPagesDisplayed={2}
+                       pageRangeDisplayed={5}
+                       onPageChange={this.handlePageClick}
+                       containerClassName={"pledgebook pagination"}
+                       subContainerClassName={"pages pagination"}
+                       activeClassName={"active"} />
                 <GSTable 
                     columns={this.state.columns}
                     rowData={this.state.pendingBillList}

@@ -39,3 +39,7 @@
 .orn-display-dom tbody tr.even {
     background-color: #f9f9f9;
 }
+ .pledgebook.pagination li>a {
+    border: none;
+    border-radius: 50%;
+ }
