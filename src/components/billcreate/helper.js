@@ -82,7 +82,7 @@ const _getPicData = (thatState) => {
 export const getCustomerNameList = (records) => {
     let list = [];
     _.each(records, (aRecord, index) => {
-        if(list.indexOf(aRecord.name) == -1)
+        if(list.indexOf(aRecord.name) == -1 && aRecord.name)
             list.push(aRecord.name);
     });
     return list;
@@ -90,7 +90,7 @@ export const getCustomerNameList = (records) => {
 export const getGaurdianNameList = (records) => {
     let list = [];
     _.each(records, (aRecord, index) => {
-        if(list.indexOf(aRecord.gaurdianName) == -1)
+        if(list.indexOf(aRecord.gaurdianName) == -1 && aRecord.gaurdianName)
             list.push(aRecord.gaurdianName);
     });
     return list;
@@ -98,7 +98,7 @@ export const getGaurdianNameList = (records) => {
 export const getAddressList = (records) => {
     let list = [];
     _.each(records, (aRecord, index) => {
-        if(list.indexOf(aRecord.address) == -1)
+        if(list.indexOf(aRecord.address) == -1 && aRecord.address)
             list.push(aRecord.address);
     });
     return list;
@@ -106,7 +106,7 @@ export const getAddressList = (records) => {
 export const getPlaceList = (records) => {
     let list = [];
     _.each(records, (aRecord, index) => {
-        if(list.indexOf(aRecord.place) == -1)
+        if(list.indexOf(aRecord.place) == -1 && aRecord.place)
             list.push(aRecord.place);
     });
     return list;
@@ -114,7 +114,7 @@ export const getPlaceList = (records) => {
 export const getCityList = (records) => {
     let list = [];
     _.each(records, (aRecord, index) => {
-        if(list.indexOf(aRecord.city) == -1)
+        if(list.indexOf(aRecord.city) == -1 && aRecord.city)
             list.push(aRecord.city);
     });
     return list;
@@ -122,7 +122,7 @@ export const getCityList = (records) => {
 export const getPincodeList = (records) => {
     let list = [];
     _.each(records, (aRecord, index) => {
-        if(list.indexOf(aRecord.pincode) == -1)
+        if(list.indexOf(aRecord.pincode) == -1 && aRecord.pincode)
             list.push(aRecord.pincode);
     });
     return list;
@@ -131,7 +131,7 @@ export const getPincodeList = (records) => {
 export const getMobileList = (records) => {
     let list = [];
     _.each(records, (aRecord, index) => {
-        if(list.indexOf(aRecord.mobile) == -1)
+        if(list.indexOf(aRecord.mobile) == -1 && aRecord.mobile)
             list.push(aRecord.mobile);
     });
     return list;
@@ -159,7 +159,7 @@ export const resetState = (nextProps, newState) => {
             anItem.rowCount = 1;
         } else if(index == 'moreDetails') {
             anItem.currCustomerInputKey = anItem.currCustomerInputField = anItem.currCustomerInputVal = anItem.billRemarks = '';                
-            anItem.customerInfo = [];
+            anItem.customerInfo = [];            
         } else {
             if(index !== 'date' && index !== 'billseries') {
                 anItem.hasError = false;
@@ -168,5 +168,6 @@ export const resetState = (nextProps, newState) => {
         }            
     });
     newState.selectedCustomer = {};
+    newState.showMoreInputs = !newState.showMoreInputs;
     return newState;
 }

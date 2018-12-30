@@ -4,6 +4,7 @@ import { getPendingBills } from '../../actions/pledgebook';
 import { parseResponse } from './helper';
 import { connect } from 'react-redux';
 import _ from 'lodash';
+import { Grid, Row, Col, FormGroup, ControlLabel, FormControl, HelpBlock, InputGroup, Button, Glyphicon } from 'react-bootstrap';
 
 import './pledgebook.css';
 import CommonModal from '../common-modal/commonModal.jsx';
@@ -99,6 +100,7 @@ class Pledgebook extends Component {
         this.handleClose = this.handleClose.bind(this);
         this.cellClickCallbacks.onBillNoClick = this.cellClickCallbacks.onBillNoClick.bind(this);
         this.handlePageCountChange = this.handlePageCountChange.bind(this);
+        this.handlePageClick = this.handlePageClick.bind(this);
         this.getOffsets = this.getOffsets.bind(this);
     }
 
@@ -108,7 +110,10 @@ class Pledgebook extends Component {
 
     componentWillReceiveProps(nextProps) {
         let newState = {...this.state};
-        newState.pendingBillList = parseResponse(nextProps.pledgeBook.list);
+        if(nextProps.pledgeBook && nextProps.pledgeBook.list) {
+            newState.pendingBillList = parseResponse(nextProps.pledgeBook.list);
+            newState.totalCount = nextProps.pledgeBook.totalCount;
+        }        
         this.setState(newState);        
     }
 
@@ -122,11 +127,11 @@ class Pledgebook extends Component {
     // START: Listeners
     async handlePageCountChange(e) {
         let selectedPageLimit = e.target.value;        
-        await this.setState({pageLimit: selectedPageLimit});        
+        await this.setState({pageLimit: selectedPageLimit, selectedPageIndex: 0});        
         this.initiateFetchPledgebookAPI();
     }
     async handlePageClick(selectedPage) {
-        await this.setState({selectedPageIndex: selectedPage});        
+        await this.setState({selectedPageIndex: selectedPage.selected});
         this.initiateFetchPledgebookAPI();
     }
 
@@ -146,6 +151,7 @@ class Pledgebook extends Component {
             let val = e.target.value;
             let newState = {...this.state};
             newState.filters.billNo = val;            
+            newState.selectedPageIndex = 0;
             await this.setState(newState);
             this.initiateFetchPledgebookAPI();
         },
@@ -153,6 +159,7 @@ class Pledgebook extends Component {
             let val = e.target.value;
             let newState = {...this.state};
             newState.filters.amount = val;            
+            newState.selectedPageIndex = 0;
             await this.setState(newState);
             this.initiateFetchPledgebookAPI();            
         },
@@ -160,6 +167,7 @@ class Pledgebook extends Component {
             let val = e.target.value;
             let newState = {...this.state};
             newState.filters.cName = val;            
+            newState.selectedPageIndex = 0;
             await this.setState(newState);
             this.initiateFetchPledgebookAPI();            
         },
@@ -167,6 +175,7 @@ class Pledgebook extends Component {
             let val = e.target.value;
             let newState = {...this.state};
             newState.filters.gName = val;            
+            newState.selectedPageIndex = 0;
             await this.setState(newState);
             this.initiateFetchPledgebookAPI();            
         },
@@ -174,6 +183,7 @@ class Pledgebook extends Component {
             let val = e.target.value;
             let newState = {...this.state};
             newState.filters.address = val;            
+            newState.selectedPageIndex = 0;
             await this.setState(newState);
             this.initiateFetchPledgebookAPI();            
         }         
@@ -207,8 +217,8 @@ class Pledgebook extends Component {
         }
     }
 
-    getPageCount() {
-        let totalRecords = this.state.pendingBillList.length;
+    getPageCount() {        
+        let totalRecords = this.state.totalCount;
         return (totalRecords/this.state.pageLimit);
     }
 
@@ -278,34 +288,54 @@ class Pledgebook extends Component {
 
     render() {                    
         return (
-            <div>               
-                 <select className="selectpicker" onChange={this.handlePageCountChange}>
-                    <option selected={this.state.pageLimit=="10" && "selected"}>10</option>
-                    <option selected={this.state.pageLimit=="25" && "selected"}>25</option>
-                    <option selected={this.state.pageLimit=="50" && "selected"}>50</option>
-                    <option selected={this.state.pageLimit=="100" && "selected"}>100</option>
-                    <option selected={this.state.pageLimit=="200" && "selected"}>200</option>
-                </select>
-                <ReactPaginate previousLabel={"<"}
-                       nextLabel={">"}
-                       breakLabel={"..."}
-                       breakClassName={"break-me"}
-                       pageCount={this.getPageCount()}
-                       marginPagesDisplayed={2}
-                       pageRangeDisplayed={5}
-                       onPageChange={this.handlePageClick}
-                       containerClassName={"pledgebook pagination"}
-                       subContainerClassName={"pages pagination"}
-                       activeClassName={"active"} />
-                <GSTable 
-                    columns={this.state.columns}
-                    rowData={this.state.pendingBillList}
-                    expandRow = { this.expandRow }                    
-                />
+            <Grid className="pledgebook-page-content">
+                <Row className='first-row'>
+                    <Col xs={6}>
+                        <p style={{fontSize: "20px"}}>Pledgebook</p>
+                    </Col>
+                    <Col xs={6} className="text-align-right" style={{color: "grey"}}>
+                        No of Bills: {this.state.totalCount}
+                    </Col>
+                </Row>
+                <Row className='second-row'>
+                    <div className='row-count gs-button'>
+                        <span>Rows Count</span>
+                        <select className="selectpicker" onChange={this.handlePageCountChange}>
+                            <option selected={this.state.pageLimit=="10" && "selected"}>10</option>
+                            <option selected={this.state.pageLimit=="25" && "selected"}>25</option>
+                            <option selected={this.state.pageLimit=="50" && "selected"}>50</option>
+                            <option selected={this.state.pageLimit=="100" && "selected"}>100</option>
+                            <option selected={this.state.pageLimit=="200" && "selected"}>200</option>
+                        </select>
+                    </div>
+                    <div>
+                        <ReactPaginate previousLabel={"<"}
+                            nextLabel={">"}
+                            breakLabel={"..."}
+                            breakClassName={"break-me"}
+                            pageCount={this.getPageCount()}
+                            marginPagesDisplayed={2}
+                            pageRangeDisplayed={5}
+                            onPageChange={this.handlePageClick}
+                            containerClassName={"pledgebook pagination"}
+                            subContainerClassName={"pages pagination"}
+                            activeClassName={"active"}
+                            forcePage={this.state.selectedPageIndex} />
+                    </div>
+                </Row>
+                <Row>
+                    <GSTable 
+                        columns={this.state.columns}
+                        rowData={this.state.pendingBillList}
+                        expandRow = { this.expandRow }
+                        className= {"my-pledgebook-table"}
+                        checkbox = {true}
+                    />
+                </Row>
                 <CommonModal modalOpen={this.state.PBmodalIsOpen} handleClose={this.handleClose}>
                     <PledgebookModal {...this.state} handleClose={this.handleClose}/>
                 </CommonModal>
-            </div>
+            </Grid>
         )
     }
 }

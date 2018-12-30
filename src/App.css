@@ -58,3 +58,7 @@
 .no-scroll {
   overflow: hidden;
 }
+
+.text-align-right {
+  text-align: right;
+}

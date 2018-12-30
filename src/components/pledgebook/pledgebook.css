@@ -1,3 +1,39 @@
+.pledgebook-page-content {
+    width: 100%;
+}
+.pledgebook-page-content .first-row,
+.pledgebook-page-content .second-row {
+    width: 90%;
+    margin-left: 5%;    
+}
+.pledgebook-page-content .second-row {
+    text-align: right;
+    padding-top: 10px;
+    padding-bottom: 5px;
+
+}
+.pledgebook-page-content .second-row > div {
+    display: inline-block;
+}
+
+.pledgebook-page-content .second-row .row-count {
+    border: 1px solid;
+    padding: 0 10px;
+    /* position: absolute;
+    right: 15%;
+    top: 108px; */
+}
+.pledgebook-page-content .second-row .row-count select {
+    border: none;
+    outline: none;
+    padding-top: 4px;
+    padding-bottom: 4px;
+    cursor: pointer;
+}
+.pledgebook-page-content .second-row .row-count select:hover,
+.pledgebook-page-content .second-row .row-count select:focus {
+    background-color: transparent;
+}
 .bill-no-cell {
     cursor: pointer;
 }
@@ -11,7 +47,7 @@
 }
 
 .orn-display-dom {
-    width: 50%;
+    width: 60%;
     margin-left: 2%;
     margin-top: 10px;
     margin-bottom: 25px;
@@ -39,7 +75,26 @@
 .orn-display-dom tbody tr.even {
     background-color: #f9f9f9;
 }
- .pledgebook.pagination li>a {
+.pledgebook.pagination {
+    /* margin: 20px 0 0 20px; */
+    /* margin: 13px 0 0 0; */
+    margin: 0;
+}
+.pledgebook.pagination li>a {
     border: none;
     border-radius: 50%;
- }
+    outline: none;
+    color: black;
+    font-weight: bold;
+}
+.pledgebook.pagination>.active>a {
+    color: white;
+}
+.my-pledgebook-table {
+    width: 90%;
+    margin-left: 5%;
+}
+
+.my-pledgebook-table thead {
+    background-color: #f5f5f5;
+}

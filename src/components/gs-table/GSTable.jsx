@@ -28,6 +28,7 @@ class GSTable extends Component {
         newState.columns = parsed.columns;
         newState.rowData = parsed.rowData;
         newState.expandRow = parsed.expandRow;
+        newState.className = parsed.className;
         this.setState(newState);
     }
     parseInputCollection(props) {
@@ -38,13 +39,20 @@ class GSTable extends Component {
         if(props && props.columns) {
             if(props.expandRow && props.expandRow.renderer !== undefined) {
                 parsedCollection.expandRow = props.expandRow;
-                if(props.expandRow.showIndicator && !this.indicatorExistsAlready(props.columns))
+                if(props.expandRow.showIndicator && !this.indicatorExistsAlready(props.columns)) {
+                    let id = "_expandIndicator";
+                    let formatter = this.defaultFormatters.expandIconFormatter;
+                    if(props.checkbox){
+                        id = "_expandIndicatorWithCheckbox";
+                        formatter = this.defaultFormatters.expandIconWithCheckboxFormatter;
+                    }
                     props.columns.unshift({
-                        id: '_expandIndicator',
+                        id: id,
                         displayText: '',
-                        formatter: this.defaultFormatters.expandIconFormatter,
-                        width: '1%'
+                        formatter: formatter,
+                        width: '4%'
                     });
+                }                    
             }
             _.each(props.columns, (aCol, index) => {
                 let buffer = {};
@@ -65,6 +73,9 @@ class GSTable extends Component {
                 parsedCollection.rowData.push(aRow);
             });
         }
+
+        parsedCollection.className = props.className || '';
+        parsedCollection.checkbox = props.checkbox || false;
         return parsedCollection;
     }
     defaults = {
@@ -90,6 +101,31 @@ class GSTable extends Component {
                         <FontAwesomeIcon icon="angle-right" />
                     </span>)
             }
+            return theDom;
+        },
+        expandIconWithCheckboxFormatter: (column, colIndex, row, rowIndex) => {
+            let theDom = [];
+            if(row._expanded) {
+                theDom.push(
+                    <span>
+                        <span key={"angle-down"} className='expand-icon arrow-down' onClick={(e) => this.onExpandIconClick(e, column, colIndex, row, rowIndex)}>
+                            <FontAwesomeIcon icon="angle-down" />
+                        </span>
+                        <span>
+                            <input type="checkbox" class="gs-checkbox" />
+                        </span>
+                    </span>);
+            } else {
+                theDom.push(
+                    <span>
+                        <span key={"angle-right"} className='expand-icon arrow-right' onClick={(e) => this.onExpandIconClick(e, column, colIndex, row, rowIndex)}>
+                            <FontAwesomeIcon icon="angle-right" />
+                        </span>
+                        <span>
+                            <input type="checkbox" class="gs-checkbox" />
+                        </span>
+                    </span>);
+            }            
             return theDom;
         }
     }
@@ -128,7 +164,7 @@ class GSTable extends Component {
 
     createTableContent() {
         return (
-            <table className='gs-table table table-striped table-hover table-bordered table-sm'>
+            <table className={this.state.className + ' gs-table table table-hover table-bordered table-sm'}>
                 {this.createColGroup()}
                 {this.createHeader()}
                 {this.createBody()}                

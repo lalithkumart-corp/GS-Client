@@ -6,7 +6,8 @@ export default function pledgeBookReducer(state= defaultState, action) {
             newState.loading = true;
             break;
         case 'GET_PENDING_BILLS':
-            newState.list = action.payload;
+            newState.list = action.payload.results;
+            newState.totalCount = action.payload.totalCount;
             newState.loading = false;
             break;            
     }
