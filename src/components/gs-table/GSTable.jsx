@@ -9,6 +9,7 @@ import React, { Component } from 'react';
 import _ from 'lodash';
 import './GSTable.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import GSCheckbox from '../ui/gs-checkbox/checkbox';
 
 class GSTable extends Component {
     constructor(props) {
@@ -29,16 +30,18 @@ class GSTable extends Component {
         newState.rowData = parsed.rowData;
         newState.expandRow = parsed.expandRow;
         newState.className = parsed.className;
+        this.checkboxOnChangeListener = parsed.checkboxOnChangeListener;
+        newState.selectedIndexes = parsed.selectedIndexes || [];
         this.setState(newState);
     }
     parseInputCollection(props) {
-        let parsedCollection = {
+        let parsedData = {
             columns: [],
             rowData: []
         };
         if(props && props.columns) {
             if(props.expandRow && props.expandRow.renderer !== undefined) {
-                parsedCollection.expandRow = props.expandRow;
+                parsedData.expandRow = props.expandRow;
                 if(props.expandRow.showIndicator && !this.indicatorExistsAlready(props.columns)) {
                     let id = "_expandIndicator";
                     let formatter = this.defaultFormatters.expandIconFormatter;
@@ -50,7 +53,7 @@ class GSTable extends Component {
                         id: id,
                         displayText: '',
                         formatter: formatter,
-                        width: '4%'
+                        width: '6%'
                     });
                 }                    
             }
@@ -64,19 +67,21 @@ class GSTable extends Component {
                 buffer.filterVal = aCol.filterVal || null;
                 buffer.filterCallback = aCol.filterCallback || this.defaults.filterCallback;
                 buffer.width = aCol.width || '0%';
-                parsedCollection.columns.push(buffer);
+                parsedData.columns.push(buffer);
             });
         }
         if(props && props.rowData) {
             _.each(props.rowData, (aRow, index) => {
                 aRow._expanded = false;
-                parsedCollection.rowData.push(aRow);
+                parsedData.rowData.push(aRow);
             });
         }
 
-        parsedCollection.className = props.className || '';
-        parsedCollection.checkbox = props.checkbox || false;
-        return parsedCollection;
+        parsedData.className = props.className || '';
+        parsedData.checkbox = props.checkbox || false;
+        parsedData.checkboxOnChangeListener = props.checkboxOnChangeListener;
+        parsedData.selectedIndexes = props.selectedIndexes || [];
+        return parsedData;
     }
     defaults = {
         isFilterable: false,
@@ -111,8 +116,11 @@ class GSTable extends Component {
                         <span key={"angle-down"} className='expand-icon arrow-down' onClick={(e) => this.onExpandIconClick(e, column, colIndex, row, rowIndex)}>
                             <FontAwesomeIcon icon="angle-down" />
                         </span>
-                        <span>
-                            <input type="checkbox" class="gs-checkbox" />
+                        <span className="gstable-checkbox-container">
+                            <GSCheckbox labelText="" 
+                                checked={this.checkIsSelected(rowIndex)} 
+                                onChangeListener = {(e) => {this.callbackMiddleware.checkboxOnChange(e, column, colIndex, row, rowIndex)}} 
+                                className={"gstable-selector-checkbox"}/>
                         </span>
                     </span>);
             } else {
@@ -121,22 +129,38 @@ class GSTable extends Component {
                         <span key={"angle-right"} className='expand-icon arrow-right' onClick={(e) => this.onExpandIconClick(e, column, colIndex, row, rowIndex)}>
                             <FontAwesomeIcon icon="angle-right" />
                         </span>
-                        <span>
-                            <input type="checkbox" class="gs-checkbox" />
+                        <span className="gstable-checkbox-container">
+                            <GSCheckbox labelText="" 
+                                checked={this.checkIsSelected(rowIndex)} 
+                                onChangeListener = {(e) => {this.callbackMiddleware.checkboxOnChange(e, column, colIndex, row, rowIndex)}} 
+                                className={"gstable-selector-checkbox"}/>
                         </span>
                     </span>);
             }            
             return theDom;
         }
     }
+    callbackMiddleware = {
+        checkboxOnChange: (e, column, colIndex, row, rowIndex) => {
+            let isChecked = e.target.checked;
+            this.checkboxOnChangeListener({isChecked, column, colIndex, row, rowIndex});
+        }
+    }
 
     indicatorExistsAlready(columns) {
         let exits = false;
         _.each(columns, (aCol, index) => {
-            if(aCol.id == "_expandIndicator")
+            if(aCol.id == "_expandIndicator" || aCol.id == "_expandIndicatorWithCheckbox")
                 exits = true;
         });
         return exits;
+    }
+
+    checkIsSelected(rowIndex) {        
+        let flag = false;
+        if(this.state.selectedIndexes.indexOf(rowIndex) != -1)
+            flag = true;
+        return flag;
     }
 
     getFilterBox(column, colIndex) {
@@ -235,15 +259,16 @@ class GSTable extends Component {
     createBody() {
         let makeARow = (aRowData, rowIndex) => {
             let columns = this.state.columns;
+            let theClassName = (this.checkIsSelected(rowIndex))?"selected":"";
             return (
-                <tr key={rowIndex+"-row"} className="a-row">
+                <tr key={rowIndex+"-row"} className={theClassName +" a-row"}>
                     {
                         ( () => {                            
                             let rowCells = [];
                             for(let i=0; i<columns.length; i++) {
                                 let formatter = columns[i].formatter;                                
                                 rowCells.push(
-                                    <td key={i+"-body"}>
+                                    <td className={"column-"+ i} key={i+"-body"}>
                                         {formatter(columns[i], i, aRowData, rowIndex)}                                        
                                     </td>
                                 );

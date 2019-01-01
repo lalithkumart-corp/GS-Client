@@ -29,6 +29,8 @@ class Pledgebook extends Component {
                 amount: '',
             },
             selectedPageIndex: 0,
+            selectedIndexes: [],
+            selectedRowJson: [],
             pageLimit: 10,
             pendingBillList :[],
             columns : [{
@@ -102,6 +104,7 @@ class Pledgebook extends Component {
         this.handlePageCountChange = this.handlePageCountChange.bind(this);
         this.handlePageClick = this.handlePageClick.bind(this);
         this.getOffsets = this.getOffsets.bind(this);
+        this.handleCheckboxChangeListener = this.handleCheckboxChangeListener.bind(this);
     }
 
     componentDidMount() {
@@ -137,6 +140,25 @@ class Pledgebook extends Component {
 
     handleClose() {
         this.setState({PBmodalIsOpen: false});
+    }
+
+    //params will receive the following {isChecked, column, colIndex, row, rowIndex}
+    handleCheckboxChangeListener(params) {
+        let newState = {...this.state};
+        if(params.isChecked) {
+            newState.selectedIndexes.push(params.rowIndex);        
+            newState.selectedRowJson.push(params.row);
+        } else {
+            let rowIndex = newState.selectedIndexes.indexOf(params.rowIndex);
+            newState.selectedIndexes.splice(rowIndex, 1);            
+            newState.selectedRowJson= newState.selectedRowJson.filter(
+                (anItem) => {
+                    if(newState.selectedIndexes.indexOf(anItem.rowNumber) == -1)
+                        return true;                                                  
+                }        
+            );
+        }        
+        this.setState(newState);
     }
 
     cellClickCallbacks = {
@@ -330,6 +352,8 @@ class Pledgebook extends Component {
                         expandRow = { this.expandRow }
                         className= {"my-pledgebook-table"}
                         checkbox = {true}
+                        checkboxOnChangeListener = {this.handleCheckboxChangeListener}
+                        selectedIndexes = {this.state.selectedIndexes}
                     />
                 </Row>
                 <CommonModal modalOpen={this.state.PBmodalIsOpen} handleClose={this.handleClose}>
