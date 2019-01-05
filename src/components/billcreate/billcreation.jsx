@@ -708,8 +708,21 @@ s
                     break;
                 case 'billno':
                 case 'amount':
-                case 'date':
                     newState.formData[identifier].inputVal = val;
+                    break;
+                case 'date':
+                    let currentDate = new Date();
+                    let currHr = currentDate.getHours();
+                    let currMin = currentDate.getMinutes();
+                    let currSec = currentDate.getSeconds();
+                    let currMilliSec = currentDate.getMilliseconds();
+                    let selectedDate = new Date(val);
+                    selectedDate.setHours(currHr);
+                    selectedDate.setMinutes(currMin);
+                    selectedDate.setSeconds(currSec);
+                    selectedDate.setMilliseconds(currMilliSec);
+                    let selectedDateInUTC = selectedDate.toISOString(); // (val.slice(0,10) + 'T' + currUTCHr + ':'+ currUTCMin + ':' + currUTCSec + '.' + currUTCMilliSec + 'Z');
+                    newState.formData[identifier].inputVal = selectedDateInUTC;                    
                     break;
                 case 'billRemarks':
                     newState.formData.moreDetails.billRemarks = val;
@@ -1029,10 +1042,11 @@ s
                                     <DatePicker
                                         id="example-datepicker" 
                                         value={this.state.formData.date.inputVal} 
-                                        onChange={(dateVal) => this.inputControls.onChange(null, dateVal, 'date') }
+                                        onChange={(fullDateVal, dateVal) => {debugger; this.inputControls.onChange(null, fullDateVal, 'date')} }
                                         ref = {(domElm) => { this.domElmns.date = domElm; }}
                                         onKeyUp = {(e) => this.handleKeyUp(e, {currElmKey: 'date'}) }
                                         readOnly={this.props.billCreation.loading}
+                                        dateFormat="DD-MM-YYYY"
                                         />
                                 </FormGroup>
                         </Col>

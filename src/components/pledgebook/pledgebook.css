@@ -98,3 +98,16 @@
 .my-pledgebook-table thead {
     background-color: #f5f5f5;
 }
+
+.pledgebook-date-filter {
+    font-weight: normal;
+    padding: 0 !important;
+    color: grey !important;
+    outline: none;
+}
+.pledgebook-date-filter .calendar-icon-div {
+    padding-right: 5px;
+}
+.pledgebook-date-filter .arrow-down-icon {
+    padding-left: 5px;
+}

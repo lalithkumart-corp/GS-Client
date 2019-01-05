@@ -66,6 +66,7 @@ class GSTable extends Component {
                 buffer.isFilterable = aCol.isFilterable || this.defaults.isFilterable;
                 buffer.filterVal = aCol.filterVal || null;
                 buffer.filterCallback = aCol.filterCallback || this.defaults.filterCallback;
+                buffer.filterFormatter = aCol.filterFormatter || this.defaultFormatters.filter;
                 buffer.width = aCol.width || '0%';
                 parsedData.columns.push(buffer);
             });
@@ -112,7 +113,7 @@ class GSTable extends Component {
             let theDom = [];
             if(row._expanded) {
                 theDom.push(
-                    <span>
+                    <span key={colIndex+'-expand-icon'}>
                         <span key={"angle-down"} className='expand-icon arrow-down' onClick={(e) => this.onExpandIconClick(e, column, colIndex, row, rowIndex)}>
                             <FontAwesomeIcon icon="angle-down" />
                         </span>
@@ -125,7 +126,7 @@ class GSTable extends Component {
                     </span>);
             } else {
                 theDom.push(
-                    <span>
+                    <span key={colIndex+'-expand-icon'}>
                         <span key={"angle-right"} className='expand-icon arrow-right' onClick={(e) => this.onExpandIconClick(e, column, colIndex, row, rowIndex)}>
                             <FontAwesomeIcon icon="angle-right" />
                         </span>
@@ -138,6 +139,11 @@ class GSTable extends Component {
                     </span>);
             }            
             return theDom;
+        },
+        filter: (column, colIndex) => {
+            return (                
+                <input type='text' value={undefined} onChange={(e) => column.filterCallback(e, column, colIndex)}/>                
+            );
         }
     }
     callbackMiddleware = {
@@ -166,10 +172,10 @@ class GSTable extends Component {
     getFilterBox(column, colIndex) {
         return (
             <th key={colIndex+"-inner-header"} className={column.className + " inner-header a-cell"}>
-                <input type='text' value={undefined} onChange={(e) => column.filterCallback(e, column, colIndex)}/>
+                {column.filterFormatter(column, colIndex)}
             </th>
         );
-    }   
+    }
     
     onExpandIconClick(e, column, colIndex, row, rowIndex) {
         let newState = {...this.state};

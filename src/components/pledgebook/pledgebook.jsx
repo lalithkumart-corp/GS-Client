@@ -11,20 +11,30 @@ import CommonModal from '../common-modal/commonModal.jsx';
 import PledgebookModal from './pledgebookModal';
 import GSTable from '../gs-table/GSTable';
 import ReactPaginate from 'react-paginate';
+import DateRangePicker from '../dateRangePicker/dataRangePicker';
 
 class Pledgebook extends Component {
     constructor(props) {
         super(props);
         this.timeOut = 300;
+        let todaysDate = new Date();
+        let past7daysStartDate = new Date();
+        past7daysStartDate.setDate(past7daysStartDate.getDate()-7);
+        todaysDate.setHours(0,0,0,0);
+        let todaysEndDate = new Date();
+        todaysEndDate.setHours(23,59,59,999);
         this.state = {
             PBmodalIsOpen: false,
             offsetStart: 0,
             offsetEnd: 10,
             filters: {
+                date: {
+                    startDate: past7daysStartDate,
+                    endDate: todaysEndDate
+                },
                 cName: '',
                 gName: '',
                 address: '',
-                date: '',
                 billNo: '',
                 amount: '',
             },
@@ -34,22 +44,22 @@ class Pledgebook extends Component {
             pageLimit: 10,
             pendingBillList :[],
             columns : [{
-                    id: 'SNo',
-                    displayText: 'No',
-                    width: '4%',
-                    formatter: (column, columnIndex, row, rowIndex) => {
-                        let temp = row[column.id];
-                        return (
-                            <span>{++temp}</span>
-                        )
-                    }
-                },{
                     id: 'Date',
                     displayText: 'Date',
-                    width: '15%',
+                    width: '20%',
                     formatter: (column, columnIndex, row, rowIndex) => {
                         return (
-                            <span>{this.customDateFormatter(row[column.id])}</span>
+                            <span>{this.convertToLocalTime(row[column.id])}</span>
+                        )
+                    },
+                    isFilterable: true,
+                    filterFormatter: (column, colIndex) => {
+                        return (
+                            <DateRangePicker 
+                                className = 'pledgebook-date-filter'
+                                selectDateRange={this.filterCallbacks.date}
+                                startDate={this.state.filters.date.startDate}
+                                endDate={this.state.filters.date.endDate}/>
                         )
                     }
                 },{
@@ -65,25 +75,25 @@ class Pledgebook extends Component {
                             </span>
                         )
                     },
-                    width: '5%'
+                    width: '3%'
                 },{
                     id: 'Amount',
                     displayText: 'Amount',
-                    width: '5%',
+                    width: '3%',
                     isFilterable: true,
                     filterCallback: this.filterCallbacks.onAmountChange,
                     className: 'pb-amount-col'
                 }, {
                     id: 'Name',
                     displayText: 'Customer Name',
-                    width: '20%',
+                    width: '18%',
                     isFilterable: true,
                     filterCallback: this.filterCallbacks.onCustNameChange,
                     className: 'pb-customer-name-col'
                 }, {
                     id: 'GaurdianName',
                     displayText: 'Gaurdian Name',
-                    width: '20%',
+                    width: '18%',
                     isFilterable: true,
                     filterCallback: this.filterCallbacks.onGuardianNameChange,
                     className: 'pb-guardian-name-col'
@@ -134,7 +144,7 @@ class Pledgebook extends Component {
         this.initiateFetchPledgebookAPI();
     }
     async handlePageClick(selectedPage) {
-        await this.setState({selectedPageIndex: selectedPage.selected});
+        await this.setState({selectedPageIndex: selectedPage.selected, selectedIndexes: []});        
         this.initiateFetchPledgebookAPI();
     }
 
@@ -169,6 +179,13 @@ class Pledgebook extends Component {
     }        
 
     filterCallbacks = {
+        date: async (startDate, endDate) => {
+            let newState = {...this.state};
+            newState.filters.date.startDate = new Date(startDate);
+            newState.filters.date.endDate = new Date(endDate);
+            await this.setState(newState);
+            this.initiateFetchPledgebookAPI();
+        },
         billNo: async (e, col, colIndex) => {
             let val = e.target.value;
             let newState = {...this.state};
@@ -212,6 +229,12 @@ class Pledgebook extends Component {
     }    
 
     // START: Helper's
+    dateFormatter(theDate, options) {        
+        let formattedDate = theDate.toISOString().replace('T', ' ').slice(0,19);        
+        if(options && options.onlyDate)
+            formattedDate = formattedDate.slice(0, 10);
+        return formattedDate;
+    }
     getAPIParams() {
         let offsets = this.getOffsets();
         let filters = this.getFilters();
@@ -228,9 +251,14 @@ class Pledgebook extends Component {
         return [offsetStart, offsetEnd];
     }
 
-    getFilters() {
+    getFilters() {                
+        let endDate = new Date(this.state.filters.date.endDate);
+        endDate.setHours(23,59,59,999);
         return {            
-            date: this.state.filters.date,            
+            date: {
+                startDate: this.dateFormatter(this.state.filters.date.startDate),
+                endDate: this.dateFormatter(endDate)
+            },
             billNo: this.state.filters.billNo,
             amount: this.state.filters.amount,
             cName: this.state.filters.cName,
@@ -251,9 +279,22 @@ class Pledgebook extends Component {
             this.props.getPendingBills(params);
         }, this.timeOut);        
     }
-    customDateFormatter(theDate) {
-        // TODO: format date accordingly
-        return theDate;
+    convertToLocalTime(theDate){
+        const twoDigitFormat = (val) => {
+            val = parseInt(val);
+            if(val < 10)
+                val = '0'+val;
+            return val;
+        };        
+        let localDateObj = new Date(theDate + ' UTC');
+        let dd = twoDigitFormat(localDateObj.getDate());
+        let mm = twoDigitFormat(localDateObj.getMonth() + 1);        
+        let yyyy = localDateObj.getFullYear();
+        let hr = twoDigitFormat(localDateObj.getHours());
+        let min = twoDigitFormat(localDateObj.getMinutes());
+        let sec = twoDigitFormat(localDateObj.getSeconds());
+        let localDate = `${yyyy}-${mm}-${dd}  ${hr}:${min}:${sec}`;        
+        return localDate;        
     }
     expandRow = {
         renderer: (row) => {
