@@ -25,6 +25,7 @@ import EditDetailsDialog from './editDetailsDialog';
 import { insertNewBill, updateClearEntriesFlag, showEditDetailModal, hideEditDetailModal, getBillNoFromDB, disableReadOnlyMode } from '../../actions/billCreation';
 import { DoublyLinkedList } from '../../utilities/doublyLinkedList';
 import { getGaurdianNameList, getAddressList, getPlaceList, getCityList, getPincodeList, getMobileList, buildRequestParams, updateBillNumber, resetState, defaultPictureState } from './helper';
+import { getAccessToken } from '../../core/storage';
 
 const ENTER_KEY = 13;
 const SPACE_KEY = 32;
@@ -195,7 +196,8 @@ s
 
     /* START: API accessors */
     fetchMetaData() {
-        axios.get(PLEDGEBOOK_METADATA + '?identifiers=["all", "otherDetails"]')
+        let accessToken = getAccessToken();
+        axios.get(PLEDGEBOOK_METADATA + `?access_token=${accessToken}&identifiers=["all", "otherDetails"]`)
             .then(
                 (successResp) => {                      
                     let newState = {...this.state};
@@ -1042,7 +1044,7 @@ s
                                     <DatePicker
                                         id="example-datepicker" 
                                         value={this.state.formData.date.inputVal} 
-                                        onChange={(fullDateVal, dateVal) => {debugger; this.inputControls.onChange(null, fullDateVal, 'date')} }
+                                        onChange={(fullDateVal, dateVal) => {this.inputControls.onChange(null, fullDateVal, 'date')} }
                                         ref = {(domElm) => { this.domElmns.date = domElm; }}
                                         onKeyUp = {(e) => this.handleKeyUp(e, {currElmKey: 'date'}) }
                                         readOnly={this.props.billCreation.loading}
@@ -1314,7 +1316,6 @@ class CustomerListAdaptor extends ItemAdapter {
     } */
 
     // itemMatchesInput(item, foldedValue) {
-    //     debugger;
     //     for (let text of this.getTextRepresentations(item)) {
     //       if (text === foldedValue) {
     //         return true

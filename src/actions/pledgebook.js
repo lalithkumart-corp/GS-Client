@@ -1,10 +1,11 @@
 import axios from 'axios';
 import { GET_PENDING_BILLS } from '../core/sitemap';
 import { toast } from 'react-toastify';
+import { getAccessToken } from '../core/storage';
 export const getPendingBills = (args) => {    
     return (dispatch) => {
         enableLoading();        
-        axios.get(`${GET_PENDING_BILLS}?args=${JSON.stringify(args)}`)
+        axios.get(`${GET_PENDING_BILLS}?access_token=${getAccessToken()}&params=${JSON.stringify(args)}`)
         .then(
             (successResp) => {                
                 dispatch({

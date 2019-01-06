@@ -19,7 +19,8 @@ export default function authReducer(state=defaultState, action){
             newState = {
                 ...newState,
                 loading: false,
-                isAuthenticated: true
+                isAuthenticated: true,
+                authDetails: action.data
             };
             break;
         case 'AUTH_ERROR':
@@ -29,7 +30,11 @@ export default function authReducer(state=defaultState, action){
                 isAuthenticated: false
             };
             break;
-
+        case 'LOGGED_OUT':
+            newState = {
+                ...newState,
+                isAuthenticated: false
+            };
     }
     return newState;
 }

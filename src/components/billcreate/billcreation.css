@@ -169,3 +169,13 @@
     background-color: #eee;
     opacity: 1;
 }
+
+.bill-creation-container .autosuggest .show-all:after{
+    content: 'Show Others';
+    font-style: italic;
+    font-size: 12px;
+    text-align: center;
+    /* margin: 0 auto; */
+    display: block;
+    padding-right: 15px;
+}

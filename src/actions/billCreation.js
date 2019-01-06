@@ -1,6 +1,7 @@
 import axios from 'axios';
 import { PLEDGEBOOK_ADD_RECORD, GET_LAST_BILL_NO } from '../core/sitemap';
 import { toast } from 'react-toastify';
+import { getAccessToken } from '../core/storage';
 
 export const insertNewBill = (requestParams) => {
     return (dispatch) => {
@@ -87,7 +88,8 @@ export const disableReadOnlyMode = () => {
 
 export const getBillNoFromDB = () => {
     return (dispatch) => {
-        axios.get(GET_LAST_BILL_NO)
+        let accessToken = getAccessToken();
+        axios.get(GET_LAST_BILL_NO+`?access_token=${accessToken}`)
             .then(
                 (successResp) => {                                        
                     dispatch({                        

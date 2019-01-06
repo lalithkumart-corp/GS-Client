@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { Nav, Navbar, NavDropdown, NavItem, MenuItem } from 'react-bootstrap';
-import { LinkContainer } from 'react-router-bootstrap'
+import { LinkContainer } from 'react-router-bootstrap';
 
 class NavbarComp extends Component {
     constructor(props) {
@@ -41,6 +41,12 @@ class NavbarComp extends Component {
 
                     <NavItem eventKey={3} href="#">
                         Help
+                    </NavItem>
+
+                    <NavItem eventKey={4} href="#">
+                        <LinkContainer to='/logout'>
+                            <MenuItem eventKey={4}>Logout</MenuItem>
+                        </LinkContainer>
                     </NavItem>
                 </Nav>
             </Navbar>

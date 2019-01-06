@@ -9,6 +9,7 @@ import Redeem from '../redeem/redeem';
 import Pledgebook from '../pledgebook/pledgebook';
 import Demo from '../demo/demo';
 import Picture from '../profilePic/ProfilePic';
+import Logout from '../logout/logout';
 import Navbar from '../navbar/navbar';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
@@ -34,13 +35,14 @@ class SmartComponent extends Component {
                                 <Navbar />
                             </div>
                             <div className='page-content'>
-                                <ToastContainer autoClose={false} position={'top-center'} hideProgressBar={true}/>
+                                <ToastContainer autoClose={true} position={'top-center'} hideProgressBar={false}/>
                                 <Route exact path='/' component={Home} />
                                 <Route path= '/billcreate' component={BillCreation} />
                                 <Route path= '/redeem' component={Redeem} />
                                 <Route path= '/pledgebook' component={Pledgebook} />
                                 <Route path= '/demo' component={Demo} />
                                 <Route path= '/picture' component={Picture} />
+                                <Route path= '/logout' component={Logout} />
                             </div>
                         </div>
                 </Router>
@@ -49,8 +51,8 @@ class SmartComponent extends Component {
             return (
                 <Router history={history}>
                     <div>
-                        <ToastContainer autoClose={false} position={'top-center'} hideProgressBar={true}/>
-                        <Route exact path= '/' component={LoginPage} />                        
+                        <ToastContainer autoClose={true} position={'top-center'} hideProgressBar={false}/>
+                        <Route exact path= '/' component={LoginPage} />
                     </div>
                 </Router>
             )            

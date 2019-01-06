@@ -23,7 +23,7 @@ export const defaultPictureState = {
 export const buildRequestParams = (thatState = {}) => {
     let state = {...thatState}; //for preventing reference issue    
     let params = {
-        date: state.formData.date.inputVal,
+        date: state.formData.date.inputVal.replace('T', ' ').slice(0,23),
         billSeries: state.formData.billseries.inputVal,
         billNo: state.formData.billno.inputVal, //_getBillNo(thatState),
         amount: state.formData.amount.inputVal,
