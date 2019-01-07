@@ -22,7 +22,7 @@ import { Collapse } from 'react-collapse';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import sh from 'shorthash';
 import EditDetailsDialog from './editDetailsDialog';
-import { insertNewBill, updateClearEntriesFlag, showEditDetailModal, hideEditDetailModal, getBillNoFromDB, disableReadOnlyMode } from '../../actions/billCreation';
+import { insertNewBill, updateClearEntriesFlag, showEditDetailModal, hideEditDetailModal, getBillNoFromDB, disableReadOnlyMode, updateBillNoInStore } from '../../actions/billCreation';
 import { DoublyLinkedList } from '../../utilities/doublyLinkedList';
 import { getGaurdianNameList, getAddressList, getPlaceList, getCityList, getPincodeList, getMobileList, buildRequestParams, updateBillNumber, resetState, defaultPictureState } from './helper';
 import { getAccessToken } from '../../core/storage';
@@ -247,11 +247,15 @@ s
         newState.formData.orn.rowCount = Object.keys(ornObj).length;
         newState.formData.moreDetails.customerInfo = JSON.parse(data.OtherDetails) || [];    
         
-        let buff = new Buffer(data.Image.data, "base64"); //.toString('base64');
-        let img = buff.toString('ascii');
-        img = img.substring(1);
-        img = img.substring(0, img.length-1);
-        newState.picture.holder.confirmedImgSrc = "data:image/webp;base64,"+ img;        
+        if(data.Image && data.Image.data) {
+            let buff = new Buffer(data.Image.data, "base64"); //.toString('base64');
+            let img = buff.toString('ascii');
+            img = img.substring(1);
+            img = img.substring(0, img.length-1);
+            newState.picture.holder.confirmedImgSrc = "data:image/webp;base64,"+ img;
+            newState.picture.holder.imgSrc = '';
+            newState.picture.status = 'SAVED';
+        }
         
         this.setState(newState);
     }
@@ -532,6 +536,10 @@ s
         this.props.insertNewBill(requestParams);
     }
 
+    handleUpdate() {
+        
+    }
+
     onEditDetailIconClick(index) {        
         let newState = {...this.state};
         newState.editModalContent = {
@@ -707,10 +715,13 @@ s
                 case 'ornNWt':
                 case 'ornNos':
                     newState.formData.orn.inputs[options.serialNo][identifier] = val;
-                    break;
-                case 'billno':
+                    break;                
                 case 'amount':
                     newState.formData[identifier].inputVal = val;
+                    break;
+                case 'billno':
+                    newState.formData[identifier].inputVal = val;
+                    this.props.updateBillNoInStore(newState.formData.billseries.inputVal, val);
                     break;
                 case 'date':
                     let currentDate = new Date();
@@ -1281,7 +1292,7 @@ const mapStateToProps = (state) => {
     };
 };
 
-export default connect(mapStateToProps, {insertNewBill, updateClearEntriesFlag, showEditDetailModal, hideEditDetailModal, getBillNoFromDB, disableReadOnlyMode})(BillCreation);
+export default connect(mapStateToProps, {insertNewBill, updateClearEntriesFlag, showEditDetailModal, hideEditDetailModal, getBillNoFromDB, disableReadOnlyMode, updateBillNoInStore})(BillCreation);
 
 
 class CommonAdaptor extends ItemAdapter {

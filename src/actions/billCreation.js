@@ -8,17 +8,19 @@ export const insertNewBill = (requestParams) => {
         dispatch({
             type: 'ENABLE_LOADING'
         });
-        axios.post(PLEDGEBOOK_ADD_RECORD, requestParams)
+        let accessToken = getAccessToken();
+        axios.post(PLEDGEBOOK_ADD_RECORD, {accessToken, requestParams})
             .then(
                 (resp) => {
                     if(resp.data.STATUS == 'error') {
-                        toast.error('Error in adding new bill to pledgebook!');
+                        let errorText = resp.data.ERROR;
+                        toast.error('Error in adding new bill to pledgebook - ' + errorText);
                         dispatch({
                             type: 'NEW_BILL_INSERTION_ERROR',
                             data: {msg: resp.data.ERROR}
                         });                    
                     } else {
-                        toast.success('Inserted the new bill into Pledgebook successfully'); //TODO: Hide this msg automatically after some timeout
+                        toast.success('New bill added successfully'); //TODO: Hide this msg automatically after some timeout
                         dispatch({
                             type: 'NEW_BILL_INSERTED_SUCCESSFULLY'
                         });
@@ -106,5 +108,14 @@ export const getBillNoFromDB = () => {
                     toast.error('Exception occured in fetching th elast etered Bill number series');
                 }
             )
+    }
+}
+
+export const updateBillNoInStore = (billSeries, billNo) => {
+    return (dispatch) => {
+        dispatch({
+            type: 'UPDATE_BILL_NUMBER',
+            data: {billSeries: billSeries, billNo: billNo}
+        });
     }
 }

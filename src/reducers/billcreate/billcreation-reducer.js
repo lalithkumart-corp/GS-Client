@@ -72,7 +72,14 @@ export default function billCreationReducer(state=defaultState, action) {
                 ...newState,
                 billSeries: billSeries,
                 billNumber: nextBillNumber
-            }
+            };
+            break;
+        case 'UPDATE_BILL_NUMBER':
+            newState = {
+                ...newState,
+                billSeries: action.data.billSeries,
+                billNumber: action.data.billNo
+            };
             break;
     }
     return newState;

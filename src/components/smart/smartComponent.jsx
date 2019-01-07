@@ -35,7 +35,7 @@ class SmartComponent extends Component {
                                 <Navbar />
                             </div>
                             <div className='page-content'>
-                                <ToastContainer autoClose={true} position={'top-center'} hideProgressBar={false}/>
+                                <ToastContainer position={'top-center'} hideProgressBar={false}/>
                                 <Route exact path='/' component={Home} />
                                 <Route path= '/billcreate' component={BillCreation} />
                                 <Route path= '/redeem' component={Redeem} />
@@ -51,7 +51,7 @@ class SmartComponent extends Component {
             return (
                 <Router history={history}>
                     <div>
-                        <ToastContainer autoClose={true} position={'top-center'} hideProgressBar={false}/>
+                        <ToastContainer position={'top-center'} hideProgressBar={false}/>
                         <Route exact path= '/' component={LoginPage} />
                     </div>
                 </Router>
