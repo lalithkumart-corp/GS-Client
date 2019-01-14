@@ -4,6 +4,8 @@ import { Grid, Row, Col, FormGroup, ControlLabel, FormControl, HelpBlock, InputG
 import "./pledgebookModal.css";
 import { connect } from 'react-redux';
 import { enableReadOnlyMode, disableReadOnlyMode } from '../../actions/billCreation';
+import { REDEEM_PENDING_BILLS } from '../../core/sitemap';
+import { makeRedeemAPIRequestParams } from './helper';
 
 class PledgebookModal extends Component {
     constructor(props) {
@@ -14,7 +16,7 @@ class PledgebookModal extends Component {
         }
     }
 
-    componentDidMount() {        
+    componentDidMount() {
         this.props.enableReadOnlyMode();
     }
 
@@ -28,6 +30,13 @@ class PledgebookModal extends Component {
         this.props.enableReadOnlyMode();
     }
 
+    onRedeemClick() {
+        //REDEEM_PENDING_BILLS
+        debugger;
+        let requestParams = makeRedeemAPIRequestParams(this.props.currentBillData);
+        
+    }
+
     canDisableBtn(btn) {
         let flag = false;
         switch(btn) {
@@ -38,7 +47,11 @@ class PledgebookModal extends Component {
             case 'ignore':
                 if(this.state.cancelMode)
                     flag = true;
-                break;         
+                break;
+            case 'redeem':
+                if(!this.props.currentBillData.Status)
+                    flag = true;
+                break;
         }
         return flag;
     }
@@ -48,6 +61,13 @@ class PledgebookModal extends Component {
             <div className="pledgebook-modal-container">
                 <Row>
                     <Col xs={12} md={12} className='button-container'>
+                        <input 
+                            type="button"
+                            className='gs-button'
+                            onClick={(e) => this.onRedeemClick()}
+                            value='Redeem'
+                            disabled={this.canDisableBtn('redeem')}
+                            />
                         <input 
                             type="button"
                             className='gs-button'
