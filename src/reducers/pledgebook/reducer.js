@@ -9,7 +9,11 @@ export default function pledgeBookReducer(state= defaultState, action) {
             newState.list = action.payload.results;
             newState.totalCount = action.payload.totalCount;
             newState.loading = false;
-            break;            
+            newState.refreshTable = true;
+            break;
+        case 'SET_REFRESH_FLAG':
+            newState.refreshTable = false;
+            break;
     }
     return newState;
 }

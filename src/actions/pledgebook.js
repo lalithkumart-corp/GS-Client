@@ -35,3 +35,12 @@ export const enableLoading = () => {
         });
     }    
 }
+
+export const setRefreshFlag = (flag) => {
+    return (dispatch) => {
+        dispatch({
+            type: 'SET_REFRESH_FLAG',
+            payload: flag
+        })
+    }
+}

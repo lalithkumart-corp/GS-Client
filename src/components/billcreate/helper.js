@@ -38,12 +38,12 @@ export const buildRequestParams = (thatState = {}) => {
         billRemarks: _getBillRemarks(thatState),
         moreDetails: _getMoreData(thatState),
         picture: _getPicData(thatState)
-    }    
+    };
     return params;
 }
 
 const _getBillNo = (state) => {
-    let billNo;    
+    let billNo;
     if(state.formData.billseries.inputVal)
         billNo = state.formData.billseries.inputVal + '.' + state.formData.billno.inputVal;
     else

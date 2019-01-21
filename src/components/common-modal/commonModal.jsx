@@ -11,6 +11,9 @@ class CommonModal extends Component {
     constructor(props) {
         super(props);
         this.onModalClose = this.onModalClose.bind(this);
+        this.state = {
+            secClass: this.props.secClass || ''
+        }
     }
     componentDidUpdate() {
         if(this.props.modalOpen)
@@ -26,7 +29,7 @@ class CommonModal extends Component {
             <div>
                 { this.props.modalOpen?(
                     <div className='common-modal-wrapper'>
-                        <div className={this.props.secClass + ' common-modal-content'}>
+                        <div className={this.state.secClass + ' common-modal-content'}>
                             <div className='header'>
                                 <span className='close-icon gs-button rounded' onClick={this.onModalClose}><FontAwesomeIcon icon="times" /></span>
                             </div>

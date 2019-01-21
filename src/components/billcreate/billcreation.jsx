@@ -999,7 +999,7 @@ s
                                 >
                                 <ControlLabel>Bill No</ControlLabel>
                                 <InputGroup>
-                                    <InputGroup.Addon>{this.state.formData.billseries.inputVal}</InputGroup.Addon>
+                                    <InputGroup.Addon readOnly={this.props.billCreation.loading}>{this.state.formData.billseries.inputVal}</InputGroup.Addon>
                                     <FormControl
                                         type="text"
                                         value={this.state.formData.billno.inputVal}
@@ -1023,7 +1023,7 @@ s
                                 >
                                 <ControlLabel>Pledge Amount</ControlLabel>
                                 <InputGroup>
-                                    <InputGroup.Addon>Rs:</InputGroup.Addon>
+                                    <InputGroup.Addon readOnly={this.props.billCreation.loading}>Rs:</InputGroup.Addon>
                                     <FormControl
                                         type="text"
                                         value={this.state.formData.amount.inputVal}
@@ -1152,7 +1152,7 @@ s
                                     value={this.getInputValFromCustomSources('city')}
                                     onChange={ (val) => this.autuSuggestionControls.onChange(val, 'city') }
                                     ref = {(domElm) => { this.domElmns.city = domElm; }}
-                                    onKeyUp = {(e) => this.handleKeyUp(e, {currElmKey: 'city'}) }
+                   onKeyUp = {(e) => this.handleKeyUp(e, {currElmKey: 'city'}) }
                                     readOnly={this.props.billCreation.loading}
                                 />
                                 <FormControl.Feedback />
@@ -1346,7 +1346,6 @@ class CustomerListAdaptor extends ItemAdapter {
                 contains = true
             
         }
-        console.log('---------------Contains', contains);
         return contains ? 1 : 2;
     }  
 

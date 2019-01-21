@@ -1,5 +1,5 @@
 import _ from 'lodash';
-
+import { getAccessToken } from '../../core/storage';
 export const getPendingBillArgs = (thatState) => {
     //TODO:
 }
@@ -12,4 +12,12 @@ export const parseResponse = (responseList) => {
         parsedResponse.push(aBill); // Right now just pushing the raw response
     });
     return parsedResponse;
+}
+
+export const makeRedeemAPIRequestParams = (thatState) => {    
+    let requestParams = {
+        ids: [thatState.PledgeBookID],
+        status: 0
+    };    
+    return requestParams;
 }

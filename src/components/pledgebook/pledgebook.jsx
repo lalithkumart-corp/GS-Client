@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 // import BootstrapTable from 'react-bootstrap-table-next';
-import { getPendingBills } from '../../actions/pledgebook';
+import { getPendingBills, setRefreshFlag } from '../../actions/pledgebook';
 import { parseResponse } from './helper';
 import { connect } from 'react-redux';
 import _ from 'lodash';
@@ -115,6 +115,7 @@ class Pledgebook extends Component {
         this.handlePageClick = this.handlePageClick.bind(this);
         this.getOffsets = this.getOffsets.bind(this);
         this.handleCheckboxChangeListener = this.handleCheckboxChangeListener.bind(this);
+        this.refresh = this.refresh.bind(this);
     }
 
     componentDidMount() {
@@ -122,12 +123,15 @@ class Pledgebook extends Component {
     }
 
     componentWillReceiveProps(nextProps) {
-        let newState = {...this.state};
-        if(nextProps.pledgeBook && nextProps.pledgeBook.list) {
+        let newState = {...this.state};        
+        if(nextProps.pledgeBook && nextProps.pledgeBook.list && nextProps.pledgeBook.refreshTable) {
+            this.props.setRefreshFlag(false);
             newState.pendingBillList = parseResponse(nextProps.pledgeBook.list);
             newState.totalCount = nextProps.pledgeBook.totalCount;
+            if(newState.currRowIndex)
+                newState.currentBillData = newState.pendingBillList[newState.currRowIndex];            
         }        
-        this.setState(newState);        
+        this.setState(newState);
     }
 
     componentWillUpdate(newProps, newState, newContext) {
@@ -149,7 +153,7 @@ class Pledgebook extends Component {
     }
 
     handleClose() {
-        this.setState({PBmodalIsOpen: false});
+        this.setState({PBmodalIsOpen: false, currentBillData: null, currRowIndex: null});
     }
 
     //params will receive the following {isChecked, column, colIndex, row, rowIndex}
@@ -174,7 +178,7 @@ class Pledgebook extends Component {
     cellClickCallbacks = {
         onBillNoClick(params) {
             // TODO:
-            this.setState({PBmodalIsOpen: true, currentBillData: params.row});
+            this.setState({PBmodalIsOpen: true, currentBillData: params.row, currRowIndex: params.rowIndex});
         }
     }        
 
@@ -272,13 +276,18 @@ class Pledgebook extends Component {
         return (totalRecords/this.state.pageLimit);
     }
 
-    initiateFetchPledgebookAPI() {    
+    initiateFetchPledgebookAPI() {
         clearTimeout(this.timer);
         this.timer = setTimeout(() => {            
             let params = this.getAPIParams();
             this.props.getPendingBills(params);
         }, this.timeOut);        
     }
+
+    refresh() {
+        this.initiateFetchPledgebookAPI();
+    }
+
     convertToLocalTime(theDate){
         const twoDigitFormat = (val) => {
             val = parseInt(val);
@@ -398,7 +407,7 @@ class Pledgebook extends Component {
                     />
                 </Row>
                 <CommonModal modalOpen={this.state.PBmodalIsOpen} handleClose={this.handleClose}>
-                    <PledgebookModal {...this.state} handleClose={this.handleClose}/>
+                    <PledgebookModal {...this.state} handleClose={this.handleClose} refresh={this.refresh}/>
                 </CommonModal>
             </Grid>
         )
@@ -408,8 +417,8 @@ class Pledgebook extends Component {
 
 const mapStateToProps = (state) => { 
     return {
-        pledgeBook: state.pledgeBook
+        pledgeBook: state.pledgeBook        
     };
 };
 
-export default connect(mapStateToProps, { getPendingBills })(Pledgebook);
+export default connect(mapStateToProps, { getPendingBills, setRefreshFlag })(Pledgebook);
