@@ -7,6 +7,10 @@ import { enableReadOnlyMode, disableReadOnlyMode } from '../../actions/billCreat
 import { REDEEM_PENDING_BILLS } from '../../core/sitemap';
 import { makeRedeemAPIRequestParams } from './helper';
 
+import { getAccessToken } from '../../core/storage';
+import axios from 'axios';
+import { toast } from 'react-toastify';
+
 class PledgebookModal extends Component {
     constructor(props) {
         super(props);
@@ -20,6 +24,10 @@ class PledgebookModal extends Component {
         this.props.enableReadOnlyMode();
     }
 
+    componentWillReceiveProps(nextProps) {
+        
+    }
+
     onEdit() {
         this.setState({editMode: true, cancelMode: false});
         this.props.disableReadOnlyMode();
@@ -30,11 +38,34 @@ class PledgebookModal extends Component {
         this.props.enableReadOnlyMode();
     }
 
-    onRedeemClick() {
-        //REDEEM_PENDING_BILLS
-        debugger;
-        let requestParams = makeRedeemAPIRequestParams(this.props.currentBillData);
-        
+    onRedeemClick() {                
+        let requestParams = makeRedeemAPIRequestParams(this.props.currentBillData);           
+        let params = {
+            accessToken: getAccessToken(),
+            requestParams
+        };
+        axios.post(REDEEM_PENDING_BILLS, params)
+            .then(
+                (successResp) => {
+                    if(successResp.data.STATUS = 'success') {
+                        toast.success('Updated bill successfully!');
+                        this.props.refresh();
+                    } else {
+                        toast.error('Not updated!');
+                        console.log(successResp);
+                    }
+                },
+                (errorResp) => {
+                    toast.error('Error in udating the bill');
+                    console.log(errorResp);
+                }
+            )
+            .catch(
+                (exception) => {
+                    toast.error('Exception occured while updating the bill');
+                    console.log(exception);
+                }
+            )     
     }
 
     canDisableBtn(btn) {
@@ -57,6 +88,7 @@ class PledgebookModal extends Component {
     }
 
     render() {
+        debugger;
         return (
             <div className="pledgebook-modal-container">
                 <Row>
@@ -90,7 +122,6 @@ class PledgebookModal extends Component {
     }
 }
 
-// export default PledgebookModal;
 const mapStateToProps = (state) => { 
     return {
         pledgebookModal: state.pledgebookModal

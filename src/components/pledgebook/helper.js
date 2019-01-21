@@ -16,12 +16,8 @@ export const parseResponse = (responseList) => {
 
 export const makeRedeemAPIRequestParams = (thatState) => {    
     let requestParams = {
-        id: thatState.PledgeBookID,
+        ids: [thatState.PledgeBookID],
         status: 0
-    };
-    let params = {
-        accessToken: getAccessToken(),
-        requestParams
-    }
-    return params;
+    };    
+    return requestParams;
 }

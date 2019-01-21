@@ -166,8 +166,11 @@
 /* END: Picture */
 
 .bill-creation-container input[readonly]{
-    background-color: #eee;
+    background-color: transparent;
     opacity: 1;
+    border: none;
+    box-shadow: none;
+    outline: none;
 }
 
 .bill-creation-container .autosuggest .show-all:after{
@@ -178,4 +181,10 @@
     /* margin: 0 auto; */
     display: block;
     padding-right: 15px;
+}
+
+.bill-creation-container span.input-group-addon[readonly] {
+    padding-right: 0;
+    background-color: transparent;
+    border: none;
 }

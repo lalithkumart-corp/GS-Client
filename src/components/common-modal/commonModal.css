@@ -4,14 +4,14 @@
     right: 0;
     top: 0;
     bottom: 0;
-    background-color: rgba(0,0,0,0.6);
+    background-color: rgba(0, 0, 0, 0.35);
     z-index: 999;
     overflow: auto;
 }
 .common-modal-content{
     width: 75%;
-    margin: 3pc auto;
-    background-color: #EDEFF0;
+    margin: 3px auto;
+    /* background-color: #EDEFF0; */
     padding: 20px;
     position: relative;
     border-radius: 3px;
