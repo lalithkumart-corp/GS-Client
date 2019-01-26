@@ -18,6 +18,7 @@ class PledgebookModal extends Component {
             editMode: false,
             cancelMode: true
         }
+        this.canShowBtn = this.canShowBtn.bind(this);
     }
 
     componentDidMount() {
@@ -26,6 +27,14 @@ class PledgebookModal extends Component {
 
     componentWillReceiveProps(nextProps) {
         
+    }
+
+    onReopenClick() {
+
+    }
+
+    onCalculateClick() {
+
     }
 
     onEdit() {
@@ -39,7 +48,7 @@ class PledgebookModal extends Component {
     }
 
     onRedeemClick() {                
-        let requestParams = makeRedeemAPIRequestParams(this.props.currentBillData);           
+        let requestParams = makeRedeemAPIRequestParams(this.props.currentBillData);
         let params = {
             accessToken: getAccessToken(),
             requestParams
@@ -71,8 +80,16 @@ class PledgebookModal extends Component {
     canDisableBtn(btn) {
         let flag = false;
         switch(btn) {
+            case 'reopen':
+                if(this.props.currentBillData.Status)
+                    flag = true;
+                break;
+            case 'calc':
+                if(!this.props.currentBillData.Status)
+                    flag = true;
+                break;
             case 'edit':
-                if(this.state.editMode)
+                if(this.state.editMode || !this.props.currentBillData.Status)
                     flag = true;
                 break;
             case 'ignore':
@@ -87,29 +104,64 @@ class PledgebookModal extends Component {
         return flag;
     }
 
-    render() {
-        debugger;
+    canShowBtn(btn) {
+        let flag = true;
+        switch(btn) {
+            case 'ignore':
+                if(this.state.cancelMode)
+                    flag = false;
+                break;
+            case 'edit':
+                if(this.state.editMode || !this.props.currentBillData.Status)
+                    flag = false;
+                break;
+        }
+        return flag;
+    }
+
+    getBtnVisibilityClass(btn) {
+        let className = '';
+        if(!this.canShowBtn(btn))
+            className = 'hidden';        
+        return className;
+    }
+
+    render() {        
         return (
             <div className="pledgebook-modal-container">
                 <Row>
                     <Col xs={12} md={12} className='button-container'>
                         <input 
                             type="button"
-                            className='gs-button'
+                            className={"gs-button bordered "}
+                            onClick={(e) => this.onReopenClick()}
+                            value='Re-Open'
+                            disabled={this.canDisableBtn('reopen')}
+                            />
+                        <input 
+                            type="button"
+                            className="gs-button bordered"
+                            onClick={(e) => this.onCalculateClick()}
+                            value='Calculate'
+                            disabled={this.canDisableBtn('calc')}
+                            />
+                        <input 
+                            type="button"
+                            className='gs-button bordered'
                             onClick={(e) => this.onRedeemClick()}
                             value='Redeem'
                             disabled={this.canDisableBtn('redeem')}
                             />
                         <input 
                             type="button"
-                            className='gs-button'
+                            className={'gs-button bordered ' + this.getBtnVisibilityClass('edit')}
                             onClick={(e) => this.onEdit()}
                             value='Edit'
                             disabled={this.canDisableBtn('edit')}
                             />
                         <input 
                             type="button"
-                            className='gs-button'
+                            className={'gs-button bordered ' + this.getBtnVisibilityClass('ignore')}
                             onClick={(e) => this.onIgnore()}
                             value='Ignore'
                             disabled={this.canDisableBtn('ignore')}

@@ -68,12 +68,13 @@ class GSTable extends Component {
                 buffer.filterCallback = aCol.filterCallback || this.defaults.filterCallback;
                 buffer.filterFormatter = aCol.filterFormatter || this.defaultFormatters.filter;
                 buffer.width = aCol.width || '0%';
+                buffer.tdClassNameGetter = aCol.tdClassNameGetter || this.defaults.tdClassNameGetter;
                 parsedData.columns.push(buffer);
             });
         }
         if(props && props.rowData) {
             _.each(props.rowData, (aRow, index) => {
-                aRow._expanded = false;
+                aRow._expanded = false;                
                 parsedData.rowData.push(aRow);
             });
         }
@@ -81,12 +82,13 @@ class GSTable extends Component {
         parsedData.className = props.className || '';
         parsedData.checkbox = props.checkbox || false;
         parsedData.checkboxOnChangeListener = props.checkboxOnChangeListener;
-        parsedData.selectedIndexes = props.selectedIndexes || [];
+        parsedData.selectedIndexes = props.selectedIndexes || [];        
         return parsedData;
     }
     defaults = {
         isFilterable: false,
-        filterCallback: (e, col, colIndex) => {}
+        filterCallback: (e, col, colIndex) => {},
+        tdClassNameGetter: () => {return ''}
     }
     defaultFormatters = {
         cell: (column, colIndex, row, rowIndex) => {
@@ -272,9 +274,10 @@ class GSTable extends Component {
                         ( () => {                            
                             let rowCells = [];
                             for(let i=0; i<columns.length; i++) {
+                                let  tdClassName = columns[i].tdClassNameGetter(columns[i], i, aRowData, rowIndex);
                                 let formatter = columns[i].formatter;                                
                                 rowCells.push(
-                                    <td className={"column-"+ i} key={i+"-body"}>
+                                    <td className={"column-"+ i + ' ' + tdClassName} key={i+"-body"}>
                                         {formatter(columns[i], i, aRowData, rowIndex)}                                        
                                     </td>
                                 );

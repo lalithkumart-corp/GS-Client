@@ -61,6 +61,12 @@ class Pledgebook extends Component {
                                 startDate={this.state.filters.date.startDate}
                                 endDate={this.state.filters.date.endDate}/>
                         )
+                    },
+                    tdClassNameGetter: (column, columnIndex, row, rowIndex) => {
+                        let className = 'bill-open';
+                        if(row.Status == 0)
+                            className = 'bill-closed';
+                        return className;
                     }
                 },{
                     id: 'BillNo',
