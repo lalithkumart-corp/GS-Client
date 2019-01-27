@@ -26,7 +26,7 @@ import { insertNewBill, updateClearEntriesFlag, showEditDetailModal, hideEditDet
 import { DoublyLinkedList } from '../../utilities/doublyLinkedList';
 import { getGaurdianNameList, getAddressList, getPlaceList, getCityList, getPincodeList, getMobileList, buildRequestParams, updateBillNumber, resetState, defaultPictureState } from './helper';
 import { getAccessToken } from '../../core/storage';
-
+import { getDateInUTC } from '../../utilities/utility';
 const ENTER_KEY = 13;
 const SPACE_KEY = 32;
 
@@ -723,19 +723,8 @@ s
                     newState.formData[identifier].inputVal = val;
                     this.props.updateBillNoInStore(newState.formData.billseries.inputVal, val);
                     break;
-                case 'date':
-                    let currentDate = new Date();
-                    let currHr = currentDate.getHours();
-                    let currMin = currentDate.getMinutes();
-                    let currSec = currentDate.getSeconds();
-                    let currMilliSec = currentDate.getMilliseconds();
-                    let selectedDate = new Date(val);
-                    selectedDate.setHours(currHr);
-                    selectedDate.setMinutes(currMin);
-                    selectedDate.setSeconds(currSec);
-                    selectedDate.setMilliseconds(currMilliSec);
-                    let selectedDateInUTC = selectedDate.toISOString(); // (val.slice(0,10) + 'T' + currUTCHr + ':'+ currUTCMin + ':' + currUTCSec + '.' + currUTCMilliSec + 'Z');
-                    newState.formData[identifier].inputVal = selectedDateInUTC;                    
+                case 'date':                    
+                    newState.formData[identifier].inputVal = getDateInUTC(val);
                     break;
                 case 'billRemarks':
                     newState.formData.moreDetails.billRemarks = val;
