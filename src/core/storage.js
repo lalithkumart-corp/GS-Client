@@ -4,12 +4,14 @@ const keys = {
     userId: 'userId',
     userPreferences: 'userPreferences',
     accessToken: 'accessToken',
+    interestRates: 'interestRates'
 };
 
 const keyMaps = {
     local: [
         keys.userId,
         keys.userPreferences,
+        keys.interestRates
     ],
     session: [
 
@@ -103,17 +105,22 @@ const _getCookieOptions = (options = {}) => {
 export const getUserPreference = () => {
     return _read(keys.userPreferences);
 };
+
 export const setUserPreference = (data) => {
     _save(keys.userPreferences, data);
+};
+
+export const clearUserPreference = () => {
+    _clear(keys.userPreferences);
 };
 
 export const storeAccessToken = (data) => {
     _save(keys.accessToken, data);
 };
 
-export const saveSession = (data) => {
-    _save(keys.accessToken, data.id);
-    _save(keys.userPreferences, data);    
+export const saveSession = (data) => {    
+    storeAccessToken(data.id);
+    setUserPreference(data);    
 };
 
 export const getAccessToken = (data) => {
@@ -125,6 +132,19 @@ export const clearAccessToken = (data) => {
 };
 
 export const clearSession = () => {
-    _clear(keys.accessToken);
-    _clear(keys.userPreferences);
+    clearAccessToken();
+    clearUserPreference();
+    clearInterestRates();
+}
+
+export const setInterestRates = (data) => {
+    _save(keys.interestRates, data);
+}
+
+export const getInterestRates = () => {
+    return _read(keys.interestRates);
+}
+
+export const clearInterestRates = () => {
+    _clear(keys.interestRates);
 }

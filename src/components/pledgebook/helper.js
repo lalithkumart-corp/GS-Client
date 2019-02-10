@@ -1,5 +1,6 @@
 import _ from 'lodash';
 import { getAccessToken } from '../../core/storage';
+import { getRequestParams } from '../redeem/helper';
 export const getPendingBillArgs = (thatState) => {
     //TODO:
 }
@@ -14,10 +15,13 @@ export const parseResponse = (responseList) => {
     return parsedResponse;
 }
 
-export const makeRedeemAPIRequestParams = (thatState) => {    
-    let requestParams = {
-        ids: [thatState.PledgeBookID],
-        status: 0
-    };    
+export const makeRedeemAPIRequestParams = (billData) => {
+    let requestParams = getRequestParams(billData);
+    // let requestParams = [
+    //     {
+    //         pledgeBookID: thatState.PledgeBookID,
+    //         pledgeBookUID: thatState.UniqueIdentifier
+    //     }
+    // ];
     return requestParams;
 }

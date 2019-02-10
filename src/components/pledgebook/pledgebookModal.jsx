@@ -5,11 +5,12 @@ import "./pledgebookModal.css";
 import { connect } from 'react-redux';
 import { enableReadOnlyMode, disableReadOnlyMode } from '../../actions/billCreation';
 import { REDEEM_PENDING_BILLS } from '../../core/sitemap';
-import { makeRedeemAPIRequestParams } from './helper';
-
+import { getInterestRate } from '../../utilities/utility';
 import { getAccessToken } from '../../core/storage';
 import axios from 'axios';
 import { toast } from 'react-toastify';
+import { calculateData, getRequestParams } from '../redeem/helper';
+import moment from 'moment';
 
 class PledgebookModal extends Component {
     constructor(props) {
@@ -47,8 +48,12 @@ class PledgebookModal extends Component {
         this.props.enableReadOnlyMode();
     }
 
-    onRedeemClick() {                
-        let requestParams = makeRedeemAPIRequestParams(this.props.currentBillData);
+    async onRedeemClick() {
+        let options = {...this.props.currentBillData};
+        let interestRates = await getInterestRate();
+        options = calculateData(options, {date: moment().format('DD/MM/YYYY'), interestRates: interestRates});
+        options.closingDate = new Date().toISOString();
+        let requestParams = getRequestParams(options);
         let params = {
             accessToken: getAccessToken(),
             requestParams
