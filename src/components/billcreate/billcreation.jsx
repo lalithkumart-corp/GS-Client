@@ -278,14 +278,14 @@ s
         return prevNode;
     }
 
-    getInputValFromCustomSources(identifier) {        
+    getInputValFromCustomSources(identifier) {
         let returnVal;
         if(identifier == 'moreDetails') {
             returnVal = this.state.formData[identifier].customerInfo;
         }else {
             returnVal = this.state.formData[identifier].inputVal;        
         }        
-        if(this.state.selectedCustomer) {       
+        if(this.state.selectedCustomer) {
             
             if(identifier == 'cname') identifier = 'name';
             if(identifier == 'moreDetails') identifier = 'otherDetails'; 
@@ -432,7 +432,7 @@ s
         this.setState({showMoreInputs: !this.state.showMoreInputs});
     }
 
-    async insertItemIntoMoreBucket() {
+    async insertItemIntoMoreBucket() {        
         let newState = {...this.state};
         let obj = {
             key: newState.formData.moreDetails.currCustomerInputKey,
@@ -459,6 +459,13 @@ s
         }
         return obj;
     } 
+
+    isExistingCustomer() {
+        let isExistingCustomer = false;
+        if(this.state.selectedCustomer && Object.keys(this.state.selectedCustomer).length != 0)
+            isExistingCustomer = true;
+        return isExistingCustomer;
+    }
 
      // TODO: remove this, if not in use.
     /* updateSelectedCustomer(params) {
@@ -488,7 +495,7 @@ s
         if(options && options.currElmKey == 'moreDetailsHeader') {            
             if(this.state.showMoreInputs)
                 this.updateDomList('disableMoreDetailsInputElmns');                
-            else
+            else if(!this.isExistingCustomer())
                 this.updateDomList('enableMoreDetailsInputElmns');
             this.toggleMoreInputs();
             this.transferFocus(e, options.currElmKey);
@@ -525,7 +532,8 @@ s
 
     handleSpaceKeyPress(e, options) {
         if(options && options.currElmKey == 'moreDetailsHeader') {
-            this.updateDomList('enableMoreDetailsInputElmns');
+            if(!this.isExistingCustomer())
+                this.updateDomList('enableMoreDetailsInputElmns');
             this.toggleMoreInputs();
             this.transferFocus(e, options.currElmKey);
         }
@@ -620,10 +628,18 @@ s
         helpers: {
             getImageForHolder: () => {
                 let imgPath = this.state.picture.holder.defaultSrc;
-                if(this.state.picture.holder.confirmedImgSrc)
-                    imgPath = this.state.picture.holder.confirmedImgSrc;
-                if(this.state.picture.holder.imgSrc)
-                    imgPath = this.state.picture.holder.imgSrc;
+                if(this.state.selectedCustomer && this.state.selectedCustomer.image && this.state.selectedCustomer.image.image.data) {
+                    let buff = new Buffer(this.state.selectedCustomer.image.image.data, "base64");                                    
+                    let img = buff.toString('ascii');
+                    img = img.substring(1);
+                    img = img.substring(0, img.length-1);
+                    imgPath = "data:image/webp;base64,"+ img;  
+                } else {
+                    if(this.state.picture.holder.confirmedImgSrc) //saved image
+                        imgPath = this.state.picture.holder.confirmedImgSrc;
+                    if(this.state.picture.holder.imgSrc) //captured, not saved image
+                        imgPath = this.state.picture.holder.imgSrc;
+                }                
                 return imgPath;
             },
             canShowCameraBtn: () => {
@@ -684,7 +700,7 @@ s
                 } else {
                     newState.formData[identifier].inputVal = val.name || '';                
                     // this.updateSelectedCustomer(val);                    
-                    newState.selectedCustomer = val;
+                    newState.selectedCustomer = val;                    
                 }
             /*} else if(identifier == "gaurdianName") {
                 newState.formData[identifier].inputVal = val;
@@ -913,7 +929,7 @@ s
                 <span>
                 {
                     (() => {
-                        let rows = [];                        
+                        let rows = [];
                         let moreDetails = this.getInputValFromCustomSources('moreDetails');
                         for(let i=0; i<moreDetails.length; i++) {
                             rows.push(
@@ -924,10 +940,12 @@ s
                                     <Col xs={5} md={5}>
                                         {moreDetails[i]['val']}
                                     </Col>
+                                    { !this.isExistingCustomer() &&
                                     <Col xs={1} md={1} className='sub-actions-div'>
                                         <span className='icon edit-icon' onClick={(e) => this.onEditDetailIconClick(i)}><FontAwesomeIcon icon="edit" /></span>
                                         <span className='icon' onClick={(e) => this.onDeleteDetailIconClick(i)}><FontAwesomeIcon icon="trash" /></span>
                                     </Col>
+                                    }
                                 </Row>
                             );
                         }
@@ -968,7 +986,7 @@ s
                     <span className='horizontal-dashed-line'></span>
                 </div>
                 <Collapse isOpened={this.state.showMoreInputs}>
-                    {getCustomerInforAdderDom()}
+                    {!this.isExistingCustomer() && getCustomerInforAdderDom()}
                     {getCustomerInfoDisplayDom()}
                     {getBillRemarksDom()}
                 </Collapse>
@@ -1232,7 +1250,7 @@ s
                                     width='220'
                                 />
                             }
-                            {
+                            {!this.isExistingCustomer() && 
                                 <div className='pic-action-container'>
                                     <span
                                         className={'gs-button rounded icon ' + (this.picture.helpers.canShowCameraBtn()? '': 'hidden-btn')}
