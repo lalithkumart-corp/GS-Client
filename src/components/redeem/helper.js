@@ -114,3 +114,13 @@ const calcMonthDiff = (date1, date2) => {
 
     return temp;
 }
+
+export const getReopenRequestParams = (billData) => {
+    let requestParams = [];    
+    let anObj = {
+        pledgeBookID: billData.PledgeBookID,
+        pledgeBookUID: billData.UniqueIdentifier                
+    };
+    requestParams.push(anObj);
+    return requestParams;
+}

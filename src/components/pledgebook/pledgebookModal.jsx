@@ -4,12 +4,12 @@ import { Grid, Row, Col, FormGroup, ControlLabel, FormControl, HelpBlock, InputG
 import "./pledgebookModal.css";
 import { connect } from 'react-redux';
 import { enableReadOnlyMode, disableReadOnlyMode } from '../../actions/billCreation';
-import { REDEEM_PENDING_BILLS } from '../../core/sitemap';
+import { REDEEM_PENDING_BILLS, REOPEN_CLOSED_BILL } from '../../core/sitemap';
 import { getInterestRate } from '../../utilities/utility';
 import { getAccessToken } from '../../core/storage';
 import axios from 'axios';
 import { toast } from 'react-toastify';
-import { calculateData, getRequestParams } from '../redeem/helper';
+import { calculateData, getRequestParams, getReopenRequestParams } from '../redeem/helper';
 import moment from 'moment';
 
 class PledgebookModal extends Component {
@@ -31,16 +31,44 @@ class PledgebookModal extends Component {
     }
 
     onReopenClick() {
-
+        let options = {...this.props.currentBillData};
+        let requestParams = getReopenRequestParams(options);
+        let params = {
+            accessToken: getAccessToken(),
+            requestParams
+        };
+        axios.post(REOPEN_CLOSED_BILL, params)
+            .then(
+                (successResp) => {
+                    debugger;
+                    if(successResp.data.STATUS == 'success') {
+                        toast.success('Re-opened bill successfully!');
+                        this.props.refresh();
+                    } else {
+                        toast.error('Could Not reopen the closed bill!');
+                        console.log(successResp);
+                    }   	
+                },
+                (errorResp) => {
+                    toast.error('Error in re-opening the bill');
+                    console.log(errorResp);
+                }
+            )
+            .catch(
+                (exception) => {
+                    toast.error('Exception occured while re-opening the bill');
+                    console.log(exception);
+                }
+            )
     }
 
     onCalculateClick() {
-
+         
     }
 
     onEdit() {
         this.setState({editMode: true, cancelMode: false});
-        this.props.disableReadOnlyMode();
+        this.props.disableReadOnlyMode();       
     }
 
     onIgnore() {
@@ -61,7 +89,7 @@ class PledgebookModal extends Component {
         axios.post(REDEEM_PENDING_BILLS, params)
             .then(
                 (successResp) => {
-                    if(successResp.data.STATUS = 'success') {
+                    if(successResp.data.STATUS == 'success') {
                         toast.success('Updated bill successfully!');
                         this.props.refresh();
                     } else {
