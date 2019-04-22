@@ -65,7 +65,7 @@ class Redeem extends Component {
     fetchBillData(billNo) {
         let accessToken = getAccessToken();
         let billNoArr = [billNo];
-        axios.get(GET_BILL_DETAILS+'?access_token='+accessToken+'&bill_nos='+ JSON.stringify(billNoArr))
+        axios.get(GET_BILL_DETAILS+'?access_token='+accessToken+'&bill_nos='+ JSON.stringify(billNoArr) + '&fetch_only_pending=true')
             .then(
                 (successResp) => {
                     if(successResp.data && successResp.data && successResp.data.billDetails && successResp.data.billDetails[0]){
@@ -75,7 +75,7 @@ class Redeem extends Component {
                         this.transferFocus(null, 'billInputBox');
                     }else{
                         this.setState({selectedBillData: null, billNotFound: true});
-                        toast.error('Bill Data not found');
+                        toast.error('Bill Data not found or might be redeemed already');
                     }
                 },
                 (errResp) => {
