@@ -62,7 +62,7 @@ class BillCreation extends Component {
         this.state = {
             showPreview: false,  
             showMoreInputs: false, 
-            picture: JSON.parse(JSON.stringify(defaultPictureState)),        
+            picture: JSON.parse(JSON.stringify(defaultPictureState)),
             formData: {
                 date: {
                     inputVal: new Date().toISOString(),
@@ -177,7 +177,7 @@ class BillCreation extends Component {
         this.updateItemInMoreDetail = this.updateItemInMoreDetail.bind(this);
         this.bindPictureMethods();
     }
-s
+
     bindPictureMethods() {
         this.picture.eventListeners.handleClick = this.picture.eventListeners.handleClick.bind(this);
         this.picture.eventListeners.turnOn = this.picture.eventListeners.turnOn.bind(this);

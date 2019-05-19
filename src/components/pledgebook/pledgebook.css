@@ -93,6 +93,7 @@
 .my-pledgebook-table {
     width: 90%;
     margin-left: 5%;
+    table-layout: fixed;
 }
 
 .my-pledgebook-table thead {
@@ -118,4 +119,10 @@
 
 .bill-closed{
     border-left: 5px solid #f86371 !important;
+}
+
+.column-in-row.pb-address-col {
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;    
 }

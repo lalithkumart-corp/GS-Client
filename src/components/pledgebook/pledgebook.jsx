@@ -11,6 +11,7 @@ import PledgebookModal from './pledgebookModal';
 import GSTable from '../gs-table/GSTable';
 import ReactPaginate from 'react-paginate';
 import DateRangePicker from '../dateRangePicker/dataRangePicker';
+import { convertToLocalTime } from '../../utilities/utility';
 
 class Pledgebook extends Component {
     constructor(props) {
@@ -45,10 +46,10 @@ class Pledgebook extends Component {
             columns : [{
                     id: 'Date',
                     displayText: 'Date',
-                    width: '20%',
+                    width: '18%',
                     formatter: (column, columnIndex, row, rowIndex) => {
                         return (
-                            <span>{this.convertToLocalTime(row[column.id])}</span>
+                            <span>{convertToLocalTime(row[column.id])}</span>
                         )
                     },
                     isFilterable: true,
@@ -80,11 +81,11 @@ class Pledgebook extends Component {
                             </span>
                         )
                     },
-                    width: '3%'
+                    width: '10%'
                 },{
                     id: 'Amount',
                     displayText: 'Amount',
-                    width: '3%',
+                    width: '10%',
                     isFilterable: true,
                     filterCallback: this.filterCallbacks.onAmountChange,
                     className: 'pb-amount-col'
@@ -293,23 +294,6 @@ class Pledgebook extends Component {
         this.initiateFetchPledgebookAPI();
     }
 
-    convertToLocalTime(theDate){
-        const twoDigitFormat = (val) => {
-            val = parseInt(val);
-            if(val < 10)
-                val = '0'+val;
-            return val;
-        };        
-        let localDateObj = new Date(theDate + ' UTC');
-        let dd = twoDigitFormat(localDateObj.getDate());
-        let mm = twoDigitFormat(localDateObj.getMonth() + 1);        
-        let yyyy = localDateObj.getFullYear();
-        let hr = twoDigitFormat(localDateObj.getHours());
-        let min = twoDigitFormat(localDateObj.getMinutes());
-        let sec = twoDigitFormat(localDateObj.getSeconds());
-        let localDate = `${yyyy}-${mm}-${dd}  ${hr}:${min}:${sec}`;        
-        return localDate;        
-    }
     expandRow = {
         renderer: (row) => {
             let ornData = JSON.parse(row.Orn) || {};

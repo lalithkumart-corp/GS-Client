@@ -1,0 +1,33 @@
+.customer-detail-container .head-section {
+    -webkit-box-shadow: -7px 5px 10px -6px #d3c5c5;
+       -moz-box-shadow: -7px 5px 10px -6px #d3c5c5;
+            box-shadow: -7px 5px 10px -6px #d3c5c5;
+}
+
+.customer-detail-container .autosuggestion-box{
+    width: 85%;
+    margin-left: 7%;
+}
+.customer-detail-container .body-section {
+    max-height: 500px;
+    overflow-x: hidden;
+}
+.body-section .a-customer-card {
+    margin-top: 15px;
+    padding: 5px;
+}
+.body-section .a-customer-card:hover,
+.body-section .a-customer-card:focus {
+    background-color: rgba(33, 150, 243, 0.08);
+    cursor: pointer;
+}
+.body-section .a-customer-card.isSelected {
+    background-color: rgba(89, 166, 227, 0.88);
+    color: white;
+}
+.right-pane .tab-content .container {
+    width: 100%;
+}
+.right-pane .tab-content .tab-pane {
+    margin-top: 15px;
+}

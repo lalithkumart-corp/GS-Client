@@ -43,3 +43,30 @@ export const getInterestRate = () => {
         }
     });
 }
+
+export const convertBufferToBase64 = (imgBuff) => {
+    let buff = new Buffer(imgBuff, "base64");                                    
+    let img = buff.toString('ascii');
+    img = img.substring(1);
+    img = img.substring(0, img.length-1);
+    let imgPath = "data:image/webp;base64,"+ img;
+    return imgPath;
+}
+
+export const convertToLocalTime = (theDate) => {
+    const twoDigitFormat = (val) => {
+        val = parseInt(val);
+        if(val < 10)
+            val = '0'+val;
+        return val;
+    };        
+    let localDateObj = new Date(theDate + ' UTC');
+    let dd = twoDigitFormat(localDateObj.getDate());
+    let mm = twoDigitFormat(localDateObj.getMonth() + 1);        
+    let yyyy = localDateObj.getFullYear();
+    let hr = twoDigitFormat(localDateObj.getHours());
+    let min = twoDigitFormat(localDateObj.getMinutes());
+    let sec = twoDigitFormat(localDateObj.getSeconds());
+    let localDate = `${yyyy}-${mm}-${dd}  ${hr}:${min}:${sec}`;        
+    return localDate;        
+}

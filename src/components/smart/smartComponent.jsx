@@ -7,6 +7,7 @@ import LoginPage from '../login/login';
 import BillCreation from '../billcreate/billcreation';
 import Redeem from '../redeem/redeem';
 import Pledgebook from '../pledgebook/pledgebook';
+import CustomerDetail from '../customerDetail/customerDetail';
 import Demo from '../demo/demo';
 import Picture from '../profilePic/ProfilePic';
 import Logout from '../logout/logout';
@@ -40,6 +41,7 @@ class SmartComponent extends Component {
                                 <Route path= '/billcreate' component={BillCreation} />
                                 <Route path= '/redeem' component={Redeem} />
                                 <Route path= '/pledgebook' component={Pledgebook} />
+                                <Route path= '/customerdetail' component={CustomerDetail} />                                
                                 <Route path= '/demo' component={Demo} />
                                 <Route path= '/picture' component={Picture} />
                                 <Route path= '/logout' component={Logout} />

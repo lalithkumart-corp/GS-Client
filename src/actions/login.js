@@ -27,11 +27,18 @@ export const doAuthentication = (params) => {
                     data: data
                 });
             },
-            (errorResponse) => {
-                toast.error('Error while login into application...');
+            (errorResponse) => {                
+                let errorMsg ='Error while login into application...';
+                let errorCode = 'AUTH_ERROR';
+                if(errorResponse.response || errorResponse.response.data.error){
+                    errorMsg = errorResponse.response.data.error.message;
+                    errorCode = errorResponse.response.data.error.code;
+                }
+                toast.error(errorMsg);
                 console.log(errorResponse);
+                
                 dispatch({
-                    type: 'AUTH_ERROR',
+                    type: errorCode,
                     data: {}
                 });
             }

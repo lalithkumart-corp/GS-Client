@@ -24,6 +24,7 @@ export default function authReducer(state=defaultState, action){
             };
             break;
         case 'AUTH_ERROR':
+        case 'LOGIN_FAILED':
             newState = {
                 ...newState,
                 loading: false,

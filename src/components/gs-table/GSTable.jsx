@@ -57,7 +57,7 @@ class GSTable extends Component {
                     });
                 }                    
             }
-            _.each(props.columns, (aCol, index) => {
+            _.each(props.columns, (aCol, index) => {                
                 let buffer = {};
                 buffer.id = aCol.id;                
                 buffer.displayText = aCol.displayText;
@@ -73,7 +73,7 @@ class GSTable extends Component {
             });
         }
         if(props && props.rowData) {
-            _.each(props.rowData, (aRow, index) => {
+            _.each(props.rowData, (aRow, index) => {            
                 aRow._expanded = false;                
                 parsedData.rowData.push(aRow);
             });
@@ -88,7 +88,9 @@ class GSTable extends Component {
     defaults = {
         isFilterable: false,
         filterCallback: (e, col, colIndex) => {},
-        tdClassNameGetter: () => {return ''}
+        tdClassNameGetter: (colData, colIndex, rowData, rowIndex) => {
+            return colData.className || '';
+        }
     }
     defaultFormatters = {
         cell: (column, colIndex, row, rowIndex) => {
@@ -273,11 +275,11 @@ class GSTable extends Component {
                     {
                         ( () => {                            
                             let rowCells = [];
-                            for(let i=0; i<columns.length; i++) {
+                            for(let i=0; i<columns.length; i++) {                                
                                 let  tdClassName = columns[i].tdClassNameGetter(columns[i], i, aRowData, rowIndex);
                                 let formatter = columns[i].formatter;                                
                                 rowCells.push(
-                                    <td className={"column-"+ i + ' ' + tdClassName} key={i+"-body"}>
+                                    <td className={"column-in-row column-"+ i + ' ' + tdClassName} key={i+"-body"}>
                                         {formatter(columns[i], i, aRowData, rowIndex)}                                        
                                     </td>
                                 );

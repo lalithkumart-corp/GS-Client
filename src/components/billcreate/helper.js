@@ -37,7 +37,7 @@ export const buildRequestParams = (thatState = {}) => {
         orn: _getOrnamentsData(thatState),
         billRemarks: _getBillRemarks(thatState),
         moreDetails: _getMoreData(thatState),
-        picture: _getPicData(thatState)
+        picture: getPicData(thatState)
     };
     return params;
 }
@@ -63,7 +63,7 @@ const _getBillRemarks = (thatState) => {
     return thatState.formData.moreDetails.billRemarks;
 }
 
-const _getPicData = (thatState) => {
+export const getPicData = (thatState) => {
     let picData = '';
     if(thatState.picture.holder.confirmedImgSrc)
         picData = thatState.picture.holder.confirmedImgSrc;
