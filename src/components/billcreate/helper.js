@@ -7,11 +7,12 @@ export const defaultPictureState = {
         confirmedImgSrc: '',
         defaultSrc: 'images/default.jpg'
     },
-    camera: {
+    webcamTool: {
         show: false,
     },
     actions: {
         camera: true,
+        upload: true,
         capture: false,
         cancel: false,
         save: false,

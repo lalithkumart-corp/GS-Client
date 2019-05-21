@@ -39,8 +39,7 @@ class PledgebookModal extends Component {
         };
         axios.post(REOPEN_CLOSED_BILL, params)
             .then(
-                (successResp) => {
-                    debugger;
+                (successResp) => {                
                     if(successResp.data.STATUS == 'success') {
                         toast.success('Re-opened bill successfully!');
                         this.props.refresh();

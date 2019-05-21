@@ -31,11 +31,17 @@ class NavbarComp extends Component {
                     </NavDropdown>
 
                     <NavDropdown eventKey={2} title="Others" id="basic-nav-dropdown">
+                        <LinkContainer to='/customerdetail'>
+                            <MenuItem eventKey={2.1}>Customer Detail</MenuItem>
+                        </LinkContainer>
                         <LinkContainer to='/demo'>
-                            <MenuItem eventKey={2.1}>Demo</MenuItem>
+                            <MenuItem eventKey={2.2}>Demo</MenuItem>
                         </LinkContainer>
                         <LinkContainer to='/picture'>
-                            <MenuItem eventKey={2.2}>Webcam</MenuItem>
+                            <MenuItem eventKey={2.3}>Webcam</MenuItem>
+                        </LinkContainer>
+                        <LinkContainer to='/uploadpicdemo'>
+                            <MenuItem eventKey={2.4}>Upload Pic Demo</MenuItem>
                         </LinkContainer>                        
                     </NavDropdown>
 

@@ -12,6 +12,7 @@ import { Grid, Row, Col, FormGroup, ControlLabel, FormControl, HelpBlock, InputG
 import DatePicker from 'react-16-bootstrap-date-picker';
 import 'react-datepicker/dist/react-datepicker.css';
 import './billcreation.css';
+import './picture-upload.css';
 import moment from 'moment';
 import Webcam from 'react-webcam';
 import Autosuggest, { ItemAdapter } from 'react-bootstrap-autosuggest' //https://affinipay.github.io/react-bootstrap-autosuggest/#playground
@@ -566,7 +567,7 @@ class BillCreation extends Component {
 
     picture= {
         eventListeners: {
-            handleClick: (identifier) => {
+            handleClick: (identifier, e) => {
                 switch(identifier) {
                     case 'turnOn':
                         this.picture.eventListeners.turnOn();
@@ -574,6 +575,9 @@ class BillCreation extends Component {
                     case 'capture':
                         this.picture.eventListeners.capture();
                         break;
+                    case 'upload':
+                        this.picture.eventListeners.upload(e);
+                        break;                        
                     case 'save':
                         this.picture.eventListeners.save();
                         break;
@@ -587,9 +591,10 @@ class BillCreation extends Component {
             },
             turnOn: () => {
                 let newState = {...this.state};
-                newState.picture.camera.show = true;
+                newState.picture.webcamTool.show = true;                
                 newState.picture.holder.show = false;
                 newState.picture.actions.camera = false;
+                newState.picture.actions.upload = false;
                 newState.picture.actions.capture = true;
                 newState.picture.actions.cancel = true;
                 this.setState(newState);
@@ -597,10 +602,22 @@ class BillCreation extends Component {
             capture: () => {                
                 const imageSrc = this.webcam.getScreenshot();
                 let newState = {...this.state};
-                newState.picture.camera.show = false;
+                newState.picture.webcamTool.show = false;
                 newState.picture.holder.show = true;
                 newState.picture.holder.imgSrc = imageSrc;
                 this.setState(newState);
+            },
+            upload: (e) => {
+                var reader = new FileReader();
+                var file = e.target.files[0];
+                reader.onload = (upload) => {
+                    let newState = {...this.state};                
+                    newState.picture.holder.show = true;
+                    newState.picture.holder.imgSrc = upload.target.result;
+                    debugger;
+                    this.setState(newState);
+                };                
+                reader.readAsDataURL(file);
             },
             save: () => {
                 let newState = {...this.state};
@@ -611,7 +628,7 @@ class BillCreation extends Component {
             },
             exit: () => {
                 let newState = {...this.state};
-                newState.picture.camera.show = false;
+                newState.picture.webcamTool.show = false;
                 newState.picture.holder.show = true;
                 this.setState(newState);
             },
@@ -619,7 +636,7 @@ class BillCreation extends Component {
                 let newState = {...this.state};
                 newState.picture.holder.imgSrc = '';
                 newState.picture.holder.confirmedImgSrc = '';
-                newState.picture.camera.show = false;
+                newState.picture.webcamTool.show = false;
                 newState.picture.holder.show = true;
                 newState.picture.status = 'UNSAVED';
                 this.setState(newState);
@@ -644,13 +661,19 @@ class BillCreation extends Component {
             },
             canShowCameraBtn: () => {
                 let canShow = false;
-                if(!this.state.picture.camera.show)
+                if(!this.state.picture.webcamTool.show)
+                    canShow = true;
+                return canShow;
+            },
+            canShowUploadBtn: () => {
+                let canShow = false;
+                if(!this.state.picture.webcamTool.show)
                     canShow = true;
                 return canShow;
             },
             canShowCaptureBtn: () => {
                 let canShow = false;
-                if(this.state.picture.camera.show)
+                if(this.state.picture.webcamTool.show)
                     canShow = true;
                 return canShow;                    
             },
@@ -665,7 +688,7 @@ class BillCreation extends Component {
             },
             canShowCancelBtn: () => {
                 let canShow = false;
-                if(this.state.picture.camera.show)
+                if(this.state.picture.webcamTool.show)
                     canShow = true;
                 return canShow;                
             },
@@ -1240,10 +1263,10 @@ class BillCreation extends Component {
                         <Col xs={12} md={12}>
                             {
                                 this.state.picture.holder.show &&
-                                <img src={this.picture.helpers.getImageForHolder()} />
+                                <img src={this.picture.helpers.getImageForHolder()} className='image-viewer'/>
                             }
                             {
-                                this.state.picture.camera.show &&
+                                this.state.picture.webcamTool.show &&
                                 <Webcam
                                     ref={this.setRef}
                                     height='170'
@@ -1282,6 +1305,16 @@ class BillCreation extends Component {
                                         title='Clear picture'>
                                         <FontAwesomeIcon icon="broom" />
                                     </span>
+                                    <div class="image-upload-btn-wrapper">                                        
+                                        <span
+                                            className={'image-upload-btn gs-button rounded icon ' + (this.picture.helpers.canShowUploadBtn()? '': 'hidden-btn')}
+                                            title='Upload picture'>
+                                            <FontAwesomeIcon icon="upload" />
+                                        </span>
+                                        <input type="file" name="myfile" onChange={(e) => this.picture.eventListeners.handleClick('upload', e)}
+                                            encType="multipart/form-data" 
+                                            />
+                                    </div>
                                 </div>
                             }
                         </Col>

@@ -104,7 +104,7 @@ class GeneralInfo extends Component {
             },
             turnOn: () => {
                 let newState = {...this.state};
-                newState.picture.camera.show = true;
+                newState.picture.webcamTool.show = true;
                 newState.picture.holder.show = false;
                 newState.picture.actions.camera = false;
                 newState.picture.actions.capture = true;
@@ -114,7 +114,7 @@ class GeneralInfo extends Component {
             capture: () => {                
                 const imageSrc = this.webcam.getScreenshot();
                 let newState = {...this.state};
-                newState.picture.camera.show = false;
+                newState.picture.webcamTool.show = false;
                 newState.picture.holder.show = true;
                 newState.picture.holder.imgSrc = imageSrc;
                 this.setState(newState);
@@ -129,7 +129,7 @@ class GeneralInfo extends Component {
             },
             exit: () => {
                 let newState = {...this.state};
-                newState.picture.camera.show = false;
+                newState.picture.webcamTool.show = false;
                 newState.picture.holder.show = true;
                 this.setState(newState);
             },
@@ -137,7 +137,7 @@ class GeneralInfo extends Component {
                 let newState = {...this.state};
                 newState.picture.holder.imgSrc = '';
                 newState.picture.holder.confirmedImgSrc = '';
-                newState.picture.camera.show = false;
+                newState.picture.webcamTool.show = false;
                 newState.picture.holder.show = true;
                 newState.picture.status = 'UNSAVED';
                 this.setState(newState);
@@ -162,13 +162,13 @@ class GeneralInfo extends Component {
             },
             canShowCameraBtn: () => {
                 let canShow = false;
-                if(!this.state.picture.camera.show)
+                if(!this.state.picture.webcamTool.show)
                     canShow = true;
                 return canShow;
             },
             canShowCaptureBtn: () => {
                 let canShow = false;
-                if(this.state.picture.camera.show)
+                if(this.state.picture.webcamTool.show)
                     canShow = true;
                 return canShow;                    
             },
@@ -183,7 +183,7 @@ class GeneralInfo extends Component {
             },
             canShowCancelBtn: () => {
                 let canShow = false;
-                if(this.state.picture.camera.show)
+                if(this.state.picture.webcamTool.show)
                     canShow = true;
                 return canShow;                
             },
@@ -276,7 +276,7 @@ class GeneralInfo extends Component {
                                 <img src={this.picture.helpers.getImageForHolder()} />
                             }
                             {
-                                this.state.picture.camera.show &&
+                                this.state.picture.webcamTool.show &&
                                 <Webcam
                                     ref={this.setRef}
                                     height='170'

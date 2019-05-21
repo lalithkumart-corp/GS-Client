@@ -163,6 +163,9 @@
     color: #2196f3;
     cursor: pointer;
 }
+.image-viewer {
+    max-width: 100%;
+}
 /* END: Picture */
 
 .bill-creation-container input[readonly]{

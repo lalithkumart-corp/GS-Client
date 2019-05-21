@@ -10,6 +10,7 @@ import Pledgebook from '../pledgebook/pledgebook';
 import CustomerDetail from '../customerDetail/customerDetail';
 import Demo from '../demo/demo';
 import Picture from '../profilePic/ProfilePic';
+import UploadPicDemo from '../profilePic/uploadPic';
 import Logout from '../logout/logout';
 import Navbar from '../navbar/navbar';
 import { ToastContainer } from 'react-toastify';
@@ -45,6 +46,7 @@ class SmartComponent extends Component {
                                 <Route path= '/demo' component={Demo} />
                                 <Route path= '/picture' component={Picture} />
                                 <Route path= '/logout' component={Logout} />
+                                <Route path= '/uploadpicdemo' component={UploadPicDemo} />
                             </div>
                         </div>
                 </Router>
