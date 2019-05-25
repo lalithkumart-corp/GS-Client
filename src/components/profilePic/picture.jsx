@@ -207,7 +207,7 @@ class Picture extends Component {
         }
     }
     canShowActionButtons() {
-        if(this.props.canShowActionButtons)
+        if(this.props.canShowActionButtons !== undefined)
             return this.props.canShowActionButtons;
         else
             return true;

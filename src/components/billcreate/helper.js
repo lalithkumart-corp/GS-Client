@@ -66,16 +66,22 @@ const _getBillRemarks = (thatState) => {
 
 export const getPicData = (thatState) => {
     let picData = '';
-    if(thatState.picture.holder.confirmedImgSrc)
-        picData = thatState.picture.holder.confirmedImgSrc;
- 
-    if(picData){
-        let temp = picData;
-        picData = {};
-        picData.format = temp.split(',')[0];
-        picData.value = temp.split(',')[1];
-    } else {
-        picData = {};
+    if(thatState.picture) {
+        if(thatState.picture.holder.confirmedImgSrc)
+            picData = thatState.picture.holder.confirmedImgSrc;
+    
+        if(picData){
+            let temp = picData;
+            picData = {};
+            picData.format = temp.split(',')[0];
+            picData.value = temp.split(',')[1];
+        } else {
+            picData = {};
+        }
+    } else if(thatState.selectedCustomer && thatState.selectedCustomer.image && thatState.selectedCustomer.image.id) {        
+        picData = {
+            imageId: thatState.selectedCustomer.image.id
+        };        
     }
     return picData;
 }
