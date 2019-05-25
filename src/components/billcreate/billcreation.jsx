@@ -25,9 +25,10 @@ import sh from 'shorthash';
 import EditDetailsDialog from './editDetailsDialog';
 import { insertNewBill, updateClearEntriesFlag, showEditDetailModal, hideEditDetailModal, getBillNoFromDB, disableReadOnlyMode, updateBillNoInStore } from '../../actions/billCreation';
 import { DoublyLinkedList } from '../../utilities/doublyLinkedList';
-import { getGaurdianNameList, getAddressList, getPlaceList, getCityList, getPincodeList, getMobileList, buildRequestParams, updateBillNumber, resetState, defaultPictureState } from './helper';
+import { getGaurdianNameList, getAddressList, getPlaceList, getCityList, getPincodeList, getMobileList, buildRequestParams, updateBillNumber, resetState } from './helper';
 import { getAccessToken } from '../../core/storage';
 import { getDateInUTC } from '../../utilities/utility';
+import Picture from '../profilePic/picture';
 const ENTER_KEY = 13;
 const SPACE_KEY = 32;
 
@@ -62,8 +63,7 @@ class BillCreation extends Component {
         this.domOrders = domList;        
         this.state = {
             showPreview: false,  
-            showMoreInputs: false, 
-            picture: JSON.parse(JSON.stringify(defaultPictureState)),
+            showMoreInputs: false,             
             formData: {
                 date: {
                     inputVal: new Date().toISOString(),
@@ -175,24 +175,14 @@ class BillCreation extends Component {
         this.setRef = this.setRef.bind(this);        
         this.autuSuggestionControls.onChange = this.autuSuggestionControls.onChange.bind(this);
         this.toggleMoreInputs = this.toggleMoreInputs.bind(this);
-        this.updateItemInMoreDetail = this.updateItemInMoreDetail.bind(this);
-        this.bindPictureMethods();
+        this.updateItemInMoreDetail = this.updateItemInMoreDetail.bind(this);  
+        this.updatePictureData = this.updatePictureData.bind(this);      
     }
 
-    bindPictureMethods() {
-        this.picture.eventListeners.handleClick = this.picture.eventListeners.handleClick.bind(this);
-        this.picture.eventListeners.turnOn = this.picture.eventListeners.turnOn.bind(this);
-        this.picture.eventListeners.capture = this.picture.eventListeners.capture.bind(this);
-        this.picture.eventListeners.save = this.picture.eventListeners.save.bind(this);
-        this.picture.eventListeners.exit = this.picture.eventListeners.exit.bind(this);
-        this.picture.eventListeners.clear = this.picture.eventListeners.clear.bind(this);
-        this.picture.helpers.getImageForHolder = this.picture.helpers.getImageForHolder.bind(this);
-        this.picture.helpers.canShowCameraBtn = this.picture.helpers.canShowCameraBtn.bind(this);
-        this.picture.helpers.canShowCaptureBtn = this.picture.helpers.canShowCaptureBtn.bind(this);
-        this.picture.helpers.canShowClearBtn = this.picture.helpers.canShowClearBtn.bind(this);
-        this.picture.helpers.canShowCancelBtn = this.picture.helpers.canShowCancelBtn.bind(this);
-        this.picture.helpers.canshowSaveBtn = this.picture.helpers.canshowSaveBtn.bind(this);
+    updatePictureData(picture) {
+        this.setState({picture: picture});
     }
+
     /* END: "this" Binders */
 
     /* START: API accessors */
@@ -295,6 +285,13 @@ class BillCreation extends Component {
         }
         return returnVal;
 
+    }
+
+    getImageBase64() {
+        if(this.state.selectedCustomer && this.state.selectedCustomer.image && this.state.selectedCustomer.image.image.data)
+            return this.state.selectedCustomer.image.image.data;
+        else
+            return null;
     }
     /* END: GETTERS */
 
@@ -563,145 +560,6 @@ class BillCreation extends Component {
         let newState = {...this.state};        
         newState.formData.moreDetails.customerInfo.splice(index, 1);
         await this.setState(newState);
-    }   
-
-    picture= {
-        eventListeners: {
-            handleClick: (identifier, e) => {
-                switch(identifier) {
-                    case 'turnOn':
-                        this.picture.eventListeners.turnOn();
-                        break;
-                    case 'capture':
-                        this.picture.eventListeners.capture();
-                        break;
-                    case 'upload':
-                        this.picture.eventListeners.upload(e);
-                        break;                        
-                    case 'save':
-                        this.picture.eventListeners.save();
-                        break;
-                    case 'exit':
-                        this.picture.eventListeners.exit();
-                        break;
-                    case 'clear':
-                        this.picture.eventListeners.clear();
-                        break;
-                }
-            },
-            turnOn: () => {
-                let newState = {...this.state};
-                newState.picture.webcamTool.show = true;                
-                newState.picture.holder.show = false;
-                newState.picture.actions.camera = false;
-                newState.picture.actions.upload = false;
-                newState.picture.actions.capture = true;
-                newState.picture.actions.cancel = true;
-                this.setState(newState);
-            },
-            capture: () => {                
-                const imageSrc = this.webcam.getScreenshot();
-                let newState = {...this.state};
-                newState.picture.webcamTool.show = false;
-                newState.picture.holder.show = true;
-                newState.picture.holder.imgSrc = imageSrc;
-                this.setState(newState);
-            },
-            upload: (e) => {
-                var reader = new FileReader();
-                var file = e.target.files[0];
-                reader.onload = (upload) => {
-                    let newState = {...this.state};                
-                    newState.picture.holder.show = true;
-                    newState.picture.holder.imgSrc = upload.target.result;
-                    debugger;
-                    this.setState(newState);
-                };                
-                reader.readAsDataURL(file);
-            },
-            save: () => {
-                let newState = {...this.state};
-                newState.picture.holder.confirmedImgSrc = newState.picture.holder.imgSrc;
-                newState.picture.holder.imgSrc = '';
-                newState.picture.status = 'SAVED';
-                this.setState(newState);
-            },
-            exit: () => {
-                let newState = {...this.state};
-                newState.picture.webcamTool.show = false;
-                newState.picture.holder.show = true;
-                this.setState(newState);
-            },
-            clear: () => {
-                let newState = {...this.state};
-                newState.picture.holder.imgSrc = '';
-                newState.picture.holder.confirmedImgSrc = '';
-                newState.picture.webcamTool.show = false;
-                newState.picture.holder.show = true;
-                newState.picture.status = 'UNSAVED';
-                this.setState(newState);
-            }
-        },
-        helpers: {
-            getImageForHolder: () => {
-                let imgPath = this.state.picture.holder.defaultSrc;
-                if(this.state.selectedCustomer && this.state.selectedCustomer.image && this.state.selectedCustomer.image.image.data) {
-                    let buff = new Buffer(this.state.selectedCustomer.image.image.data, "base64");                                    
-                    let img = buff.toString('ascii');
-                    img = img.substring(1);
-                    img = img.substring(0, img.length-1);
-                    imgPath = "data:image/webp;base64,"+ img;  
-                } else {
-                    if(this.state.picture.holder.confirmedImgSrc) //saved image
-                        imgPath = this.state.picture.holder.confirmedImgSrc;
-                    if(this.state.picture.holder.imgSrc) //captured, not saved image
-                        imgPath = this.state.picture.holder.imgSrc;
-                }                
-                return imgPath;
-            },
-            canShowCameraBtn: () => {
-                let canShow = false;
-                if(!this.state.picture.webcamTool.show)
-                    canShow = true;
-                return canShow;
-            },
-            canShowUploadBtn: () => {
-                let canShow = false;
-                if(!this.state.picture.webcamTool.show)
-                    canShow = true;
-                return canShow;
-            },
-            canShowCaptureBtn: () => {
-                let canShow = false;
-                if(this.state.picture.webcamTool.show)
-                    canShow = true;
-                return canShow;                    
-            },
-            canShowClearBtn: () => {
-                let canShow = false;
-                if(this.state.picture.holder.show &&
-                  (this.state.picture.holder.imgSrc ||
-                   this.state.picture.holder.confirmedImgSrc )) {
-                    canShow = true;
-                }
-                return canShow;
-            },
-            canShowCancelBtn: () => {
-                let canShow = false;
-                if(this.state.picture.webcamTool.show)
-                    canShow = true;
-                return canShow;                
-            },
-            canshowSaveBtn: () => {
-                let canShow = false;
-                if(this.state.picture.holder.show &&
-                this.state.picture.holder.imgSrc &&
-                this.state.picture.status !== 'SAVED') {
-                    canShow = true;
-                }
-                return canShow;
-            }
-        }
     }
 
     autuSuggestionControls = {
@@ -1259,66 +1117,7 @@ class BillCreation extends Component {
                     </Row>
                 </Col>
                 <Col className="right-pane" xs={4} md={4}>
-                    <Row>
-                        <Col xs={12} md={12}>
-                            {
-                                this.state.picture.holder.show &&
-                                <img src={this.picture.helpers.getImageForHolder()} className='image-viewer'/>
-                            }
-                            {
-                                this.state.picture.webcamTool.show &&
-                                <Webcam
-                                    ref={this.setRef}
-                                    height='170'
-                                    width='220'
-                                />
-                            }
-                            {!this.isExistingCustomer() && 
-                                <div className='pic-action-container'>
-                                    <span
-                                        className={'gs-button rounded icon ' + (this.picture.helpers.canShowCameraBtn()? '': 'hidden-btn')}
-                                        onClick={(e) => this.picture.eventListeners.handleClick('turnOn')}
-                                        title='Turn On Camera'>
-                                        <FontAwesomeIcon icon="camera" />
-                                    </span>
-                                    <span
-                                        className={'gs-button rounded icon ' + (this.picture.helpers.canShowCaptureBtn()? '': 'hidden-btn')}
-                                        onClick={(e) => this.picture.eventListeners.handleClick('capture')}
-                                        title='Capture image'>
-                                        <FontAwesomeIcon icon="check" />
-                                    </span>
-                                    <span
-                                        className={'gs-button rounded icon ' + (this.picture.helpers.canshowSaveBtn()? '': 'hidden-btn')}
-                                        onClick={(e) => this.picture.eventListeners.handleClick('save')}
-                                        title='Save picture'>
-                                        <FontAwesomeIcon icon="save" />
-                                    </span>
-                                    <span
-                                        className={'gs-button rounded icon ' + (this.picture.helpers.canShowCancelBtn()? '': 'hidden-btn')}
-                                        onClick={(e) => this.picture.eventListeners.handleClick('exit')}
-                                        title='Exit'>
-                                        <FontAwesomeIcon icon="times" />
-                                    </span>
-                                    <span
-                                        className={'gs-button rounded icon ' + (this.picture.helpers.canShowClearBtn()? '': 'hidden-btn')}
-                                        onClick={(e) => this.picture.eventListeners.handleClick('clear')}
-                                        title='Clear picture'>
-                                        <FontAwesomeIcon icon="broom" />
-                                    </span>
-                                    <div class="image-upload-btn-wrapper">                                        
-                                        <span
-                                            className={'image-upload-btn gs-button rounded icon ' + (this.picture.helpers.canShowUploadBtn()? '': 'hidden-btn')}
-                                            title='Upload picture'>
-                                            <FontAwesomeIcon icon="upload" />
-                                        </span>
-                                        <input type="file" name="myfile" onChange={(e) => this.picture.eventListeners.handleClick('upload', e)}
-                                            encType="multipart/form-data" 
-                                            />
-                                    </div>
-                                </div>
-                            }
-                        </Col>
-                    </Row>
+                    <Picture imageBase64={this.getImageBase64()} updatePictureData={this.updatePictureData} canShowActionButtons={!this.isExistingCustomer()}/>
                 </Col>
                 <EditDetailsDialog {...this.state.editModalContent} update={this.updateItemInMoreDetail} />
             </Grid>
