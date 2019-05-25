@@ -3,12 +3,14 @@ import Webcam from 'react-webcam';
 import { defaultPictureState } from '../billcreate/helper';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Grid, Row, Col, FormGroup, ControlLabel, FormControl, HelpBlock, InputGroup, Button, Glyphicon } from 'react-bootstrap';
+import { convertBufferToBase64 } from '../../utilities/utility';
 
 class Picture extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            picture: JSON.parse(JSON.stringify(defaultPictureState))            
+            picture: JSON.parse(JSON.stringify(defaultPictureState)),
+            editMode: (this.props.editMode === undefined)?true:(this.props.editMode)
         }
         this.capture = this.capture.bind(this);
         this.setRef = this.setRef.bind(this);
@@ -113,27 +115,51 @@ class Picture extends Component {
             }
         },
         helpers: {
+
+
+            // if(this.state.picture.holder.confirmedImgSrc) //saved image
+            //         imgPath = this.state.picture.holder.confirmedImgSrc;
+            //     if(this.state.picture.holder.imgSrc) //captured, not saved image
+            //         imgPath = this.state.picture.holder.imgSrc;                
+            //     if(!imgPath){
+            //         if(this.state.custDetail && this.state.custDetail.image && this.state.custDetail.image.image.data) {
+            //             imgPath = convertBufferToBase64(this.state.custDetail.image.image.data);//this.state.custDetail.image.image.data
+            //         } else {
+            //             imgPath = this.state.picture.holder.defaultSrc;
+            //         }
+            //     }
+
+
+
             getImageForHolder: () => {
-                let imgPath = this.state.picture.holder.defaultSrc;
-                if(this.props.imageBase64) {                    
-                    let buff = new Buffer(this.props.imageBase64, "base64");                                    
-                    let img = buff.toString('ascii');
-                    img = img.substring(1);
-                    img = img.substring(0, img.length-1);
-                    imgPath = "data:image/webp;base64,"+ img;  
-                } else {
-                // if(this.state.selectedCustomer && this.state.selectedCustomer.image && this.state.selectedCustomer.image.image.data) {
-                //     let buff = new Buffer(this.state.selectedCustomer.image.image.data, "base64");                                    
-                //     let img = buff.toString('ascii');
-                //     img = img.substring(1);
-                //     img = img.substring(0, img.length-1);
-                //     imgPath = "data:image/webp;base64,"+ img;  
-                // } else {
+                let imgPath = null;
+
+                if(this.state.editMode) {                    
                     if(this.state.picture.holder.confirmedImgSrc) //saved image
                         imgPath = this.state.picture.holder.confirmedImgSrc;
                     if(this.state.picture.holder.imgSrc) //captured, not saved image
                         imgPath = this.state.picture.holder.imgSrc;
-                }                
+                    if(!imgPath) {
+                        if(this.props.imageBase64) {
+                            imgPath = convertBufferToBase64(this.props.imageBase64);                           
+                        } else {
+                            imgPath = this.state.picture.holder.defaultSrc;
+                        }
+                    }
+                } else {
+                    if(this.props.imageBase64) {                    
+                        imgPath = convertBufferToBase64(this.props.imageBase64);
+                    } else {
+                        if(this.state.picture.holder.confirmedImgSrc) //saved image
+                            imgPath = this.state.picture.holder.confirmedImgSrc;
+                        if(this.state.picture.holder.imgSrc) //captured, not saved image
+                            imgPath = this.state.picture.holder.imgSrc;
+                    }
+                }
+
+                if(!imgPath)
+                    imgPath = this.state.picture.holder.defaultSrc;
+
                 return imgPath;
             },
             canShowCameraBtn: () => {
@@ -181,7 +207,10 @@ class Picture extends Component {
         }
     }
     canShowActionButtons() {
-        return this.props.canShowActionButtons;
+        if(this.props.canShowActionButtons)
+            return this.props.canShowActionButtons;
+        else
+            return true;
     }
     setRef(webcam) {
         this.webcam = webcam;

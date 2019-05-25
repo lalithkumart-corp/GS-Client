@@ -8,6 +8,7 @@ import { UPDATE_CUSTOMER_DETAIL } from '../../core/sitemap';
 import axios from 'axios';
 import { convertBufferToBase64 } from '../../utilities/utility';
 import './generalInfo.css';
+import Picture from '../profilePic/picture';
 
 var domList = new DoublyLinkedList();
 domList.add('name', {type: 'formControl', enabled: true});
@@ -16,35 +17,26 @@ class GeneralInfo extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            custDetail: this.props.selectedCust || null,
-            picture: JSON.parse(JSON.stringify(defaultPictureState)),
+            custDetail: this.props.selectedCust || null,            
             dataAltered: false
         };
-        this.domElmns = {};
-        this.setRef = this.setRef.bind(this);
-        this.bindPictureMethods();
-    }    
-
-    bindPictureMethods() {
-        this.picture.eventListeners.handleClick = this.picture.eventListeners.handleClick.bind(this);
-        this.picture.eventListeners.turnOn = this.picture.eventListeners.turnOn.bind(this);
-        this.picture.eventListeners.capture = this.picture.eventListeners.capture.bind(this);
-        this.picture.eventListeners.save = this.picture.eventListeners.save.bind(this);
-        this.picture.eventListeners.exit = this.picture.eventListeners.exit.bind(this);
-        this.picture.eventListeners.clear = this.picture.eventListeners.clear.bind(this);
-        this.picture.helpers.getImageForHolder = this.picture.helpers.getImageForHolder.bind(this);
-        this.picture.helpers.canShowCameraBtn = this.picture.helpers.canShowCameraBtn.bind(this);
-        this.picture.helpers.canShowCaptureBtn = this.picture.helpers.canShowCaptureBtn.bind(this);
-        this.picture.helpers.canShowClearBtn = this.picture.helpers.canShowClearBtn.bind(this);
-        this.picture.helpers.canShowCancelBtn = this.picture.helpers.canShowCancelBtn.bind(this);
-        this.picture.helpers.canshowSaveBtn = this.picture.helpers.canshowSaveBtn.bind(this);
-    }
+        this.domElmns = {};        
+        this.updatePictureData = this.updatePictureData.bind(this);
+    }   
+  
     componentWillReceiveProps(nextProps) {        
         this.setState({custDetail: nextProps.selectedCust, dataAltered: false});
+    }  
+
+    updatePictureData(picture) {
+        this.setState({picture: picture});
     }
 
-    setRef(webcam) {
-        this.webcam = webcam;
+    getImageBase64() {
+        let imgPath = null;
+        if(this.state.custDetail && this.state.custDetail.image && this.state.custDetail.image.image.data)
+            imgPath = this.state.custDetail.image.image.data;// convertBufferToBase64(this.state.custDetail.image.image.data);        
+        return imgPath;
     }
 
     async updateDetails() {
@@ -80,125 +72,6 @@ class GeneralInfo extends Component {
             this.setState(newState);
         }
     }
-
-    picture= {
-        eventListeners: {
-            handleClick: (identifier) => {
-                switch(identifier) {
-                    case 'turnOn':
-                        this.picture.eventListeners.turnOn();
-                        break;
-                    case 'capture':
-                        this.picture.eventListeners.capture();
-                        break;
-                    case 'save':
-                        this.picture.eventListeners.save();
-                        break;
-                    case 'exit':
-                        this.picture.eventListeners.exit();
-                        break;
-                    case 'clear':
-                        this.picture.eventListeners.clear();
-                        break;
-                }
-            },
-            turnOn: () => {
-                let newState = {...this.state};
-                newState.picture.webcamTool.show = true;
-                newState.picture.holder.show = false;
-                newState.picture.actions.camera = false;
-                newState.picture.actions.capture = true;
-                newState.picture.actions.cancel = true;
-                this.setState(newState);
-            },
-            capture: () => {                
-                const imageSrc = this.webcam.getScreenshot();
-                let newState = {...this.state};
-                newState.picture.webcamTool.show = false;
-                newState.picture.holder.show = true;
-                newState.picture.holder.imgSrc = imageSrc;
-                this.setState(newState);
-            },
-            save: () => {
-                let newState = {...this.state};
-                newState.picture.holder.confirmedImgSrc = newState.picture.holder.imgSrc;
-                newState.picture.holder.imgSrc = '';
-                newState.picture.status = 'SAVED';
-                newState.dataAltered = true;
-                this.setState(newState);
-            },
-            exit: () => {
-                let newState = {...this.state};
-                newState.picture.webcamTool.show = false;
-                newState.picture.holder.show = true;
-                this.setState(newState);
-            },
-            clear: () => {
-                let newState = {...this.state};
-                newState.picture.holder.imgSrc = '';
-                newState.picture.holder.confirmedImgSrc = '';
-                newState.picture.webcamTool.show = false;
-                newState.picture.holder.show = true;
-                newState.picture.status = 'UNSAVED';
-                this.setState(newState);
-            }
-        },
-        helpers: {
-            getImageForHolder: () => {
-                let imgPath = null;
-
-                if(this.state.picture.holder.confirmedImgSrc) //saved image
-                    imgPath = this.state.picture.holder.confirmedImgSrc;
-                if(this.state.picture.holder.imgSrc) //captured, not saved image
-                    imgPath = this.state.picture.holder.imgSrc;                
-                if(!imgPath){
-                    if(this.state.custDetail && this.state.custDetail.image && this.state.custDetail.image.image.data) {
-                        imgPath = convertBufferToBase64(this.state.custDetail.image.image.data);//this.state.custDetail.image.image.data
-                    } else {
-                        imgPath = this.state.picture.holder.defaultSrc;
-                    }
-                }
-                return imgPath;
-            },
-            canShowCameraBtn: () => {
-                let canShow = false;
-                if(!this.state.picture.webcamTool.show)
-                    canShow = true;
-                return canShow;
-            },
-            canShowCaptureBtn: () => {
-                let canShow = false;
-                if(this.state.picture.webcamTool.show)
-                    canShow = true;
-                return canShow;                    
-            },
-            canShowClearBtn: () => {
-                let canShow = false;
-                if(this.state.picture.holder.show &&
-                  (this.state.picture.holder.imgSrc ||
-                   this.state.picture.holder.confirmedImgSrc )) {
-                    canShow = true;
-                }
-                return canShow;
-            },
-            canShowCancelBtn: () => {
-                let canShow = false;
-                if(this.state.picture.webcamTool.show)
-                    canShow = true;
-                return canShow;                
-            },
-            canshowSaveBtn: () => {
-                let canShow = false;
-                if(this.state.picture.holder.show &&
-                this.state.picture.holder.imgSrc &&
-                this.state.picture.status !== 'SAVED') {
-                    canShow = true;
-                }
-                return canShow;
-            }
-        }
-    }
-
 
     render() {
         return (
@@ -271,52 +144,7 @@ class GeneralInfo extends Component {
                         </Row>
                     </Col>
                     <Col xs={6} md={6}>
-                        {
-                                this.state.picture.holder.show &&
-                                <img src={this.picture.helpers.getImageForHolder()} />
-                            }
-                            {
-                                this.state.picture.webcamTool.show &&
-                                <Webcam
-                                    ref={this.setRef}
-                                    height='170'
-                                    width='220'
-                                />
-                            }
-                            
-                                <div className='pic-action-container'>
-                                    <span
-                                        className={'gs-button rounded icon ' + (this.picture.helpers.canShowCameraBtn()? '': 'hidden-btn')}
-                                        onClick={(e) => this.picture.eventListeners.handleClick('turnOn')}
-                                        title='Turn On Camera'>
-                                        <FontAwesomeIcon icon="camera" />
-                                    </span>
-                                    <span
-                                        className={'gs-button rounded icon ' + (this.picture.helpers.canShowCaptureBtn()? '': 'hidden-btn')}
-                                        onClick={(e) => this.picture.eventListeners.handleClick('capture')}
-                                        title='Capture image'>
-                                        <FontAwesomeIcon icon="check" />
-                                    </span>
-                                    <span
-                                        className={'gs-button rounded icon ' + (this.picture.helpers.canshowSaveBtn()? '': 'hidden-btn')}
-                                        onClick={(e) => this.picture.eventListeners.handleClick('save')}
-                                        title='Save picture'>
-                                        <FontAwesomeIcon icon="save" />
-                                    </span>
-                                    <span
-                                        className={'gs-button rounded icon ' + (this.picture.helpers.canShowCancelBtn()? '': 'hidden-btn')}
-                                        onClick={(e) => this.picture.eventListeners.handleClick('exit')}
-                                        title='Exit'>
-                                        <FontAwesomeIcon icon="times" />
-                                    </span>
-                                    <span
-                                        className={'gs-button rounded icon ' + (this.picture.helpers.canShowClearBtn()? '': 'hidden-btn')}
-                                        onClick={(e) => this.picture.eventListeners.handleClick('clear')}
-                                        title='Clear picture'>
-                                        <FontAwesomeIcon icon="broom" />
-                                    </span>
-                                </div>
-                            
+                        <Picture imageBase64={this.getImageBase64()} updatePictureData={this.updatePictureData} editMode={true} />
                     </Col>
                 </Row>               
                 <Row>

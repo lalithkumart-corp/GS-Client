@@ -14,7 +14,6 @@ import 'react-datepicker/dist/react-datepicker.css';
 import './billcreation.css';
 import './picture-upload.css';
 import moment from 'moment';
-import Webcam from 'react-webcam';
 import Autosuggest, { ItemAdapter } from 'react-bootstrap-autosuggest' //https://affinipay.github.io/react-bootstrap-autosuggest/#playground
 import _ from 'lodash';
 import axios from "axios";
@@ -171,8 +170,7 @@ class BillCreation extends Component {
     /* END: Lifecycle methods */
 
     /* START: "this" Binders */
-    bindMethods() {
-        this.setRef = this.setRef.bind(this);        
+    bindMethods() {        
         this.autuSuggestionControls.onChange = this.autuSuggestionControls.onChange.bind(this);
         this.toggleMoreInputs = this.toggleMoreInputs.bind(this);
         this.updateItemInMoreDetail = this.updateItemInMoreDetail.bind(this);  
@@ -210,10 +208,7 @@ class BillCreation extends Component {
     }
     /* END: API accessors */
 
-    /* START: SETTERS */
-    setRef(webcam) {
-        this.webcam = webcam;
-    }
+    /* START: SETTERS */    
     updateFieldValuesInState(data) {
         let newState = {...this.state};
         newState.formData.date.inputVal = data.Date;
