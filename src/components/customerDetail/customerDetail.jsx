@@ -16,11 +16,44 @@ class CustomerDetail extends Component {
             searchVal: '',
             customerList: []
         }
+        this.bindMethods();
+    }
+
+    bindMethods() {
+        this.inputControls.onChange = this.inputControls.onChange.bind(this);
+        this.filterCustomerList = this.filterCustomerList.bind(this);
     }
 
     async componentDidMount() {
         let customerList = await this._fetchCustomerList();        
-        this.setState({customerList: customerList});
+        this.setState({customerList: customerList, rawCustomerList: customerList});
+    }
+
+    inputControls = {
+        onChange: (evt, val, identifier) => {
+            switch(identifier) {
+                case 'moreCustomerDetailsValue':
+                    this.filterCustomerList(val);
+                    break;
+            }
+        }
+    }
+
+    filterCustomerList(custName) {
+
+        let filteredCustList = [];
+        if(custName == '') {
+            filteredCustList = this.state.rawCustomerList;            
+        } else {    
+            _.each(this.state.rawCustomerList, (aCust, index) => {
+                aCust.isSelected = false;
+                let name = aCust.name.toLowerCase();                
+                custName = custName.toLowerCase();
+                if(name.indexOf(custName) == 0)
+                    filteredCustList.push(aCust);                
+            });
+        }
+        this.setState({searchVal: custName, customerList: filteredCustList, selectedCust: null});
     }
 
     async _fetchCustomerList() {
@@ -29,7 +62,7 @@ class CustomerDetail extends Component {
         return response.data.row;
     }
 
-    onCardClick(e, aCust, index) {        
+    onCardClick(e, aCust, index) {
         let custList = {...this.state.customerList};
         _.each(custList, (aCust, key) => {
             if(index == key)
@@ -61,7 +94,7 @@ class CustomerDetail extends Component {
                         className="autosuggestion-box"
                         placeholder="Enter Customer name"
                         onChange={(e) => this.inputControls.onChange(null, e.target.value, 'moreCustomerDetailsValue')} 
-                        onKeyUp={(e) => this.handleKeyUp(e, {currElmKey: 'moreCustomerDetailValue', isToAddMoreDetail: true, traverseDirection: 'backward'})} 
+                        //onKeyUp={(e) => this.handleKeyUp(e, {currElmKey: 'moreCustomerDetailValue', isToAddMoreDetail: true, traverseDirection: 'backward'})} 
                         value={this.state.searchVal}
                     />
                     <FormControl.Feedback />
