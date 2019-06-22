@@ -13,7 +13,7 @@ class Picture extends Component {
             editMode: (this.props.editMode === undefined)?true:(this.props.editMode)
         }
         this.capture = this.capture.bind(this);
-        this.setRef = this.setRef.bind(this);
+        this.setRef = this.setRef.bind(this);        
         this.bindPictureMethods();
     }
 
@@ -34,6 +34,16 @@ class Picture extends Component {
         this.picture.helpers.canShowClearBtn = this.picture.helpers.canShowClearBtn.bind(this);
         this.picture.helpers.canShowCancelBtn = this.picture.helpers.canShowCancelBtn.bind(this);
         this.picture.helpers.canshowSaveBtn = this.picture.helpers.canshowSaveBtn.bind(this);
+    }
+
+    getUploadMethod() {
+        let handlingMode = ['BASE64', 'DIRECT_UPLOAD'];
+        let defaultHandlingMode = 'BASE64';
+        let theMode = this.props.handlingMode || defaultHandlingMode;
+        theMode = theMode.toUpperCase();
+        if(handlingMode.indexOf(theMode) == -1)
+            theMode = defaultHandlingMode;
+        return theMode;
     }
 
     picture= {
@@ -80,11 +90,13 @@ class Picture extends Component {
             },
             upload: (e) => {
                 var reader = new FileReader();
-                var file = e.target.files[0];
+                var file = e.target.files[0];                
                 reader.onload = (upload) => {
                     let newState = {...this.state};                
                     newState.picture.holder.show = true;
-                    newState.picture.holder.imgSrc = upload.target.result;                    
+                    newState.picture.holder.imgSrc = upload.target.result; 
+                    if(newState.picture.uploadMethod == 'DIRECT_UPLOAD')
+                        newState.picture.holder.file = file;
                     this.setState(newState);
                 };                
                 reader.readAsDataURL(file);
@@ -95,7 +107,7 @@ class Picture extends Component {
                 newState.picture.holder.imgSrc = '';
                 newState.picture.status = 'SAVED';
                 this.setState(newState);
-                this.props.updatePictureData(newState.picture);
+                this.props.updatePictureData(newState.picture, 'save');
             },
             exit: () => {
                 let newState = {...this.state};
@@ -105,13 +117,16 @@ class Picture extends Component {
             },
             clear: () => {
                 let newState = {...this.state};
+                let id = newState.picture.id;
                 newState.picture.holder.imgSrc = '';
                 newState.picture.holder.confirmedImgSrc = '';
+                newState.picture.holder.file = null;
                 newState.picture.webcamTool.show = false;
-                newState.picture.holder.show = true;
+                newState.picture.holder.show = true;                
+                newState.picture.id = null;
                 newState.picture.status = 'UNSAVED';
                 this.setState(newState);
-                this.props.updatePictureData(newState.picture);
+                this.props.updatePictureData(newState.picture, 'del', id);
             }
         },
         helpers: {
@@ -164,13 +179,15 @@ class Picture extends Component {
             },
             canShowCameraBtn: () => {
                 let canShow = false;
-                if(!this.state.picture.webcamTool.show)
+                if(!this.state.picture.webcamTool.show && !(this.state.picture.holder.imgSrc ||
+                    this.state.picture.holder.confirmedImgSrc ))
                     canShow = true;
                 return canShow;
             },
             canShowUploadBtn: () => {
                 let canShow = false;
-                if(!this.state.picture.webcamTool.show)
+                if(!this.state.picture.webcamTool.show && !(this.state.picture.holder.imgSrc ||
+                    this.state.picture.holder.confirmedImgSrc ))
                     canShow = true;
                 return canShow;
             },
@@ -185,6 +202,13 @@ class Picture extends Component {
                 if(this.state.picture.holder.show &&
                   (this.state.picture.holder.imgSrc ||
                    this.state.picture.holder.confirmedImgSrc )) {
+                    canShow = true;
+                }
+                return canShow;
+            },
+            canShowSpinner: () => {
+                let canShow = false;
+                if(this.state.picture.loading ) {
                     canShow = true;
                 }
                 return canShow;
@@ -219,7 +243,7 @@ class Picture extends Component {
         const imageSrc = this.webcam.getScreenshot();
         this.setState({imageSrc: imageSrc});
     }
-    render() {
+    render() {        
         return (
             <div>
                <Row>
@@ -267,6 +291,11 @@ class Picture extends Component {
                                     onClick={(e) => this.picture.eventListeners.handleClick('clear')}
                                     title='Clear picture'>
                                     <FontAwesomeIcon icon="broom" />
+                                </span>
+                                <span
+                                    className={'gs-button rounded icon ' + (this.picture.helpers.canShowSpinner()? '': 'hidden-btn')}                                    
+                                    title='Loading...'>
+                                    <FontAwesomeIcon icon="spinner" />
                                 </span>
                                 <div class="image-upload-btn-wrapper">                                        
                                     <span

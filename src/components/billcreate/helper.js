@@ -18,7 +18,8 @@ export const defaultPictureState = {
         save: false,
         clear: false,
     },
-    status: 'UNSAVED'
+    status: 'UNSAVED',
+    uploadMethod: 'DIRECT_UPLOAD'
 };
 
 export const buildRequestParams = (thatState = {}) => {
@@ -38,7 +39,8 @@ export const buildRequestParams = (thatState = {}) => {
         orn: _getOrnamentsData(thatState),
         billRemarks: _getBillRemarks(thatState),
         moreDetails: _getMoreData(thatState),
-        picture: getPicData(thatState)
+        userPicture: getPicData(thatState),
+        ornPicture: getOrnPicData(thatState)
     };
     return params;
 }
@@ -65,23 +67,21 @@ const _getBillRemarks = (thatState) => {
 }
 
 export const getPicData = (thatState) => {
-    let picData = '';
-    if(thatState.picture) {
-        if(thatState.picture.holder.confirmedImgSrc)
-            picData = thatState.picture.holder.confirmedImgSrc;
-    
-        if(picData){
-            let temp = picData;
-            picData = {};
-            picData.format = temp.split(',')[0];
-            picData.value = temp.split(',')[1];
-        } else {
-            picData = {};
-        }
+    let picData = null;
+    if(thatState.userPicture) {        
+        picData = {imageId: thatState.userPicture.id}
     } else if(thatState.selectedCustomer && thatState.selectedCustomer.image && thatState.selectedCustomer.image.id) {        
         picData = {
             imageId: thatState.selectedCustomer.image.id
         };        
+    }
+    return picData;
+}
+
+export const getOrnPicData = (thatState) => {
+    let picData = null;
+    if(thatState.ornPicture) {        
+        picData = {imageId: thatState.ornPicture.id}
     }
     return picData;
 }

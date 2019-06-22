@@ -17,7 +17,7 @@ import moment from 'moment';
 import Autosuggest, { ItemAdapter } from 'react-bootstrap-autosuggest' //https://affinipay.github.io/react-bootstrap-autosuggest/#playground
 import _ from 'lodash';
 import axios from "axios";
-import { PLEDGEBOOK_METADATA, PLEDGEBOOK_ADD_RECORD } from '../../core/sitemap';
+import { PLEDGEBOOK_METADATA, SAVE_BASE64_IMAGE_AND_GET_ID, SAVE_BINARY_IMAGE_AND_GET_ID, DEL_IMAGE_BY_ID } from '../../core/sitemap';
 import { Collapse } from 'react-collapse';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import sh from 'shorthash';
@@ -28,6 +28,7 @@ import { getGaurdianNameList, getAddressList, getPlaceList, getCityList, getPinc
 import { getAccessToken } from '../../core/storage';
 import { getDateInUTC } from '../../utilities/utility';
 import Picture from '../profilePic/picture';
+
 const ENTER_KEY = 13;
 const SPACE_KEY = 32;
 
@@ -174,12 +175,107 @@ class BillCreation extends Component {
         this.autuSuggestionControls.onChange = this.autuSuggestionControls.onChange.bind(this);
         this.toggleMoreInputs = this.toggleMoreInputs.bind(this);
         this.updateItemInMoreDetail = this.updateItemInMoreDetail.bind(this);  
-        this.updatePictureData = this.updatePictureData.bind(this);      
+        this.updatePictureData = this.updatePictureData.bind(this);  
+        this.updateOrnPictureData = this.updateOrnPictureData.bind(this);
     }
 
-    updatePictureData(picture) {
-        this.setState({picture: picture});
+    /*async uploadImage(e) {
+        try {            
+            let theFormData = new FormData();
+            theFormData.append('_format_of_image', '7bit');
+            theFormData.append('name', 'Lalith');
+            theFormData.append('fatherName', 'Tejaram');
+            theFormData.append('picture', e.target.files[0]);
+            theFormData.append('ornPicture', e.target.files[0]);
+            // let reader = new FileReader();
+            // reader.onload = (e) => {
+            //     document.querySelector('.storeImgSrc').src = e.target.result;
+            // }
+            // reader.readAsDataURL(target.files[0]);
+            // document.querySelector('.addlogotxt').style.opacity = 0;
+            // document.querySelector('.choose_file').style.opacity = 0;
+            // this.setState({
+            //     storeimagename:target.files[0].name,
+            //     file: target.files[0],
+            // }); 
+
+            let theResp = await axios.post(TEMP, theFormData);
+            console.log(theResp);
+        } catch(e) {
+            console.log(e);
+        }
+    }*/
+
+    async updatePictureData(picture, action, imageId) {
+        picture.loading = true;
+        this.setState({userPicture: picture});
+        let uploadedImageDetail;
+        if(action == 'save') {
+            let reqParams = {};
+            if(picture.holder.file) {
+                reqParams = new FormData();
+                reqParams.append('imgContentType', 'file'); //Type of image contetn passed to API
+                reqParams.append('storeAs', 'FILE'); // Suggesting API to save in mentioned format
+                reqParams.append('pic', picture.holder.file); // Image content
+                uploadedImageDetail = await axios.post(SAVE_BINARY_IMAGE_AND_GET_ID, reqParams);
+            } else {
+                reqParams.imgContentType = 'base64'; //Type of image contetn passed to API
+                reqParams.storeAs = 'FILE'; // Suggesting API to save in mentioned format                
+                reqParams.format = picture.holder.confirmedImgSrc.split(',')[0];
+                reqParams.pic = picture.holder.confirmedImgSrc.split(',')[1]; // Image content
+                uploadedImageDetail = await axios.post(SAVE_BASE64_IMAGE_AND_GET_ID, reqParams);
+            }            
+            let currState = {...this.state};
+            currState.userPicture.loading = false;
+            currState.userPicture.id = uploadedImageDetail.data.ID;
+            this.setState(currState);
+        } else if(action == 'del') {
+            picture.loading = true;
+            this.setState({userPicture: picture});
+            await axios.delete(DEL_IMAGE_BY_ID, { data: {imageId: imageId} });
+            let currState = {...this.state};
+            currState.userPicture.loading = false;
+            currState.userPicture.id = null;
+            this.setState(currState);
+        }     
     }
+
+    async updateOrnPictureData(picture, action, imageId) {
+        picture.loading = true;
+        this.setState({ornPicture: picture});
+        let uploadedImageDetail;
+        if(action == 'save') {
+            let reqParams = {};
+            if(picture.holder.file) {
+                reqParams = new FormData();
+                reqParams.append('imgContentType', 'file'); //Type of image contetn passed to API
+                reqParams.append('storeAs', 'FILE'); // Suggesting API to save in mentioned format
+                reqParams.append('pic', picture.holder.file); // Image content
+                reqParams.append('imgCategory', 'ORN');
+                uploadedImageDetail = await axios.post(SAVE_BINARY_IMAGE_AND_GET_ID, reqParams);
+            } else {
+                reqParams.imgContentType = 'base64'; //Type of image contetn passed to API
+                reqParams.storeAs = 'FILE'; // Suggesting API to save in mentioned format                
+                reqParams.format = picture.holder.confirmedImgSrc.split(',')[0];
+                reqParams.pic = picture.holder.confirmedImgSrc.split(',')[1]; // Image content
+                reqParams.imgCategory = 'ORN';
+                uploadedImageDetail = await axios.post(SAVE_BASE64_IMAGE_AND_GET_ID, reqParams);
+            }
+            let currState = {...this.state};
+            currState.ornPicture.loading = false;
+            currState.ornPicture.id = uploadedImageDetail.data.ID;            
+            this.setState(currState);
+        } else if(action == 'del') {            
+            picture.loading = true;
+            this.setState({ornPicture: picture});
+            await axios.delete(DEL_IMAGE_BY_ID, { data: {imageId: imageId, imgCategory: 'ORN'} });
+            let currState = {...this.state};
+            currState.ornPicture.loading = false;
+            currState.ornPicture.id = null;
+            this.setState(currState);
+        }
+        
+    }    
 
     /* END: "this" Binders */
 
@@ -190,7 +286,7 @@ class BillCreation extends Component {
             .then(
                 (successResp) => {                      
                     let newState = {...this.state};
-                    let results = successResp.data;                    
+                    let results = successResp.data;
                     newState.formData.cname.list = results.row;
                     newState.formData.gaurdianName.list = getGaurdianNameList(results.row);
                     newState.formData.address.list = getAddressList(results.row);
@@ -1108,11 +1204,12 @@ class BillCreation extends Component {
                                     value='Update Bill'
                                     />
                             }
-                        </Col>
+                        </Col>                  
                     </Row>
                 </Col>
                 <Col className="right-pane" xs={4} md={4}>
                     <Picture imageBase64={this.getImageBase64()} updatePictureData={this.updatePictureData} canShowActionButtons={!this.isExistingCustomer()}/>
+                    <Picture updatePictureData={this.updateOrnPictureData} />
                 </Col>
                 <EditDetailsDialog {...this.state.editModalContent} update={this.updateItemInMoreDetail} />
             </Grid>
