@@ -18,7 +18,8 @@ class Picture extends Component {
     }
 
     componentWillReceiveProps(nextProps) {
-        
+        if(nextProps.picData)
+            this.setState({picture: nextProps.picData});
     }
 
     bindPictureMethods() {
@@ -85,6 +86,7 @@ class Picture extends Component {
                 let newState = {...this.state};
                 newState.picture.webcamTool.show = false;
                 newState.picture.holder.show = true;
+                debugger;
                 newState.picture.holder.imgSrc = imageSrc;
                 this.setState(newState);
             },
@@ -116,17 +118,21 @@ class Picture extends Component {
                 this.setState(newState);
             },
             clear: () => {
-                let newState = {...this.state};
-                let id = newState.picture.id;
-                newState.picture.holder.imgSrc = '';
-                newState.picture.holder.confirmedImgSrc = '';
-                newState.picture.holder.file = null;
-                newState.picture.webcamTool.show = false;
-                newState.picture.holder.show = true;                
-                newState.picture.id = null;
-                newState.picture.status = 'UNSAVED';
-                this.setState(newState);
-                this.props.updatePictureData(newState.picture, 'del', id);
+                let result = window.confirm("Sure to delete? You will not be able to restore this pic."); 
+                if (result == true) {
+                    let newState = {...this.state};
+                    let id = newState.picture.id;
+                    newState.picture.holder.imgSrc = '';
+                    newState.picture.holder.confirmedImgSrc = '';
+                    newState.picture.holder.file = null;
+                    newState.picture.holder.path = '';
+                    newState.picture.webcamTool.show = false;
+                    newState.picture.holder.show = true;                
+                    newState.picture.id = null;                
+                    newState.picture.status = 'UNSAVED';
+                    this.setState(newState);
+                    this.props.updatePictureData(newState.picture, 'del', id);
+                }                
             }
         },
         helpers: {
@@ -147,29 +153,21 @@ class Picture extends Component {
 
 
             getImageForHolder: () => {
-                let imgPath = null;
-
-                if(this.state.editMode) {                    
+                let imgPath = null;                
+                if(this.state.editMode) {
                     if(this.state.picture.holder.confirmedImgSrc) //saved image
                         imgPath = this.state.picture.holder.confirmedImgSrc;
+                    else if(this.state.picture.holder.path)
+                        imgPath = this.state.picture.holder.path;
                     if(this.state.picture.holder.imgSrc) //captured, not saved image
-                        imgPath = this.state.picture.holder.imgSrc;
-                    if(!imgPath) {
-                        if(this.props.imageBase64) {
-                            imgPath = convertBufferToBase64(this.props.imageBase64);                           
-                        } else {
-                            imgPath = this.state.picture.holder.defaultSrc;
-                        }
-                    }
+                        imgPath = this.state.picture.holder.imgSrc;                
                 } else {
-                    if(this.props.imageBase64) {                    
-                        imgPath = convertBufferToBase64(this.props.imageBase64);
-                    } else {
-                        if(this.state.picture.holder.confirmedImgSrc) //saved image
-                            imgPath = this.state.picture.holder.confirmedImgSrc;
-                        if(this.state.picture.holder.imgSrc) //captured, not saved image
-                            imgPath = this.state.picture.holder.imgSrc;
-                    }
+                    if(this.state.picture.holder.path)
+                        imgPath = this.state.picture.holder.path;
+                    else if(this.state.picture.holder.confirmedImgSrc)
+                        imgPath = this.state.picture.holder.confirmedImgSrc;
+                    if(this.state.picture.holder.imgSrc) //captured, not saved image
+                        imgPath = this.state.picture.holder.imgSrc;                    
                 }
 
                 if(!imgPath)
@@ -180,14 +178,14 @@ class Picture extends Component {
             canShowCameraBtn: () => {
                 let canShow = false;
                 if(!this.state.picture.webcamTool.show && !(this.state.picture.holder.imgSrc ||
-                    this.state.picture.holder.confirmedImgSrc ))
+                    this.state.picture.holder.confirmedImgSrc || this.state.picture.holder.path))
                     canShow = true;
                 return canShow;
             },
             canShowUploadBtn: () => {
                 let canShow = false;
                 if(!this.state.picture.webcamTool.show && !(this.state.picture.holder.imgSrc ||
-                    this.state.picture.holder.confirmedImgSrc ))
+                    this.state.picture.holder.confirmedImgSrc || this.state.picture.holder.path))
                     canShow = true;
                 return canShow;
             },
@@ -201,7 +199,8 @@ class Picture extends Component {
                 let canShow = false;
                 if(this.state.picture.holder.show &&
                   (this.state.picture.holder.imgSrc ||
-                   this.state.picture.holder.confirmedImgSrc )) {
+                   this.state.picture.holder.confirmedImgSrc ||
+                    this.state.picture.holder.path)) {
                     canShow = true;
                 }
                 return canShow;
@@ -219,11 +218,10 @@ class Picture extends Component {
                     canShow = true;
                 return canShow;                
             },
-            canshowSaveBtn: () => {
+            canshowSaveBtn: () => {                
                 let canShow = false;
                 if(this.state.picture.holder.show &&
-                this.state.picture.holder.imgSrc &&
-                this.state.picture.status !== 'SAVED') {
+                this.state.picture.holder.imgSrc ) { //this.state.picture.status !== 'SAVED'
                     canShow = true;
                 }
                 return canShow;

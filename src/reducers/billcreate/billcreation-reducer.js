@@ -8,7 +8,19 @@ export default function billCreationReducer(state=defaultState, action) {
                 loading: false
             }
             break;
+        case 'BILL_UPDATED_SUCCESSFULLY':
+            newState = {
+                ...newState,
+                loading: false
+            }
+            break;
         case 'NEW_BILL_INSERTION_ERROR':
+            newState = {
+                ...newState,
+                loading: false
+            };
+            break;
+        case 'BILL_UPDATION_ERROR':
             newState = {
                 ...newState,
                 loading: false

@@ -22,9 +22,9 @@ import { Collapse } from 'react-collapse';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import sh from 'shorthash';
 import EditDetailsDialog from './editDetailsDialog';
-import { insertNewBill, updateClearEntriesFlag, showEditDetailModal, hideEditDetailModal, getBillNoFromDB, disableReadOnlyMode, updateBillNoInStore } from '../../actions/billCreation';
+import { insertNewBill, updateBill, updateClearEntriesFlag, showEditDetailModal, hideEditDetailModal, getBillNoFromDB, disableReadOnlyMode, updateBillNoInStore } from '../../actions/billCreation';
 import { DoublyLinkedList } from '../../utilities/doublyLinkedList';
-import { getGaurdianNameList, getAddressList, getPlaceList, getCityList, getPincodeList, getMobileList, buildRequestParams, updateBillNumber, resetState } from './helper';
+import { getGaurdianNameList, getAddressList, getPlaceList, getCityList, getPincodeList, getMobileList, buildRequestParams, buildRequestParamsForUpdate, updateBillNumber, resetState, defaultPictureState } from './helper';
 import { getAccessToken } from '../../core/storage';
 import { getDateInUTC } from '../../utilities/utility';
 import Picture from '../profilePic/picture';
@@ -139,8 +139,10 @@ class BillCreation extends Component {
                     billRemarks: '',
                     list: ['Aadhar card', 'Pan Card', 'License Number', 'SBI Bank Account Number', 'Email']
                 },
-                selectedCustomer: {}
+                selectedCustomer: {}                
             },
+            userPicture: JSON.parse(JSON.stringify(defaultPictureState)),
+            ornPicture: JSON.parse(JSON.stringify(defaultPictureState))
         };
         this.bindMethods();        
     }    
@@ -159,8 +161,10 @@ class BillCreation extends Component {
 
     componentWillReceiveProps(nextProps) {
         let newState = {...this.state};
-        if(!this.props.loadedInPledgebook)
+        if(!this.props.loadedInPledgebook) {
+            debugger;
             newState = updateBillNumber(nextProps, newState);
+        }
         if(nextProps.billCreation.clearEntries) {
             newState = resetState(nextProps, newState);
             this.updateDomList('disableMoreDetailsInputElmns'); 
@@ -207,6 +211,7 @@ class BillCreation extends Component {
     }*/
 
     async updatePictureData(picture, action, imageId) {
+        debugger;
         picture.loading = true;
         this.setState({userPicture: picture});
         let uploadedImageDetail;
@@ -224,23 +229,26 @@ class BillCreation extends Component {
                 reqParams.format = picture.holder.confirmedImgSrc.split(',')[0];
                 reqParams.pic = picture.holder.confirmedImgSrc.split(',')[1]; // Image content
                 uploadedImageDetail = await axios.post(SAVE_BASE64_IMAGE_AND_GET_ID, reqParams);
-            }            
+            }
             let currState = {...this.state};
             currState.userPicture.loading = false;
             currState.userPicture.id = uploadedImageDetail.data.ID;
             this.setState(currState);
-        } else if(action == 'del') {
-            picture.loading = true;
-            this.setState({userPicture: picture});
-            await axios.delete(DEL_IMAGE_BY_ID, { data: {imageId: imageId} });
+        } else if(action == 'del') {            
+            if(imageId) {
+                picture.loading = true;
+                this.setState({userPicture: picture});
+                await axios.delete(DEL_IMAGE_BY_ID, { data: {imageId: imageId} });
+            }
             let currState = {...this.state};
             currState.userPicture.loading = false;
             currState.userPicture.id = null;
+            currState.userPicture.holder = JSON.parse(JSON.stringify(defaultPictureState.holder));            
             this.setState(currState);
         }     
     }
 
-    async updateOrnPictureData(picture, action, imageId) {
+    async updateOrnPictureData(picture, action, imageId) {        
         picture.loading = true;
         this.setState({ornPicture: picture});
         let uploadedImageDetail;
@@ -265,13 +273,16 @@ class BillCreation extends Component {
             currState.ornPicture.loading = false;
             currState.ornPicture.id = uploadedImageDetail.data.ID;            
             this.setState(currState);
-        } else if(action == 'del') {            
-            picture.loading = true;
-            this.setState({ornPicture: picture});
-            await axios.delete(DEL_IMAGE_BY_ID, { data: {imageId: imageId, imgCategory: 'ORN'} });
+        } else if(action == 'del') {
+            if(imageId) {
+                picture.loading = true;
+                this.setState({ornPicture: picture});
+                await axios.delete(DEL_IMAGE_BY_ID, { data: {imageId: imageId, imgCategory: 'ORN'} });
+            }
             let currState = {...this.state};
             currState.ornPicture.loading = false;
             currState.ornPicture.id = null;
+            currState.ornPicture.holder = JSON.parse(JSON.stringify(defaultPictureState.holder));
             this.setState(currState);
         }
         
@@ -294,6 +305,7 @@ class BillCreation extends Component {
                     newState.formData.city.list = getCityList(results.row);
                     newState.formData.pincode.list = getPincodeList(results.row);
                     newState.formData.mobile.list = getMobileList(results.row);
+                    console.log(newState.formData.mobile.list); 
                     newState.formData.moreDetails.list = results.otherDetails.map((anItem) => {return {key: anItem.key, value: anItem.displayText}});
                     this.setState(newState);
                 },
@@ -328,16 +340,41 @@ class BillCreation extends Component {
         newState.formData.orn.inputs = ornObj;
         newState.formData.orn.rowCount = Object.keys(ornObj).length;
         newState.formData.moreDetails.customerInfo = JSON.parse(data.OtherDetails) || [];    
-        
-        if(data.Image && data.Image.data) {
-            let buff = new Buffer(data.Image.data, "base64"); //.toString('base64');
+        newState.userPicture = JSON.parse(JSON.stringify(defaultPictureState));
+        newState.ornPicture = JSON.parse(JSON.stringify(defaultPictureState));
+
+        if(data.UserImageBlob && data.UserImageBlob.data) {
+            let buff = new Buffer(data.UserImageBlob.data, "base64"); //.toString('base64');
             let img = buff.toString('ascii');
             img = img.substring(1);
             img = img.substring(0, img.length-1);
-            newState.picture.holder.confirmedImgSrc = "data:image/webp;base64,"+ img;
-            newState.picture.holder.imgSrc = '';
-            newState.picture.status = 'SAVED';
+            newState.userPicture.holder.confirmedImgSrc = "data:image/webp;base64,"+ img;
+            newState.userPicture.holder.imgSrc = '';
+            newState.userPicture.status = 'SAVED';
+        } else if (data.UserImagePath) {
+            newState.userPicture.holder.path = data.UserImagePath;
+            newState.userPicture.holder.confirmedImgSrc = '';
+            newState.userPicture.holder.imgSrc = '';
+            newState.userPicture.status = 'SAVED';
         }
+
+        if(data.OrnImageBlob && data.OrnImageBlob.data) {
+            let buff = new Buffer(data.OrnImageBlob.data, "base64"); //.toString('base64');
+            let img = buff.toString('ascii');
+            img = img.substring(1);
+            img = img.substring(0, img.length-1);
+            newState.ornPicture.holder.confirmedImgSrc = "data:image/webp;base64,"+ img;
+            newState.ornPicture.holder.imgSrc = '';
+            newState.ornPicture.status = 'SAVED';
+        } else if (data.OrnImagePath) {
+            newState.ornPicture.holder.path = data.OrnImagePath;
+            newState.ornPicture.id = data.OrnImageTableID;
+            newState.ornPicture.holder.confirmedImgSrc = '';
+            newState.ornPicture.holder.imgSrc = '';
+            newState.ornPicture.status = 'SAVED';
+        }
+
+        newState.uniqueIdentifier = data.UniqueIdentifier;        
         
         this.setState(newState);
     }
@@ -378,6 +415,21 @@ class BillCreation extends Component {
 
     }
 
+    getUserImageData() {
+        let returnVal = {};
+        debugger;
+        if(this.state.selectedCustomer && this.state.selectedCustomer.userImagePath) {
+            returnVal = JSON.parse(JSON.stringify(defaultPictureState));
+            returnVal.holder.path = this.state.selectedCustomer.userImagePath;
+            returnVal.holder.confirmedImgSrc = '';
+            returnVal.holder.imgSrc = '';
+            returnVal.status = 'SAVED';
+        } else {
+            returnVal = this.state.userPicture;
+        }
+        return returnVal;
+    }
+    
     getImageBase64() {
         if(this.state.selectedCustomer && this.state.selectedCustomer.image && this.state.selectedCustomer.image.image.data)
             return this.state.selectedCustomer.image.image.data;
@@ -628,16 +680,19 @@ class BillCreation extends Component {
         }
     }
 
-    handleSubmit() {        
+    handleSubmit() {
+        //TODO: Validation. "Customer Name & Amount & Date " should not be empty
         let requestParams = buildRequestParams(this.state);
         this.props.insertNewBill(requestParams);
     }
 
     handleUpdate() {
-        
+        //TODO: Validation. "Customer Name & Amount & Date " should not be empty
+        let requestParams = buildRequestParamsForUpdate(this.state);
+        this.props.updateBill(requestParams);
     }
 
-    onEditDetailIconClick(index) {        
+    onEditDetailIconClick(index) {
         let newState = {...this.state};
         newState.editModalContent = {
             index: index,
@@ -738,10 +793,6 @@ class BillCreation extends Component {
             }            
             this.setState(newState); */
         }
-    }
-
-    submitListener() {
-        let request = buildRequestParams(this.state);
     }
 
     /* END: Action/Event listeners */    
@@ -1204,12 +1255,12 @@ class BillCreation extends Component {
                                     value='Update Bill'
                                     />
                             }
-                        </Col>                  
+                        </Col>
                     </Row>
                 </Col>
                 <Col className="right-pane" xs={4} md={4}>
-                    <Picture imageBase64={this.getImageBase64()} updatePictureData={this.updatePictureData} canShowActionButtons={!this.isExistingCustomer()}/>
-                    <Picture updatePictureData={this.updateOrnPictureData} />
+                    <Picture picData={this.getUserImageData()} updatePictureData={this.updatePictureData} canShowActionButtons={!(this.isExistingCustomer() || this.props.loadedInPledgebook)}/>
+                    <Picture picData={this.state.ornPicture} updatePictureData={this.updateOrnPictureData} />
                 </Col>
                 <EditDetailsDialog {...this.state.editModalContent} update={this.updateItemInMoreDetail} />
             </Grid>
@@ -1223,7 +1274,7 @@ const mapStateToProps = (state) => {
     };
 };
 
-export default connect(mapStateToProps, {insertNewBill, updateClearEntriesFlag, showEditDetailModal, hideEditDetailModal, getBillNoFromDB, disableReadOnlyMode, updateBillNoInStore})(BillCreation);
+export default connect(mapStateToProps, {insertNewBill, updateBill, updateClearEntriesFlag, showEditDetailModal, hideEditDetailModal, getBillNoFromDB, disableReadOnlyMode, updateBillNoInStore})(BillCreation);
 
 
 class CommonAdaptor extends ItemAdapter {

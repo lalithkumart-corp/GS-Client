@@ -22,6 +22,7 @@ class CustomerDetail extends Component {
     bindMethods() {
         this.inputControls.onChange = this.inputControls.onChange.bind(this);
         this.filterCustomerList = this.filterCustomerList.bind(this);
+        this.refreshCustomerList = this.refreshCustomerList.bind(this);
     }
 
     async componentDidMount() {
@@ -43,7 +44,7 @@ class CustomerDetail extends Component {
 
         let filteredCustList = [];
         if(custName == '') {
-            filteredCustList = this.state.rawCustomerList;            
+            filteredCustList = this.state.rawCustomerList;
         } else {    
             _.each(this.state.rawCustomerList, (aCust, index) => {
                 aCust.isSelected = false;
@@ -85,6 +86,11 @@ class CustomerDetail extends Component {
         }        
     }
 
+    async refreshCustomerList() {
+        let customerList = await this._fetchCustomerList();        
+        this.setState({customerList: customerList, rawCustomerList: customerList, selectedCust: null});        
+    }
+
     getSearchBox() {
         return (
             <Row className='head-section'>
@@ -124,7 +130,7 @@ class CustomerDetail extends Component {
         if(this.state.selectedCust){
             buffer.push(<Tabs defaultActiveKey="history">
                 <Tab eventKey="general" title="General" >
-                    <GeneralInfo {...this.state}/>
+                    <GeneralInfo {...this.state} refreshCustomerList={this.refreshCustomerList}/>
                 </Tab>
                 <Tab eventKey="history" title="History">
                     <History {...this.state}/>

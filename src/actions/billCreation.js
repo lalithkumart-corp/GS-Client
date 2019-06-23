@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { PLEDGEBOOK_ADD_RECORD, GET_LAST_BILL_NO } from '../core/sitemap';
+import { PLEDGEBOOK_ADD_RECORD, GET_LAST_BILL_NO, PLEDGEBOOK_UPDATE_RECORD } from '../core/sitemap';
 import { toast } from 'react-toastify';
 import { getAccessToken } from '../core/storage';
 
@@ -12,7 +12,7 @@ export const insertNewBill = (requestParams) => {
         axios.post(PLEDGEBOOK_ADD_RECORD, {accessToken, requestParams})
             .then(
                 (resp) => {
-                    if(resp.data.STATUS == 'error') {
+                    if(resp.data.STATUS == 'ERROR') {
                         let errorText = resp.data.ERROR;
                         toast.error('Error in adding new bill to pledgebook - ' + errorText);
                         dispatch({
@@ -32,6 +32,42 @@ export const insertNewBill = (requestParams) => {
                             type: 'TRACK_Bill_NUMBER',
                             data: {billSeries: requestParams.billSeries, lastBillNumber: requestParams.billNo}
                         });
+                    }
+                    console.log(resp.data);
+                },
+                (errResp) => {
+                    console.log(errResp);
+                }
+            )
+            .catch(
+                (exception) => {
+                    console.log(exception);
+                }
+            )
+    }
+}
+
+export const updateBill = (requestParams) => {
+    return (dispatch) => {
+        dispatch({
+            type: 'ENABLE_LOADING'
+        });
+        let accessToken = getAccessToken();
+        axios.post(PLEDGEBOOK_UPDATE_RECORD, {accessToken, requestParams})
+            .then(
+                (resp) => {
+                    if(resp.data.STATUS == 'ERROR') {
+                        let errorText = resp.data.ERROR;
+                        toast.error('Error in Updating the bill in pledgebook - ' + errorText);
+                        dispatch({
+                            type: 'BILL_UPDATION_ERROR',
+                            data: {msg: resp.data.ERROR}
+                        });                    
+                    } else {
+                        toast.success('Updated the bill successfully'); //TODO: Hide this msg automatically after some timeout
+                        dispatch({
+                            type: 'BILL_UPDATED_SUCCESSFULLY'
+                        });                        
                     }
                     console.log(resp.data);
                 },

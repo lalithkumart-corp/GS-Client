@@ -23,7 +23,8 @@ export const defaultPictureState = {
 };
 
 export const buildRequestParams = (thatState = {}) => {
-    let state = {...thatState}; //for preventing reference issue    
+    let state = {...thatState}; //for preventing reference issue  
+    state.selectedCustomer = state.selectedCustomer || {};  
     let params = {
         date: state.formData.date.inputVal.replace('T', ' ').slice(0,23),
         billSeries: state.formData.billseries.inputVal,
@@ -41,6 +42,30 @@ export const buildRequestParams = (thatState = {}) => {
         moreDetails: _getMoreData(thatState),
         userPicture: getPicData(thatState),
         ornPicture: getOrnPicData(thatState)
+    };
+    return params;
+}
+
+export const buildRequestParamsForUpdate = (thatState = {}) => {    
+    let state = {...thatState}; //for preventing reference issue
+    state.selectedCustomer = state.selectedCustomer || {};
+    let params = {
+        date: state.formData.date.inputVal.replace('T', ' ').slice(0,23),
+        billSeries: state.formData.billseries.inputVal,
+        billNo: state.formData.billno.inputVal, //_getBillNo(thatState),     
+        amount: state.formData.amount.inputVal,
+        cname: state.selectedCustomer.name || state.formData.cname.inputVal,
+        gaurdianName: state.selectedCustomer.gaurdianName || state.formData.gaurdianName.inputVal,
+        address: state.selectedCustomer.address || state.formData.address.inputVal,
+        place: state.selectedCustomer.place || state.formData.place.inputVal,
+        city: state.selectedCustomer.city || state.formData.city.inputVal,
+        pinCode: state.selectedCustomer.pincode || state.formData.pincode.inputVal,
+        mobile: state.selectedCustomer.mobile || state.formData.mobile.inputVal,
+        orn: _getOrnamentsData(thatState),
+        billRemarks: _getBillRemarks(thatState),
+        userPicture: getPicData(thatState),
+        ornPicture: getOrnPicData(thatState),
+        uniqueIdentifier: state.uniqueIdentifier
     };
     return params;
 }
