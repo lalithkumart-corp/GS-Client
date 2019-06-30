@@ -161,8 +161,7 @@ class BillCreation extends Component {
 
     componentWillReceiveProps(nextProps) {
         let newState = {...this.state};
-        if(!this.props.loadedInPledgebook) {
-            debugger;
+        if(!this.props.loadedInPledgebook) {            
             newState = updateBillNumber(nextProps, newState);
         }
         if(nextProps.billCreation.clearEntries) {
@@ -210,8 +209,7 @@ class BillCreation extends Component {
         }
     }*/
 
-    async updatePictureData(picture, action, imageId) {
-        debugger;
+    async updatePictureData(picture, action, imageId) {        
         picture.loading = true;
         this.setState({userPicture: picture});
         let uploadedImageDetail;
@@ -304,8 +302,7 @@ class BillCreation extends Component {
                     newState.formData.place.list = getPlaceList(results.row);
                     newState.formData.city.list = getCityList(results.row);
                     newState.formData.pincode.list = getPincodeList(results.row);
-                    newState.formData.mobile.list = getMobileList(results.row);
-                    console.log(newState.formData.mobile.list); 
+                    newState.formData.mobile.list = getMobileList(results.row);                    
                     newState.formData.moreDetails.list = results.otherDetails.map((anItem) => {return {key: anItem.key, value: anItem.displayText}});
                     this.setState(newState);
                 },
@@ -410,6 +407,12 @@ class BillCreation extends Component {
             if(identifier == 'moreDetails') identifier = 'otherDetails'; 
 
             returnVal = this.state.selectedCustomer[identifier] || returnVal;
+            try{
+                if(identifier == 'otherDetails')
+                    returnVal = JSON.parse(returnVal);
+            } catch(e) {
+                console.log(e);
+            }            
         }
         return returnVal;
 
@@ -417,7 +420,6 @@ class BillCreation extends Component {
 
     getUserImageData() {
         let returnVal = {};
-        debugger;
         if(this.state.selectedCustomer && this.state.selectedCustomer.userImagePath) {
             returnVal = JSON.parse(JSON.stringify(defaultPictureState));
             returnVal.holder.path = this.state.selectedCustomer.userImagePath;
@@ -576,6 +578,7 @@ class BillCreation extends Component {
     async insertItemIntoMoreBucket() {        
         let newState = {...this.state};
         let obj = {
+            uniq: Date.now(),
             key: newState.formData.moreDetails.currCustomerInputKey,
             field: newState.formData.moreDetails.currCustomerInputField,
             val: newState.formData.moreDetails.currCustomerInputVal
@@ -650,7 +653,7 @@ class BillCreation extends Component {
 
     }
     async handleEnterKeyPress(e, options) {        
-        if(options && options.isOrnNosInput && (this.canAppendNewRow(options))) {            
+        if(options && options.isOrnNosInput && (this.canAppendNewRow(options))) {
             await this.appendNewRow(e, options.nextSerialNo);
         } else if(options && options.isOrnItemInput) {
             options = await this.checkOrnRowClearance(e, options);
@@ -727,7 +730,7 @@ class BillCreation extends Component {
                 } else {
                     newState.formData[identifier].inputVal = val.name || '';                
                     // this.updateSelectedCustomer(val);                    
-                    newState.selectedCustomer = val;                    
+                    newState.selectedCustomer = val;                                        
                 }
             /*} else if(identifier == "gaurdianName") {
                 newState.formData[identifier].inputVal = val;
@@ -953,7 +956,7 @@ class BillCreation extends Component {
                 {
                     (() => {
                         let rows = [];
-                        let moreDetails = this.getInputValFromCustomSources('moreDetails');
+                        let moreDetails = this.getInputValFromCustomSources('moreDetails');                        
                         for(let i=0; i<moreDetails.length; i++) {
                             rows.push(
                                 <Row className="customer-info-display-row" key={i}>
@@ -1182,7 +1185,7 @@ class BillCreation extends Component {
                                     value={this.getInputValFromCustomSources('city')}
                                     onChange={ (val) => this.autuSuggestionControls.onChange(val, 'city') }
                                     ref = {(domElm) => { this.domElmns.city = domElm; }}
-                   onKeyUp = {(e) => this.handleKeyUp(e, {currElmKey: 'city'}) }
+                                    onKeyUp = {(e) => this.handleKeyUp(e, {currElmKey: 'city'}) }
                                     readOnly={this.props.billCreation.loading}
                                 />
                                 <FormControl.Feedback />

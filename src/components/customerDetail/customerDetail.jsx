@@ -60,7 +60,22 @@ class CustomerDetail extends Component {
     async _fetchCustomerList() {
         let accessToken = getAccessToken();
         let response = await axios.get(PLEDGEBOOK_METADATA + `?access_token=${accessToken}&identifiers=["all", "otherDetails"]`);
-        return response.data.row;
+        let parsedData = this.parseCustomerDataList(response.data.row);
+        return parsedData;
+    }
+
+    parseCustomerDataList(rawCustomerDataList) {
+        let parsedData = [];
+        _.each(rawCustomerDataList, (aCustData, index) => {
+            try{
+                aCustData.otherDetails = JSON.parse(aCustData.otherDetails);
+                parsedData.push(aCustData);
+            } catch(e) {
+                alert(e);
+                console.log(e);
+            }
+        });
+        return parsedData;
     }
 
     onCardClick(e, aCust, index) {
@@ -128,7 +143,7 @@ class CustomerDetail extends Component {
     getDetailView() {
         let buffer = [];
         if(this.state.selectedCust){
-            buffer.push(<Tabs defaultActiveKey="history">
+            buffer.push(<Tabs defaultActiveKey="general">
                 <Tab eventKey="general" title="General" >
                     <GeneralInfo {...this.state} refreshCustomerList={this.refreshCustomerList}/>
                 </Tab>

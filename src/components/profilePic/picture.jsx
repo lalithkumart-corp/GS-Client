@@ -85,8 +85,7 @@ class Picture extends Component {
                 const imageSrc = this.webcam.getScreenshot();
                 let newState = {...this.state};
                 newState.picture.webcamTool.show = false;
-                newState.picture.holder.show = true;
-                debugger;
+                newState.picture.holder.show = true;                
                 newState.picture.holder.imgSrc = imageSrc;
                 this.setState(newState);
             },
