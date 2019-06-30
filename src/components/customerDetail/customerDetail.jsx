@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { Grid, Row, Col, FormGroup, ControlLabel, FormControl, HelpBlock, InputGroup, Button, Glyphicon, Tabs, Tab } from 'react-bootstrap';
 import axios from 'axios';
-import { PLEDGEBOOK_METADATA, PLEDGEBOOK_FETCH_USER_HISTORY } from '../../core/sitemap';
+import { PLEDGEBOOK_METADATA, PLEDGEBOOK_FETCH_CUSTOMER_HISTORY } from '../../core/sitemap';
 import { getAccessToken } from '../../core/storage';
 import _ from 'lodash';
 import './customerDetail.css';
@@ -86,14 +86,14 @@ class CustomerDetail extends Component {
             else
                 aCust.isSelected = false;
         });
-        this.fetchBillHistory(aCust.customerId);
+        this.fetchCustomerHistory(aCust.customerId);        
         this.setState({selectedCust: aCust, customerList: custList, billHistory: null, billHistoryLoading: true});
     }
 
-    async fetchBillHistory(customerId) {
+    async fetchCustomerHistory(customerId) {
         try {
             let accessToken = getAccessToken();
-            let response = await axios.get(PLEDGEBOOK_FETCH_USER_HISTORY + `?access_token=${accessToken}&customer_id=${customerId}`);            
+            let response = await axios.get(PLEDGEBOOK_FETCH_CUSTOMER_HISTORY + `?access_token=${accessToken}&customer_id=${customerId}`);            
             this.setState({billHistory: response.data.RESPONSE, billHistoryLoading: false});
         } catch(e) {
             alert(e);
