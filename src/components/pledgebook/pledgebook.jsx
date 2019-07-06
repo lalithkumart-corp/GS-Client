@@ -3,7 +3,7 @@ import { getPendingBills, setRefreshFlag } from '../../actions/pledgebook';
 import { parseResponse } from './helper';
 import { connect } from 'react-redux';
 import _ from 'lodash';
-import { Grid, Row, Col, FormGroup, ControlLabel, FormControl, HelpBlock, InputGroup, Button, Glyphicon } from 'react-bootstrap';
+import { Grid, Row, Col, FormGroup, ControlLabel, FormControl, HelpBlock, InputGroup, Button, Glyphicon, Radio } from 'react-bootstrap';
 
 import './pledgebook.css';
 import CommonModal from '../common-modal/commonModal.jsx';
@@ -12,19 +12,25 @@ import GSTable from '../gs-table/GSTable';
 import ReactPaginate from 'react-paginate';
 import DateRangePicker from '../dateRangePicker/dataRangePicker';
 import { convertToLocalTime } from '../../utilities/utility';
+import ImageZoom from 'react-medium-image-zoom';
+//import Popover from 'react-simple-popover';
+import Popover, {ArrowContainer} from 'react-tiny-popover'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 class Pledgebook extends Component {
     constructor(props) {
-        super(props);
+        super(props);        
         this.timeOut = 300;
         let todaysDate = new Date();
         let past7daysStartDate = new Date();
-        past7daysStartDate.setDate(past7daysStartDate.getDate()-7);
+        past7daysStartDate.setDate(past7daysStartDate.getDate()-1000);
         todaysDate.setHours(0,0,0,0);
         let todaysEndDate = new Date();
-        todaysEndDate.setHours(23,59,59,999);
+        todaysEndDate.setHours(23,59,59,999);        
         this.state = {
             PBmodalIsOpen: false,
+            statusPopupVisibility: false,
+            billDisplayFlag: 'pending',
             offsetStart: 0,
             offsetEnd: 10,
             filters: {
@@ -53,13 +59,68 @@ class Pledgebook extends Component {
                         )
                     },
                     isFilterable: true,
+                    className:'pb-date-cell',
                     filterFormatter: (column, colIndex) => {
+                        //let $this = this;
                         return (
-                            <DateRangePicker 
-                                className = 'pledgebook-date-filter'
-                                selectDateRange={this.filterCallbacks.date}
-                                startDate={this.state.filters.date.startDate}
-                                endDate={this.state.filters.date.endDate}/>
+                            <div>
+                                {/* <a
+                                    ref = 'statusPopoverTarget'
+                                    onClick={() => this.onPopupTriggerClick()}>
+                                2
+                                </a>
+                                <Popover
+                                    placement='left'
+                                    container={this}
+                                    target={this.refs.statusPopoverTarget}
+                                    show= {this.state.statusPopupVisibility}                                    
+                                    >
+                                    <span>This is the popover content</span>
+                                </Popover> */}
+                                
+                                <Popover
+                                    className='status-popover'
+                                    isOpen={this.state.statusPopupVisibility}
+                                    position={'right'} // preferred position
+                                    content={({ position, targetRect, popoverRect }) => {
+                                        return (
+                                        <ArrowContainer // if you'd like an arrow, you can import the ArrowContainer!
+                                            position={position}
+                                            targetRect={targetRect}
+                                            popoverRect={popoverRect}
+                                            arrowColor={'white'}
+                                            arrowSize={10}
+                                            //arrowStyle={{ opacity: 0.7 }}
+                                        >                                        
+                                            <div className='status-popover-content' onChange={this.onStatusPopoverChange}>
+                                                <Radio name='billstatus' checked={this.state.billDisplayFlag=='all'} value='all'>All</Radio>
+                                                <Radio name='billstatus' checked={this.state.billDisplayFlag=='pending'} value='pending'>Pending</Radio>
+                                                <Radio name='billstatus' checked={this.state.billDisplayFlag=='closed'} value='closed'>Closed</Radio>
+                                                <input 
+                                                    type="button"
+                                                    className='gs-button'
+                                                    onClick={(e) => this.onStatusPopoverSubmit()}
+                                                    value='Load'
+                                                />
+                                            </div>
+                                        </ArrowContainer>
+                                        )
+                                    }
+                                }                                                                 
+                                >
+                                    
+                                        <span className='status-popover-trigger-btn' onClick={this.onPopupTriggerClick}>
+                                            <FontAwesomeIcon icon='cog'/>
+                                        </span>                                    
+                                </Popover>
+
+                                <DateRangePicker 
+                                    className = 'pledgebook-date-filter'
+                                    selectDateRange={this.filterCallbacks.date}
+                                    startDate={this.state.filters.date.startDate}
+                                    endDate={this.state.filters.date.endDate}
+                                />
+                            </div>                            
                         )
                     },
                     tdClassNameGetter: (column, columnIndex, row, rowIndex) => {
@@ -112,6 +173,7 @@ class Pledgebook extends Component {
                     className: 'pb-address-col'
                 }]
         }
+        let billDisplayFlag = this.state.billDisplayFlag;
         this.bindMethods();
     }
     bindMethods() {
@@ -122,6 +184,9 @@ class Pledgebook extends Component {
         this.getOffsets = this.getOffsets.bind(this);
         this.handleCheckboxChangeListener = this.handleCheckboxChangeListener.bind(this);
         this.refresh = this.refresh.bind(this);
+        this.onPopupTriggerClick = this.onPopupTriggerClick.bind(this);
+        this.onStatusPopoverChange = this.onStatusPopoverChange.bind(this);
+        this.onStatusPopoverSubmit = this.onStatusPopoverSubmit.bind(this);        
     }
 
     componentDidMount() {
@@ -182,8 +247,7 @@ class Pledgebook extends Component {
     }
 
     cellClickCallbacks = {
-        onBillNoClick(params) {
-            // TODO:
+        onBillNoClick(params) {            
             this.setState({PBmodalIsOpen: true, currentBillData: params.row, currRowIndex: params.rowIndex});
         }
     }        
@@ -238,6 +302,19 @@ class Pledgebook extends Component {
         }         
     }    
 
+    onPopupTriggerClick() {
+        this.setState({statusPopupVisibility: !this.state.statusPopupVisibility});
+    }
+
+    onStatusPopoverChange(e) {
+        this.setState({billDisplayFlag: e.target.value});
+    }
+
+    async onStatusPopoverSubmit() {
+        await this.setState({statusPopupVisibility: false});
+        this.initiateFetchPledgebookAPI();
+    }
+
     // START: Helper's
     dateFormatter(theDate, options) {        
         let formattedDate = theDate.toISOString().replace('T', ' ').slice(0,19);        
@@ -273,7 +350,8 @@ class Pledgebook extends Component {
             amount: this.state.filters.amount,
             cName: this.state.filters.cName,
             gName: this.state.filters.gName,
-            address: this.state.filters.address
+            address: this.state.filters.address,
+            include: this.state.billDisplayFlag //"all" or "pending" or "closed"
         }
     }
 
@@ -298,47 +376,59 @@ class Pledgebook extends Component {
         renderer: (row) => {
             let ornData = JSON.parse(row.Orn) || {};
             return (
-                <div className="orn-display-dom">
-                    <table>
-                        <colgroup>
-                            <col style={{width: "40%"}}></col>
-                            <col style={{width: "10%"}}></col>
-                            <col style={{width: "10%"}}></col>
-                            <col style={{width: "20%"}}></col>
-                            <col style={{width: "20%"}}></col>
-                        </colgroup>
-                        <thead>
-                            <tr>
-                                <td>Orn Name</td>
-                                <td>Gross Wt</td>
-                                <td>Net Wt</td>
-                                <td>Specs</td>
-                                <td>Qty</td>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {
-                                ( () => {
-                                    let rows = [];
-                                    _.each(ornData, (anOrnItem, index) => {
-                                        let className = "even";
-                                        if(index && index%2 !== 0)
-                                            className = "odd";
-                                        rows.push(
-                                            <tr className={className}>
-                                                <td>{anOrnItem.ornItem}</td>
-                                                <td>{anOrnItem.ornGWt}</td>
-                                                <td>{anOrnItem.ornNWt}</td>
-                                                <td>{anOrnItem.ornSpec}</td>
-                                                <td>{anOrnItem.ornNos}</td>
-                                            </tr>
-                                        )
-                                    });
-                                    return rows;
-                                })()
-                            }
-                        </tbody>
-                    </table>                   
+                <div>
+                    <div className="orn-display-dom">
+                        <table>
+                            <colgroup>
+                                <col style={{width: "40%"}}></col>
+                                <col style={{width: "10%"}}></col>
+                                <col style={{width: "10%"}}></col>
+                                <col style={{width: "20%"}}></col>
+                                <col style={{width: "20%"}}></col>
+                            </colgroup>
+                            <thead>
+                                <tr>
+                                    <td>Orn Name</td>
+                                    <td>Gross Wt</td>
+                                    <td>Net Wt</td>
+                                    <td>Specs</td>
+                                    <td>Qty</td>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {
+                                    ( () => {
+                                        let rows = [];
+                                        _.each(ornData, (anOrnItem, index) => {
+                                            let className = "even";
+                                            if(index && index%2 !== 0)
+                                                className = "odd";
+                                            rows.push(
+                                                <tr className={className}>
+                                                    <td>{anOrnItem.ornItem}</td>
+                                                    <td>{anOrnItem.ornGWt}</td>
+                                                    <td>{anOrnItem.ornNWt}</td>
+                                                    <td>{anOrnItem.ornSpec}</td>
+                                                    <td>{anOrnItem.ornNos}</td>
+                                                </tr>
+                                            )
+                                        });
+                                        return rows;
+                                    })()
+                                }
+                            </tbody>
+                        </table>                   
+                    </div>
+                    {row.OrnImagePath &&
+                        <ImageZoom
+                            image={{
+                            src: row.OrnImagePath,
+                            alt: 'Ornament Imamge',
+                            className: 'pledgebook-orn-display-in-row',
+                            // style: { width: '50em' }
+                            }}
+                        />
+                    }
                 </div>
             )
         },

@@ -203,3 +203,19 @@ export const resetState = (nextProps, newState) => {
     newState.showMoreInputs = !newState.showMoreInputs;
     return newState;
 }
+
+export const validateFormValues = (formValues) => {
+    let errors = [];
+    if(!formValues.date)
+        errors.push('Date Field could not be empty');
+    if(!formValues.billNo)
+        errors.push('Bill No could not be empty');
+    if(!formValues.amount)
+        errors.push('Amount Value could not be empty');
+    if(!formValues.cname)
+        errors.push('Customer Name could not be empty');
+
+    return {
+        errors: errors
+    };
+}

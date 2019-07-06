@@ -315,6 +315,9 @@ class Picture extends Component {
                                 </div>
                             </div>
                         }
+                        {!this.canShowActionButtons() &&
+                            <div className='pic-action-container'></div>
+                        }
                     </Col>
                 </Row>
             </div>

@@ -1,8 +1,6 @@
 /**
  * TODO: Input fields valdation
-    - Fields value (do this in UI)
     - Bill number should be unique (do this from backend)
-    - etc... (will add on the fly)
  */
 
 import React, { Component } from 'react';
@@ -24,10 +22,11 @@ import sh from 'shorthash';
 import EditDetailsDialog from './editDetailsDialog';
 import { insertNewBill, updateBill, updateClearEntriesFlag, showEditDetailModal, hideEditDetailModal, getBillNoFromDB, disableReadOnlyMode, updateBillNoInStore } from '../../actions/billCreation';
 import { DoublyLinkedList } from '../../utilities/doublyLinkedList';
-import { getGaurdianNameList, getAddressList, getPlaceList, getCityList, getPincodeList, getMobileList, buildRequestParams, buildRequestParamsForUpdate, updateBillNumber, resetState, defaultPictureState } from './helper';
+import { getGaurdianNameList, getAddressList, getPlaceList, getCityList, getPincodeList, getMobileList, buildRequestParams, buildRequestParamsForUpdate, updateBillNumber, resetState, defaultPictureState, validateFormValues } from './helper';
 import { getAccessToken } from '../../core/storage';
 import { getDateInUTC } from '../../utilities/utility';
 import Picture from '../profilePic/picture';
+import { toast } from 'react-toastify';
 
 const ENTER_KEY = 13;
 const SPACE_KEY = 32;
@@ -684,15 +683,21 @@ class BillCreation extends Component {
     }
 
     handleSubmit() {
-        //TODO: Validation. "Customer Name & Amount & Date " should not be empty
         let requestParams = buildRequestParams(this.state);
-        this.props.insertNewBill(requestParams);
+        let validation = validateFormValues(requestParams);
+        if(validation.errors.length)
+            toast.error(`${validation.errors.join(' , ')} `);        
+        else
+            this.props.insertNewBill(requestParams);
     }
 
     handleUpdate() {
-        //TODO: Validation. "Customer Name & Amount & Date " should not be empty
-        let requestParams = buildRequestParamsForUpdate(this.state);
-        this.props.updateBill(requestParams);
+        let requestParams = buildRequestParamsForUpdate(this.state);        
+        let validation = validateFormValues(requestParams);
+        if(validation.errors.length)
+            toast.error(`${validation.errors.join(' , ')} `);        
+        else
+            this.props.updateBill(requestParams);
     }
 
     onEditDetailIconClick(index) {
