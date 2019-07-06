@@ -34,3 +34,9 @@ span.gstable-checkbox-container{
 .gs-table .a-row.selected {
     background-color: #f5f5f5;
 }
+.gs-table-empty-view-col {
+    height: 90px;
+    text-align: center;
+    vertical-align: middle !important;
+    font-size: 20px;
+}

@@ -9,7 +9,10 @@ class History extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            billHistory: [],
+            parsedBillHistory: {
+                pendingBills: [],
+                closedBills: []
+            },
             billHistoryLoading: false,
             columns : [{
                 id: 'Date',
@@ -54,8 +57,22 @@ class History extends Component {
             }]
         }
     }
-    componentWillReceiveProps(nextProps) {
-        this.setState({billHistory: nextProps.billHistory, billHistoryLoading: nextProps.billHistoryLoading});
+    componentWillReceiveProps(nextProps) {        
+        this.setState({parsedBillHistory: this.parseBillHistory(nextProps.billHistory), totalBillCount: this.getTotalBillsCount(nextProps.billHistory), billHistoryLoading: nextProps.billHistoryLoading});
+    }
+
+    parseBillHistory(billHistory) {
+        let parsedBillHistory = {
+            closedBills: [],
+            pendingBills: []
+        };
+        _.each(billHistory, (aBillObj, index) => {
+            if(aBillObj.Status)
+                parsedBillHistory.pendingBills.push(aBillObj);
+            else
+                parsedBillHistory.closedBills.push(aBillObj);
+        });
+        return parsedBillHistory;
     }
 
     expandRow = {
@@ -110,16 +127,51 @@ class History extends Component {
         expandByColumnOnly: true
     }
 
+    getTotalBillsCount(list) {        
+        list = list || [];
+        return list.length;
+    }
+
+    getBillCountIcon(length) {
+        if(length) {
+            return (
+                <span className='bill-count-notifier'>{length}</span>
+            )
+        } else {
+            return (
+                <span></span>
+            )
+        }
+    }
     render() {        
         return (
             <Grid>
                 <Row>
-                    <GSTable 
-                        columns={this.state.columns}
-                        rowData={this.state.billHistory}
-                        expandRow = { this.expandRow }
-                        className= {"my-pledgebook-table"}
-                    />
+                    <span className='total-bill-count-span'>Total Bills: <b>{this.state.totalBillCount}</b></span>                
+                    <Tabs defaultActiveKey="pending">
+                        <Tab eventKey="pending" title={
+                                                    <p>Pending Bills {this.getBillCountIcon(this.state.parsedBillHistory.pendingBills.length)}</p>
+                                                } >
+                            <GSTable 
+                                columns={this.state.columns}
+                                rowData={this.state.parsedBillHistory.pendingBills}
+                                expandRow = { this.expandRow }
+                                className= {"my-pledgebook-table"}
+                            />
+                        </Tab>
+                        <Tab eventKey="closed" title={
+                                                <p>Closed Bills {this.getBillCountIcon(this.state.parsedBillHistory.closedBills.length)}</p>
+                                                } >
+                            <GSTable 
+                                columns={this.state.columns}
+                                rowData={this.state.parsedBillHistory.closedBills}
+                                expandRow = { this.expandRow }
+                                className= {"my-pledgebook-table"}
+                            />
+                        </Tab>
+                    </Tabs>
+
+                    
                 </Row>
             </Grid>
         )

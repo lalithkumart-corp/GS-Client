@@ -267,6 +267,15 @@ class GSTable extends Component {
         )
     }
     createBody() {
+        let makeEmptyRowDOM = () => {
+            return (
+                <tr>
+                    <td colSpan={this.state.columns.length+1} className='gs-table-empty-view-col'>
+                        No Data Available
+                    </td>
+                </tr>
+            )
+        }
         let makeARow = (aRowData, rowIndex) => {
             let columns = this.state.columns;
             let theClassName = (this.checkIsSelected(rowIndex))?"selected":"";
@@ -305,10 +314,14 @@ class GSTable extends Component {
                     (()=> {
                         let rows = [];
                         let rowData = this.state.rowData;
-                        for(let i=0; i< rowData.length; i++) {
-                            rows.push(makeARow(rowData[i], i));
-                            if(rowData[i]._expanded)
-                                rows.push(makeExpandedRow(rowData[i], i));
+                        if(rowData.length) {
+                            for(let i=0; i< rowData.length; i++) {
+                                rows.push(makeARow(rowData[i], i));
+                                if(rowData[i]._expanded)
+                                    rows.push(makeExpandedRow(rowData[i], i));
+                            }
+                        } else {
+                            rows.push(makeEmptyRowDOM());
                         }
                         return rows;
                     })()
