@@ -242,7 +242,7 @@ class Redeem extends Component {
                     </Row>
                 </Col>
                 <Col xs={4}>
-                    <img src={billData._picture.holder.imgSrc} />
+                    <img className='image-viewer' src={billData._picture.holder.imgSrc} />
                 </Col>
             </Row>
         )
@@ -348,12 +348,16 @@ class Redeem extends Component {
         selectedBillData._picture = {
             holder: {}
         }
-        if(selectedBillData.Image && selectedBillData.Image.data) {
-            let buff = new Buffer(selectedBillData.Image.data, "base64"); //.toString('base64');
-            let img = buff.toString('ascii');
-            img = img.substring(1);
-            img = img.substring(0, img.length-1);                        
-            selectedBillData._picture.holder.imgSrc = "data:image/webp;base64,"+ img;            
+        // if(selectedBillData.Image && selectedBillData.Image.data) {
+        //     let buff = new Buffer(selectedBillData.Image.data, "base64"); //.toString('base64');
+        //     let img = buff.toString('ascii');
+        //     img = img.substring(1);
+        //     img = img.substring(0, img.length-1);                        
+        //     selectedBillData._picture.holder.imgSrc = "data:image/webp;base64,"+ img;            
+        // } else {
+
+        if(selectedBillData.UserImagePath){
+            selectedBillData._picture.holder.imgSrc = selectedBillData.UserImagePath;
         } else {
             selectedBillData._picture.holder.imgSrc = 'images/default.jpg';
         }

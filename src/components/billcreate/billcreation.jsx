@@ -407,7 +407,7 @@ class BillCreation extends Component {
 
             returnVal = this.state.selectedCustomer[identifier] || returnVal;
             try{
-                if(identifier == 'otherDetails')
+                if(identifier == 'otherDetails' && typeof returnVal == 'string')
                     returnVal = JSON.parse(returnVal);
             } catch(e) {
                 console.log(e);

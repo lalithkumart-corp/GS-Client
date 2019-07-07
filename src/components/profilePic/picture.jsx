@@ -92,7 +92,7 @@ class Picture extends Component {
             },
             upload: (e) => {
                 var reader = new FileReader();
-                var file = e.target.files[0];                
+                var file = e.target.files[0];
                 reader.onload = (upload) => {
                     let newState = {...this.state};                
                     newState.picture.holder.show = true;
@@ -100,8 +100,13 @@ class Picture extends Component {
                     if(newState.picture.uploadMethod == 'DIRECT_UPLOAD')
                         newState.picture.holder.file = file;
                     this.setState(newState);
-                };                
-                reader.readAsDataURL(file);
+                };
+                if(!file)
+                    alert('hoi');
+                
+                if(file) {
+                    reader.readAsDataURL(file);
+                }                
             },
             save: () => {
                 let newState = {...this.state};

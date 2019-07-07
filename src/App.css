@@ -92,3 +92,6 @@
 .lightgrey {
   color: lightgrey;
 }
+.float-right {
+  float: right;
+}

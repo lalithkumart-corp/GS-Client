@@ -3,6 +3,8 @@ import { Grid, Row, Col, FormGroup, ControlLabel, FormControl, HelpBlock, InputG
 import { getAccessToken } from '../../core/storage';
 import axios from 'axios';
 import { FETCH_NOTES }  from '../../core/sitemap';
+import _ from 'lodash';
+import './notes.css';
 
 class Notes extends Component {
     constructor(props) {
@@ -14,11 +16,12 @@ class Notes extends Component {
 
     async componentWillReceiveProps(nextProps, a, c) {
         console.log(nextProps);
+        this.setState({billHistory: nextProps.billHistory});
         if(this.state.custDetail.customerId !== nextProps.selectedCust.customerId) {
             await this.setState({custDetail: nextProps.selectedCust});
             this.fetchNotesFromDB();
         } else {
-            this.setState({custDetail: nextProps.selectedCust});
+            //this.setState({custDetail: nextProps.selectedCust});
         }            
     }
 
@@ -45,7 +48,18 @@ class Notes extends Component {
     }
 
     getRemarksByBill() {
-
+        let theDOM = [];        
+        _.each(this.state.billHistory, (aRec, index) => {
+            if(aRec.Remarks) {
+                theDOM .push(
+                    <div className='bill-remark-display'>
+                        <p><span>{aRec.BillNo}</span> <span className='float-right'>{aRec.Date}</span></p>
+                        <p>{aRec.Remarks}</p>
+                    </div>
+                );
+            }
+        });
+        return theDOM;
     }
 
     getCustomRemarks() {
@@ -55,7 +69,7 @@ class Notes extends Component {
 
     render() {
         return (
-            <Grid>                
+            <Grid className='notes-main-container'>                
                 {this.getRemarksByBill()}                
                 {this.getCustomRemarks()}
             </Grid>
