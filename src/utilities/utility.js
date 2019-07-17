@@ -17,6 +17,13 @@ export const getDateInUTC = (theDate) => {
     return selectedDateInUTC;
 }
 
+export const dateFormatter = (theDate, options) => {        
+    let formattedDate = theDate.toISOString().replace('T', ' ').slice(0,19);        
+    if(options && options.onlyDate)
+        formattedDate = formattedDate.slice(0, 10);
+    return formattedDate;
+}
+
 export const getInterestRate = () => {
     return new Promise( (resolve, reject) => {
         let intRatesFromCookie = getInterestRates();
@@ -53,7 +60,7 @@ export const convertBufferToBase64 = (imgBuff) => {
     return imgPath;
 }
 
-export const convertToLocalTime = (theDate) => {
+export const convertToLocalTime = (theDate) => {    
     const twoDigitFormat = (val) => {
         val = parseInt(val);
         if(val < 10)

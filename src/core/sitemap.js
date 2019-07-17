@@ -30,6 +30,7 @@ export const REDEEM_PENDING_BILLS = `${config.proxy_protocol}://${config.proxy_a
 export const REOPEN_CLOSED_BILL = `${config.proxy_protocol}://${config.proxy_api_host}:${config.proxy_api_port}/${config.restApiRoot}/Pledgebooks/re-open-closed-bills`;
 export const GET_PENDING_BILL_NOS = `${config.proxy_protocol}://${config.proxy_api_host}:${config.proxy_api_port}/${config.restApiRoot}/Pledgebooks/get-pending-bill-nos`;
 export const GET_BILL_DETAILS = `${config.proxy_protocol}://${config.proxy_api_host}:${config.proxy_api_port}/${config.restApiRoot}/Pledgebooks/get-bill-details`;
+export const PLEDGEBOOK_EXPORT = `${config.proxy_protocol}://${config.proxy_api_host}:${config.proxy_api_port}/${config.restApiRoot}/Pledgebooks/export-pledgebook`;
 export const GET_INTEREST_RATES = `${config.proxy_protocol}://${config.proxy_api_host}:${config.proxy_api_port}/${config.restApiRoot}/Interests/get-interest-rates`;
 export const UPDATE_CUSTOMER_DETAIL = `${config.proxy_protocol}://${config.proxy_api_host}:${config.proxy_api_port}/${config.restApiRoot}/Customers/update-customer-detail`;
 export const SAVE_BASE64_IMAGE_AND_GET_ID = `${config.proxy_protocol}://${config.proxy_api_host}:${config.proxy_api_port}/${config.restApiRoot}/Images/save-base64-and-get-id`;

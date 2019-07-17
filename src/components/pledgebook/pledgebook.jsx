@@ -11,11 +11,12 @@ import PledgebookModal from './pledgebookModal';
 import GSTable from '../gs-table/GSTable';
 import ReactPaginate from 'react-paginate';
 import DateRangePicker from '../dateRangePicker/dataRangePicker';
-import { convertToLocalTime } from '../../utilities/utility';
+import { convertToLocalTime, dateFormatter } from '../../utilities/utility';
 import ImageZoom from 'react-medium-image-zoom';
 //import Popover from 'react-simple-popover';
 import Popover, {ArrowContainer} from 'react-tiny-popover'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import PledgebookExportPopup from './pledgebookExportPopup';
 
 class Pledgebook extends Component {
     constructor(props) {
@@ -186,7 +187,9 @@ class Pledgebook extends Component {
         this.refresh = this.refresh.bind(this);
         this.onPopupTriggerClick = this.onPopupTriggerClick.bind(this);
         this.onStatusPopoverChange = this.onStatusPopoverChange.bind(this);
-        this.onStatusPopoverSubmit = this.onStatusPopoverSubmit.bind(this);        
+        this.onStatusPopoverSubmit = this.onStatusPopoverSubmit.bind(this);
+        this.onExportClick = this.onExportClick.bind(this);
+        this.handleExportPopupClose = this.handleExportPopupClose.bind(this);
     }
 
     componentDidMount() {
@@ -315,13 +318,21 @@ class Pledgebook extends Component {
         this.initiateFetchPledgebookAPI();
     }
 
-    // START: Helper's
-    dateFormatter(theDate, options) {        
-        let formattedDate = theDate.toISOString().replace('T', ' ').slice(0,19);        
-        if(options && options.onlyDate)
-            formattedDate = formattedDate.slice(0, 10);
-        return formattedDate;
+    onExportClick() {
+        this.setState({displayExportPopup: true});
     }
+
+    handleExportPopupClose() {
+        this.setState({displayExportPopup: false});
+    }
+
+    // START: Helper's
+    // dateFormatter(theDate, options) {        
+    //     let formattedDate = theDate.toISOString().replace('T', ' ').slice(0,19);        
+    //     if(options && options.onlyDate)
+    //         formattedDate = formattedDate.slice(0, 10);
+    //     return formattedDate;
+    // }
     getAPIParams() {
         let offsets = this.getOffsets();
         let filters = this.getFilters();
@@ -343,8 +354,8 @@ class Pledgebook extends Component {
         endDate.setHours(23,59,59,999);
         return {            
             date: {
-                startDate: this.dateFormatter(this.state.filters.date.startDate),
-                endDate: this.dateFormatter(endDate)
+                startDate: dateFormatter(this.state.filters.date.startDate),
+                endDate: dateFormatter(endDate)
             },
             billNo: this.state.filters.billNo,
             amount: this.state.filters.amount,
@@ -449,6 +460,11 @@ class Pledgebook extends Component {
                     </Col>
                 </Row>
                 <Row className='second-row'>
+                    <div className='action-container'>
+                        <span className='export-btn action-btn' onClick={this.onExportClick}>
+                            <FontAwesomeIcon icon='file-excel'/>
+                        </span>
+                    </div>
                     <div className='row-count gs-button'>
                         <span>Rows Count</span>
                         <select className="selectpicker" onChange={this.handlePageCountChange}>
@@ -459,7 +475,7 @@ class Pledgebook extends Component {
                             <option selected={this.state.pageLimit=="200" && "selected"}>200</option>
                         </select>
                     </div>
-                    <div>
+                    <div className='pagination-container'>
                         <ReactPaginate previousLabel={"<"}
                             nextLabel={">"}
                             breakLabel={"..."}
@@ -487,6 +503,10 @@ class Pledgebook extends Component {
                 </Row>
                 <CommonModal modalOpen={this.state.PBmodalIsOpen} handleClose={this.handleClose}>
                     <PledgebookModal {...this.state} handleClose={this.handleClose} refresh={this.refresh}/>
+                </CommonModal>
+
+                <CommonModal modalOpen={this.state.displayExportPopup} secClass="export-pledgebook-popup" handleClose={this.handleExportPopupClose}>
+                    <PledgebookExportPopup handleClose={this.handleExportPopupClose}/>
                 </CommonModal>
             </Grid>
         )

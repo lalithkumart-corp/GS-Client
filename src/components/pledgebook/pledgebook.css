@@ -7,7 +7,7 @@
     margin-left: 5%;    
 }
 .pledgebook-page-content .second-row {
-    text-align: right;
+    /* text-align: right; */
     padding-top: 10px;
     padding-bottom: 5px;
 
@@ -150,4 +150,12 @@
 .my-pledgebook-table.gs-table .pb-date-cell {
     padding-left: 4px;
     padding-right: 0;    
+}
+
+.pledgebook-page-content .second-row .action-btn {
+    cursor: pointer;
+}
+.pledgebook-page-content .second-row .row-count,
+.pledgebook-page-content .second-row .pagination-container {
+    float: right;
 }
