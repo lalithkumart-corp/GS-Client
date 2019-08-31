@@ -59,12 +59,12 @@
     padding: 3px 0;
 }
 
-.orn-input-cell {
+/* .orn-input-cell {
     border: none;    
     width: calc(100% - 15px);
     padding: 6px 12px 6px 0;
     outline: none;
-}
+} */
 .ornament-dom-container {
     border: 1px solid lightgray;
     min-height: 200px;
@@ -76,8 +76,8 @@
     box-shadow: none;
     padding: 6px 12px 6px 0;
 }
-.orn-input-cell:focus,
-.orn-input-cell:hover,
+/* .orn-input-cell:focus,
+.orn-input-cell:hover, */
 .ornament-dom-container .form-control:hover,
 .ornament-dom-container .form-control:focus {
     border-bottom: 2px solid #0acfee;

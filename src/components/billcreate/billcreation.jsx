@@ -59,7 +59,7 @@ class BillCreation extends Component {
         this.domElmns = {
             orn: {}
         };
-        this.domOrders = domList;        
+        this.domOrders = domList;                
         this.state = {
             showPreview: false,  
             showMoreInputs: false,             
@@ -853,7 +853,7 @@ class BillCreation extends Component {
                     <td>
                         <input 
                             type="text" 
-                            className="orn-input-cell" 
+                            className="gs-input-cell orn-input-cell" 
                             placeholder="0.00"
                             value={this.state.formData.orn.inputs[serialNo].ornGWt}
                             ref= {(domElm) => {this.domElmns.orn['ornGWt' + serialNo] = domElm; }}
@@ -865,7 +865,7 @@ class BillCreation extends Component {
                     <td>
                         <input 
                             type="text" 
-                            className="orn-input-cell"
+                            className="gs-input-cell orn-input-cell"
                             placeholder="0.00"
                             value={this.state.formData.orn.inputs[serialNo].ornNWt}
                             ref= {(domElm) => {this.domElmns.orn['ornNWt' + serialNo] = domElm; }}
@@ -889,7 +889,7 @@ class BillCreation extends Component {
                     <td>
                         <input 
                             type="text" 
-                            className="orn-input-cell" 
+                            className="gs-input-cell orn-input-cell" 
                             placeholder="Quantity"
                             value={this.state.formData.orn.inputs[serialNo].ornNos}
                             ref= {(domElm) => {this.domElmns.orn['ornNos' + serialNo] = domElm; }}

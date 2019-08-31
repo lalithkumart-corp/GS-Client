@@ -85,7 +85,7 @@ class BillingSettings extends Component {
                                 Serial:
                             </Col>
                             <Col xs={8} md={8}>
-                                <input type='text' value={this.state.billSeries} onChange={(e) => this.onChange(e, 'series')}/>
+                                <input className='gs-input-cell' type='text' value={this.state.billSeries} onChange={(e) => this.onChange(e, 'series')}/>
                             </Col>
                         </Row>
                         <Row>
@@ -93,7 +93,7 @@ class BillingSettings extends Component {
                                 Next Bill Number:
                             </Col>
                             <Col xs={8} md={8}>
-                                <input type='number' value={this.state.billNumber} onChange={(e) => this.onChange(e, 'billNumber')}/>
+                                <input className='gs-input-cell' type='number' value={this.state.billNumber} onChange={(e) => this.onChange(e, 'billNumber')}/>
                             </Col>
                         </Row>
                         <Row className='text-align-right'>
