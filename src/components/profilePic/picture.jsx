@@ -308,7 +308,7 @@ class Picture extends Component {
                                     title='Loading...'>
                                     <FontAwesomeIcon icon="spinner" />
                                 </span>
-                                <div class="image-upload-btn-wrapper">                                        
+                                <div className="image-upload-btn-wrapper">                                        
                                     <span
                                         className={'image-upload-btn gs-button rounded icon ' + (this.picture.helpers.canShowUploadBtn()? '': 'hidden-btn')}
                                         title='Upload picture'>

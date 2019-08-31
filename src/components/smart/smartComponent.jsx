@@ -16,7 +16,9 @@ import Navbar from '../navbar/navbar';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import history from '../../history';
+import Users from '../users/users.jsx';
 import './smartComponent.css';
+import SignUpPage from '../signup/signup';
 
 class SmartComponent extends Component {
     constructor(props) {
@@ -38,11 +40,12 @@ class SmartComponent extends Component {
                             </div>
                             <div className='page-content'>
                                 <ToastContainer position={'top-center'} hideProgressBar={false}/>
-                                <Route exact path='/' component={Home} />
+                                <Route exact path='/' component={Home} />                                
                                 <Route path= '/billcreate' component={BillCreation} />
                                 <Route path= '/redeem' component={Redeem} />
                                 <Route path= '/pledgebook' component={Pledgebook} />
                                 <Route path= '/customerdetail' component={CustomerDetail} />                                
+                                <Route path= '/users' component={Users} />
                                 <Route path= '/demo' component={Demo} />
                                 <Route path= '/picture' component={Picture} />
                                 <Route path= '/logout' component={Logout} />
@@ -57,13 +60,12 @@ class SmartComponent extends Component {
                     <div>
                         <ToastContainer position={'top-center'} hideProgressBar={false}/>
                         <Route exact path= '/' component={LoginPage} />
+                        <Route path= '/signup' component={SignUpPage} />
                     </div>
                 </Router>
-            )            
+            )
         }
-        
     }
-    
 }
 
 const mapStateToProps = (state) => {     

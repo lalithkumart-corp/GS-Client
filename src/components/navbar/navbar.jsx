@@ -28,30 +28,36 @@ class NavbarComp extends Component {
                         <LinkContainer to="/pledgebook">
                             <MenuItem eventKey={1.3}>Book</MenuItem>    
                         </LinkContainer>
-                    </NavDropdown>
+                    </NavDropdown>                    
 
-                    <NavDropdown eventKey={2} title="Others" id="basic-nav-dropdown">
+                    <NavItem eventKey={2} href="#">
+                        <LinkContainer to='/users'>
+                            <MenuItem eventKey={2.1}>Users</MenuItem>
+                        </LinkContainer>
+                    </NavItem>
+
+                    <NavDropdown eventKey={3} title="Others" id="basic-nav-dropdown">
                         <LinkContainer to='/customerdetail'>
-                            <MenuItem eventKey={2.1}>Customer Detail</MenuItem>
+                            <MenuItem eventKey={3.1}>Customer Detail</MenuItem>
                         </LinkContainer>
                         <LinkContainer to='/demo'>
-                            <MenuItem eventKey={2.2}>Demo</MenuItem>
+                            <MenuItem eventKey={3.2}>Demo</MenuItem>
                         </LinkContainer>
                         <LinkContainer to='/picture'>
-                            <MenuItem eventKey={2.3}>Webcam</MenuItem>
+                            <MenuItem eventKey={3.3}>Webcam</MenuItem>
                         </LinkContainer>
                         <LinkContainer to='/uploadpicdemo'>
-                            <MenuItem eventKey={2.4}>Upload Pic Demo</MenuItem>
+                            <MenuItem eventKey={3.4}>Upload Pic Demo</MenuItem>
                         </LinkContainer>                        
                     </NavDropdown>
 
-                    <NavItem eventKey={3} href="#">
+                    <NavItem eventKey={4} href="#">
                         Help
                     </NavItem>
 
-                    <NavItem eventKey={4} href="#">
+                    <NavItem eventKey={5} href="#">
                         <LinkContainer to='/logout'>
-                            <MenuItem eventKey={4}>Logout</MenuItem>
+                            <MenuItem eventKey={5.1}>Logout</MenuItem>
                         </LinkContainer>
                     </NavItem>
                 </Nav>

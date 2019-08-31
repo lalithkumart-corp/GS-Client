@@ -1,0 +1,27 @@
+.signup-grid-container {
+    width: 800px;
+    border: 1px solid lightgrey;
+    padding: 25px 25px 45px 25px;
+}
+.signup-grid-container .header-container {
+    text-align: center;
+    border-bottom: 1px solid lightgray;
+}
+.signup-grid-container .header {
+    font-size: 24px;
+    padding: 10px;
+}
+.signup-grid-container .input-container {
+    padding-top: 25px;
+    padding-bottom: 25px;
+}
+.signup-grid-container .form-group .input-group {
+    width: 100%;
+}
+
+.signup-grid-container .form-group .form-control {
+    border-radius: 4px;
+}
+.signup-grid-container .footer-container {
+    text-align: center;
+}
