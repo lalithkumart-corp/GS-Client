@@ -26,6 +26,7 @@ export const PLEDGEBOOK_ADD_RECORD = `${config.proxy_protocol}://${config.proxy_
 export const PLEDGEBOOK_UPDATE_RECORD = `${config.proxy_protocol}://${config.proxy_api_host}:${config.proxy_api_port}/${config.restApiRoot}/Pledgebooks/update-billrecord`;
 export const PLEDGEBOOK_FETCH_CUSTOMER_HISTORY = `${config.proxy_protocol}://${config.proxy_api_host}:${config.proxy_api_port}/${config.restApiRoot}/Pledgebooks/fetch-customer-history`;
 export const GET_LAST_BILL_NO = `${config.proxy_protocol}://${config.proxy_api_host}:${config.proxy_api_port}/${config.restApiRoot}/PledgebookSettings/get-last-bill-series-and-number`;
+export const UPDATE_BILL_NO_SETTINGS = `${config.proxy_protocol}://${config.proxy_api_host}:${config.proxy_api_port}/${config.restApiRoot}/PledgebookSettings/update-bill-series-and-number`;
 export const GET_PENDING_BILLS = `${config.proxy_protocol}://${config.proxy_api_host}:${config.proxy_api_port}/${config.restApiRoot}/Pledgebooks/get-pending-bills`;
 export const REDEEM_PENDING_BILLS = `${config.proxy_protocol}://${config.proxy_api_host}:${config.proxy_api_port}/${config.restApiRoot}/Pledgebooks/redeem-pending-bills`;
 export const REOPEN_CLOSED_BILL = `${config.proxy_protocol}://${config.proxy_api_host}:${config.proxy_api_port}/${config.restApiRoot}/Pledgebooks/re-open-closed-bills`;

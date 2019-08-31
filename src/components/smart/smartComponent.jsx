@@ -19,6 +19,7 @@ import history from '../../history';
 import Users from '../users/users.jsx';
 import './smartComponent.css';
 import SignUpPage from '../signup/signup';
+import Settings from '../settings/settings';
 
 class SmartComponent extends Component {
     constructor(props) {
@@ -50,6 +51,7 @@ class SmartComponent extends Component {
                                 <Route path= '/picture' component={Picture} />
                                 <Route path= '/logout' component={Logout} />
                                 <Route path= '/uploadpicdemo' component={UploadPicDemo} />
+                                <Route path= '/settings' component={Settings} />
                             </div>
                         </div>
                 </Router>

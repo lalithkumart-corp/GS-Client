@@ -40,14 +40,17 @@ class NavbarComp extends Component {
                         <LinkContainer to='/customerdetail'>
                             <MenuItem eventKey={3.1}>Customer Detail</MenuItem>
                         </LinkContainer>
-                        <LinkContainer to='/demo'>
-                            <MenuItem eventKey={3.2}>Demo</MenuItem>
-                        </LinkContainer>
+                        <LinkContainer to='/settings'>
+                            <MenuItem eventKey={3.2}>Settings</MenuItem>
+                        </LinkContainer>                        
                         <LinkContainer to='/picture'>
                             <MenuItem eventKey={3.3}>Webcam</MenuItem>
                         </LinkContainer>
                         <LinkContainer to='/uploadpicdemo'>
                             <MenuItem eventKey={3.4}>Upload Pic Demo</MenuItem>
+                        </LinkContainer>
+                        <LinkContainer to='/demo'>
+                            <MenuItem eventKey={3.5}>Demo</MenuItem>
                         </LinkContainer>                        
                     </NavDropdown>
 
