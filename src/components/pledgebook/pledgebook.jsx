@@ -50,6 +50,13 @@ class Pledgebook extends Component {
             selectedRowJson: [],
             pageLimit: 10,
             pendingBillList :[],
+            moreFilter: {
+                popoverOpen: false,
+                perGramRange: {
+                    gtrThanVal: 2000,
+                    lessThanVal: 2500
+                }
+            },
             columns : [{
                     id: 'Date',
                     displayText: 'Date',
@@ -190,6 +197,9 @@ class Pledgebook extends Component {
         this.onStatusPopoverSubmit = this.onStatusPopoverSubmit.bind(this);
         this.onExportClick = this.onExportClick.bind(this);
         this.handleExportPopupClose = this.handleExportPopupClose.bind(this);
+        this.onMoreFilterPopoverTrigger = this.onMoreFilterPopoverTrigger.bind(this);
+        this.onMoreFilterPopoverChange.gtrThanAmount = this.onMoreFilterPopoverChange.gtrThanAmount.bind(this);
+        this.onMoreFilterPopoverChange.lessThanAmount = this.onMoreFilterPopoverChange.lessThanAmount.bind(this);
     }
 
     componentDidMount() {
@@ -304,6 +314,29 @@ class Pledgebook extends Component {
             this.initiateFetchPledgebookAPI();            
         }         
     }    
+
+    onMoreFilterPopoverTrigger() {
+        let newState = {...this.state};
+        newState.moreFilter.popoverOpen = !newState.moreFilter.popoverOpen;
+        this.setState(newState);
+    }
+
+    onMoreFilterPopoverChange = {
+        gtrThanAmount: (e) => {
+            let newState = {...this.state};
+            newState.moreFilter.perGramRange.gtrThanVal = e.target.value;
+            this.setState(newState);
+        },
+        lessThanAmount: (e) => {
+            let newState = {...this.state};
+            newState.moreFilter.perGramRange.lessThanVal = e.target.value;
+            this.setState(newState);
+        }
+    }
+
+    onMoreFilterPopoverSubmit() {
+        
+    }
 
     onPopupTriggerClick() {
         this.setState({statusPopupVisibility: !this.state.statusPopupVisibility});
@@ -464,6 +497,42 @@ class Pledgebook extends Component {
                         <span className='export-btn action-btn' onClick={this.onExportClick}>
                             <FontAwesomeIcon icon='file-excel'/>
                         </span>
+                        <Popover
+                            className='more-filter-popover'
+                            isOpen={this.state.moreFilter.popoverOpen}
+                            position={'right'}
+                            content={({position, targetRect, popoverRect}) => {
+                                return (
+                                    <ArrowContainer
+                                        position={position}
+                                        targetRect={targetRect}
+                                        popoverRect={popoverRect}
+                                        arrowColor={'white'}
+                                        arrowSize={10}
+                                    >
+                                        <div className='gs-card'>
+                                            <div className='gs-card-content'>
+                                                <div>
+                                                    <input type='checkbox' className='gs-checkbox'/>
+                                                    <h5 className='inline-block'>Amount Range between (per/gram)</h5>
+                                                    <br></br>
+                                                    <input type='number' className='gtr-input-val gs-input-cell' value={this.state.moreFilter.perGramRange.gtrThanVal} onChange={(e) => this.onMoreFilterPopoverChange.gtrThanAmount(e)}/>
+                                                    <span className='gtr-label-less'> To </span>
+                                                    <input type='number' className='less-input-val gs-input-cell' value={this.state.moreFilter.perGramRange.lessThanVal} onChange={(e) => this.onMoreFilterPopoverChange.lessThanAmount(e)}/>
+                                                </div>
+                                                <div className='text-align-right'>
+                                                    <input type='button' className='gs-button' value='Filter' onClick={this.onMoreFilterPopoverSubmit}/>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </ArrowContainer>
+                                )
+                            }}
+                            >
+                                <span className='more-filter-popover-trigger action-btn' onClick={this.onMoreFilterPopoverTrigger}>
+                                    <FontAwesomeIcon icon='filter'/>
+                                </span>
+                        </Popover>
                     </div>
                     <div className='row-count gs-button'>
                         <span>Rows Count</span>

@@ -96,6 +96,14 @@
   float: right;
 }
 
+.inline-block {
+  display: inline-block;
+}
+
+.margin-top-30 {
+  margin-top: 30px !important;
+}
+
 /* TABS */
 .gs-tabs .tab-content {
   margin-top: 20px;

@@ -59,27 +59,27 @@ export default class PledgebookExportPopup extends Component {
     }
     render () {
         return(
-            <Grid>
-                <Row>
-                    <h4>Please select the Date Range:</h4>
-                </Row>                
-                <Row>
-                    <Col>
+            <div>                
+                <Row className='gs-card'>
+                    <Col className='gs-card-content'>
+                        <h4>Please select the Date Range:</h4>
                         <DateRangePicker 
                             className = 'pledgebook-date-filter popup'
                             selectDateRange={this.dateSubmitCallback}
                             startDate={this.state.startDate}
                             endDate={this.state.endDate}
                         />
-                    </Col>
-                    <Col>
+                    </Col>                    
+                </Row>
+                <Row className='gs-card margin-top-30'>
+                    <Col className='gs-card-content'>
                         <p>TODO: export only pending or closed or ALL ?</p>
                     </Col>
                 </Row>
                 <Row>
                     <input type='button' className='gs-button' value='START EXPORT' onClick={this.triggerExportAPI} />
                 </Row>
-            </Grid>
+            </div>
         )
     }
 }

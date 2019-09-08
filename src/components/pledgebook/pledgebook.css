@@ -154,8 +154,21 @@
 
 .pledgebook-page-content .second-row .action-btn {
     cursor: pointer;
+    margin-left: 10px;
 }
+
+.pledgebook-page-content .second-row .action-btn:hover,
+.pledgebook-page-content .second-row .action-btn:focus {
+    color: #337ab7;
+}
+
 .pledgebook-page-content .second-row .row-count,
 .pledgebook-page-content .second-row .pagination-container {
     float: right;
+}
+.gtr-input-val,
+.gtr-label-less,
+.less-input-val {
+    width: 25% !important;
+    display: inline-block;
 }
