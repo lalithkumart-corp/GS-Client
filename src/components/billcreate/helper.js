@@ -33,10 +33,10 @@ export const buildRequestParams = (thatState = {}) => {
         cname: state.selectedCustomer.name || state.formData.cname.inputVal,
         gaurdianName: state.selectedCustomer.gaurdianName || state.formData.gaurdianName.inputVal,
         address: state.selectedCustomer.address || state.formData.address.inputVal,
-        place: state.selectedCustomer.place || state.formData.place.inputVal,
-        city: state.selectedCustomer.city || state.formData.city.inputVal,
-        pinCode: state.selectedCustomer.pincode || state.formData.pincode.inputVal,
-        mobile: state.selectedCustomer.mobile || state.formData.mobile.inputVal,
+        place: !isNull(state.selectedCustomer.place)?(state.selectedCustomer.place):(state.formData.place.inputVal),
+        city: !isNull(state.selectedCustomer.city)?(state.selectedCustomer.city):(state.formData.city.inputVal),
+        pinCode: !isNull(state.selectedCustomer.pincode)?(state.selectedCustomer.pincode):(state.formData.pincode.inputVal),
+        mobile: !isNull(state.selectedCustomer.mobile)?(state.selectedCustomer.mobile):(state.formData.mobile.inputVal),
         orn: _getOrnamentsData(thatState),
         billRemarks: _getBillRemarks(thatState),
         moreDetails: _getMoreData(thatState),
@@ -57,10 +57,10 @@ export const buildRequestParamsForUpdate = (thatState = {}) => {
         cname: state.selectedCustomer.name || state.formData.cname.inputVal,
         gaurdianName: state.selectedCustomer.gaurdianName || state.formData.gaurdianName.inputVal,
         address: state.selectedCustomer.address || state.formData.address.inputVal,
-        place: state.selectedCustomer.place || state.formData.place.inputVal,
-        city: state.selectedCustomer.city || state.formData.city.inputVal,
-        pinCode: state.selectedCustomer.pincode || state.formData.pincode.inputVal,
-        mobile: state.selectedCustomer.mobile || state.formData.mobile.inputVal,
+        place: !isNull(state.selectedCustomer.place)?(state.selectedCustomer.place):(state.formData.place.inputVal),
+        city: !isNull(state.selectedCustomer.city)?(state.selectedCustomer.city):(state.formData.city.inputVal),
+        pinCode: !isNull(state.selectedCustomer.pincode)?(state.selectedCustomer.pincode):(state.formData.pincode.inputVal),
+        mobile: !isNull(state.selectedCustomer.mobile)?(state.selectedCustomer.mobile):(state.formData.mobile.inputVal),
         orn: _getOrnamentsData(thatState),
         billRemarks: _getBillRemarks(thatState),
         userPicture: getPicData(thatState),
@@ -68,6 +68,15 @@ export const buildRequestParamsForUpdate = (thatState = {}) => {
         uniqueIdentifier: state.uniqueIdentifier
     };
     return params;
+}
+
+const isNull = (val) => {
+    let isNull = true;
+    if(val) {
+        if(val !== 'null' && val !== 'undefined')
+            isNull = false;
+    }
+    return isNull;
 }
 
 const _getBillNo = (state) => {
@@ -91,7 +100,7 @@ const _getBillRemarks = (thatState) => {
     return thatState.formData.moreDetails.billRemarks;
 }
 
-export const getPicData = (thatState) => {
+export const getPicData = (thatState) => {    
     let picData = null;
     if(thatState.userPicture) {        
         picData = {imageId: thatState.userPicture.id}

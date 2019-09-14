@@ -48,7 +48,7 @@ export const calculateInterestBasedOnRate = (interestPerMonth, amount) => {
 export const getRequestParams = (billData) => {
     let requestParams = [];    
     let anObj = {
-        pledgeBookID: billData.PledgeBookID,
+        //pledgeBookID: billData.PledgeBookID,
         pledgeBookUID: billData.UniqueIdentifier,
         billNo: billData.BillNo,
         pledgedDate: billData.Date.replace('T', ' ').slice(0,23),
@@ -118,7 +118,7 @@ const calcMonthDiff = (date1, date2) => {
 export const getReopenRequestParams = (billData) => {
     let requestParams = [];    
     let anObj = {
-        pledgeBookID: billData.PledgeBookID,
+        //pledgeBookID: billData.PledgeBookID,
         pledgeBookUID: billData.UniqueIdentifier                
     };
     requestParams.push(anObj);
