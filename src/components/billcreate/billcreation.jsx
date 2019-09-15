@@ -15,7 +15,7 @@ import moment from 'moment';
 import Autosuggest, { ItemAdapter } from 'react-bootstrap-autosuggest' //https://affinipay.github.io/react-bootstrap-autosuggest/#playground
 import _ from 'lodash';
 import axios from "axios";
-import { PLEDGEBOOK_METADATA, SAVE_BASE64_IMAGE_AND_GET_ID, SAVE_BINARY_IMAGE_AND_GET_ID, DEL_IMAGE_BY_ID } from '../../core/sitemap';
+import { PLEDGEBOOK_METADATA, SAVE_BASE64_IMAGE_AND_GET_ID, SAVE_BINARY_IMAGE_AND_GET_ID, DEL_IMAGE_BY_ID, ORNAMENT_LIST } from '../../core/sitemap';
 import { Collapse } from 'react-collapse';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import sh from 'shorthash';
@@ -306,7 +306,31 @@ class BillCreation extends Component {
                     this.setState(newState);
                 },
                 (errResp) => {
-                    
+                    console.log(errResp);
+                }
+            )
+            .catch(
+                (exception) => {
+                    console.log(exception);
+                }
+            )
+        axios.get(ORNAMENT_LIST+ `?access_token=${accessToken}`)
+            .then(
+                (successResp) => {
+                    let newState = {...this.state};
+                    if(successResp.data.STATUS == 'SUCCESS')
+                        newState.formData.orn.list = successResp.data.RESPONSE;
+                    else
+                        newState.formData.orn.list = [];
+                    this.setState(newState);
+                },
+                (errResp) => {
+                    console.log(errResp);
+                }
+            )
+            .catch(
+                (exception) => {
+                    console.log(exception);
                 }
             )
     }
@@ -721,7 +745,7 @@ class BillCreation extends Component {
             let newState = {...this.state};
             if(identifier.indexOf('orn') == 0) { //starts with 'orn'
                 let inputs = newState.formData.orn.inputs;
-                inputs[options.serialNo] = inputs[options.serialNo] || {};
+                inputs[options.serialNo] = inputs[options.serialNo] || {};                
                 inputs[options.serialNo][identifier] = val;
             } else if(identifier == 'moreCustomerDetailsField') {
                 let anObj = this.parseCustomerDetailsVal(val);                
@@ -840,9 +864,10 @@ class BillCreation extends Component {
                     <td>{serialNo}</td>
                     <td>
                         <Autosuggest
-                            datalist={this.state.formData.cname.list}
+                            datalist={this.state.formData.orn.list}
                             itemAdapter={CommonAdaptor.instance}
                             placeholder="Enter Ornament"
+                            valueIsItem={true}
                             value={this.state.formData.orn.inputs[serialNo].ornItem}
                             onChange={ (val) => this.autuSuggestionControls.onChange(val, 'ornItem', {serialNo: serialNo}) }
                             ref = {(domElm) => { this.domElmns.orn['ornItem'+ serialNo] = domElm; }}
@@ -1112,7 +1137,7 @@ class BillCreation extends Component {
                                     datalist={this.state.formData.cname.list}
                                     itemAdapter={CustomerListAdaptor.instance}
                                     placeholder="Enter CustomerName"
-                                    valueIsItem={true}                                    
+                                    valueIsItem={true}
                                     value={this.getInputValFromCustomSources('cname')}
                                     onChange={ (val) => {this.autuSuggestionControls.onChange(val, 'cname') }}
                                     ref = {(domElm) => { this.domElmns.cname = domElm; }}
@@ -1295,6 +1320,53 @@ class CommonAdaptor extends ItemAdapter {
     }
 }
 CommonAdaptor.instance = new CommonAdaptor()
+
+/* class OrnamentAdaptor extends ItemAdapter {
+    itemInclusionRankForInput(item, foldedValue) {
+        let contains = false
+        for (let text of this.getTextRepresentations(item)) {
+            const index = text.indexOf(foldedValue)
+            if (index === 0)
+                return 0
+            
+            if (index > 0)
+                contains = true
+            
+        }
+        return contains ? 1 : 2;
+    }  
+
+    itemIncludedByInput(item, foldedVal) {        
+        let canInclude = false;
+        let name = item.name || '';
+        debugger;
+        name = name.toLowerCase();
+        foldedVal = foldedVal.toLowerCase();
+        if(name.indexOf(foldedVal) == 0)
+            canInclude = true;
+        return canInclude;        
+    }
+    getInputValue(item) {
+        if(typeof item == 'string')
+            return item.toString();
+        else        
+            return (item.name).toString();
+    }
+
+    //Our custom method to form the react key value fr list items
+    getReactKey(item) {
+        return (+new Date())+'-menu-item';
+    }
+    renderItem(item) {        
+        return (
+            <div className='list-item'>
+                <span>{item.name}</span>
+            </div>
+        )
+    }
+}
+OrnamentAdaptor.instance = new OrnamentAdaptor();
+*/
 
 class CustomerListAdaptor extends ItemAdapter {
 
