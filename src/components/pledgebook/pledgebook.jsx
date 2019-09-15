@@ -191,6 +191,7 @@ class Pledgebook extends Component {
         this.handlePageClick = this.handlePageClick.bind(this);
         this.getOffsets = this.getOffsets.bind(this);
         this.handleCheckboxChangeListener = this.handleCheckboxChangeListener.bind(this);
+        this.handleGlobalCheckboxChange = this.handleGlobalCheckboxChange.bind(this);
         this.refresh = this.refresh.bind(this);
         this.onPopupTriggerClick = this.onPopupTriggerClick.bind(this);
         this.onStatusPopoverChange = this.onStatusPopoverChange.bind(this);
@@ -253,9 +254,23 @@ class Pledgebook extends Component {
                 (anItem) => {
                     if(newState.selectedIndexes.indexOf(anItem.rowNumber) == -1)
                         return true;                                                  
-                }        
+                }
             );
         }        
+        this.setState(newState);
+    }
+
+    handleGlobalCheckboxChange(params) {
+        let newState = {...this.state};
+        if(params.isChecked) {
+            _.each(params.rows, (aRow, index) => {
+                newState.selectedIndexes.push(index);
+                newState.selectedRowJson.push(aRow);
+            });
+        } else {
+            newState.selectedIndexes = [];
+            newState.selectedRowJson = [];
+        }
         this.setState(newState);
     }
 
@@ -564,10 +579,14 @@ class Pledgebook extends Component {
                         columns={this.state.columns}
                         rowData={this.state.pendingBillList}
                         expandRow = { this.expandRow }
+                        //isGlobalExpandIconExpanded = {this.shouldExpndAll()} //in case of filter, we can enable...to show the ornaments in expanded section
                         className= {"my-pledgebook-table"}
                         checkbox = {true}
+                        IsGlobalCheckboxSelected = {false} //optional
                         checkboxOnChangeListener = {this.handleCheckboxChangeListener}
+                        globalCheckBoxListener = {this.handleGlobalCheckboxChange}
                         selectedIndexes = {this.state.selectedIndexes}
+                        
                     />
                 </Row>
                 <CommonModal modalOpen={this.state.PBmodalIsOpen} handleClose={this.handleClose}>

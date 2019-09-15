@@ -4,7 +4,8 @@
 .gs-table .expand-icon {
     font-size: 18px;
     padding-top: 8px;
-    padding-left: 5px;
+    padding-left: 10px;
+    padding-right: 10px;
     display: inline-block;
 }
 .gs-table .expanded-row {

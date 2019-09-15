@@ -19,7 +19,7 @@ class GSTable extends Component {
             rowData:[],
             expandRow: {
                 expandByColumnOnly: false
-            }
+            }            
         };
         this.createBody = this.createBody.bind(this);
     }
@@ -30,6 +30,8 @@ class GSTable extends Component {
         newState.rowData = parsed.rowData;
         newState.expandRow = parsed.expandRow;
         newState.className = parsed.className;
+        newState.IsGlobalCheckboxSelected = parsed.IsGlobalCheckboxSelected || false;
+        newState.isGlobalExpandIconExpanded = parsed.isGlobalExpandIconExpanded || false;
         this.checkboxOnChangeListener = parsed.checkboxOnChangeListener;
         newState.selectedIndexes = parsed.selectedIndexes || [];
         this.setState(newState);
@@ -48,14 +50,16 @@ class GSTable extends Component {
                     if(props.checkbox){
                         id = "_expandIndicatorWithCheckbox";
                         formatter = this.defaultFormatters.expandIconWithCheckboxFormatter;
-                    }
+                    }                    
                     props.columns.unshift({
                         id: id,
                         displayText: '',
                         formatter: formatter,
                         width: '6%'
                     });
-                }                    
+                }
+
+
             }
             _.each(props.columns, (aCol, index) => {                
                 let buffer = {};
@@ -74,10 +78,13 @@ class GSTable extends Component {
         }
         if(props && props.rowData) {
             _.each(props.rowData, (aRow, index) => {            
-                aRow._expanded = false;                
+                //aRow._expanded = false;
                 parsedData.rowData.push(aRow);
             });
         }
+
+        if(props && props.IsGlobalCheckboxSelected)
+            parsedData.IsGlobalCheckboxSelected = props.IsGlobalCheckboxSelected;
 
         parsedData.className = props.className || '';
         parsedData.checkbox = props.checkbox || false;
@@ -115,36 +122,68 @@ class GSTable extends Component {
         },
         expandIconWithCheckboxFormatter: (column, colIndex, row, rowIndex) => {
             let theDom = [];
+            let expanIconName = "angle-right";
+            let expandIconClass = "arrow-right";
             if(row._expanded) {
-                theDom.push(
-                    <span key={colIndex+'-expand-icon'}>
-                        <span key={"angle-down"} className='expand-icon arrow-down' onClick={(e) => this.onExpandIconClick(e, column, colIndex, row, rowIndex)}>
-                            <FontAwesomeIcon icon="angle-down" />
-                        </span>
-                        <span className="gstable-checkbox-container">
-                            <GSCheckbox labelText="" 
-                                checked={this.checkIsSelected(rowIndex)} 
-                                onChangeListener = {(e) => {this.callbackMiddleware.checkboxOnChange(e, column, colIndex, row, rowIndex)}} 
-                                className={"gstable-selector-checkbox"}/>
-                        </span>
-                    </span>);
-            } else {
-                theDom.push(
-                    <span key={colIndex+'-expand-icon'}>
-                        <span key={"angle-right"} className='expand-icon arrow-right' onClick={(e) => this.onExpandIconClick(e, column, colIndex, row, rowIndex)}>
-                            <FontAwesomeIcon icon="angle-right" />
-                        </span>
-                        <span className="gstable-checkbox-container">
-                            <GSCheckbox labelText="" 
-                                checked={this.checkIsSelected(rowIndex)} 
-                                onChangeListener = {(e) => {this.callbackMiddleware.checkboxOnChange(e, column, colIndex, row, rowIndex)}} 
-                                className={"gstable-selector-checkbox"}/>
-                        </span>
-                    </span>);
-            }            
+                expanIconName = "angle-down";
+                expandIconClass = "arrow-down";                
+            }  
+            theDom.push(
+                <span key={colIndex+'-expand-icon'}>
+                    <span key={expanIconName} className={expandIconClass + ' expand-icon'} onClick={(e) => this.onExpandIconClick(e, column, colIndex, row, rowIndex)}>
+                        <FontAwesomeIcon icon={expanIconName} />
+                    </span>
+                    <span className="gstable-checkbox-container">
+                        <GSCheckbox labelText="" 
+                            checked={this.checkIsSelected(rowIndex)} 
+                            onChangeListener = {(e) => {this.callbackMiddleware.checkboxOnChange(e, column, colIndex, row, rowIndex)}} 
+                            className={"gstable-selector-checkbox"}/>
+                    </span>
+                </span>);
+
             return theDom;
         },
-        filter: (column, colIndex) => {
+        expndAllFormatter: (column, colIndex) => {
+            let theDom = [];
+            let expanIconName = "angle-right";
+            let expandIconClass = "arrow-right";
+            if(this.state.isGlobalExpandIconExpanded) {
+                expanIconName = "angle-down";
+                expandIconClass = "arrow-down";                
+            }  
+            theDom.push(                
+                <span key={expanIconName} className={expandIconClass + ' expand-icon'} onClick={(e) => this.onGlobalExpandIconClick(e, column, colIndex)}>
+                    <FontAwesomeIcon icon={expanIconName} />
+                </span>                    
+            );
+
+            return theDom;
+        },
+
+        expndAllWithSelectAllCboxFormatter: (column, colIndex) => {
+            let theDom = [];
+            let expanIconName = "angle-right";
+            let expandIconClass = "arrow-right";
+            if(this.state.isGlobalExpandIconExpanded) {
+                expanIconName = "angle-down";
+                expandIconClass = "arrow-down";                
+            }  
+            theDom.push(
+                <span key={colIndex+'-expand-icon'}>
+                    <span key={expanIconName} className={expandIconClass + ' expand-icon'} onClick={(e) => this.onGlobalExpandIconClick(e, column, colIndex)}>
+                        <FontAwesomeIcon icon={expanIconName} />
+                    </span>
+                    <span className="gstable-checkbox-container">
+                        <GSCheckbox labelText="" 
+                            checked={this.IsGlobalCheckboxSelected()} 
+                            onChangeListener = {(e) => {this.onGlobalCheckcboxChange(e)}} 
+                            className={"gstable-selector-checkbox"}/>
+                    </span>
+                </span>);
+
+            return theDom;
+        },
+        filter: (column, colIndex) => {            
             return (                
                 <input type='text' value={undefined} onChange={(e) => column.filterCallback(e, column, colIndex)}/>                
             );
@@ -157,6 +196,13 @@ class GSTable extends Component {
         }
     }
 
+    async onGlobalCheckcboxChange() {
+        let newState = {...this.state};        
+        newState.isGlobalCheckboxSelected = !newState.isGlobalCheckboxSelected;        
+        await this.setState(newState);
+        this.props.globalCheckBoxListener({rows: this.state.rowData, isChecked: newState.isGlobalCheckboxSelected});
+    }
+
     indicatorExistsAlready(columns) {
         let exits = false;
         _.each(columns, (aCol, index) => {
@@ -166,6 +212,13 @@ class GSTable extends Component {
         return exits;
     }
 
+    IsGlobalCheckboxSelected() {
+        let flag = false;        
+        if(this.state.isGlobalCheckboxSelected)
+            flag = true;
+        return flag;
+    }
+
     checkIsSelected(rowIndex) {        
         let flag = false;
         if(this.state.selectedIndexes.indexOf(rowIndex) != -1)
@@ -173,14 +226,39 @@ class GSTable extends Component {
         return flag;
     }
 
-    getFilterBox(column, colIndex) {
+    getFilterDOM(column, colIndex) {
         return (
             <th key={colIndex+"-inner-header"} className={column.className + " inner-header a-cell"}>
                 {column.filterFormatter(column, colIndex)}
             </th>
         );
     }
+
+    getSelectAllwithExpandAllDOM(column, colIndex) {        
+        return (
+            <th key={colIndex+"-inner-hedaer"} className={column.className + " inner-header a-cell"}>
+                {this.defaultFormatters.expndAllWithSelectAllCboxFormatter(column, colIndex)}
+            </th>
+        )
+    }
+
+    getExpandAll(column, colIndex) {
+        return (
+            <th key={colIndex+"-inner-header"} className={column.className + " inner-header a-cell"}>
+                {this.defaultFormatters.expndAllFormatter(column, colIndex)}
+            </th>
+        )
+    }
     
+    onGlobalExpandIconClick(e, column, colIndex) {
+        let newState = {...this.state};
+        newState.isGlobalExpandIconExpanded = !newState.isGlobalExpandIconExpanded;        
+        _.each(newState.rowData, (aRow, index) => {
+            aRow._expanded = newState.isGlobalExpandIconExpanded;
+        });        
+        this.setState(newState);
+    }
+
     onExpandIconClick(e, column, colIndex, row, rowIndex) {
         let newState = {...this.state};
         newState.rowData[rowIndex]._expanded = !newState.rowData[rowIndex]._expanded;
@@ -231,10 +309,14 @@ class GSTable extends Component {
                     { 
                         ( () => {
                             let innerHeaderCells = [];
-                            let columns = this.state.columns;
+                            let columns = this.state.columns;                            
                             for(let h=0; h< columns.length; h++) {
                                 if(columns[h].isFilterable)
-                                    innerHeaderCells.push(this.getFilterBox(columns[h], h))
+                                    innerHeaderCells.push(this.getFilterDOM(columns[h], h))
+                                else if(columns[h].id == "_expandIndicatorWithCheckbox")
+                                    innerHeaderCells.push(this.getSelectAllwithExpandAllDOM(columns[h], h));
+                                else if(columns[h].id == "_expandIndicator")
+                                    innerHeaderCells.push(this.getExpandAll(columns[h], h));
                                 else
                                     innerHeaderCells.push(<th key={h+"-inner-header"}></th>)
                             }
@@ -243,7 +325,7 @@ class GSTable extends Component {
                     }
                 </tr>
             )
-        }
+        }        
         return (
             <thead>
                 <tr>
