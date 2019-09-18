@@ -84,7 +84,8 @@ class BillCreation extends Component {
                 cname: {
                     inputVal: '',
                     hasError: false,
-                    list: ['Loading...']
+                    list: ['Loading...'],
+                    limitedList: ['Loading...']
                 },
                 gaurdianName: {
                     inputVal: '',
@@ -175,6 +176,7 @@ class BillCreation extends Component {
     /* START: "this" Binders */
     bindMethods() {        
         this.autuSuggestionControls.onChange = this.autuSuggestionControls.onChange.bind(this);
+        this.autuSuggestionControls.onCustomerSearch = this.autuSuggestionControls.onCustomerSearch.bind(this);
         this.toggleMoreInputs = this.toggleMoreInputs.bind(this);
         this.updateItemInMoreDetail = this.updateItemInMoreDetail.bind(this);  
         this.updatePictureData = this.updatePictureData.bind(this);  
@@ -776,6 +778,25 @@ class BillCreation extends Component {
         },
         inputSelect: (e) => {
             console.log(e);
+        },
+        onCustomerSearch: (val) => {            
+            let newState = {...this.state};
+            let limit = 20;
+            let currListSize = 0;            
+
+            newState.formData.cname.limitedList = [];
+            _.each(newState.formData.cname.list, (aList, index) => {                
+                let name = aList.name || '';
+                name = name.toLowerCase();
+                let inputVal = val;
+                inputVal = inputVal.toLowerCase();
+
+                if(name.indexOf(inputVal) == 0 && currListSize < limit) {                    
+                    newState.formData.cname.limitedList.push(aList);
+                    currListSize++;
+                }
+            });
+            this.setState(newState);
         }
     }
 
@@ -960,7 +981,7 @@ class BillCreation extends Component {
                             onChange={ (val) => this.autuSuggestionControls.onChange(val, 'moreCustomerDetailsField') }
                             onKeyUp={(e) => this.handleKeyUp(e, {currElmKey: 'moreCustomerDetailField', isMoreDetailInputKey: true})} 
                             ref = {(domElm) => { this.domElmns.moreCustomerDetailField = domElm; }}
-                            readOnly={this.props.billCreation.loading}
+                            readOnly={this.props.billCreation.loading}                            
                         />
                     </Col>
                     <Col xs={6} md={6}>
@@ -1134,7 +1155,7 @@ class BillCreation extends Component {
                                 >
                                 <ControlLabel>Customer Name</ControlLabel>
                                 <Autosuggest
-                                    datalist={this.state.formData.cname.list}
+                                    datalist={this.state.formData.cname.limitedList}
                                     itemAdapter={CustomerListAdaptor.instance}
                                     placeholder="Enter CustomerName"
                                     valueIsItem={true}
@@ -1144,7 +1165,9 @@ class BillCreation extends Component {
                                     onKeyUp = {(e) => this.handleKeyUp(e, {currElmKey: 'cname', isCustomerNameInput: true}) }
                                     // onSelect = {(dontknow) => this.autuSuggestionControls.onInputSelect(dontknow, 'cname')}
                                     // inputSelect = {(e) => this.autuSuggestionControls.inputSelect(e)}
-                                    readOnly={this.props.billCreation.loading}
+                                    readOnly={this.props.billCreation.loading}                                    
+                                    searchDebounce={250}
+                                    onSearch={(e) => this.autuSuggestionControls.onCustomerSearch(e)}
                                 />
                             </FormGroup>
                         </Col>
