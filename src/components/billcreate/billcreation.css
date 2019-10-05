@@ -51,12 +51,19 @@
 }
 /*END: Custom styles for the Date Picker(to make it bigger font size looking */
 
-.customer-name-field-container .dropdown-menu > li {
+.customer-name-field-container .dropdown-menu > li,
+.customer-list-item {
     border-bottom: 1px dotted grey;
     margin: 0 6px;
 }
 .customer-name-field-container .dropdown-menu > li > a {
     padding: 3px 0;
+}
+.customer-list-item-maindetail {
+    font-weight: 600;
+}
+.customer-list-item-subdetail {
+    font-size: 10px;
 }
 
 /* .orn-input-cell {

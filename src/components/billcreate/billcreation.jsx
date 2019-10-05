@@ -13,6 +13,7 @@ import './billcreation.css';
 import './picture-upload.css';
 import moment from 'moment';
 import Autosuggest, { ItemAdapter } from 'react-bootstrap-autosuggest' //https://affinipay.github.io/react-bootstrap-autosuggest/#playground
+import * as ReactAutosuggest from 'react-autosuggest';
 import _ from 'lodash';
 import axios from "axios";
 import { PLEDGEBOOK_METADATA, SAVE_BASE64_IMAGE_AND_GET_ID, SAVE_BINARY_IMAGE_AND_GET_ID, DEL_IMAGE_BY_ID, ORNAMENT_LIST } from '../../core/sitemap';
@@ -35,7 +36,7 @@ var domList = new DoublyLinkedList();
 domList.add('billno', {type: 'formControl', enabled: true});
 domList.add('amount', {type: 'formControl', enabled: true});
 //domList.add('date', {type: 'datePicker', enabled: true});
-domList.add('cname', {type: 'autosuggest', enabled: true});
+domList.add('cname', {type: 'rautosuggest', enabled: true});
 domList.add('gaurdianName', {type: 'autosuggest', enabled: true});
 domList.add('address', {type: 'autosuggest', enabled: true});
 domList.add('place', {type: 'autosuggest', enabled: true});
@@ -157,6 +158,7 @@ class BillCreation extends Component {
             this.updateFieldValuesInState(this.props.billData);
             this.updateDomList('enableUpdateBtn');
         }
+        this.domElmns["amount"].focus();
     }
 
     componentWillReceiveProps(nextProps) {
@@ -170,6 +172,7 @@ class BillCreation extends Component {
             this.props.updateClearEntriesFlag(false);
         }
         this.setState(newState);
+        this.domElmns["amount"].focus();
     }
     /* END: Lifecycle methods */
 
@@ -177,6 +180,11 @@ class BillCreation extends Component {
     bindMethods() {        
         this.autuSuggestionControls.onChange = this.autuSuggestionControls.onChange.bind(this);
         this.autuSuggestionControls.onCustomerSearch = this.autuSuggestionControls.onCustomerSearch.bind(this);
+        this.reactAutosuggestControls.onSuggestionsFetchRequested = this.reactAutosuggestControls.onSuggestionsFetchRequested.bind(this);
+        //this.reactAutosuggestControls.onSuggestionsClearRequested = this.reactAutosuggestControls.onSuggestionsClearRequested.bind(this);
+        this.reactAutosuggestControls.onChange = this.reactAutosuggestControls.onChange.bind(this);
+        this.reactAutosuggestControls.onSuggestionSelected = this.reactAutosuggestControls.onSuggestionSelected.bind(this);
+        this.getSuggestionValue = this.getSuggestionValue.bind(this);
         this.toggleMoreInputs = this.toggleMoreInputs.bind(this);
         this.updateItemInMoreDetail = this.updateItemInMoreDetail.bind(this);  
         this.updatePictureData = this.updatePictureData.bind(this);  
@@ -425,11 +433,11 @@ class BillCreation extends Component {
             returnVal = this.state.formData[identifier].customerInfo;
         }else {
             returnVal = this.state.formData[identifier].inputVal;        
-        }        
+        }
         if(this.state.selectedCustomer) {
             
             if(identifier == 'cname') identifier = 'name';
-            if(identifier == 'moreDetails') identifier = 'otherDetails'; 
+            if(identifier == 'moreDetails') identifier = 'otherDetails';
 
             returnVal = this.state.selectedCustomer[identifier] || returnVal;
             try{
@@ -463,6 +471,25 @@ class BillCreation extends Component {
         else
             return null;
     }
+    getCustomerListSuggestions(value) {
+        const inputValue = value.trim().toLowerCase();
+        const inputLength = inputValue.length;
+          
+        return inputLength === 0 ? [] : this.state.formData.cname.list.filter(lang =>
+            lang.name.toLowerCase().slice(0, inputLength) === inputValue
+        );
+    }
+    
+    getSuggestionValue = suggestion => suggestion.name;
+
+    // Use your imagination to render suggestions.
+    renderSuggestion = suggestion => (
+        <div className="customer-list-item" id={suggestion.hashKey + 'parent'}>
+            <div id={suggestion.hashKey+ '1'}><span className='customer-list-item-maindetail'>{suggestion.name}  <span  className='customer-list-item-maindetail' style={{"fontSize":"8px"}}>&nbsp;c/of &nbsp;&nbsp;</span> {suggestion.gaurdianName}</span></div>
+            <div id={suggestion.hashKey+ '2'}><span className='customer-list-item-subdetail'>{suggestion.address}</span></div>
+            <div id={suggestion.hashKey+ '3'}><span className='customer-list-item-subdetail'>{suggestion.place}, {suggestion.city} - {suggestion.pincode}</span></div>
+        </div>
+    );
     /* END: GETTERS */
 
     /* START: Helpers */
@@ -498,10 +525,12 @@ class BillCreation extends Component {
         try{
             if(nextElm) {
                 if(nextElm.value.indexOf('orn') !== 0) { //If not Orn Input field                
-                    if(nextElm.type == 'autosuggest'){
+                    if(nextElm.type == 'autosuggest' || nextElm.type == 'datePicker'){
                         this.domElmns[nextElm.key].refs.input.focus();
                     }else if (nextElm.type == 'defaultInput' || nextElm.type == 'formControl'){                    
                         this.domElmns[nextElm.key].focus();
+                    } else if(nextElm.type == 'rautosuggest') {
+                        this.domElmns[nextElm.key].focus()
                     }
                 } else { //Hanlding Orn Input fields                
                     if(nextElm.type == 'autosuggest')
@@ -514,6 +543,7 @@ class BillCreation extends Component {
             //TODO: Remove this alert after completing development
             alert("Exception occured in transferring focus...check console immediately");
             console.log(e);
+            console.log(currentElmKey, direction);
         }
     }
 
@@ -695,7 +725,7 @@ class BillCreation extends Component {
             this.verifySelectedCustomerByAddr();
         }else if(options && options.isSubmitBtn) {
             this.handleSubmit();
-        }
+        }        
         this.transferFocus(e, options.currElmKey, options.traverseDirection);
     }
 
@@ -743,7 +773,7 @@ class BillCreation extends Component {
     }
 
     autuSuggestionControls = {
-        onChange: (val, identifier, options) => {            
+        onChange: (val, identifier, options) => {                        
             let newState = {...this.state};
             if(identifier.indexOf('orn') == 0) { //starts with 'orn'
                 let inputs = newState.formData.orn.inputs;
@@ -760,8 +790,8 @@ class BillCreation extends Component {
                     newState.selectedCustomer = {};
                 } else {
                     newState.formData[identifier].inputVal = val.name || '';                
-                    // this.updateSelectedCustomer(val);                    
-                    newState.selectedCustomer = val;                                        
+                    // this.updateSelectedCustomer(val);
+                    newState.selectedCustomer = val;
                 }
             /*} else if(identifier == "gaurdianName") {
                 newState.formData[identifier].inputVal = val;
@@ -781,7 +811,7 @@ class BillCreation extends Component {
         },
         onCustomerSearch: (val) => {            
             let newState = {...this.state};
-            let limit = 20;
+            let limit = 30;
             let currListSize = 0;            
 
             newState.formData.cname.limitedList = [];
@@ -796,6 +826,39 @@ class BillCreation extends Component {
                     currListSize++;
                 }
             });
+            this.setState(newState);
+        }
+    }
+
+    reactAutosuggestControls = {
+        onSuggestionsFetchRequested: ({ value }) => {
+            let suggestionsList = this.getCustomerListSuggestions(value);
+            let newState = {...this.state};
+            suggestionsList = suggestionsList.slice(0, 30);
+            newState.formData.cname.limitedList = suggestionsList;
+            console.log('---clprit 3');
+            this.setState(newState);
+        },
+        // onSuggestionsClearRequested: () => {
+        //     let newState = {...this.state};
+        //     newState.formData.cname.limitedList = [];
+        //     newState.time = 0;
+        //     console.log('-=====culpri 4');
+        //     console.log(newState);
+        //     this.setState(newState);
+        // },
+        onChange: (event, { newValue, method }) => {
+            let newState = {...this.state};
+            newState.formData.cname.inputVal = newValue;
+            this.setState(newState);
+        },
+        onKeyUp: (event, options) => {
+            if(event.keyCode == ENTER_KEY)
+                this.handleEnterKeyPress(event, options);
+        },
+        onSuggestionSelected: (event, { suggestion, suggestionValue, suggestionIndex, sectionIndex, method }) => {
+            let newState = {...this.state};
+            newState.selectedCustomer = suggestion;
             this.setState(newState);
         }
     }
@@ -1072,7 +1135,7 @@ class BillCreation extends Component {
     }
     /* END: DOM Getter's */    
     
-    render(){        
+    render(){
         return(
             <Grid className="bill-creation-container">
                 <Col className="left-pane" xs={8} md={8}>
@@ -1154,7 +1217,7 @@ class BillCreation extends Component {
                                 validationState= {this.state.formData.cname.hasError ? "error" :null}
                                 >
                                 <ControlLabel>Customer Name</ControlLabel>
-                                <Autosuggest
+                                {/* <Autosuggest
                                     datalist={this.state.formData.cname.limitedList}
                                     itemAdapter={CustomerListAdaptor.instance}
                                     placeholder="Enter CustomerName"
@@ -1168,6 +1231,21 @@ class BillCreation extends Component {
                                     readOnly={this.props.billCreation.loading}                                    
                                     searchDebounce={250}
                                     onSearch={(e) => this.autuSuggestionControls.onCustomerSearch(e)}
+                                /> */}
+                                <ReactAutosuggest
+                                    suggestions={this.state.formData.cname.limitedList}
+                                    onSuggestionsFetchRequested={this.reactAutosuggestControls.onSuggestionsFetchRequested}
+                                    // onSuggestionsClearRequested={this.reactAutosuggestControls.onSuggestionsClearRequested}
+                                    getSuggestionValue={(suggestion, e) => this.getSuggestionValue(suggestion, e)}
+                                    renderSuggestion={this.renderSuggestion}
+                                    onSuggestionSelected={(event, { suggestion, suggestionValue, suggestionIndex, sectionIndex, method }) => this.reactAutosuggestControls.onSuggestionSelected(event, { suggestion, suggestionValue, suggestionIndex, sectionIndex, method })}
+                                    inputProps={{
+                                        placeholder: 'Type a Customer name',
+                                        value: this.state.formData.cname.inputVal,
+                                        onChange: this.reactAutosuggestControls.onChange,
+                                        onKeyUp: (e) => this.reactAutosuggestControls.onKeyUp(e, {currElmKey: 'cname'})                                        
+                                    }}
+                                    ref = {(domElm) => { this.domElmns.cname = domElm?domElm.input:domElm; }}
                                 />
                             </FormGroup>
                         </Col>
@@ -1179,7 +1257,7 @@ class BillCreation extends Component {
                                 <Autosuggest
                                     className='gaurdianname-autosuggest'
                                     datalist={this.state.formData.gaurdianName.list}
-                                    placeholder="Enter CustomerName"
+                                    placeholder="Enter Guardian Name"
                                     value={this.getInputValFromCustomSources('gaurdianName')}
                                     onChange={ (val) => this.autuSuggestionControls.onChange(val, 'gaurdianName') }
                                     ref = {(domElm) => { this.domElmns.gaurdianName = domElm; }}
