@@ -1,0 +1,23 @@
+.interest-rate-module .interest-detail-row {
+    padding-bottom: 10px;
+    padding-top: 10px;
+    margin-left: 20px;
+    margin-right: 20px;
+    border-bottom: 1px solid lightgray;
+}
+.interest-rate-module .interest-detail-row:hover,
+.interest-rate-module .interest-detail-row:focus {    
+    background-color: #d3d3d39e;
+    border-radius: 5px;
+}
+
+.interest-rate-module .type {
+    display: inline-block;
+    padding-bottom: 10px;
+    text-transform: uppercase;
+}
+
+.interest-rate-module .roi {
+    font-size: 21px;
+    text-align: right;
+}

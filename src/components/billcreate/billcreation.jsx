@@ -516,8 +516,19 @@ class BillCreation extends Component {
         }
     }
 
+    canTransferFocus(e, currElmKey) {
+        let flag = true;
+        if(currElmKey == 'amount') {
+            if(this.state.formData.amount.inputVal == '')
+                flag = false;
+            if(this.props.billCreation.loading)
+                flag = false;
+        }
+        return flag;
+    }
+
     transferFocus(e, currentElmKey, direction='forward') {
-        let nextElm;        
+        let nextElm;
         if(direction == 'forward')
             nextElm = this.getNextElm(currentElmKey);
         else
@@ -641,8 +652,14 @@ class BillCreation extends Component {
         newState.formData.moreDetails.customerInfo.push(obj);
         newState.formData.moreDetails.currCustomerInputField = '';
         newState.formData.moreDetails.currCustomerInputVal = '';
-        newState.formData.moreDetails.currCustomerInputKey = '';   
+        newState.formData.moreDetails.currCustomerInputKey = '';
         await this.setState(newState);        
+    }
+
+    fillNetWtValue(serialNo) {
+        let newState = {...this.state};
+        newState.formData.orn.inputs[serialNo].ornNWt = newState.formData.orn.inputs[serialNo].ornGWt;
+        this.setState(newState);
     }
 
     parseCustomerDetailsVal(param) {
@@ -712,6 +729,8 @@ class BillCreation extends Component {
             await this.appendNewRow(e, options.nextSerialNo);
         } else if(options && options.isOrnItemInput) {
             options = await this.checkOrnRowClearance(e, options);
+        } else if(options && options.isOrnGwtInput) {
+            this.fillNetWtValue(options.serialNo);
         } else if(options && options.isToAddMoreDetail) {
             await this.insertItemIntoMoreBucket();
         } else if(options && options.isMoreDetailInputKey){
@@ -725,8 +744,9 @@ class BillCreation extends Component {
             this.verifySelectedCustomerByAddr();
         }else if(options && options.isSubmitBtn) {
             this.handleSubmit();
-        }        
-        this.transferFocus(e, options.currElmKey, options.traverseDirection);
+        }
+        if(this.canTransferFocus(e, options.currElmKey))
+            this.transferFocus(e, options.currElmKey, options.traverseDirection);
     }
 
     handleSpaceKeyPress(e, options) {
@@ -836,7 +856,6 @@ class BillCreation extends Component {
             let newState = {...this.state};
             suggestionsList = suggestionsList.slice(0, 30);
             newState.formData.cname.limitedList = suggestionsList;
-            console.log('---clprit 3');
             this.setState(newState);
         },
         // onSuggestionsClearRequested: () => {
@@ -966,7 +985,7 @@ class BillCreation extends Component {
                             placeholder="0.00"
                             value={this.state.formData.orn.inputs[serialNo].ornGWt}
                             ref= {(domElm) => {this.domElmns.orn['ornGWt' + serialNo] = domElm; }}
-                            onKeyUp = {(e) => this.handleKeyUp(e, {currElmKey: 'ornGWt'+ serialNo}) }
+                            onKeyUp = {(e) => this.handleKeyUp(e, {currElmKey: 'ornGWt'+ serialNo, isOrnGwtInput: true, serialNo: serialNo}) }
                             onChange={ (e) => this.inputControls.onChange(null, e.target.value, 'ornGWt', {serialNo: serialNo}) }
                             readOnly={this.props.billCreation.loading}
                             />

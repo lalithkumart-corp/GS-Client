@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import {Tabs, Tab} from 'react-bootstrap';
 import BillingSettings from './billing/BillingSettings';
+import AccountSettings from './account/AccountSettings';
 import './settings.css';
 
 export default class Settings extends Component {    
@@ -14,6 +15,9 @@ export default class Settings extends Component {
                 <Tabs defaultActiveKey="billing" className='gs-tabs'>
                     <Tab eventKey="billing" title="Billing" >
                         <BillingSettings {...this.state} />
+                    </Tab>
+                    <Tab eventKey="Account" title="Account Setup">
+                        <AccountSettings {...this.state} />
                     </Tab>
                 </Tabs>
             </div>

@@ -6,6 +6,7 @@ import { UPDATE_BILL_NO_SETTINGS } from '../../../core/sitemap';
 import { getAccessToken } from '../../../core/storage';
 import axios from 'axios';
 import { toast } from 'react-toastify';
+import InterestRates from '../interestRate/InterestRate';
 
 class BillingSettings extends Component {
     constructor(props) {
@@ -101,6 +102,7 @@ class BillingSettings extends Component {
                         </Row>
                     </div>
                 </div>
+                <InterestRates {...this.props}/>
             </div>
         )
     }
