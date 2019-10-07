@@ -28,6 +28,7 @@ import { getAccessToken } from '../../core/storage';
 import { getDateInUTC } from '../../utilities/utility';
 import Picture from '../profilePic/picture';
 import { toast } from 'react-toastify';
+import BillHistoryView from './billHistoryView';
 
 const ENTER_KEY = 13;
 const SPACE_KEY = 32;
@@ -1414,6 +1415,9 @@ class BillCreation extends Component {
                 <Col className="right-pane" xs={4} md={4}>
                     <Picture picData={this.getUserImageData()} updatePictureData={this.updatePictureData} canShowActionButtons={!(this.isExistingCustomer() || this.props.loadedInPledgebook)}/>
                     <Picture picData={this.state.ornPicture} updatePictureData={this.updateOrnPictureData} />
+                    <Row className="orn-history-div">
+                        <BillHistoryView custId={this.state.selectedCustomer?this.state.selectedCustomer.customerId:"notfound"}/>
+                    </Row>
                 </Col>
                 <EditDetailsDialog {...this.state.editModalContent} update={this.updateItemInMoreDetail} />
             </Grid>

@@ -1,0 +1,6 @@
+.bill-history-view thead {
+    border-bottom: 1px solid;
+}
+.bill-history-view tbody {
+    font-size: 13px;
+}

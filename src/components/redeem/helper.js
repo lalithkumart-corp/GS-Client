@@ -86,7 +86,7 @@ export const calculateData = (selectedBillData, options) => {
     return selectedBillData;
 }
 
-const calcMonthDiff = (date1, date2) => {
+export const calcMonthDiff = (date1, date2) => {
     let y1 = date1.substring(date1.lastIndexOf('/') + 1);
     let y2 = date2.substring(date2.lastIndexOf('/') + 1);
 

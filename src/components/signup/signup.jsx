@@ -390,7 +390,7 @@ export default class SignUpPage extends Component {
                     </Col>
                 </Row>
                 <Row className='footer-container'>
-                    <input type='button' className='gs-button' value='Register' onKeyUp={(e) => this.handleKeyUp(e, {currElmKey: 'register'})} onClick={this.handleSubmit}/>
+                    <input type='button' className='gs-button' value='Register' onKeyUp={(e) => this.handleKeyUp(e, {currElmKey: 'register'})} />
                 </Row>
             </Grid>
         )
