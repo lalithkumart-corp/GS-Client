@@ -204,18 +204,18 @@ class Redeem extends Component {
                             {billData.BillNo}
                         </Col>
                         <Col xs={6} className='padding-b-5 padding-t-5 text-align-right'>
-                            <span>{moment.utc(billData.Date).local().format('YYYY-MM-DD HH:mm:ss')}</span>
+                            <span>{moment.utc(billData.Date).local().format('YYYY-MM-DD')}</span>
                         </Col>
                     </Row>
                     <Row>
-                        <Col xs={12} className='padding-b-5 padding-t-5'>
-                            {billData.Name}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; c/o  &nbsp;&nbsp;&nbsp;{billData.GaurdianName}
+                        <Col xs={12} className='padding-b-5 padding-t-10'>
+                            <b>{billData.Name}</b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; c/o  &nbsp;&nbsp;&nbsp;<b>{billData.GaurdianName}</b>
                         </Col>
-                        <Col xs={12} className='padding-b-5 padding-t-5'>
-                            {billData.Address+ ', ' + billData.Place}
+                        <Col xs={12} className='padding-b-5 padding-t-3'>
+                            <span style={{fontSize: "13px"}}>{billData.Address+ ', ' + billData.Place}</span>
                         </Col>
-                        <Col xs={12} className='padding-b-5 padding-t-5'>
-                            {billData.City+ ', ' + billData.Pincode}
+                        <Col xs={12} className='padding-b-5 padding-t-3'>
+                            <span style={{fontSize: "13px"}}>{billData.City+ ', ' + billData.Pincode}</span>
                         </Col>
                     </Row>
                     <Row className='orn-section'>
@@ -255,16 +255,25 @@ class Redeem extends Component {
             theDom = <Row>
                 <Col xs={6} xsOffset={2}>
                     <Row>
-                        <Col xs={8}>
-                            {selectedBillData._pledgedDate} - {selectedBillData._todayDate} &nbsp;@&nbsp; {selectedBillData._roi}%&nbsp;p/m
+                        <Col xs={8} style={{fontSize: "13px"}}>
+                            <Row>
+                                <Col sm={4} xs={4} style={{paddingBottom: "5px"}}>Pledged Date: </Col><Col sm={8} xs={8}>{selectedBillData._pledgedDate}</Col>
+                            </Row>
+                            <Row>
+                                <Col sm={4} xs={4} style={{paddingBottom: "5px"}}>Today Date: </Col><Col sm={8} xs={8}>{selectedBillData._todayDate}</Col>
+                            </Row>
+                            <Row>
+                                <Col sm={4} xs={4} style={{paddingBottom: "5px"}}>Int. Rate</Col> <Col sm={8} xs={8}>{selectedBillData._roi}% per/month</Col>
+                            </Row>
                         </Col>
                         <Col xs={4}>
                             <Col xs={4} className='no-padding'>
                                 <input className='interest-value-input' type = 'text' value={selectedBillData._interestPerMonth} onChange={(e) => this.inputControls.onChange(e, e.target.value, 'interestPerMonth')}/>
                             </Col>
                             <Col xs={4} className='no-padding'>
-                                &nbsp;X &nbsp;
+                                &nbsp;<span style={{fontSize: "10px"}}>X</span> &nbsp;
                                 {selectedBillData._monthDiff}
+                                &nbsp;&nbsp;&nbsp;<span style={{fontSize: "10px"}}>=</span> &nbsp;
                             </Col>
                             <Col xs={4}>
                                 <p>{selectedBillData._totalInterestValue}</p>
@@ -274,7 +283,7 @@ class Redeem extends Component {
                     <Row>
                         <Col xs={4} xsOffset={8}>
                             <Col xs={8}>
-                                <p className='text-align-right lightgrey'>Less</p>
+                                <p className='text-align-right lightgrey'>Discount</p>
                             </Col>
                             <Col xs={4}>
                                 <input className='discount-value-input' type='text' value={selectedBillData._discountValue} onChange={(e) => this.inputControls.onChange(e, e.target.value, 'discount')}/>

@@ -75,11 +75,20 @@
 .bgLightGrey {
   background-color: lightgray;
 }
+.padding-b-3 {
+  padding-bottom: 3px;
+}
 .padding-b-5 {
   padding-bottom: 5px;
 }
+.padding-t-3 {
+  padding-top: 3px;
+}
 .padding-t-5 {
   padding-top: 5px;
+}
+.padding-t-10 {
+  padding-top: 10px;
 }
 
 .font-family-monospace {
