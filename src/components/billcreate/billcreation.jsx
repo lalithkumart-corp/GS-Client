@@ -168,8 +168,9 @@ class BillCreation extends Component {
             newState = updateBillNumber(nextProps, newState);
         }
         if(nextProps.billCreation.clearEntries) {
+            this.updateDomList('resetOrnTableRows', newState);
             newState = resetState(nextProps, newState);
-            this.updateDomList('disableMoreDetailsInputElmns'); 
+            this.updateDomList('disableMoreDetailsInputElmns');
             this.props.updateClearEntriesFlag(false);
         }
         this.setState(newState);
@@ -474,8 +475,30 @@ class BillCreation extends Component {
     }
     getCustomerListSuggestions(value) {
         const inputValue = value.trim().toLowerCase();
+
         const inputLength = inputValue.length;
           
+        if(inputLength === 0) {
+            return [];
+        } else {
+            
+            let splits = inputValue.split('/');
+            if(splits.length > 1 && splits[1].length > 0) {
+                return this.state.formData.cname.list.filter(anObj => {
+                    if(anObj.name.toLowerCase().indexOf(splits[0]) === 0) {
+                        debugger;
+                    }
+
+                    if(anObj.name.toLowerCase().slice(0, splits[0].length) === splits[0] && anObj.gaurdianName.toLowerCase().slice(0, splits[1].length) === splits[1]){
+                        return true;
+                    } else {
+                        return false;
+                    }
+                });
+            } else {
+                return this.state.formData.cname.list.filter(anObj => anObj.name.toLowerCase().slice(0, splits[0].length) === splits[0]);
+            }
+        }
         return inputLength === 0 ? [] : this.state.formData.cname.list.filter(lang =>
             lang.name.toLowerCase().slice(0, inputLength) === inputValue
         );
@@ -494,7 +517,7 @@ class BillCreation extends Component {
     /* END: GETTERS */
 
     /* START: Helpers */
-    updateDomList(identifier) {
+    updateDomList(identifier, options) {
         switch(identifier) {
             case 'enableMoreDetailsInputElmns':
                 domList.enable('moreCustomerDetailField');
@@ -513,6 +536,17 @@ class BillCreation extends Component {
             case 'enableUpdateBtn':
                 domList.enable('submitBtn');
                 domList.enable('updateBtn');
+                break;
+            case 'resetOrnTableRows':
+                _.each(options.formData.orn.inputs, (anInput, index) => {
+                    if(index !== 1) {
+                        domList.remove('ornItem'+index);
+                        domList.remove('ornGWt'+index);
+                        domList.remove('ornNWt'+index);
+                        domList.remove('ornSpec'+index);
+                        domList.remove('ornNos'+index);
+                    }
+                });
                 break;
         }
     }
@@ -555,7 +589,7 @@ class BillCreation extends Component {
             //TODO: Remove this alert after completing development
             alert("Exception occured in transferring focus...check console immediately");
             console.log(e);
-            console.log(currentElmKey, direction);
+            console.log(currentElmKey, nextElm, direction);
         }
     }
 
@@ -587,7 +621,7 @@ class BillCreation extends Component {
             domList.remove('ornGWt'+serialNo);
             domList.remove('ornNWt'+serialNo);
             domList.remove('ornSpec'+serialNo);
-            domList.remove('ornNos'+serialNo);            
+            domList.remove('ornNos'+serialNo);
 
             await this.setState(newState);
 
@@ -855,7 +889,7 @@ class BillCreation extends Component {
         onSuggestionsFetchRequested: ({ value }) => {
             let suggestionsList = this.getCustomerListSuggestions(value);
             let newState = {...this.state};
-            suggestionsList = suggestionsList.slice(0, 30);
+            suggestionsList = suggestionsList.slice(0, 35);
             newState.formData.cname.limitedList = suggestionsList;
             this.setState(newState);
         },

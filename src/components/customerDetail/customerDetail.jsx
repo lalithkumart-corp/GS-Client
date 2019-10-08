@@ -131,7 +131,7 @@ class CustomerDetail extends Component {
             buffer.push(
                 <Row className={(isSelected?'isSelected ':'') +'a-customer-card' } onClick={(e) => this.onCardClick(e, aCust, index)}>
                     <Col></Col>
-                    <Col id={index+ '1'}><span>{aCust.name}  <span style={{"fontSize":"8px"}}>c/of</span> {aCust.gaurdianName}</span></Col>
+                    <Col id={index+ '1'}><span> <b>{aCust.name}</b>  <span style={{"fontSize":"8px"}}>c/of</span> <b>{aCust.gaurdianName}</b></span></Col>
                     <Col id={index+ '2'}><span>{aCust.address}</span></Col>
                     <Col id={index+ '3'}><span>{aCust.place}, {aCust.city} - {aCust.pincode}</span></Col>
                 </Row>

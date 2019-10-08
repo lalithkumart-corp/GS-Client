@@ -15,6 +15,7 @@
 .body-section .a-customer-card {
     margin-top: 15px;
     padding: 5px;
+    font-size: 13px;
 }
 .body-section .a-customer-card:hover,
 .body-section .a-customer-card:focus {

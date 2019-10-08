@@ -204,6 +204,7 @@ export const resetState = (nextProps, newState) => {
         } else {
             if(index !== 'date' && index !== 'billseries') {
                 anItem.hasError = false;
+                anItem.hasTextUpdated = false;
                 anItem.inputVal = '';
             }
         }            
