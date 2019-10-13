@@ -147,8 +147,7 @@
   padding: 6px 12px 6px 0;
   outline: none;
 }
-.gs-input-cell:focus,
-.gs-input-cell:hover {
+.gs-input-cell:focus {
     border-bottom: 2px solid #0acfee;
 }
 /*END: INPUT FIELD */

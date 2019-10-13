@@ -74,8 +74,8 @@
 } */
 .ornament-dom-container {
     border: 1px solid lightgray;
-    min-height: 200px;
-    margin-top: 25px;
+    min-height: 160px;
+    /* margin-top: 25px; */
     padding: 15px;
 }
 .ornament-dom-container .form-control {
@@ -85,10 +85,22 @@
 }
 /* .orn-input-cell:focus,
 .orn-input-cell:hover, */
-.ornament-dom-container .form-control:hover,
+
+.bill-creation-container .form-control:focus,
+.cust-name:focus,
 .ornament-dom-container .form-control:focus {
+    border-color: rgb(204, 204, 204);
     border-bottom: 2px solid #0acfee;
+    box-shadow: none;
+    outline: none;
 }
+
+.bill-creation-container .form-control:hover,
+.cust-name:hover,
+.ornament-dom-container .form-control:hover {
+    
+}
+
 .ornament-dom-container .input-group {
     width: calc(100% - 10px);
 }

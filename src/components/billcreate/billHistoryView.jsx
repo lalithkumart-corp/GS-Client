@@ -18,12 +18,15 @@ export default class BillHistoryView extends Component {
     componentWillReceiveProps(nextProps) {
         let newState = {...this.state};
         if(nextProps.custId) {
-            if(nextProps.custId !== "notfound" && newState.custId !== nextProps.custId){
+            if(newState.custId !== nextProps.custId){
                 newState.custId = nextProps.custId;
                 this.fetchHistory(newState.custId);
-            } else {
-                newState.custId = null;
+                this.setState(newState);
             }
+        } else if(nextProps.custId == null && newState.custId == null) {
+            
+        } else {
+            newState.custId = null;
             this.setState(newState);
         }
     }

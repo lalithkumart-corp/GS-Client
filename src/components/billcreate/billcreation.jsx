@@ -371,7 +371,8 @@ class BillCreation extends Component {
         let ornObj = JSON.parse(data.Orn);        
         newState.formData.orn.inputs = ornObj;
         newState.formData.orn.rowCount = Object.keys(ornObj).length;
-        newState.formData.moreDetails.customerInfo = JSON.parse(data.OtherDetails) || [];    
+        newState.formData.moreDetails.customerInfo = JSON.parse(data.OtherDetails) || [];  
+        newState.formData.moreDetails.billRemarks = data.Remarks || '';  
         newState.userPicture = JSON.parse(JSON.stringify(defaultPictureState));
         newState.ornPicture = JSON.parse(JSON.stringify(defaultPictureState));
 
@@ -486,7 +487,7 @@ class BillCreation extends Component {
             if(splits.length > 1 && splits[1].length > 0) {
                 return this.state.formData.cname.list.filter(anObj => {
                     if(anObj.name.toLowerCase().indexOf(splits[0]) === 0) {
-                        debugger;
+                        
                     }
 
                     if(anObj.name.toLowerCase().slice(0, splits[0].length) === splits[0] && anObj.gaurdianName.toLowerCase().slice(0, splits[1].length) === splits[1]){
@@ -514,6 +515,14 @@ class BillCreation extends Component {
             <div id={suggestion.hashKey+ '3'}><span className='customer-list-item-subdetail'>{suggestion.place}, {suggestion.city} - {suggestion.pincode}</span></div>
         </div>
     );
+
+    getSelectedCustId = () => {
+        //return this.state.selectedCustomer?this.state.selectedCustomer.customerId:"notfound";
+        let custId = null;
+        if(this.state.selectedCustomer && this.state.selectedCustomer.customerId)
+            custId = this.state.selectedCustomer.customerId;
+        return custId;
+    }
     /* END: GETTERS */
 
     /* START: Helpers */
@@ -539,7 +548,7 @@ class BillCreation extends Component {
                 break;
             case 'resetOrnTableRows':
                 _.each(options.formData.orn.inputs, (anInput, index) => {
-                    if(index !== 1) {
+                    if(index !== "1") {
                         domList.remove('ornItem'+index);
                         domList.remove('ornGWt'+index);
                         domList.remove('ornNWt'+index);
@@ -589,7 +598,7 @@ class BillCreation extends Component {
             //TODO: Remove this alert after completing development
             alert("Exception occured in transferring focus...check console immediately");
             console.log(e);
-            console.log(currentElmKey, nextElm, direction);
+            console.log(currentElmKey, nextElm.key, direction);
         }
     }
 
@@ -1297,7 +1306,8 @@ class BillCreation extends Component {
                                         placeholder: 'Type a Customer name',
                                         value: this.state.formData.cname.inputVal,
                                         onChange: this.reactAutosuggestControls.onChange,
-                                        onKeyUp: (e) => this.reactAutosuggestControls.onKeyUp(e, {currElmKey: 'cname'})                                        
+                                        onKeyUp: (e) => this.reactAutosuggestControls.onKeyUp(e, {currElmKey: 'cname'}),
+                                        className: "react-autosuggest__input cust-name"
                                     }}
                                     ref = {(domElm) => { this.domElmns.cname = domElm?domElm.input:domElm; }}
                                 />
@@ -1450,7 +1460,7 @@ class BillCreation extends Component {
                     <Picture picData={this.getUserImageData()} updatePictureData={this.updatePictureData} canShowActionButtons={!(this.isExistingCustomer() || this.props.loadedInPledgebook)}/>
                     <Picture picData={this.state.ornPicture} updatePictureData={this.updateOrnPictureData} />
                     <Row className="orn-history-div">
-                        <BillHistoryView custId={this.state.selectedCustomer?this.state.selectedCustomer.customerId:"notfound"}/>
+                        <BillHistoryView custId={this.getSelectedCustId()}/>
                     </Row>
                 </Col>
                 <EditDetailsDialog {...this.state.editModalContent} update={this.updateItemInMoreDetail} />

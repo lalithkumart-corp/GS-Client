@@ -14,14 +14,15 @@ export const getPendingBills = (args) => {
                 })
             },
             (errResp) => {
-                toast.error('Error occured in fetching the Pending bill list...');
-                console.log(errResp);
+                let msg = 'Error occured in fetching the Pending bill list...';
+                if(errResp.response && errResp.response.data && errResp.response.data.error && errResp.response.data.error.message)
+                    msg = errResp.response.data.error.message;
+                toast.error(msg);
             }
         )
         .catch(
             (exception) => {
                 toast.error('Exception occured in fetching the Pending bill list...');
-                console.log(exception);
             }
         )
     }
