@@ -31,7 +31,8 @@ class Redeem extends Component {
                 inputVal: new Date().toISOString(),
                 _inputVal: moment().format('DD/MM/YYYY')
             },
-            billNumberList: [],
+            filteredBillNoList: [],
+            totalBillNoList: [],
             fetchingBillNoList: true
         }        
     }
@@ -47,7 +48,7 @@ class Redeem extends Component {
             .then(
                 (successResp) => {
                     let list = successResp.data.list;
-                    this.setState({billNumberList: list, fetchingBillNoList: false});                    
+                    this.setState({totalBillNoList: list, fetchingBillNoList: false});                    
                     this.transferFocus(null, 'submitBtn', 'previous');
                 },
                 (errResp) => {
@@ -75,7 +76,7 @@ class Redeem extends Component {
                         this.transferFocus(null, 'billInputBox');
                     }else{
                         this.setState({selectedBillData: null, billNotFound: true});
-                        toast.error('Bill Data not found or might be redeemed already');
+                        toast.error(`${billNo} Bill Data not found or might be redeemed already`);
                     }
                 },
                 (errResp) => {
@@ -96,6 +97,25 @@ class Redeem extends Component {
     autuSuggestionControls = {
         onChange: (val,identifier) => {
             this.setState({billno: val});
+        },
+        onBillNoSearch: (val) => {
+            let newState = {...this.state};
+            let limit = 10;
+            let currListSize = 0;            
+
+            newState.filteredBillNoList = [];
+            _.each(newState.totalBillNoList, (aBillNo, index) => {                
+                let lowercaseBillNo = aBillNo || '';
+                lowercaseBillNo = lowercaseBillNo.toLowerCase();
+                let inputVal = val;
+                inputVal = inputVal.toLowerCase();
+
+                if(lowercaseBillNo.indexOf(inputVal) == 0 && currListSize < limit) {                    
+                    newState.filteredBillNoList.push(aBillNo);
+                    currListSize++;
+                }
+            });
+            this.setState(newState);
         },
         onSelect: (val, identifier) => {
         
@@ -151,32 +171,42 @@ class Redeem extends Component {
 
     handleSubmit() {
         let params = {...this.state.selectedBillData};
-        params.closingDate = this.state.date.inputVal;
-        let requestParams = getRequestParams(params);
-        let accessToken = getAccessToken();
-        let apiParams = {requestParams, accessToken};
-        axios.post(REDEEM_PENDING_BILLS, apiParams)
-            .then(
-                (successResp) => {
-                    if(successResp.data.STATUS == 'success') {
-                        this.clearView();
+        if(window.confirm(`${params.BillNo} Do you really want to close this bill ?`)) {
+            params.closingDate = this.state.date.inputVal;
+            let requestParams = getRequestParams(params);
+            let accessToken = getAccessToken();
+            let apiParams = {requestParams, accessToken};
+            axios.post(REDEEM_PENDING_BILLS, apiParams)
+                .then(
+                    (successResp) => {
+                        if(successResp.data.STATUS == 'success') {
+                            this.clearView();
+                        }
+                    },
+                    (errResp) => {
+                        toast.error('Error occured while closing the bill');
+                        console.log(errResp);
                     }
-                },
-                (errResp) => {
-                    toast.error('Error occured while closing the bill');
-                    console.log(errResp);
-                }
-            )
-            .catch(
-                (exception) => {
-                    toast.error('Exception occured while closing the bill');
-                    console.log(exception);
-                }
-            )
+                )
+                .catch(
+                    (exception) => {
+                        toast.error('Exception occured while closing the bill');
+                        console.log(exception);
+                    }
+                )
+            }
     }
 
-    clearView() {
-        this.setState({selectedBillData: null, fetchingBillNoList: true});
+    async clearView() {
+        // let defaultBillNoPrefix = '';
+        // if(this.props.billCreation && this.props.billCreation.billSeries)
+        //     defaultBillNoPrefix = this.props.billCreation.billSeries + '.';
+
+        //Adding the last typed bill number's prefix(bill series..ie: if A.4521 is last typed bill no, then 4521 nly be cleared, and "A." will be remained
+        let existingBillNo = this.state.billno || '';
+        let splits = existingBillNo.split('.');
+        let nextBillnoSuggestion = splits[0] || '';
+        await this.setState({billno: nextBillnoSuggestion, selectedBillData: null, fetchingBillNoList: true});
         this.transferFocus(null, 'submitBtn', 'previous');
         this.getBillNos();
     }
@@ -204,7 +234,7 @@ class Redeem extends Component {
                             {billData.BillNo}
                         </Col>
                         <Col xs={6} className='padding-b-5 padding-t-5 text-align-right'>
-                            <span>{moment.utc(billData.Date).local().format('YYYY-MM-DD')}</span>
+                            <span>{moment.utc(billData.Date).local().format('DD-MM-YYYY')}</span>
                         </Col>
                     </Row>
                     <Row>
@@ -422,14 +452,15 @@ class Redeem extends Component {
                     <Row className='main-input-container'>
                         <Col xs={2}>
                             <Autosuggest
-                                datalist={this.state.billNumberList}
+                                datalist={this.state.filteredBillNoList}
                                 placeholder="Bill No"
                                 value={this.state.billno}
-                                // onChange={ (val) => {this.autuSuggestionControls.onChange(val, 'billno') }}
+                                onChange={ (val) => {this.autuSuggestionControls.onChange(val, 'billno') }}
                                 ref = {(domElm) => { this.domElmns.billInputBox = domElm; }}
                                 onKeyUp = {(e) => this.handleKeyUp(e, {currElmKey: 'billno'}) }
                                 readOnly={this.state.fetchingBillNoList}
                                 showToggle={false}
+                                onSearch={(e) => this.autuSuggestionControls.onBillNoSearch(e)}
                                 // onSelect = { (val) => {this.autuSuggestionControls.onSelect(val, 'billno')}}
                             />
                         </Col>
