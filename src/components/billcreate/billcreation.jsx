@@ -818,10 +818,12 @@ class BillCreation extends Component {
     handleSubmit() {
         let requestParams = buildRequestParams(this.state);
         let validation = validateFormValues(requestParams);
-        if(validation.errors.length)
+        if(validation.errors.length) {
             toast.error(`${validation.errors.join(' , ')} `);        
-        else
-            this.props.insertNewBill(requestParams);
+        } else {
+            if(window.confirm('Are you Sure to create new Bill?'))
+                this.props.insertNewBill(requestParams);
+        }
     }
 
     handleUpdate() {

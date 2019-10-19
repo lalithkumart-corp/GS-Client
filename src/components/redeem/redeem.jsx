@@ -205,7 +205,9 @@ class Redeem extends Component {
         //Adding the last typed bill number's prefix(bill series..ie: if A.4521 is last typed bill no, then 4521 nly be cleared, and "A." will be remained
         let existingBillNo = this.state.billno || '';
         let splits = existingBillNo.split('.');
-        let nextBillnoSuggestion = splits[0] || '';
+        let nextBillnoSuggestion = '';
+        if(splits.length > 1)
+            nextBillnoSuggestion= splits[0]+'.' || '';
         await this.setState({billno: nextBillnoSuggestion, selectedBillData: null, fetchingBillNoList: true});
         this.transferFocus(null, 'submitBtn', 'previous');
         this.getBillNos();
