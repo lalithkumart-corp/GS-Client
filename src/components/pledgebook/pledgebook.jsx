@@ -59,12 +59,19 @@ class Pledgebook extends Component {
             },
             columns : [{
                     id: 'Date',
-                    displayText: 'Date',
+                    displayText: 'Pledged Date',
                     width: '18%',
                     formatter: (column, columnIndex, row, rowIndex) => {
-                        return (
-                            <span>{convertToLocalTime(row[column.id])}</span>
-                        )
+                        if(row['closed_date']) {
+                            let closed_date = convertToLocalTime(row['closed_date'], {excludeTime: true});
+                            return (
+                                <span>{convertToLocalTime(row[column.id], {excludeTime: true} )} - {closed_date}</span>
+                            )
+                        } else {
+                            return (
+                                <span>{convertToLocalTime(row[column.id], {excludeTime: true})}</span>
+                            )
+                        }
                     },
                     isFilterable: true,
                     className:'pb-date-cell',

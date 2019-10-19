@@ -60,7 +60,8 @@ export const convertBufferToBase64 = (imgBuff) => {
     return imgPath;
 }
 
-export const convertToLocalTime = (theDate) => {    
+export const convertToLocalTime = (theDate, options) => {
+    options = options || {};
     const twoDigitFormat = (val) => {
         val = parseInt(val);
         if(val < 10)
@@ -71,9 +72,14 @@ export const convertToLocalTime = (theDate) => {
     let dd = twoDigitFormat(localDateObj.getDate());
     let mm = twoDigitFormat(localDateObj.getMonth() + 1);        
     let yyyy = localDateObj.getFullYear();
-    let hr = twoDigitFormat(localDateObj.getHours());
-    let min = twoDigitFormat(localDateObj.getMinutes());
-    let sec = twoDigitFormat(localDateObj.getSeconds());
-    let localDate = `${yyyy}-${mm}-${dd}  ${hr}:${min}:${sec}`;        
+    let localDate;
+    if(options.excludeTime) {
+        localDate = `${dd}-${mm}-${yyyy}`;
+    } else {
+        let hr = twoDigitFormat(localDateObj.getHours());
+        let min = twoDigitFormat(localDateObj.getMinutes());
+        let sec = twoDigitFormat(localDateObj.getSeconds());
+        localDate = `${dd}-${mm}-${yyyy} ${hr}:${min}:${sec}`;
+    }
     return localDate;        
 }
