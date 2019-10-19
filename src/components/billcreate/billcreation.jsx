@@ -48,10 +48,10 @@ domList.add('moreDetailsHeader', {type: 'defaultInput', enabled: true});
 domList.add('moreCustomerDetailField', {type: 'autosuggest', enabled: false});
 domList.add('moreCustomerDetailValue', {type: 'formControl', enabled: false});
 domList.add('ornItem1', {type: 'autosuggest', enabled: true});
+domList.add('ornNos1', {type: 'defaultInput', enabled: true});
 domList.add('ornGWt1', {type: 'defaultInput', enabled: true});
 domList.add('ornNWt1', {type: 'defaultInput', enabled: true});
 domList.add('ornSpec1', {type: 'autosuggest', enabled: true});
-domList.add('ornNos1', {type: 'defaultInput', enabled: true});
 domList.add('submitBtn', {type: 'defaultInput', enabled: true});
 domList.add('updateBtn', {type: 'defaultInput', enabled: false});
 
@@ -158,6 +158,8 @@ class BillCreation extends Component {
         } else {
             this.updateFieldValuesInState(this.props.billData);
             this.updateDomList('enableUpdateBtn');
+            this.updateDomList('resetOrnTableRows', this.state);
+            this.updateDomList('ornInputFields');
         }
         this.domElmns["amount"].focus();
     }
@@ -543,20 +545,31 @@ class BillCreation extends Component {
                 domList.enable('moreCustomerDetailValue');
                 break;
             case 'enableUpdateBtn':
-                domList.enable('submitBtn');
+                domList.disable('submitBtn');
                 domList.enable('updateBtn');
                 break;
             case 'resetOrnTableRows':
                 _.each(options.formData.orn.inputs, (anInput, index) => {
                     if(index !== "1") {
                         domList.remove('ornItem'+index);
+                        domList.remove('ornNos'+index);
                         domList.remove('ornGWt'+index);
                         domList.remove('ornNWt'+index);
                         domList.remove('ornSpec'+index);
-                        domList.remove('ornNos'+index);
                     }
                 });
                 break;
+            case 'ornInputFields': //We need to update the DomList with respect to available orn rows (in Pledgebook- Edit view)
+                let ornsCount = this.state.formData.orn.rowCount;
+                let iteration = 2; //start with adding up from second row in domList
+                while(iteration <= ornsCount) {
+                    domList.insertAfter('ornSpec'+(iteration-1), 'ornItem'+iteration, {type: 'autosuggest', enabled: true});
+                    domList.insertAfter('ornItem'+iteration, 'ornNos'+iteration, {type: 'defaultInput', enabled: true});
+                    domList.insertAfter('ornNos'+iteration, 'ornGWt'+iteration, {type: 'defaultInput', enabled: true});
+                    domList.insertAfter('ornGWt'+iteration, 'ornNWt'+iteration, {type: 'defaultInput', enabled: true});
+                    domList.insertAfter('ornNWt'+iteration, 'ornSpec'+iteration, {type: 'autosuggest', enabled: true});
+                    iteration++;
+                }
         }
     }
 
@@ -576,7 +589,7 @@ class BillCreation extends Component {
         if(direction == 'forward')
             nextElm = this.getNextElm(currentElmKey);
         else
-            nextElm = this.getPrevElm(currentElmKey);        
+            nextElm = this.getPrevElm(currentElmKey);
         try{
             if(nextElm) {
                 if(nextElm.value.indexOf('orn') !== 0) { //If not Orn Input field                
@@ -609,11 +622,11 @@ class BillCreation extends Component {
             newState.formData.orn.inputs[nextSerialNo] = {ornItem: '', ornGWt: '', ornNWt: '', ornSpec: '', ornNos: ''};
 
             let currentSerialNo = nextSerialNo-1;
-            domList.insertAfter('ornNos'+currentSerialNo, 'ornItem'+nextSerialNo, {type: 'autosuggest', enabled: true});
-            domList.insertAfter('ornItem'+nextSerialNo, 'ornGWt'+nextSerialNo, {type: 'defaultInput', enabled: true});
+            domList.insertAfter('ornSpec'+currentSerialNo, 'ornItem'+nextSerialNo, {type: 'autosuggest', enabled: true});
+            domList.insertAfter('ornItem'+nextSerialNo, 'ornNos'+nextSerialNo, {type: 'defaultInput', enabled: true});
+            domList.insertAfter('ornNos'+nextSerialNo, 'ornGWt'+nextSerialNo, {type: 'defaultInput', enabled: true});
             domList.insertAfter('ornGWt'+nextSerialNo, 'ornNWt'+nextSerialNo, {type: 'defaultInput', enabled: true});
             domList.insertAfter('ornNWt'+nextSerialNo, 'ornSpec'+nextSerialNo, {type: 'autosuggest', enabled: true});
-            domList.insertAfter('ornSpec'+nextSerialNo, 'ornNos'+nextSerialNo, {type: 'defaultInput', enabled: true});
             
             await this.setState(newState);
         }
@@ -627,14 +640,14 @@ class BillCreation extends Component {
             delete newState.formData.orn.inputs[serialNo];
 
             domList.remove('ornItem'+serialNo);
+            domList.remove('ornNos'+serialNo);
             domList.remove('ornGWt'+serialNo);
             domList.remove('ornNWt'+serialNo);
             domList.remove('ornSpec'+serialNo);
-            domList.remove('ornNos'+serialNo);
 
             await this.setState(newState);
 
-            options.currElmKey = 'ornNos'+(serialNo-1); //update current Element key            
+            options.currElmKey = 'ornSpec'+(serialNo-1); //update current Element key            
         }
         return options;
     }
@@ -769,7 +782,7 @@ class BillCreation extends Component {
 
     }
     async handleEnterKeyPress(e, options) {        
-        if(options && options.isOrnNosInput && (this.canAppendNewRow(options))) {
+        if(options && options.isOrnSpecsInput && (this.canAppendNewRow(options))) {
             await this.appendNewRow(e, options.nextSerialNo);
         } else if(options && options.isOrnItemInput) {
             options = await this.checkOrnRowClearance(e, options);
@@ -984,10 +997,10 @@ class BillCreation extends Component {
                 <colgroup>
                     <col style={{width: '5%'}}/>
                     <col style={{width: '35%'}}/>
+                    <col style={{width: '10%'}}/>
                     <col style={{width: '15%'}}/>
                     <col style={{width: '15%'}}/>
                     <col style={{width: '20%'}}/>
-                    <col style={{width: '10%'}}/>
                 </colgroup>
             )
         };
@@ -997,10 +1010,10 @@ class BillCreation extends Component {
                     <tr>
                         <th>S.No</th>
                         <th>Orn Name</th>
+                        <th>Nos</th>
                         <th>G-Wt</th>
                         <th>N-Wt</th>
                         <th>Specification</th>
-                        <th>Nos</th>
                     </tr>
                 </thead>
             );
@@ -1021,6 +1034,18 @@ class BillCreation extends Component {
                             onKeyUp = {(e) => this.handleKeyUp(e, {currElmKey: 'ornItem'+ serialNo, isOrnItemInput: true,  serialNo: serialNo}) }
                             readOnly={this.props.billCreation.loading}
                         />
+                    </td>
+                    <td>
+                        <input 
+                            type="text" 
+                            className="gs-input-cell orn-input-cell" 
+                            placeholder="Quantity"
+                            value={this.state.formData.orn.inputs[serialNo].ornNos}
+                            ref= {(domElm) => {this.domElmns.orn['ornNos' + serialNo] = domElm; }}
+                            onKeyUp = {(e) => this.handleKeyUp(e, {currElmKey: 'ornNos'+ serialNo, isOrnNosInput: true, nextSerialNo: serialNo+1}) }
+                            onChange={ (e) => this.inputControls.onChange(null, e.target.value, 'ornNos', {serialNo: serialNo}) }
+                            readOnly={this.props.billCreation.loading}
+                            />
                     </td>
                     <td>
                         <input 
@@ -1053,20 +1078,8 @@ class BillCreation extends Component {
                             placeholder="Any Specification ?"
                             value={this.state.formData.orn.inputs[serialNo].ornSpec}
                             ref= {(domElm) => {this.domElmns.orn['ornSpec' + serialNo] = domElm; }}
-                            onKeyUp = {(e) => this.handleKeyUp(e, {currElmKey: 'ornSpec'+ serialNo}) }
+                            onKeyUp = {(e) => this.handleKeyUp(e, {currElmKey: 'ornSpec'+ serialNo, isOrnSpecsInput: true, nextSerialNo: serialNo+1}) }
                             onChange={ (val) => this.autuSuggestionControls.onChange(val, 'ornSpec', {serialNo: serialNo}) }
-                            readOnly={this.props.billCreation.loading}
-                            />
-                    </td>
-                    <td>
-                        <input 
-                            type="text" 
-                            className="gs-input-cell orn-input-cell" 
-                            placeholder="Quantity"
-                            value={this.state.formData.orn.inputs[serialNo].ornNos}
-                            ref= {(domElm) => {this.domElmns.orn['ornNos' + serialNo] = domElm; }}
-                            onKeyUp = {(e) => this.handleKeyUp(e, {currElmKey: 'ornNos'+ serialNo, isOrnNosInput: true, nextSerialNo: serialNo+1}) }
-                            onChange={ (e) => this.inputControls.onChange(null, e.target.value, 'ornNos', {serialNo: serialNo}) }
                             readOnly={this.props.billCreation.loading}
                             />
                     </td>

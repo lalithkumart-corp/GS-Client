@@ -51,13 +51,22 @@ export function DoublyLinkedList () {
     this.remove = (identifier) => {        
         let currentNode = this.head;
         let previousNode = null;
-        while(currentNode.value !== identifier) {
-            previousNode = currentNode;
-            currentNode = currentNode.next;
+        let found = true;
+        if(currentNode) {
+            while(currentNode.value !== identifier) {
+                previousNode = currentNode;
+                currentNode = currentNode.next;
+                if(!currentNode) {
+                    found = false;
+                    break;
+                }
+            }
+            if(found) {
+                previousNode.next = currentNode.next;
+                currentNode.next.prev = previousNode;
+                this._length--;
+            }
         }
-        previousNode.next = currentNode.next;
-        currentNode.next.prev = previousNode;
-        this._length--;
     }
 
     this.enable = (value) => {
