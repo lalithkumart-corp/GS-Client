@@ -4,7 +4,7 @@ import { parseResponse } from './helper';
 import { connect } from 'react-redux';
 import _ from 'lodash';
 import { Grid, Row, Col, FormGroup, ControlLabel, FormControl, HelpBlock, InputGroup, Button, Glyphicon, Radio } from 'react-bootstrap';
-
+import moment from 'moment';
 import './pledgebook.css';
 import CommonModal from '../common-modal/commonModal.jsx';
 import PledgebookModal from './pledgebookModal';
@@ -24,7 +24,7 @@ class Pledgebook extends Component {
         this.timeOut = 300;
         let todaysDate = new Date();
         let past7daysStartDate = new Date();
-        past7daysStartDate.setDate(past7daysStartDate.getDate()-1000);
+        past7daysStartDate.setDate(past7daysStartDate.getDate()-730);
         todaysDate.setHours(0,0,0,0);
         let todaysEndDate = new Date();
         todaysEndDate.setHours(23,59,59,999);        

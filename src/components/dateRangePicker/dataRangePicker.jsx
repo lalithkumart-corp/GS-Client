@@ -16,6 +16,9 @@ class DatePicker extends Component {
                 'Last 30 Days': [moment().subtract(29, 'days'), moment()],
                 'This Month': [moment().startOf('month'), moment().endOf('month')],
                 'Last Month': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')],
+                'This Year': [moment().startOf('year'), moment().endOf('year')],
+                'Last 2 Years': [moment().subtract(1, 'year').startOf('year'), moment().endOf('year')],
+                'Last 3 Years': [moment().subtract(2, 'year').startOf('year'), moment().endOf('year')]
             },
             startDate: dates.startDate,
             endDate: dates.endDate,

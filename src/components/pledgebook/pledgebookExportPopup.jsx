@@ -20,7 +20,8 @@ export default class PledgebookExportPopup extends Component {
 
         this.state = {
             startDate: past30DaysDate,
-            endDate: todaysEndDate
+            endDate: todaysEndDate,
+            billStatusFlag: 'all'
         }
         this.bindMethods();
     }
@@ -32,9 +33,13 @@ export default class PledgebookExportPopup extends Component {
 
     dateSubmitCallback(startDate, endDate) {
         let newState = {...this.state};
-        newState.date.startDate = new Date(startDate);
-        newState.date.endDate = new Date(endDate);
+        newState.startDate = new Date(startDate);
+        newState.endDate = new Date(endDate);
         this.setState(newState);        
+    }
+
+    onChangeBillStatusFlag(e, flag) {
+        this.setState({billStatusFlag: flag});
     }
 
     triggerExportAPI() {
@@ -49,7 +54,8 @@ export default class PledgebookExportPopup extends Component {
             date: {
                 startDate: dateFormatter(this.state.startDate),
                 endDate: dateFormatter(endDate)
-            }
+            },
+            include: this.state.billStatusFlag
         }
         return {            
             offsetStart: 0,
@@ -73,7 +79,9 @@ export default class PledgebookExportPopup extends Component {
                 </Row>
                 <Row className='gs-card margin-top-30'>
                     <Col className='gs-card-content'>
-                        <p>TODO: export only pending or closed or ALL ?</p>
+                        <Radio name='billstatus' checked={this.state.billStatusFlag=='all'} value='all' onChange={(e) => this.onChangeBillStatusFlag(e, 'all')}>All</Radio>
+                        <Radio name='billstatus' checked={this.state.billStatusFlag=='pending'} value='pending' onChange={(e) => this.onChangeBillStatusFlag(e, 'pending')}>Pending</Radio>
+                        <Radio name='billstatus' checked={this.state.billStatusFlag=='closed'} value='closed' onChange={(e) => this.onChangeBillStatusFlag(e, 'closed')}>Closed</Radio>
                     </Col>
                 </Row>
                 <Row>
