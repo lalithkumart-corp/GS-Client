@@ -306,16 +306,16 @@ class BillCreation extends Component {
         let accessToken = getAccessToken();
         axios.get(PLEDGEBOOK_METADATA + `?access_token=${accessToken}&identifiers=["all", "otherDetails"]`)
             .then(
-                (successResp) => {                      
+                (successResp) => {
                     let newState = {...this.state};
                     let results = successResp.data;
-                    newState.formData.cname.list = results.row;
-                    newState.formData.gaurdianName.list = getGaurdianNameList(results.row);
-                    newState.formData.address.list = getAddressList(results.row);
-                    newState.formData.place.list = getPlaceList(results.row);
-                    newState.formData.city.list = getCityList(results.row);
-                    newState.formData.pincode.list = getPincodeList(results.row);
-                    newState.formData.mobile.list = getMobileList(results.row);                    
+                    newState.formData.cname.list = results.customers.list;
+                    newState.formData.gaurdianName.list = getGaurdianNameList(results.customers.list);
+                    newState.formData.address.list = getAddressList(results.customers.list);
+                    newState.formData.place.list = getPlaceList(results.customers.list);
+                    newState.formData.city.list = getCityList(results.customers.list);
+                    newState.formData.pincode.list = getPincodeList(results.customers.list);
+                    newState.formData.mobile.list = getMobileList(results.customers.list);                    
                     newState.formData.moreDetails.list = results.otherDetails.map((anItem) => {return {key: anItem.key, value: anItem.displayText}});
                     this.setState(newState);
                 },

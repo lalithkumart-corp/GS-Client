@@ -8,39 +8,54 @@ import './customerDetail.css';
 import GeneralInfo from './generalInfo';
 import History from './history';
 import Notes from './notes';
+import ReactPaginate from 'react-paginate';
 
 class CustomerDetail extends Component {
     constructor(props) {
         super(props);
         this.state = {
             searchVal: '',
-            customerList: []
+            customerList: [],
+            customersCount: 0,
+            selectedPageIndex: 0,
+            pageLimit: 10,
+            filters: {
+                cname: '',
+                fgname: ''
+            }
         }
         this.bindMethods();
     }
 
     bindMethods() {
         this.inputControls.onChange = this.inputControls.onChange.bind(this);
-        this.filterCustomerList = this.filterCustomerList.bind(this);
+        //this.filterCustomerList = this.filterCustomerList.bind(this);
         this.refreshCustomerList = this.refreshCustomerList.bind(this);
+        this.handlePageClick = this.handlePageClick.bind(this);
     }
 
-    async componentDidMount() {
-        let customerList = await this._fetchCustomerList();        
-        this.setState({customerList: customerList, rawCustomerList: customerList});
+    componentDidMount() {
+        this.initiateFetchPledgebookAPI();
     }
 
     inputControls = {
-        onChange: (evt, val, identifier) => {
+        onChange: async (evt, val, identifier) => {
             switch(identifier) {
                 case 'moreCustomerDetailsValue':
-                    this.filterCustomerList(val);
+                    let splits = val.split('/');
+                    let newState = {...this.state};
+                    newState.filters.cname = splits[0];
+                    newState.filters.fgname = splits[1] || 0;
+                    newState.searchVal = val;
+                    await this.setState(newState);
+                    this.initiateFetchPledgebookAPI();
+                    //this.filterCustomerList(val);
                     break;
             }
         }
     }
 
-    filterCustomerList(custName) {
+    /*filterCustomerList(custName) {
 
         let filteredCustList = [];
         if(custName == '') {
@@ -55,13 +70,22 @@ class CustomerDetail extends Component {
             });
         }
         this.setState({searchVal: custName, customerList: filteredCustList, selectedCust: null});
+    }*/
+
+    async initiateFetchPledgebookAPI() {
+        let customers = await this._fetchCustomers();        
+        this.setState({customerList: customers.list, customersCount: customers.count, rawCustomerList: customers.list});
     }
 
-    async _fetchCustomerList() {
+    async _fetchCustomers() {
         let accessToken = getAccessToken();
-        let response = await axios.get(PLEDGEBOOK_METADATA + `?access_token=${accessToken}&identifiers=["all", "otherDetails"]`);
-        let parsedData = this.parseCustomerDataList(response.data.row);
-        return parsedData;
+        let offsetStart = (this.state.selectedPageIndex*this.state.pageLimit);
+        let response = await axios.get(PLEDGEBOOK_METADATA + `?access_token=${accessToken}&identifiers=["all", "otherDetails"]&offsetStart=${offsetStart}&limit=${this.state.pageLimit}&filters=${JSON.stringify(this.state.filters)}`);
+        //let response = await axios.get(PLEDGEBOOK_METADATA + `?access_token=${accessToken}&identifiers=["all", "otherDetails"]`);
+        return {
+            list: this.parseCustomerDataList(response.data.customers.list),
+            count: response.data.customers.count
+        };
     }
 
     parseCustomerDataList(rawCustomerDataList) {
@@ -90,6 +114,11 @@ class CustomerDetail extends Component {
         this.setState({selectedCust: aCust, customerList: custList, billHistory: null, billHistoryLoading: true});
     }
 
+    async handlePageClick(selectedPage) {
+        await this.setState({selectedPageIndex: selectedPage.selected});
+        this.initiateFetchPledgebookAPI();
+    }
+
     async fetchCustomerHistory(customerId) {
         try {
             let accessToken = getAccessToken();
@@ -102,10 +131,35 @@ class CustomerDetail extends Component {
     }
 
     async refreshCustomerList() {
-        let customerList = await this._fetchCustomerList();        
+        let customerList = await this.initiateFetchPledgebookAPI();        
         this.setState({customerList: customerList, rawCustomerList: customerList, selectedCust: null});        
     }
 
+    getPageCount() {
+        if(this.state.customersCount > 0)
+            return this.state.customersCount/this.state.pageLimit;
+        else
+            return 0;
+    }
+
+    getPagination() {
+        return (
+            <Row>
+                <ReactPaginate previousLabel={"<"}
+                    nextLabel={">"}
+                    breakLabel={"..."}
+                    breakClassName={"break-me"}
+                    pageCount={this.getPageCount()}
+                    marginPagesDisplayed={2}
+                    pageRangeDisplayed={5}
+                    onPageChange={this.handlePageClick}
+                    containerClassName={"pledgebook pagination"}
+                    subContainerClassName={"pages pagination"}
+                    activeClassName={"active"}
+                    forcePage={this.state.selectedPageIndex} />
+            </Row>
+        )
+    }
     getSearchBox() {
         return (
             <Row className='head-section'>
@@ -164,6 +218,7 @@ class CustomerDetail extends Component {
         return (
             <Grid className="customer-detail-container">
                 <Col className="left-pane" xs={3} md={3}>
+                    {this.getPagination()}
                     {this.getSearchBox()}
                     {this.getCustomerListView()}
                 </Col>
