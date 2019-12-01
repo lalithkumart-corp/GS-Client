@@ -51,7 +51,10 @@ class NavbarComp extends Component {
                         </LinkContainer>
                         <LinkContainer to='/demo'>
                             <MenuItem eventKey={3.5}>Demo</MenuItem>
-                        </LinkContainer>                        
+                        </LinkContainer>
+                        <LinkContainer to='/backup_restore'>
+                            <MenuItem eventKey={3.6}>Backup/Restore</MenuItem>
+                        </LinkContainer>
                     </NavDropdown>
 
                     <NavItem eventKey={4} href="#">
