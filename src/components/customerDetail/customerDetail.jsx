@@ -8,6 +8,7 @@ import './customerDetail.css';
 import GeneralInfo from './generalInfo';
 import History from './history';
 import Notes from './notes';
+import Settings from './settings';
 import ReactPaginate from 'react-paginate';
 
 class CustomerDetail extends Component {
@@ -21,7 +22,8 @@ class CustomerDetail extends Component {
             pageLimit: 10,
             filters: {
                 cname: '',
-                fgname: ''
+                fgname: '',
+                hashKey: ''
             }
         }
         this.bindMethods();
@@ -41,9 +43,9 @@ class CustomerDetail extends Component {
     inputControls = {
         onChange: async (evt, val, identifier) => {
             switch(identifier) {
-                case 'moreCustomerDetailsValue':
+                case 'custOrGuardianName':
                     let splits = val.split('/');
-                    let newState = {...this.state};
+                    var newState = {...this.state};
                     newState.filters.cname = splits[0];
                     newState.filters.fgname = splits[1] || 0;
                     newState.searchVal = val;
@@ -51,6 +53,11 @@ class CustomerDetail extends Component {
                     this.initiateFetchPledgebookAPI();
                     //this.filterCustomerList(val);
                     break;
+                case 'custId': 
+                    var newState = {...this.state};
+                    newState.filters.hashKey = val;
+                    await this.setState(newState);
+                    this.initiateFetchPledgebookAPI();
             }
         }
     }
@@ -163,14 +170,27 @@ class CustomerDetail extends Component {
     getSearchBox() {
         return (
             <Row className='head-section'>
+                <FormGroup
+                    className='cname-input-box'>
+                    <FormControl
+                        type="text"
+                        className="autosuggestion-box"
+                        placeholder="Enter cust/guardian"
+                        onChange={(e) => this.inputControls.onChange(null, e.target.value, 'custOrGuardianName')} 
+                        //onKeyUp={(e) => this.handleKeyUp(e, {currElmKey: 'moreCustomerDetailValue', isToAddMoreDetail: true, traverseDirection: 'backward'})} 
+                        value={this.state.searchVal}
+                    />
+                    <FormControl.Feedback />
+                </FormGroup>
+                <Col xs={12} md={12} style={{textAlign: 'center', marginBottom: '10px', color: 'lightgrey', fontSize: '12px'}}><span>(OR)</span></Col>
                 <FormGroup>
                     <FormControl
                         type="text"
                         className="autosuggestion-box"
-                        placeholder="Enter Customer name"
-                        onChange={(e) => this.inputControls.onChange(null, e.target.value, 'moreCustomerDetailsValue')} 
+                        placeholder="Enter CustId"
+                        onChange={(e) => this.inputControls.onChange(null, e.target.value, 'custId')} 
                         //onKeyUp={(e) => this.handleKeyUp(e, {currElmKey: 'moreCustomerDetailValue', isToAddMoreDetail: true, traverseDirection: 'backward'})} 
-                        value={this.state.searchVal}
+                        value={this.state.filters.hashKey}
                     />
                     <FormControl.Feedback />
                 </FormGroup>
@@ -206,6 +226,9 @@ class CustomerDetail extends Component {
                 </Tab>
                 <Tab eventKey="notes" title="Notes">
                     <Notes {...this.state}/>
+                </Tab>
+                <Tab eventKey="settings" title="Settings">
+                    <Settings {...this.state}/>
                 </Tab>
             </Tabs>);            
         }else{

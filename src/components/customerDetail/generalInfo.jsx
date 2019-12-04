@@ -436,6 +436,9 @@ class GeneralInfo extends Component {
                         </Row>
                     </Col>
                     <Col xs={6} md={6}>
+                        <Col className='cust-id-span'>
+                            <span>Cust Id: {this.state.custDetail.hashKey} </span>
+                        </Col>
                         <Picture picData={this.getUserImageData()} updatePictureData={this.updatePictureData} editMode={true} />
                     </Col>
                 </Row>               

@@ -8,6 +8,9 @@
     width: 85%;
     margin-left: 7%;
 }
+.customer-detail-container .cname-input-box {
+    margin-bottom: 10px !important;
+}
 .customer-detail-container .body-section {
     max-height: 500px;
     overflow-x: hidden;
