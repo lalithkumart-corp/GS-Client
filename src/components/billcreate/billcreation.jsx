@@ -304,7 +304,7 @@ class BillCreation extends Component {
     /* START: API accessors */
     fetchMetaData() {
         let accessToken = getAccessToken();
-        axios.get(PLEDGEBOOK_METADATA + `?access_token=${accessToken}&identifiers=["all", "otherDetails"]`)
+        axios.get(PLEDGEBOOK_METADATA + `?access_token=${accessToken}&identifiers=["all", "otherDetails"]&filters=${JSON.stringify({onlyIsActive: true})}`)
             .then(
                 (successResp) => {
                     let newState = {...this.state};

@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { Grid, Row, Col, FormGroup, ControlLabel, FormControl, HelpBlock, InputGroup, Button, Glyphicon, Tabs, Tab } from 'react-bootstrap';
-import { PLEDGEBOOK_METADATA } from '../../core/sitemap';
+import { PLEDGEBOOK_METADATA, UPDATE_CUSTOMER_BY_MERGING } from '../../core/sitemap';
 import { getAccessToken } from '../../core/storage';
 import axios from 'axios';
 import './settings.css';
@@ -14,6 +14,7 @@ export default class Settings extends Component {
             mergetoCustomerHashkey: ''
         };
         this.fetchCustomerData = this.fetchCustomerData.bind(this);
+        this.onConfirmUpdate = this.onConfirmUpdate.bind(this);
     }
     
     componentWillReceiveProps(nextProps) {
@@ -31,7 +32,7 @@ export default class Settings extends Component {
                 return;
             }
             let accessToken = getAccessToken();
-            let response = await axios.get(PLEDGEBOOK_METADATA + `?access_token=${accessToken}&identifiers=["all", "otherDetails"]&filters=${JSON.stringify({hashKey: this.state.mergetoCustomerHashkey})}`);
+            let response = await axios.get(PLEDGEBOOK_METADATA + `?access_token=${accessToken}&identifiers=["all", "otherDetails"]&filters=${JSON.stringify({hashKey: this.state.mergetoCustomerHashkey, onlyIsActive: true})}`);
             if(response && response.data && response.data.customers && response.data.customers.list)
                 this.setState({mergeToCustomerInfo: response.data.customers.list[0]});
         } catch(err) {
@@ -39,15 +40,30 @@ export default class Settings extends Component {
         }
     }
 
+    async onConfirmUpdate() {
+        try {
+            let accessToken = getAccessToken();
+            let resp = await axios.post(UPDATE_CUSTOMER_BY_MERGING, {accessToken: accessToken, custHashkeyForMerge: this.state.custDetail.hashKey, custHashkeyForMergeInto: this.state.mergetoCustomerHashkey});
+            let msg = resp.data.message;
+            if(resp.data.STATUS == 'success')
+                toast.success(msg);
+            else
+                toast.error(msg);
+        } catch(e) {
+            console.log(e);
+            toast.error('Error occured while merging');
+        }
+    }
+
     render() {
         return (
             <div className='gs-card'>
                 <div className='gs-card-content'>
-                    <h3>Update Customer</h3>
+                    <h3>Update Customer - Merging into other</h3>
                     <Row>
                         <Col xs={3} md={3}><input type='text' className='gs-input' value={this.state.custDetail.hashKey} readonly='true'/></Col>
                         <Col xs={3} md={3}><input type='text' className='gs-input' value={this.state.mergetoCustomerHashkey} onChange={(e) => this.onCustomerHashKeyChange(e)}/></Col>
-                        <Col xs={3} md={3}><input type='button' className='gs-button' onClick={this.fetchCustomerData} value='fetch'/></Col>
+                        <Col xs={3} md={3}><input type='button' className='gs-button' onClick={this.fetchCustomerData} value='check'/></Col>
                     </Row>
                     {
                         this.state.mergeToCustomerInfo && 
@@ -83,7 +99,7 @@ export default class Settings extends Component {
                                 </Col>
                             </Row>
                             <Row>
-                                <input type='button' className='gs-button' style={{marginLeft: '10px'}} value='Confirm Update' />
+                                <input type='button' className='gs-button' style={{marginLeft: '10px'}} value='Confirm Update' onClick={this.onConfirmUpdate}/>
                             </Row>
                         </Row>
                     }

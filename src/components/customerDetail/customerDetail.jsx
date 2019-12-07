@@ -23,7 +23,8 @@ class CustomerDetail extends Component {
             filters: {
                 cname: '',
                 fgname: '',
-                hashKey: ''
+                hashKey: '',
+                onlyIsActive: true
             }
         }
         this.bindMethods();
