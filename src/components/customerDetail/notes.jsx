@@ -59,19 +59,61 @@ class Notes extends Component {
                 );
             }
         });
+        if(theDOM.length == 0) {
+            theDOM.push(
+                <Row>
+                    <Col xs={12} md={12} className='container-view'>
+                        <h3>Not Found!</h3>
+                        <h6>None of this customer bill has remarks/notes...</h6>
+                    </Col>
+                </Row>
+            )
+        }
         return theDOM;
     }
 
-    getCustomRemarks() {
+    constructNotesDom(parsedNotes) {
+        let buffer = [];
+        _.each(parsedNotes, (aNoteObj, index) => {
+            buffer.push('dummy');
+        });
+        return (
+            <Row>
+                {buffer}
+            </Row>
+        )
+    }
 
+    getCustomRemarks() {
+        let parsedNotes = [];
+        if(this.state.custDetail.notes)
+            parsedNotes = JSON.parse(this.state.custDetail.notes);
+        if(parsedNotes.length > 0) {
+            this.constructNotesDom(parsedNotes);
+        } else {
+            return (
+                <Row>
+                    <Col xs={12} md={12} className='container-view'>
+                        <h3>Not Found!</h3>
+                        <h6>No Customer specific notes found! Try to add some notes by clicking on '+' icon above...</h6>
+                    </Col>
+                </Row>
+            )
+        }
     }
 
 
     render() {
         return (
-            <Grid className='notes-main-container'>                
-                {this.getRemarksByBill()}                
-                {this.getCustomRemarks()}
+            <Grid className='notes-main-container'>
+                <Row>
+                    <h4>Customer's:</h4>
+                    {this.getCustomRemarks()}
+                </Row>
+                <Row style={{marginTop: '25px'}}>
+                    <h4>Collected from all Bills:</h4>
+                    {this.getRemarksByBill()}
+                </Row>
             </Grid>
         )
     }

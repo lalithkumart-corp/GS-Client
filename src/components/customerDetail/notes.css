@@ -3,4 +3,13 @@
     border-radius: 10px;
     padding: 10px 15px;
     background-color: cornsilk;
+    margin-bottom: 20px;
+    border-color: lightgrey;
+    color: dimgrey;
+}
+
+.notes-main-container .container-view{
+    padding: 20px;
+    color: grey;
+    text-align: center;
 }

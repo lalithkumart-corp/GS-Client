@@ -1111,7 +1111,7 @@ class BillCreation extends Component {
         let getCustomerInforAdderDom = () => {
             return (                
                 <Row>
-                    <Col xs={12} className='font-weight-bold'>Customer Information</Col>                    
+                    <Col xs={12} className='font-weight-bold' style={{marginBottom: '5px'}}>Customer Information</Col>                    
                     <Col xs={6} md={6}>
                         <Autosuggest
                             datalist={this.state.formData.moreDetails.list}
@@ -1178,7 +1178,7 @@ class BillCreation extends Component {
                 <Row className='bill-remarks-adder-dom'>
                     <Col xs={12} md={12}>
                         <FormGroup controlId="bill-remarks-textarea">
-                            <ControlLabel>Bill Remarks (or) Other additional information</ControlLabel>
+                            <ControlLabel>Add Notes for this bill</ControlLabel>
                             <FormControl componentClass="textarea" 
                                 placeholder="Type here..." 
                                 value={this.state.formData.moreDetails.billRemarks} 
