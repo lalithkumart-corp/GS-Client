@@ -348,9 +348,9 @@ class GeneralInfo extends Component {
             address: thatState.custDetail.address,
             place: thatState.custDetail.place,
             city: thatState.custDetail.city,
-            pinCode: thatState.custDetail.pincode,
-            mobile: thatState.custDetail.mobile,
-            secMobile: thatState.custDetail.secMobile,
+            pinCode: thatState.custDetail.pincode || null,
+            mobile: thatState.custDetail.mobile || null,
+            secMobile: thatState.custDetail.secMobile || null,
             picture: getPicData(thatState),
             otherDetails: thatState.custDetail.otherDetails
         }
