@@ -136,76 +136,78 @@ export default class Settings extends Component {
     render() {
         return (
             <Row>
-                <div className='gs-card'>
-                    <div className='gs-card-content'>
-                        <h4 style={{marginBottom: '40px'}}>Update Customer - Merging into other</h4>
-                        <Row>
-                            <Col xs={3} md={3}><input type='text' className='gs-input' value={this.state.custDetail.hashKey} readonly='true'/></Col>
-                            <Col xs={3} md={3}><input type='text' className='gs-input' value={this.state.mergetoCustomerHashkey} onChange={(e) => this.onCustomerHashKeyChange(e)}/></Col>
-                            <Col xs={3} md={3}><input type='button' className='gs-button' onClick={this.fetchCustomerData} value='check'/></Col>
-                        </Row>
-                        {
-                            this.state.mergeToCustomerInfo && 
-                            <Row className='mergeto-custinfo'>
-                                <Row className='mergeto-custinfo-field'>
-                                    <Col xs={3} md={3} className='lightgrey'>CustomerKey:</Col><Col xs={3} md={3}>{this.state.mergeToCustomerInfo.hashKey}</Col>
-                                </Row>
-                                <Row className='mergeto-custinfo-field'>
-                                    <Col xs={3} md={3} className='lightgrey'>Name:</Col><Col xs={3} md={3}>{this.state.mergeToCustomerInfo.name}</Col>
-                                </Row>
-                                <Row className='mergeto-custinfo-field'>
-                                    <Col xs={3} md={3} className='lightgrey'>Guardian Name:</Col><Col xs={3} md={3}>{this.state.mergeToCustomerInfo.gaurdianName}</Col>
-                                </Row>
-                                <Row className='mergeto-custinfo-field'>
-                                    <Col xs={3} md={3} className='lightgrey'>Address:</Col><Col xs={3} md={3}>{this.state.mergeToCustomerInfo.address}</Col>
-                                </Row>
-                                <Row className='mergeto-custinfo-field'>
-                                    <Col xs={3} md={3}  className='lightgrey'>Place:</Col><Col xs={3} md={3}>{this.state.mergeToCustomerInfo.place}</Col>
-                                </Row>
-                                <Row className='mergeto-custinfo-field'>
-                                    <Col xs={3} md={3}  className='lightgrey'>City:</Col><Col xs={3} md={3}>{this.state.mergeToCustomerInfo.city}</Col>
-                                </Row>
-                                <Row className='mergeto-custinfo-field'>
-                                    <Col xs={3} md={3}  className='lightgrey'>Pincode:</Col><Col xs={3} md={3}>{this.state.mergeToCustomerInfo.pincode}</Col>
-                                </Row>
-                                <Row className='mergeto-custinfo-field'>
-                                    <Col xs={3} md={3}  className='lightgrey'>Mobile:</Col><Col xs={3} md={3}>{this.state.mergeToCustomerInfo.mobile}</Col>
-                                </Row>
-                                <Row>
-                                    <Col className='mergeto-custinfo-note'>
-                                        <p>Info</p>
-                                        <p>You are trying to Merge with Other Customer Id. This change will update the details(Name, GuardianName, Address, Place, City, MobileNumber) of current customer details to above customer detail. And all the bills will get updated as well. </p>
-                                    </Col>
-                                </Row>
-                                <Row>
-                                    <input type='button' className='gs-button' style={{marginLeft: '10px'}} value='Confirm Update' onClick={this.onConfirmUpdate}/>
-                                </Row>
+                <Col xs={12} md={12}>
+                    <div className='gs-card'>
+                        <div className='gs-card-content'>
+                            <h4 style={{marginBottom: '40px'}}>Update Customer - Merging into other</h4>
+                            <Row>
+                                <Col xs={3} md={3}><input type='text' className='gs-input' value={this.state.custDetail.hashKey} readonly='true'/></Col>
+                                <Col xs={3} md={3}><input type='text' className='gs-input' value={this.state.mergetoCustomerHashkey} onChange={(e) => this.onCustomerHashKeyChange(e)}/></Col>
+                                <Col xs={3} md={3}><input type='button' className='gs-button' onClick={this.fetchCustomerData} value='check'/></Col>
                             </Row>
-                        }
+                            {
+                                this.state.mergeToCustomerInfo && 
+                                <Row className='mergeto-custinfo'>
+                                    <Row className='mergeto-custinfo-field'>
+                                        <Col xs={3} md={3} className='lightgrey'>CustomerKey:</Col><Col xs={3} md={3}>{this.state.mergeToCustomerInfo.hashKey}</Col>
+                                    </Row>
+                                    <Row className='mergeto-custinfo-field'>
+                                        <Col xs={3} md={3} className='lightgrey'>Name:</Col><Col xs={3} md={3}>{this.state.mergeToCustomerInfo.name}</Col>
+                                    </Row>
+                                    <Row className='mergeto-custinfo-field'>
+                                        <Col xs={3} md={3} className='lightgrey'>Guardian Name:</Col><Col xs={3} md={3}>{this.state.mergeToCustomerInfo.gaurdianName}</Col>
+                                    </Row>
+                                    <Row className='mergeto-custinfo-field'>
+                                        <Col xs={3} md={3} className='lightgrey'>Address:</Col><Col xs={3} md={3}>{this.state.mergeToCustomerInfo.address}</Col>
+                                    </Row>
+                                    <Row className='mergeto-custinfo-field'>
+                                        <Col xs={3} md={3}  className='lightgrey'>Place:</Col><Col xs={3} md={3}>{this.state.mergeToCustomerInfo.place}</Col>
+                                    </Row>
+                                    <Row className='mergeto-custinfo-field'>
+                                        <Col xs={3} md={3}  className='lightgrey'>City:</Col><Col xs={3} md={3}>{this.state.mergeToCustomerInfo.city}</Col>
+                                    </Row>
+                                    <Row className='mergeto-custinfo-field'>
+                                        <Col xs={3} md={3}  className='lightgrey'>Pincode:</Col><Col xs={3} md={3}>{this.state.mergeToCustomerInfo.pincode}</Col>
+                                    </Row>
+                                    <Row className='mergeto-custinfo-field'>
+                                        <Col xs={3} md={3}  className='lightgrey'>Mobile:</Col><Col xs={3} md={3}>{this.state.mergeToCustomerInfo.mobile}</Col>
+                                    </Row>
+                                    <Row>
+                                        <Col className='mergeto-custinfo-note'>
+                                            <p>Info</p>
+                                            <p>You are trying to Merge with Other Customer Id. This change will update the details(Name, GuardianName, Address, Place, City, MobileNumber) of current customer details to above customer detail. And all the bills will get updated as well. </p>
+                                        </Col>
+                                    </Row>
+                                    <Row>
+                                        <input type='button' className='gs-button' style={{marginLeft: '10px'}} value='Confirm Update' onClick={this.onConfirmUpdate}/>
+                                    </Row>
+                                </Row>
+                            }
+                        </div>
                     </div>
-                </div>
-                <div className='gs-card'>
-                    <div className='gs-card-content'>
-                        <h4 style={{marginBottom: '40px'}}>RelationShip</h4>
+                    <div className='gs-card'>
+                        <div className='gs-card-content'>
+                            <h4 style={{marginBottom: '40px'}}>RelationShip</h4>
+                        </div>
                     </div>
-                </div>
 
-                 <div className='gs-card'>
-                    <div className='gs-card-content'>
-                        <h4 style={{marginBottom: '40px'}}>STATUS</h4>
-                        <Row>
-                            <Col xs={3} md={3}>
-                                Disable: 
-                            </Col>
-                            <Col xs={3} md={3}>
-                                <input type='checkbox' className='gs-checkbox' checked={this.state.disableCheckcboxTicked} onClick={(e) => this.updateDisableButtonTick(e)}/>
-                            </Col>
-                            <Col>
-                                <input type='button' className='gs-button' value='Apply' disabled={this.canDisableApplyBtn()} onClick={(e) => this.onDisableUpdateApply()}/>
-                            </Col>
-                        </Row>
+                    <div className='gs-card'>
+                        <div className='gs-card-content'>
+                            <h4 style={{marginBottom: '40px'}}>STATUS</h4>
+                            <Row>
+                                <Col xs={3} md={3}>
+                                    Disable: 
+                                </Col>
+                                <Col xs={3} md={3}>
+                                    <input type='checkbox' className='gs-checkbox' checked={this.state.disableCheckcboxTicked} onClick={(e) => this.updateDisableButtonTick(e)}/>
+                                </Col>
+                                <Col>
+                                    <input type='button' className='gs-button' value='Apply' disabled={this.canDisableApplyBtn()} onClick={(e) => this.onDisableUpdateApply()}/>
+                                </Col>
+                            </Row>
+                        </div>
                     </div>
-                </div>
+                </Col>
             </Row>
         )
     }
