@@ -1,24 +1,29 @@
 import React, { Component } from 'react';
 import { Grid, Row, Col, FormGroup, ControlLabel, FormControl, HelpBlock, InputGroup, Button, Glyphicon, Tabs, Tab } from 'react-bootstrap';
-import { PLEDGEBOOK_METADATA, UPDATE_CUSTOMER_BY_MERGING } from '../../core/sitemap';
+import { PLEDGEBOOK_METADATA, UPDATE_CUSTOMER_BY_MERGING, UPDATE_CUSTOMER_STATUS } from '../../core/sitemap';
 import { getAccessToken } from '../../core/storage';
 import axios from 'axios';
 import './settings.css';
 import { toast } from 'react-toastify';
+import _ from 'lodash';
 
 export default class Settings extends Component {
     constructor(props) {
         super(props);
         this.state = {
             custDetail: this.props.selectedCust || null,
-            mergetoCustomerHashkey: ''
+            mergetoCustomerHashkey: '',
+            disableCheckcboxTicked: false,
         };
         this.fetchCustomerData = this.fetchCustomerData.bind(this);
         this.onConfirmUpdate = this.onConfirmUpdate.bind(this);
     }
     
     componentWillReceiveProps(nextProps) {
-        this.setState({custDetail: nextProps.selectedCust, mergetoCustomerHashkey: null, mergeToCustomerInfo: null});
+        let disableCheckcboxTicked = disableCheckcboxTicked;
+        if(nextProps.selectedCust)
+            disableCheckcboxTicked = nextProps.selectedCust.custStatus?false:true;
+        this.setState({disableCheckcboxTicked: disableCheckcboxTicked, billHistory: nextProps.billHistory, custDetail: nextProps.selectedCust, mergetoCustomerHashkey: null, mergeToCustomerInfo: null});
     }
     
     onCustomerHashKeyChange(e) {
@@ -59,6 +64,73 @@ export default class Settings extends Component {
             console.log(e);
             toast.error('Error occured while merging');
         }
+    }
+
+    updateDisableButtonTick(e) {
+        this.setState({disableCheckcboxTicked: e.target.checked});
+    }
+
+    onDisableUpdateApply(e) {
+        let action = 'Enable';
+        if(this.state.disableCheckcboxTicked)
+            action = 'Disable';
+        if(window.confirm(`Sure to ${action} this customer?`))
+            this.confirmUpdateCustStatus();
+    }
+
+    confirmUpdateCustStatus() {
+        if(this.state.disableCheckcboxTicked) { //If trying to disable customer, then check for any pending bills open or not.
+            let parsedBillHistory = this.parseBillHistory(this.state.billHistory);
+            let pendingBillsLength = parsedBillHistory.pendingBills.length;
+            if(pendingBillsLength > 0) {
+                toast.error('This Customer has Pending Bills. Redeem those bills to disable this customer...');
+                return;
+            }
+        }
+        let accessToken = getAccessToken();
+            axios.post(UPDATE_CUSTOMER_STATUS, {accessToken: accessToken, custId: this.state.custDetail.customerId, status: !this.state.disableCheckcboxTicked})
+                .then(
+                    (successResp) => {
+                        if(successResp.data.STATUS == 'success') {
+                            toast.success(successResp.data.MSG);
+                        } else {
+                            toast.error(successResp.data.MSG);
+                        }
+                    },
+                    (errResp) => {
+                        toast.error('Could not update the customer status');
+                        console.log(errResp);
+                    }
+                )
+                .catch(
+                    (e) => {
+                        console.log(e);
+                        toast.error('Exception while updating customer status');
+                    }
+                )
+        
+
+    }
+
+    parseBillHistory(billHistory) {
+        let parsedBillHistory = {
+            closedBills: [],
+            pendingBills: []
+        };
+        _.each(billHistory, (aBillObj, index) => {
+            if(aBillObj.Status)
+                parsedBillHistory.pendingBills.push(aBillObj);
+            else
+                parsedBillHistory.closedBills.push(aBillObj);
+        });
+        return parsedBillHistory;
+    }
+
+    canDisableApplyBtn() {
+        let custStatus = this.state.custDetail.custStatus?true:false;
+        if(this.state.disableCheckcboxTicked !== custStatus)
+            return true;
+        return false;
     }
 
     render() {
@@ -115,6 +187,23 @@ export default class Settings extends Component {
                 <div className='gs-card'>
                     <div className='gs-card-content'>
                         <h4 style={{marginBottom: '40px'}}>RelationShip</h4>
+                    </div>
+                </div>
+
+                 <div className='gs-card'>
+                    <div className='gs-card-content'>
+                        <h4 style={{marginBottom: '40px'}}>STATUS</h4>
+                        <Row>
+                            <Col xs={3} md={3}>
+                                Disable: 
+                            </Col>
+                            <Col xs={3} md={3}>
+                                <input type='checkbox' className='gs-checkbox' checked={this.state.disableCheckcboxTicked} onClick={(e) => this.updateDisableButtonTick(e)}/>
+                            </Col>
+                            <Col>
+                                <input type='button' className='gs-button' value='Apply' disabled={this.canDisableApplyBtn()} onClick={(e) => this.onDisableUpdateApply()}/>
+                            </Col>
+                        </Row>
                     </div>
                 </div>
             </Row>

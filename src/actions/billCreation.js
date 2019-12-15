@@ -57,7 +57,13 @@ export const updateBill = (requestParams) => {
             .then(
                 (resp) => {
                     if(resp.data.STATUS == 'ERROR') {
-                        let errorText = resp.data.ERROR;
+                        let errorText;
+                        if(typeof resp.data.ERROR == 'string')
+                            errorText = resp.data.ERROR;
+                        else if(typeof resp.data.MSG == 'string')
+                            errorText = resp.data.MSG;
+                        else
+                            errorText = 'UNKNOWN';
                         toast.error('Error in Updating the bill in pledgebook - ' + errorText);
                         dispatch({
                             type: 'BILL_UPDATION_ERROR',

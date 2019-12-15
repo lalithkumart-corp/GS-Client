@@ -45,3 +45,4 @@ export const ORNAMENT_LIST = `${config.proxy_protocol}://${config.proxy_api_host
 export const UPDATE_INTEREST_RATES = `${config.proxy_protocol}://${config.proxy_api_host}:${config.proxy_api_port}/${config.restApiRoot}/Interests/update-rate-of-interest-details`;
 export const EXPORT_FULL_DB = `${config.proxy_protocol}://${config.proxy_api_host}:${config.proxy_api_port}/${config.restApiRoot}/Commons/export-db`;
 export const UPDATE_CUSTOMER_BY_MERGING = `${config.proxy_protocol}://${config.proxy_api_host}:${config.proxy_api_port}/${config.restApiRoot}/Customers/update-by-merging`;
+export const UPDATE_CUSTOMER_STATUS = `${config.proxy_protocol}://${config.proxy_api_host}:${config.proxy_api_port}/${config.restApiRoot}/Customers/update-status`;
