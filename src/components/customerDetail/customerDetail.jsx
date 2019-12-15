@@ -24,7 +24,7 @@ class CustomerDetail extends Component {
                 cname: '',
                 fgname: '',
                 hashKey: '',
-                onlyIsActive: true
+                onlyIsActive: false
             }
         }
         this.bindMethods();
