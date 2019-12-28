@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 
-import { Grid, Row, Col, FormGroup, ControlLabel, FormControl, HelpBlock, ButtonToolbar, Button } from 'react-bootstrap';
+import { Container, Row, Col, Form, FormGroup, FormLabel, FormControl, HelpBlock, ButtonToolbar, Button } from 'react-bootstrap';
 import { validateEmpty } from '../../utilities/validation';
 import _ from 'lodash';
 import { ClipLoader } from 'react-spinners';
@@ -96,7 +96,7 @@ class LoginPage extends Component {
 
     render() {
         return (
-            <Grid className='login-container'>
+            <Container className='login-container'>
                 <Row>
                     <Col className='login-card' mdOffset= {4} md={4}>
                         <Row>
@@ -105,7 +105,7 @@ class LoginPage extends Component {
                                     controlId="formBasicText"
                                     validationState= {this.state.formData.email.hasError ? "error" : "success"}
                                     >
-                                    <ControlLabel>Email</ControlLabel>
+                                    <FormLabel>Email</FormLabel>
                                     <FormControl
                                         type="text"
                                         value={this.state.formData.email.val}
@@ -114,7 +114,7 @@ class LoginPage extends Component {
                                         onFocus={(e) => this.onTouched('email')}
                                     />
                                     {this.state.formData.email.hasError && <FormControl.Feedback /> }
-                                    {this.state.formData.email.hasError && <HelpBlock>{this.state.formData.email.errorText}</HelpBlock>}
+                                    {this.state.formData.email.hasError && <Form.Text>{this.state.formData.email.errorText}</Form.Text>}
                                 </FormGroup> 
                             </Col>
                         </Row>
@@ -124,7 +124,7 @@ class LoginPage extends Component {
                                     controlId="formBasicText"
                                     validationState= {this.state.formData.password.hasError ? "error" : "success"}
                                     >
-                                    <ControlLabel>Password</ControlLabel>
+                                    <FormLabel>Password</FormLabel>
                                     <FormControl
                                         type="password"
                                         value={this.state.formData.password.val}
@@ -133,7 +133,7 @@ class LoginPage extends Component {
                                         onFocus={(e) => this.onTouched('password')}
                                     />
                                     {this.state.formData.email.hasError && <FormControl.Feedback /> }
-                                    {this.state.formData.password.hasError && <HelpBlock>{this.state.formData.password.errorText}</HelpBlock>}
+                                    {this.state.formData.password.hasError && <Form.Text>{this.state.formData.password.errorText}</Form.Text>}
                                 </FormGroup> 
                             </Col>
                         </Row>
@@ -155,7 +155,7 @@ class LoginPage extends Component {
                         </Row>
                     </Col>
                 </Row>
-            </Grid>
+            </Container>
         );
     }
 }

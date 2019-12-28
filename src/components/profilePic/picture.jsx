@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import Webcam from 'react-webcam';
 import { defaultPictureState } from '../billcreate/helper';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { Grid, Row, Col, FormGroup, ControlLabel, FormControl, HelpBlock, InputGroup, Button, Glyphicon } from 'react-bootstrap';
+import { Row, Col, FormGroup, FormLabel, FormControl, HelpBlock, InputGroup, Button, Glyphicon } from 'react-bootstrap';
 import { convertBufferToBase64 } from '../../utilities/utility';
 import ImageZoom from 'react-medium-image-zoom';
 

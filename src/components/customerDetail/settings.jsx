@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Grid, Row, Col, FormGroup, ControlLabel, FormControl, HelpBlock, InputGroup, Button, Glyphicon, Tabs, Tab } from 'react-bootstrap';
+import { Container, Row, Col, FormGroup, FormLabel, FormControl, HelpBlock, InputGroup, Button, Glyphicon, Tabs, Tab } from 'react-bootstrap';
 import { PLEDGEBOOK_METADATA, UPDATE_CUSTOMER_BY_MERGING, UPDATE_CUSTOMER_STATUS } from '../../core/sitemap';
 import { getAccessToken } from '../../core/storage';
 import axios from 'axios';
@@ -20,7 +20,7 @@ export default class Settings extends Component {
     }
     
     componentWillReceiveProps(nextProps) {
-        let disableCheckcboxTicked = disableCheckcboxTicked;
+        let disableCheckcboxTicked = this.state.disableCheckcboxTicked;
         if(nextProps.selectedCust)
             disableCheckcboxTicked = nextProps.selectedCust.custStatus?false:true;
         this.setState({disableCheckcboxTicked: disableCheckcboxTicked, billHistory: nextProps.billHistory, custDetail: nextProps.selectedCust, mergetoCustomerHashkey: null, mergeToCustomerInfo: null});
@@ -147,7 +147,7 @@ export default class Settings extends Component {
                             </Row>
                             {
                                 this.state.mergeToCustomerInfo && 
-                                <Row className='mergeto-custinfo'>
+                                <Col className='mergeto-custinfo'>
                                     <Row className='mergeto-custinfo-field'>
                                         <Col xs={3} md={3} className='lightgrey'>CustomerKey:</Col><Col xs={3} md={3}>{this.state.mergeToCustomerInfo.hashKey}</Col>
                                     </Row>
@@ -181,7 +181,7 @@ export default class Settings extends Component {
                                     <Row>
                                         <input type='button' className='gs-button' style={{marginLeft: '10px'}} value='Confirm Update' onClick={this.onConfirmUpdate}/>
                                     </Row>
-                                </Row>
+                                </Col>
                             }
                         </div>
                     </div>

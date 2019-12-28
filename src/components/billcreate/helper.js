@@ -26,7 +26,7 @@ export const buildRequestParams = (thatState = {}) => {
     let state = {...thatState}; //for preventing reference issue  
     state.selectedCustomer = state.selectedCustomer || {};  
     let params = {
-        date: state.formData.date.inputVal.replace('T', ' ').slice(0,23),
+        date: state.formData.date._inputVal.replace('T', ' ').slice(0,23),
         billSeries: state.formData.billseries.inputVal,
         billNo: state.formData.billno.inputVal, //_getBillNo(thatState),
         amount: state.formData.amount.inputVal,
@@ -50,7 +50,7 @@ export const buildRequestParamsForUpdate = (thatState = {}) => {
     let state = {...thatState}; //for preventing reference issue
     state.selectedCustomer = state.selectedCustomer || {};
     let params = {
-        date: state.formData.date.inputVal.replace('T', ' ').slice(0,23),
+        date: state.formData.date._inputVal.replace('T', ' ').slice(0,23),
         billSeries: state.formData.billseries.inputVal,
         billNo: state.formData.billno.inputVal, //_getBillNo(thatState),     
         amount: state.formData.amount.inputVal,

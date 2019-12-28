@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import './pledgebookExportPopup.css';
 import { PLEDGEBOOK_EXPORT } from '../../core/sitemap';
 import { convertToLocalTime, dateFormatter } from '../../utilities/utility';
-import { Grid, Row, Col, FormGroup, ControlLabel, FormControl, HelpBlock, InputGroup, Button, Glyphicon, Radio } from 'react-bootstrap';
+import { Container, Row, Col, FormGroup, FormLabel, FormControl, HelpBlock, InputGroup, Button, Glyphicon, FormCheck } from 'react-bootstrap';
 import axios from 'axios';
 import { getAccessToken } from '../../core/storage';
 import DateRangePicker from '../dateRangePicker/dataRangePicker';
@@ -79,9 +79,9 @@ export default class PledgebookExportPopup extends Component {
                 </Row>
                 <Row className='gs-card margin-top-30'>
                     <Col className='gs-card-content'>
-                        <Radio name='billstatus' checked={this.state.billStatusFlag=='all'} value='all' onChange={(e) => this.onChangeBillStatusFlag(e, 'all')}>All</Radio>
-                        <Radio name='billstatus' checked={this.state.billStatusFlag=='pending'} value='pending' onChange={(e) => this.onChangeBillStatusFlag(e, 'pending')}>Pending</Radio>
-                        <Radio name='billstatus' checked={this.state.billStatusFlag=='closed'} value='closed' onChange={(e) => this.onChangeBillStatusFlag(e, 'closed')}>Closed</Radio>
+                        <FormCheck type='radio' name='billstatus' checked={this.state.billStatusFlag=='all'} value='all' onChange={(e) => this.onChangeBillStatusFlag(e, 'all')}>All</FormCheck>
+                        <FormCheck type='radio' name='billstatus' checked={this.state.billStatusFlag=='pending'} value='pending' onChange={(e) => this.onChangeBillStatusFlag(e, 'pending')}>Pending</FormCheck>
+                        <FormCheck type='radio' name='billstatus' checked={this.state.billStatusFlag=='closed'} value='closed' onChange={(e) => this.onChangeBillStatusFlag(e, 'closed')}>Closed</FormCheck>
                     </Col>
                 </Row>
                 <Row>

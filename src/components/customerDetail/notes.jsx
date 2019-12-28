@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Grid, Row, Col, FormGroup, ControlLabel, FormControl, HelpBlock, InputGroup, Button, Glyphicon, Tabs, Tab } from 'react-bootstrap';
+import { Container, Row, Col, FormGroup, FormLabel, FormControl, HelpBlock, InputGroup, Button, Glyphicon, Tabs, Tab } from 'react-bootstrap';
 import { getAccessToken } from '../../core/storage';
 import axios from 'axios';
 import { FETCH_NOTES }  from '../../core/sitemap';
@@ -105,7 +105,7 @@ class Notes extends Component {
 
     render() {
         return (
-            <Grid className='notes-main-container'>
+            <Container className='notes-main-container'>
                 <Row>
                     <h4>Customer's:</h4>
                     {this.getCustomRemarks()}
@@ -114,7 +114,7 @@ class Notes extends Component {
                     <h4>Collected from all Bills:</h4>
                     {this.getRemarksByBill()}
                 </Row>
-            </Grid>
+            </Container>
         )
     }
 }

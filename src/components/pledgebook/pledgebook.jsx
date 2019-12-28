@@ -3,7 +3,7 @@ import { getPendingBills, setRefreshFlag } from '../../actions/pledgebook';
 import { parseResponse } from './helper';
 import { connect } from 'react-redux';
 import _ from 'lodash';
-import { Grid, Row, Col, FormGroup, ControlLabel, FormControl, HelpBlock, InputGroup, Button, Glyphicon, Radio } from 'react-bootstrap';
+import { Container, Row, Col, FormGroup, FormLabel, FormControl, HelpBlock, InputGroup, Button, Glyphicon, FormCheck } from 'react-bootstrap';
 import moment from 'moment';
 import './pledgebook.css';
 import CommonModal from '../common-modal/commonModal.jsx';
@@ -108,9 +108,9 @@ class Pledgebook extends Component {
                                             //arrowStyle={{ opacity: 0.7 }}
                                         >                                        
                                             <div className='status-popover-content' onChange={this.onStatusPopoverChange}>
-                                                <Radio name='billstatus' checked={this.state.billDisplayFlag=='all'} value='all'>All</Radio>
-                                                <Radio name='billstatus' checked={this.state.billDisplayFlag=='pending'} value='pending'>Pending</Radio>
-                                                <Radio name='billstatus' checked={this.state.billDisplayFlag=='closed'} value='closed'>Closed</Radio>
+                                                <FormCheck type='radio' name='billstatus' checked={this.state.billDisplayFlag=='all'} value='all'>All</FormCheck>
+                                                <FormCheck type='radio' name='billstatus' checked={this.state.billDisplayFlag=='pending'} value='pending'>Pending</FormCheck>
+                                                <FormCheck type='radio' name='billstatus' checked={this.state.billDisplayFlag=='closed'} value='closed'>Closed</FormCheck>
                                                 <input 
                                                     type="button"
                                                     className='gs-button'
@@ -455,8 +455,8 @@ class Pledgebook extends Component {
                             <thead>
                                 <tr>
                                     <td>Orn Name</td>
-                                    <td>Gross Wt</td>
-                                    <td>Net Wt</td>
+                                    <td>G-Wt</td>
+                                    <td>N-Wt</td>
                                     <td>Specs</td>
                                     <td>Qty</td>
                                 </tr>
@@ -505,7 +505,7 @@ class Pledgebook extends Component {
 
     render() {                    
         return (
-            <Grid className="pledgebook-page-content">
+            <Container className="pledgebook-page-content">
                 <Row className='first-row'>
                     <Col xs={6}>
                         <p style={{fontSize: "20px"}}>Pledgebook</p>
@@ -603,7 +603,7 @@ class Pledgebook extends Component {
                 <CommonModal modalOpen={this.state.displayExportPopup} secClass="export-pledgebook-popup" handleClose={this.handleExportPopupClose}>
                     <PledgebookExportPopup handleClose={this.handleExportPopupClose}/>
                 </CommonModal>
-            </Grid>
+            </Container>
         )
     }
 }

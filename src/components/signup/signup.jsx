@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import {Grid, Row, Col, FormControl, FormGroup, ControlLabel, InputGroup} from 'react-bootstrap';
+import {Row, Col, FormControl, FormGroup, FormLabel, InputGroup, Container} from 'react-bootstrap';
 import { DoublyLinkedList } from '../../utilities/doublyLinkedList';
 import './signup.css';
 import { toast } from 'react-toastify';
@@ -221,7 +221,7 @@ export default class SignUpPage extends Component {
     }
     render() {
         return (
-            <Grid className='signup-grid-container'>
+            <Container className='signup-grid-container'>
                 <Row>
                     <Col md={12} sm={12} className='header-container'>
                         <p className='header'>Create an Account</p>
@@ -234,7 +234,7 @@ export default class SignUpPage extends Component {
                                 <FormGroup
                                     validationState= {this.state.formData.email.hasError ? "error" :null}
                                     >
-                                    <ControlLabel>Email Id</ControlLabel>
+                                    <FormLabel>Email Id</FormLabel>
                                     <InputGroup>
                                         {/* <InputGroup.Addon readOnly={this.state.loading}>{this.state.formData.email.inputVal}</InputGroup.Addon> */}
                                         <FormControl
@@ -257,7 +257,7 @@ export default class SignUpPage extends Component {
                                 <FormGroup
                                     validationState= {this.state.formData.password.hasError ? "error" :null}
                                     >
-                                    <ControlLabel>Password</ControlLabel>
+                                    <FormLabel>Password</FormLabel>
                                     <InputGroup>
                                         {/* <InputGroup.Addon readOnly={this.state.loading}>{this.state.formData.password.inputVal}</InputGroup.Addon> */}
                                         <FormControl
@@ -278,7 +278,7 @@ export default class SignUpPage extends Component {
                                 <FormGroup
                                     validationState= {this.state.formData.confirmPassword.hasError ? "error" :null}
                                     >
-                                    <ControlLabel>Confirm Password</ControlLabel>
+                                    <FormLabel>Confirm Password</FormLabel>
                                     <InputGroup>
                                         {/* <InputGroup.Addon readOnly={this.state.loading}>{this.state.formData.confirmPassword.inputVal}</InputGroup.Addon> */}
                                         <FormControl
@@ -301,7 +301,7 @@ export default class SignUpPage extends Component {
                                 <FormGroup
                                     validationState= {this.state.formData.name.hasError ? "error" :null}
                                     >
-                                    <ControlLabel>Name</ControlLabel>
+                                    <FormLabel>Name</FormLabel>
                                     <InputGroup>
                                         {/* <InputGroup.Addon readOnly={this.state.loading}>{this.state.formData.name.inputVal}</InputGroup.Addon> */}
                                         <FormControl
@@ -322,7 +322,7 @@ export default class SignUpPage extends Component {
                                 <FormGroup
                                     validationState= {this.state.formData.guardianName.hasError ? "error" :null}
                                     >
-                                    <ControlLabel>Guardian Name</ControlLabel>
+                                    <FormLabel>Guardian Name</FormLabel>
                                     <InputGroup>
                                         {/* <InputGroup.Addon readOnly={this.state.loading}>{this.state.formData.guardianName.inputVal}</InputGroup.Addon> */}
                                         <FormControl
@@ -345,7 +345,7 @@ export default class SignUpPage extends Component {
                                 <FormGroup
                                     validationState= {this.state.formData.storeName.hasError ? "error" :null}
                                     >
-                                    <ControlLabel>Store Name</ControlLabel>
+                                    <FormLabel>Store Name</FormLabel>
                                     <InputGroup>
                                         {/* <InputGroup.Addon readOnly={this.state.loading}>{this.state.formData.storeName.inputVal}</InputGroup.Addon> */}
                                         <FormControl
@@ -366,7 +366,7 @@ export default class SignUpPage extends Component {
                                 <FormGroup
                                     validationState= {this.state.formData.phone.hasError ? "error" :null}
                                     >
-                                    <ControlLabel>Phone</ControlLabel>
+                                    <FormLabel>Phone</FormLabel>
                                     <InputGroup>
                                         {/* <InputGroup.Addon readOnly={this.state.loading}>{this.state.formData.phone.inputVal}</InputGroup.Addon> */}
                                         <FormControl
@@ -392,7 +392,7 @@ export default class SignUpPage extends Component {
                 <Row className='footer-container'>
                     <input type='button' className='gs-button' value='Register' onKeyUp={(e) => this.handleKeyUp(e, {currElmKey: 'register'})} />
                 </Row>
-            </Grid>
+            </Container>
         )
     }
 }

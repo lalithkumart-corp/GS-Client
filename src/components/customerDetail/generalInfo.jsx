@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Grid, Row, Col, FormGroup, ControlLabel, FormControl, HelpBlock, InputGroup, Button, Glyphicon, Tabs, Tab } from 'react-bootstrap';
+import { Container, Row, Col, FormGroup, FormLabel, FormControl, HelpBlock, InputGroup, Button, Glyphicon, Tabs, Tab } from 'react-bootstrap';
 import { DoublyLinkedList } from '../../utilities/doublyLinkedList';
 import { defaultPictureState, getPicData } from '../billcreate/helper';
 import { SAVE_BASE64_IMAGE_AND_GET_ID, SAVE_BINARY_IMAGE_AND_GET_ID, DEL_IMAGE_BY_ID } from '../../core/sitemap';
@@ -11,7 +11,8 @@ import Picture from '../profilePic/picture';
 import { toast } from 'react-toastify';
 import _ from 'lodash';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import Autosuggest, { ItemAdapter } from 'react-bootstrap-autosuggest' //https://affinipay.github.io/react-bootstrap-autosuggest/#playground
+//import Autosuggest, { ItemAdapter } from 'react-bootstrap-autosuggest' //https://affinipay.github.io/react-bootstrap-autosuggest/#playground
+import * as ReactAutosuggest from 'react-autosuggest';
 import { Collapse } from 'react-collapse';
 import sh from 'shorthash';
 import DetailsEditDialog from '../billcreate/detailsEditDialog';
@@ -45,7 +46,8 @@ class GeneralInfo extends Component {
                     currCustomerInputKey: '',
                     currCustomerInputField: '',
                     currCustomerInputVal: '',
-                    list: []
+                    list: [],
+                    limitedList: []
                 }
             },
             showMoreInputs: false
@@ -200,19 +202,61 @@ class GeneralInfo extends Component {
         }        
     }
 
+    reactAutosuggestControls = {
+        onSuggestionsFetchRequested: ({value}) => {
+            let newState = {...this.state};
+            var lowerCaseVal = value.toLowerCase();
+            let suggestionsList = this.state.formData.moreDetails.list.filter(aSuggestion => aSuggestion.toLowerCase().indexOf(lowerCaseVal) != -1);
+            suggestionsList = suggestionsList.slice(0, 35);
+            newState.formData.moreDetails.limitedList = suggestionsList;
+            this.setState(newState);
+        },
+        onSuggestionSelected: (event, { suggestion, suggestionValue, suggestionIndex, sectionIndex, method }, identifier, options) => {
+            this.autuSuggestionControls.onChange(suggestion, 'moreCustomerDetailsField');
+        },
+        getSuggestionValue: (suggestion, identifier) => {
+            return suggestion;
+        },
+        renderSuggestion: (suggestion, identifier) => {
+            let theDom;
+            theDom = (
+                <div className='react-auto-suggest-list-item'>
+                    <span>{suggestion}</span>
+                </div>
+            );
+            return theDom;
+        }
+    }
+
     getMoreElmnsContainer() {
         let getCustomerInforAdderDom = () => {
             return (                
                 <Row>
                     <Col xs={12} className='font-weight-bold'>Customer Information</Col>
                     <Col xs={6} md={6}>
-                        <Autosuggest
+                        {/* <Autosuggest
                             datalist={this.state.formData.moreDetails.list}
                             placeholder="select any key"
                             itemAdapter={CustomerInfoAdaptor.instance}
                             valueIsItem={true}
                             value={this.state.formData.moreDetails.currCustomerInputField}
                             onChange={ (val) => this.autuSuggestionControls.onChange(val, 'moreCustomerDetailsField') }
+                        /> */}
+
+                        <ReactAutosuggest
+                            suggestions={this.state.formData.moreDetails.limitedList}
+                            onSuggestionsFetchRequested={({value}) => this.reactAutosuggestControls.onSuggestionsFetchRequested({value})}
+                            // onSuggestionsClearRequested={this.reactAutosuggestControls.onSuggestionsClearRequested}
+                            getSuggestionValue={(suggestion, e) => this.reactAutosuggestControls.getSuggestionValue(suggestion, 'moreDetails')}
+                            renderSuggestion={(suggestion) => this.reactAutosuggestControls.renderSuggestion(suggestion, 'moreDetails')}
+                            onSuggestionSelected={(event, { suggestion, suggestionValue, suggestionIndex, sectionIndex, method}) => this.reactAutosuggestControls.onSuggestionSelected(event, { suggestion, suggestionValue, suggestionIndex, sectionIndex, method }, 'ornItem')}
+                            inputProps={{
+                                placeholder: 'Type ...',
+                                value: this.state.formData.moreDetails.currCustomerInputField,
+                                onChange: (e, {newValue, method}) => this.reactAutosuggestControls.onChange(e, {newValue, method}, 'moreDetails'),
+                                //onKeyUp: (e) => this.reactAutosuggestControls.onKeyUp(e, {currElmKey: 'moreDetails'}),
+                                className: "react-autosuggest__input"
+                            }}
                         />
                     </Col>
                     <Col xs={6} md={6}>
@@ -365,13 +409,13 @@ class GeneralInfo extends Component {
 
     render() {
         return (
-            <Grid>
+            <Container>
                 <Row>
                     <Col xs={6} md={6}>
                         <Row>
                             <Col xs={12} md={12}>
                                 <FormGroup>
-                                    <ControlLabel>Name</ControlLabel>
+                                    <FormLabel>Name</FormLabel>
                                     <FormControl
                                         type="text"
                                         placeholder="Enter text"
@@ -388,7 +432,7 @@ class GeneralInfo extends Component {
                         <Row>
                             <Col xs={12} md={12}>
                                 <FormGroup>
-                                    <ControlLabel>Guardian Name</ControlLabel>
+                                    <FormLabel>Guardian Name</FormLabel>
                                     <FormControl
                                         type="text"
                                         placeholder="Enter text"
@@ -405,7 +449,7 @@ class GeneralInfo extends Component {
                         <Row>
                             <Col xs={12} md={12}>
                                 <FormGroup>
-                                    <ControlLabel>Address</ControlLabel>
+                                    <FormLabel>Address</FormLabel>
                                     <FormControl
                                         type="text"
                                         placeholder="Enter text"
@@ -421,7 +465,7 @@ class GeneralInfo extends Component {
                         <Row>
                             <Col xs={12} md={12}>
                                 <FormGroup>
-                                    <ControlLabel>Place</ControlLabel>
+                                    <FormLabel>Place</FormLabel>
                                     <FormControl
                                         type="text"
                                         placeholder="Enter text"
@@ -445,7 +489,7 @@ class GeneralInfo extends Component {
                 <Row>
                 <Col xs={6} md={6}>
                         <FormGroup>
-                            <ControlLabel>City</ControlLabel>
+                            <FormLabel>City</FormLabel>
                             <FormControl
                                 type="text"
                                 placeholder="Enter text"
@@ -459,7 +503,7 @@ class GeneralInfo extends Component {
                     </Col>
                     <Col xs={6} md={6}>
                         <FormGroup>
-                            <ControlLabel>Pincode</ControlLabel>
+                            <FormLabel>Pincode</FormLabel>
                             <FormControl
                                 type="text"
                                 placeholder="Enter text"
@@ -475,7 +519,7 @@ class GeneralInfo extends Component {
                 <Row>
                     <Col xs={6} md={6}>
                         <FormGroup>
-                            <ControlLabel>Mobile</ControlLabel>
+                            <FormLabel>Mobile</FormLabel>
                             <FormControl
                                 type="text"
                                 placeholder="Enter text"
@@ -489,7 +533,7 @@ class GeneralInfo extends Component {
                     </Col>
                     <Col xs={6} md={6}>
                         <FormGroup>
-                            <ControlLabel>Mobile 2</ControlLabel>
+                            <FormLabel>Mobile 2</FormLabel>
                             <FormControl
                                 type="text"
                                 placeholder="Enter text"
@@ -521,18 +565,18 @@ class GeneralInfo extends Component {
                 <CommonModal modalOpen={this.state.editModalOpen} handleClose={this.handleEditModalClose} secClass='detail-edit-modal'>
                     <DetailsEditDialog data={this.state.editDetailsData} onUpdate={this.updateDetail}/>
                 </CommonModal>
-            </Grid>
+            </Container>
         )
     }
 }
 export default GeneralInfo;
 
-class CustomerInfoAdaptor extends ItemAdapter {
-    renderItem(item) {
-        return (
-            <div className='list-item'>
-                <span>{item.value}</span>
-            </div>
-        )
-    }
-}
+// class CustomerInfoAdaptor extends ItemAdapter {
+//     renderItem(item) {
+//         return (
+//             <div className='list-item'>
+//                 <span>{item.value}</span>
+//             </div>
+//         )
+//     }
+// }

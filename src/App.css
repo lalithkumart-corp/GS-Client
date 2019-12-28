@@ -1,3 +1,6 @@
+html {
+  font-size: 14px;
+}
 .App {
   text-align: center;
 }
@@ -207,3 +210,10 @@
   border-bottom-right-radius: 0;
 }
 /* END: React-Autosuggest css */
+
+
+/* START: Fixing, Bootstrap issue (due to different versions exist among diff npm */
+.tab-content>.active.show {
+  opacity: 1;
+}
+/* END: ootstrap issue (due to different versions exist among diff npm */

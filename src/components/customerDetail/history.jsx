@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Grid, Row, Col, FormGroup, ControlLabel, FormControl, HelpBlock, InputGroup, Button, Glyphicon, Tabs, Tab } from 'react-bootstrap';
+import { Container, Row, Col, FormGroup, FormLabel, FormControl, HelpBlock, InputGroup, Button, Glyphicon, Tabs, Tab } from 'react-bootstrap';
 import GSTable from '../gs-table/GSTable';
 import _ from 'lodash';
 import ImageZoom from 'react-medium-image-zoom';
@@ -202,12 +202,12 @@ class History extends Component {
     }
     render() {        
         return (
-            <Grid>
+            <Container>
                 <Row>
                     <span className='total-bill-count-span'>Total Bills: <b>{this.state.totalBillCount}</b></span>                
-                    <Tabs defaultActiveKey="pending">
+                    <Tabs defaultActiveKey="pending" variant='pills'>
                         <Tab eventKey="pending" title={
-                                                    <p>Pending Bills {this.getBillCountIcon(this.state.parsedBillHistory.pendingBills.length)}</p>
+                                                    <span>Pending Bills {this.getBillCountIcon(this.state.parsedBillHistory.pendingBills.length)}</span>
                                                 } >
                             <GSTable 
                                 columns={this.state.columns}
@@ -217,7 +217,7 @@ class History extends Component {
                             />
                         </Tab>
                         <Tab eventKey="closed" title={
-                                                <p>Closed Bills {this.getBillCountIcon(this.state.parsedBillHistory.closedBills.length)}</p>
+                                                <span>Closed Bills {this.getBillCountIcon(this.state.parsedBillHistory.closedBills.length)}</span>
                                                 } >
                             <GSTable 
                                 columns={this.state.columns2}
@@ -230,7 +230,7 @@ class History extends Component {
 
                     
                 </Row>
-            </Grid>
+            </Container>
         )
     }
 }

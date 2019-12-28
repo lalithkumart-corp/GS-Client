@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { getBillNoFromDB } from '../../../actions/billCreation';
-import { Grid, Row, Col } from 'react-bootstrap';
+import { Row, Col } from 'react-bootstrap';
 import { UPDATE_BILL_NO_SETTINGS } from '../../../core/sitemap';
 import { getAccessToken } from '../../../core/storage';
 import axios from 'axios';

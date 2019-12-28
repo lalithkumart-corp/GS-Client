@@ -55,23 +55,23 @@
     display: inline-block;
 }
 .orn-display-dom thead tr {
-    border: 1px dashed;
-    background-color: grey;
-    color: white;
+    border: 1px solid lightgrey;
+    /* background-color: grey;
+    color: white; */
 }
 
 .orn-display-dom thead tr td {
     padding: 4px 5px 4px 6px;
-    border-right: 1px dashed;   
+    border-right: 1px solid lightgrey;   
 }
 
 .orn-display-dom tbody tr {
-    border: 1px dashed;
+    border: 1px solid lightgrey;
 }
 
 .orn-display-dom tbody tr td {
     padding: 4px 5px 4px 6px;
-    border-right: 1px dashed;
+    border-right: 1px solid lightgrey;
 }
 
 .orn-display-dom tbody tr.even {

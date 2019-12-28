@@ -86,11 +86,9 @@ export default class BillHistoryView extends Component {
     }
     render() {
         return (
-            <Row>
-                <Col smOffset={1} xsOffset={1} sm={7} xs={7} className="no-padding">
-                    {this.getOrnHistoryDiv()}
-                </Col>
-            </Row>
+            <Col sm={{span: 7, offset: 1}} xs={{span: 7, offset: 1}} className="no-padding">
+                {this.getOrnHistoryDiv()}
+            </Col>
         )
     }
 }

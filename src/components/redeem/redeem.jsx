@@ -1,9 +1,11 @@
 import React, { Component } from 'react';
-import { Grid, Row, Col, FormGroup, ControlLabel, FormControl, HelpBlock, InputGroup, Button, Glyphicon } from 'react-bootstrap';
-import Autosuggest, { ItemAdapter } from 'react-bootstrap-autosuggest';
+import { Container, Row, Col, FormGroup, FormLabel, FormControl, HelpBlock, InputGroup, Button, Glyphicon } from 'react-bootstrap';
+//import Autosuggest, { ItemAdapter } from 'react-bootstrap-autosuggest';
+import * as ReactAutosuggest from 'react-autosuggest';
 import { DoublyLinkedList } from '../../utilities/doublyLinkedList';
 import { getDateInUTC } from '../../utilities/utility';
-import DatePicker from 'react-16-bootstrap-date-picker';
+//import DatePicker from 'react-16-bootstrap-date-picker';
+import DatePicker from 'react-datepicker';
 import { GET_PENDING_BILL_NOS, GET_BILL_DETAILS, REDEEM_PENDING_BILLS } from '../../core/sitemap';
 import { getAccessToken } from '../../core/storage';
 import axios from 'axios';
@@ -13,9 +15,10 @@ import _ from 'lodash';
 import moment from 'moment';
 import { getInterestRate } from '../../utilities/utility';
 import { calculateData, calculateInterestBasedOnRate, getRequestParams } from './helper';
+import 'bootstrap/dist/css/bootstrap.min.css';
 
 let domList = new DoublyLinkedList();
-domList.add('billInputBox', {type: 'autosuggest', enabled: true});
+domList.add('billInputBox', {type: 'rautosuggest', enabled: true});
 // domList.add('date', {type: 'autosuggest', enabled: false});
 domList.add('submitBtn', {type: 'defaultInput', enabled: true});
 
@@ -28,18 +31,26 @@ class Redeem extends Component {
         this.domElmns = {};
         this.state = {
             date: {
-                inputVal: new Date().toISOString(),
+                inputVal: new Date().toISOString(), //ISO string
                 _inputVal: moment().format('DD/MM/YYYY')
             },
-            filteredBillNoList: [],
+            filteredBillNoList: ['loading'],
             totalBillNoList: [],
-            fetchingBillNoList: true
-        }        
+            fetchingBillNoList: true,
+            formData: {
+                billNo: {
+                    inputVal: ''
+                }
+            }
+        };
+        this.autuSuggestionControls.onChange = this.autuSuggestionControls.onChange.bind(this);
+        this.reactAutosuggestControls.onSuggestionsFetchRequested = this.reactAutosuggestControls.onSuggestionsFetchRequested.bind(this);
     }
     async componentDidMount() {
         this.getBillNos();
         let rates = await getInterestRate();
-        this.setState({interestRates: rates});        
+        console.log('-------49');
+        this.setState({interestRates: rates});
     }
     /* START: API related methods */
     getBillNos() {
@@ -48,6 +59,7 @@ class Redeem extends Component {
             .then(
                 (successResp) => {
                     let list = successResp.data.list;
+                    console.log('-------59');
                     this.setState({totalBillNoList: list, fetchingBillNoList: false});                    
                     this.transferFocus(null, 'submitBtn', 'previous');
                 },
@@ -72,14 +84,17 @@ class Redeem extends Component {
                     if(successResp.data && successResp.data && successResp.data.billDetails && successResp.data.billDetails[0]){
                         let selectedBillData = successResp.data.billDetails[0];
                         selectedBillData = this.parseResponse(selectedBillData);
+                        console.log('-------84');
                         this.setState({selectedBillData: selectedBillData, billNotFound: false});
                         this.transferFocus(null, 'billInputBox');
                     }else{
+                        console.log('-------88');
                         this.setState({selectedBillData: null, billNotFound: true});
                         toast.error(`${billNo} Bill Data not found or might be redeemed already`);
                     }
                 },
                 (errResp) => {
+                    console.log('-------94');
                     this.setState({selectedBillData: null, error: true});
                     toast.error('Error in fetching the bill details');
                     console.log(errResp);
@@ -87,6 +102,7 @@ class Redeem extends Component {
             )
             .catch(
                 (exception) => {
+                    console.log('------102');
                     this.setState({selectedBillData: null, error: true});
                     toast.error('Exception occured in fetching the billDetails');
                     console.log(exception)
@@ -95,13 +111,19 @@ class Redeem extends Component {
     }
     /* END: API related methods */
     autuSuggestionControls = {
-        onChange: (val,identifier) => {
-            this.setState({billno: val});
+        onChange: async (billnoVal, identifier) => {
+            console.log(billnoVal, 'Before state update>>>>>>>', this.state.formData.billNo.inputVal);
+            let newState = {...this.state};
+            newState.formData.billNo.inputVal = billnoVal;
+            newState.lalith = billnoVal;
+            console.log('-------116');
+            this.setState(newState, () => {console.log('CALLBACK', this.state.lalith, this.state.formData.billNo.inputVal)});
+            console.log('After state update<<<<<<<', this.state.formData.billNo.inputVal);
         },
         onBillNoSearch: (val) => {
             let newState = {...this.state};
             let limit = 10;
-            let currListSize = 0;            
+            let currListSize = 0;
 
             newState.filteredBillNoList = [];
             _.each(newState.totalBillNoList, (aBillNo, index) => {                
@@ -115,17 +137,46 @@ class Redeem extends Component {
                     currListSize++;
                 }
             });
+            console.log('-------137', newState.lalith, newState.billno);
             this.setState(newState);
         },
         onSelect: (val, identifier) => {
         
         }        
     }
+
+    reactAutosuggestControls = {
+        onSuggestionsFetchRequested: ({value}) => {
+            this.autuSuggestionControls.onBillNoSearch(value);
+        },
+        onSuggestionSelected: (event, { suggestion, suggestionValue, suggestionIndex, sectionIndex, method }, identifier, options) => {
+            this.autuSuggestionControls.onChange(suggestion, identifier);
+        },
+        getSuggestionValue: (suggestion, identifier) => {
+            return suggestion;
+        },
+        renderSuggestion: (suggestion, identifier) => {
+            let theDom = (
+                <div className='react-auto-suggest-list-item'>
+                    <span>{suggestion}</span>
+                </div>
+            );
+            return theDom;
+        },
+        handleKeyUp: (e, options) => {
+            this.handleKeyUp(e, options);
+        },
+        onChange: async (event, { newValue, method }, identifier) => {
+            await this.autuSuggestionControls.onChange(newValue, identifier);
+            console.log('RAS- after update state', this.state.formData.billNo.inputVal);
+        }
+    }
     inputControls = {
         onChange: (e, val, identifier, options) => {
             let newState = {...this.state};
             switch(identifier) {
                 case 'date':
+                    debugger;
                     newState.date.inputVal = getDateInUTC(val);
                     newState.date._inputVal = moment(val).format('DD/MM/YYYY');
                     break;
@@ -140,6 +191,7 @@ class Redeem extends Component {
                     newState.selectedBillData._totalValue = newState.selectedBillData.Amount + newState.selectedBillData._totalInterestValue - newState.selectedBillData._discountValue;
                     break;
             }
+            console.log('-------190');
             this.setState(newState);
         }
     }
@@ -155,6 +207,7 @@ class Redeem extends Component {
         switch(options.currElmKey) {
             case 'billno':
                 let billNo = e.target.value;
+                console.log('-------206');
                 this.setState({selectedBillNo: billNo});
                 if(billNo)
                     this.fetchBillData(billNo);
@@ -163,16 +216,18 @@ class Redeem extends Component {
         }
         if(canTransferFocus)
             this.transferFocus(e, options.currElmKey, options.traverseDirection);
+
+        console.log('-------ENTER key pressed');
     }
     
     handleSpaceKeyPress(e, options) {
-
+        console.log('-------Space key pressed');
     }
 
     handleSubmit() {
         let params = {...this.state.selectedBillData};
         if(window.confirm(`${params.BillNo} Do you really want to close this bill ?`)) {
-            params.closingDate = this.state.date.inputVal;
+            params.closingDate = this.state.date.inputVal; // ISO string
             let requestParams = getRequestParams(params);
             let accessToken = getAccessToken();
             let apiParams = {requestParams, accessToken};
@@ -203,11 +258,12 @@ class Redeem extends Component {
         //     defaultBillNoPrefix = this.props.billCreation.billSeries + '.';
 
         //Adding the last typed bill number's prefix(bill series..ie: if A.4521 is last typed bill no, then 4521 nly be cleared, and "A." will be remained
-        let existingBillNo = this.state.billno || '';
+        let existingBillNo = this.state.formData.billNo.inputVal || '';
         let splits = existingBillNo.split('.');
         let nextBillnoSuggestion = '';
         if(splits.length > 1)
             nextBillnoSuggestion= splits[0]+'.' || '';
+        console.log('-------252');
         await this.setState({billno: nextBillnoSuggestion, selectedBillData: null, fetchingBillNoList: true});
         this.transferFocus(null, 'submitBtn', 'previous');
         this.getBillNos();
@@ -229,54 +285,56 @@ class Redeem extends Component {
     getBillDataView() {
         let billData = this.state.selectedBillData;
         return (
-            <Row>
-                <Col xs={6} xsOffset={2} className='bill-data-container'>
-                    <Row className='head-section'>
-                        <Col xs={6} className='padding-b-5 padding-t-5'>
-                            {billData.BillNo}
-                        </Col>
-                        <Col xs={6} className='padding-b-5 padding-t-5 text-align-right'>
-                            <span>{moment.utc(billData.Date).local().format('DD-MM-YYYY')}</span>
-                        </Col>
-                    </Row>
-                    <Row>
-                        <Col xs={12} className='padding-b-5 padding-t-10'>
-                            <b>{billData.Name}</b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; c/o  &nbsp;&nbsp;&nbsp;<b>{billData.GaurdianName}</b>
-                        </Col>
-                        <Col xs={12} className='padding-b-5 padding-t-3'>
-                            <span style={{fontSize: "13px"}}>{billData.Address+ ', ' + billData.Place}</span>
-                        </Col>
-                        <Col xs={12} className='padding-b-5 padding-t-3'>
-                            <span style={{fontSize: "13px"}}>{billData.City+ ', ' + billData.Pincode}</span>
-                        </Col>
-                    </Row>
-                    <Row className='orn-section'>
-                        {
-                            ( ()=> {
-                                let ornData = JSON.parse(billData.Orn);
-                                let rows = [];
-                                _.each(ornData, (anOrnDatum, index) => {
-                                    rows.push(
-                                        <li>
-                                            <span>{anOrnDatum.ornNos}</span>&nbsp;&nbsp;
-                                            <span><i>{anOrnDatum.ornItem}</i></span>&nbsp;&nbsp;
-                                            {/* <span className='font-family-monospace' style={{fontSize: '12px'}}>{anOrnDatum.ornNWt}gm</span>&nbsp; */}
-                                        </li>
-                                    )
-                                });                                
-                                return <ul>{rows}</ul>;
-                            } )()
-                        }
-                    </Row>
-                    <Row className='tail-section'>
-                        <Col xs={6} className='font-family-monospace gram-field'><b>{this.getTotalNWt(billData.Orn)}</b>&nbsp;gm</Col>
-                        <Col xs={6} className='amount-field text-align-right'>{billData.Amount}</Col>
-                    </Row>
-                </Col>
-                <Col xs={4}>
-                    <img className='image-viewer' src={billData._picture.holder.imgSrc} />
-                </Col>
-            </Row>
+            <Col xs={12} md={12}>
+                <Row>
+                    <Col xs={{span: 6, offset: 2}} md={{span: 6, offset: 2}} className='bill-data-container'>
+                        <Row className='head-section'>
+                            <Col xs={6} className='padding-b-5 padding-t-5'>
+                                {billData.BillNo}
+                            </Col>
+                            <Col xs={6} className='padding-b-5 padding-t-5 text-align-right'>
+                                <span>{moment.utc(billData.Date).local().format('DD-MM-YYYY')}</span>
+                            </Col>
+                        </Row>
+                        <Row>
+                            <Col xs={12} className='padding-b-5 padding-t-10'>
+                                <b>{billData.Name}</b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; c/o  &nbsp;&nbsp;&nbsp;<b>{billData.GaurdianName}</b>
+                            </Col>
+                            <Col xs={12} className='padding-b-5 padding-t-3'>
+                                <span style={{fontSize: "13px"}}>{billData.Address+ ', ' + billData.Place}</span>
+                            </Col>
+                            <Col xs={12} className='padding-b-5 padding-t-3'>
+                                <span style={{fontSize: "13px"}}>{billData.City+ ', ' + billData.Pincode}</span>
+                            </Col>
+                        </Row>
+                        <Row className='orn-section'>
+                            {
+                                ( ()=> {
+                                    let ornData = JSON.parse(billData.Orn);
+                                    let rows = [];
+                                    _.each(ornData, (anOrnDatum, index) => {
+                                        rows.push(
+                                            <li>
+                                                <span>{anOrnDatum.ornNos}</span>&nbsp;&nbsp;
+                                                <span><i>{anOrnDatum.ornItem}</i></span>&nbsp;&nbsp;
+                                                {/* <span className='font-family-monospace' style={{fontSize: '12px'}}>{anOrnDatum.ornNWt}gm</span>&nbsp; */}
+                                            </li>
+                                        )
+                                    });                                
+                                    return <ul>{rows}</ul>;
+                                } )()
+                            }
+                        </Row>
+                        <Row className='tail-section'>
+                            <Col xs={6} className='font-family-monospace gram-field'><b>{this.getTotalNWt(billData.Orn)}</b>&nbsp;gm</Col>
+                            <Col xs={6} className='amount-field text-align-right'>{billData.Amount}</Col>
+                        </Row>
+                    </Col>
+                    <Col xs={4}>
+                        <img className='image-viewer' src={billData._picture.holder.imgSrc} />
+                    </Col>
+                </Row>
+            </Col>
         )
     }
 
@@ -284,8 +342,9 @@ class Redeem extends Component {
         let selectedBillData = this.state.selectedBillData;
         let theDom;
         if(this.state.selectedBillData) {
-            theDom = <Row>
-                <Col xs={6} xsOffset={2}>
+            theDom = <Col xs={12} md={12}>
+            <Row>
+                <Col xs={{ span: 6, offset: 2}} xs={{span: 6, offset: 2}}>
                     <Row>
                         <Col xs={8} style={{fontSize: "13px"}}>
                             <Row>
@@ -313,7 +372,7 @@ class Redeem extends Component {
                         </Col> 
                     </Row>
                     <Row>
-                        <Col xs={4} xsOffset={8}>
+                        <Col xs={{span: 4, offset: 8}} xs={{span: 4, offset: 8}}>
                             <Col xs={8}>
                                 <p className='text-align-right lightgrey'>Discount</p>
                             </Col>
@@ -323,7 +382,7 @@ class Redeem extends Component {
                         </Col>
                     </Row>
                     <Row>
-                        <Col xs={4} xsOffset={8}>
+                        <Col xs={{span: 4, offset: 8}} xs={{span: 4, offset: 8}}>
                             <Col xs={8}>
                                 <p className='text-align-right lightgrey'>Total</p>
                             </Col>
@@ -334,10 +393,11 @@ class Redeem extends Component {
                     </Row>
                 </Col>
             </Row>
+        </Col>
         } else {
-            <Row>
-
-            </Row>
+            theDom = <Col><Row>
+                
+            </Row></Col>
         }
         return theDom;
     }
@@ -357,8 +417,8 @@ class Redeem extends Component {
     getSubmitDom() {
         let theDom;
         if(this.state.selectedBillData) {
-            theDom = <Row>
-                        <Col xs={6} xsOffset={2} className='text-align-right'>
+            theDom = <Col><Row>
+                        <Col xs={{span: 6, offset: 2}} md={{span: 6, offset: 2}} className='text-align-right'>
                             <input 
                                 type='button'
                                 className='gs-button bordered'
@@ -367,7 +427,7 @@ class Redeem extends Component {
                                 value='Redeem'                    
                                 />
                         </Col>
-                    </Row>;
+                    </Row></Col>;
         } else {
             theDom = <Row></Row>;
         }
@@ -436,7 +496,7 @@ class Redeem extends Component {
             if(nextElm) {                
                 if(nextElm.type == 'autosuggest'){                    
                     this.domElmns[nextElm.key].refs.input.focus();
-                } else if (nextElm.type == 'defaultInput' || nextElm.type == 'formControl'){                    
+                } else if (nextElm.type == 'defaultInput' || nextElm.type == 'formControl' || nextElm.type == 'rautosuggest'){
                     this.domElmns[nextElm.key].focus();
                 }
             }
@@ -449,46 +509,71 @@ class Redeem extends Component {
 
     render() {
         return(
-            <Grid className='bill-closing-container'>
-                <Col>
-                    <Row className='main-input-container'>
-                        <Col xs={2}>
-                            <Autosuggest
-                                datalist={this.state.filteredBillNoList}
-                                placeholder="Bill No"
-                                value={this.state.billno}
-                                onChange={ (val) => {this.autuSuggestionControls.onChange(val, 'billno') }}
-                                ref = {(domElm) => { this.domElmns.billInputBox = domElm; }}
-                                onKeyUp = {(e) => this.handleKeyUp(e, {currElmKey: 'billno'}) }
-                                readOnly={this.state.fetchingBillNoList}
-                                showToggle={false}
-                                onSearch={(e) => this.autuSuggestionControls.onBillNoSearch(e)}
-                                // onSelect = { (val) => {this.autuSuggestionControls.onSelect(val, 'billno')}}
-                            />
-                        </Col>
-                        <Col xs={2}>
-                            <DatePicker
-                                id="example-datepicker" 
-                                value={this.state.date.inputVal} 
-                                onChange={(fullDateVal, dateVal) => {this.inputControls.onChange(null, fullDateVal, 'date')} }
-                                ref = {(domElm) => { this.domElmns.date = domElm; }}
-                                onKeyUp = {(e) => this.handleKeyUp(e, {currElmKey: 'date'}) }
-                                readOnly={this.state.loading}
-                                dateFormat="DD-MM-YYYY"
-                            />
-                        </Col>
-                    </Row>
-                    <Row className='bill-display-container'>
-                        {this.getDisplayDom()}
-                    </Row>
-                    <Row className='calculation-container'>
-                        {this.getCalculationDom()}
-                    </Row>
-                    <Row className='submit-container'>
-                        {this.getSubmitDom()}
-                    </Row>
-                </Col>                                
-            </Grid>
+            <Container className='bill-closing-container'>
+                <Row className='main-input-container'>
+                    <Col xs={2}>
+                        {/* <Autosuggest
+                            datalist={this.state.filteredBillNoList}
+                            placeholder="Bill No"
+                            value={this.state.billno}
+                            onChange={ (val) => {this.autuSuggestionControls.onChange(val, 'billno') }}
+                            ref = {(domElm) => { this.domElmns.billInputBox = domElm; }}
+                            onKeyUp = {(e) => this.handleKeyUp(e, {currElmKey: 'billno'}) }
+                            readOnly={this.state.fetchingBillNoList}
+                            showToggle={false}
+                            onSearch={(e) => this.autuSuggestionControls.onBillNoSearch(e)}
+                            // onSelect = { (val) => {this.autuSuggestionControls.onSelect(val, 'billno')}}
+                        /> */}
+
+                        <ReactAutosuggest
+                            suggestions={this.state.filteredBillNoList}
+                            onSuggestionsFetchRequested={({value}) => this.reactAutosuggestControls.onSuggestionsFetchRequested({value}, 'billno')}
+                            // onSuggestionsClearRequested={this.reactAutosuggestControls.onSuggestionsClearRequested}
+                            getSuggestionValue={(suggestion, e) => this.reactAutosuggestControls.getSuggestionValue(suggestion, 'billno')}
+                            renderSuggestion={(suggestion) => this.reactAutosuggestControls.renderSuggestion(suggestion, 'billno')}
+                            onSuggestionSelected={(event, { suggestion, suggestionValue, suggestionIndex, sectionIndex, method}) => this.reactAutosuggestControls.onSuggestionSelected(event, { suggestion, suggestionValue, suggestionIndex, sectionIndex, method }, 'billno')}
+                            inputProps={{
+                                placeholder: 'Type ...',
+                                value: this.state.formData.billNo.inputVal || '',
+                                onChange: (e, {newValue, method}) => this.reactAutosuggestControls.onChange(e, {newValue, method}, 'billno'),//this.setState({billno: e.target.value}),
+                                onKeyUp: (e) => this.reactAutosuggestControls.handleKeyUp(e, {currElmKey: 'billno'}),
+                                className: "react-autosuggest__input"
+                            }}
+                            ref = {(domElm) => { this.domElmns.billInputBox = domElm?domElm.input:domElm; }}
+                        />
+                        {/* <input type='text' value={this.state.temp} onChange={(e) => this.setState({temp: e.target.value})} /> */}
+                    </Col>
+                    <Col xs={2}>
+                        {/* <DatePicker
+                            id="example-datepicker" 
+                            value={this.state.date.inputVal} 
+                            onChange={(fullDateVal, dateVal) => {this.inputControls.onChange(null, fullDateVal, 'date')} }
+                            ref = {(domElm) => { this.domElmns.date = domElm; }}
+                            onKeyUp = {(e) => this.handleKeyUp(e, {currElmKey: 'date'}) }
+                            readOnly={this.state.loading}
+                            dateFormat="yyyy/MM/dd"
+                        /> */}
+
+                        <DatePicker
+                            id="example-datepicker" 
+                            value={this.state.date._inputVal} 
+                            onChange={(fullDateVal, dateVal) => {this.inputControls.onChange(null, fullDateVal, 'date')} }
+                            ref = {(domElm) => { this.domElmns.date = domElm; }}
+                            onKeyUp = {(e) => this.handleKeyUp(e, {currElmKey: 'date'}) }
+                            readOnly={this.state.loading}
+                        />
+                    </Col>
+                </Row>
+                <Row className='bill-display-container'>
+                    {this.getDisplayDom()}
+                </Row>
+                <Row className='calculation-container'>
+                    {this.getCalculationDom()}
+                </Row>
+                <Row className='submit-container'>
+                    {this.getSubmitDom()}
+                </Row>
+            </Container>
         )
     }
 }
