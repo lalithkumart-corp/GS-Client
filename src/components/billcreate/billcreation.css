@@ -76,7 +76,7 @@
     border: 1px solid lightgray;
     min-height: 160px;
     /* margin-top: 25px; */
-    padding: 0;
+    padding: 0 !important;
     margin-left: 15px;
 }
 .ornament-dom-container .form-control {
@@ -92,12 +92,12 @@
 .ornament-dom-container .serial-no-header {
     padding: 4px;
 }
-/* .ornament-dom-container .serial-no-col {
-    background-color: #e9ecef;
-    color: #495057;
+.ornament-dom-container .serial-no-col {
+    /* background-color: #e9ecef;
+    color: #495057; */
     text-align: right;
     padding-right: 10px;
-} */
+}
 
 /* .orn-input-cell:focus,
 .orn-input-cell:hover, */
@@ -228,9 +228,6 @@
     padding-right: 0;
     background-color: transparent;
     border: none;
-}
-.react-auto-suggest-list-item {
-    padding: 2px 5px;
 }
 
 .bill-creation-container .second-row,

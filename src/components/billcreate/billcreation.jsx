@@ -36,7 +36,7 @@ const SPACE_KEY = 32;
 var domList = new DoublyLinkedList();
 domList.add('billno', {type: 'formControl', enabled: true});
 domList.add('amount', {type: 'formControl', enabled: true});
-domList.add('date', {type: 'datePicker', enabled: true});
+domList.add('date', {type: 'datePicker', enabled: false});
 domList.add('cname', {type: 'rautosuggest', enabled: true});
 domList.add('gaurdianName', {type: 'rautosuggest', enabled: true});
 domList.add('address', {type: 'rautosuggest', enabled: true});
@@ -1259,7 +1259,7 @@ class BillCreation extends Component {
                             renderSuggestion={(suggestion) => this.renderSuggestion(suggestion, 'ornSpec')}
                             onSuggestionSelected={(event, { suggestion, suggestionValue, suggestionIndex, sectionIndex, method}) => this.reactAutosuggestControls.onSuggestionSelected(event, { suggestion, suggestionValue, suggestionIndex, sectionIndex, method }, 'ornSpec', {serialNo: serialNo})}
                             inputProps={{
-                                placeholder: 'Type specs if any',
+                                placeholder: '',
                                 value: this.state.formData.orn.inputs[serialNo].ornSpec,
                                 onChange: (e, {newValue, method}) => this.reactAutosuggestControls.onChange(e, {newValue, method}, 'ornSpec', {serialNo: serialNo}),
                                 onKeyUp: (e) => this.reactAutosuggestControls.onKeyUp(e, {currElmKey: 'ornSpec'+ serialNo, isOrnSpecsInput: true, nextSerialNo: serialNo+1}),
@@ -1727,7 +1727,7 @@ class BillCreation extends Component {
                                     getSuggestionValue={(suggestion, e) => this.getSuggestionValue(suggestion)}
                                     renderSuggestion={this.renderSuggestion}
                                     inputProps={{
-                                        placeholder: 'Type mobile',
+                                        placeholder: 'Mobile No...',
                                         value: this.getInputValFromCustomSources('mobile'),
                                         onChange: (e, {newValue, method}) => this.reactAutosuggestControls.onChange(e, {newValue, method}, 'mobile'),
                                         onKeyUp: (e) => this.reactAutosuggestControls.onKeyUp(e, {currElmKey: 'mobile'}),

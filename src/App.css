@@ -209,6 +209,10 @@ html {
   border-bottom-left-radius: 0;
   border-bottom-right-radius: 0;
 }
+
+.react-auto-suggest-list-item {
+  padding: 5px 10px;
+}
 /* END: React-Autosuggest css */
 
 
