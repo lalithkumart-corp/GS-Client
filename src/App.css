@@ -216,4 +216,10 @@ html {
 .tab-content>.active.show {
   opacity: 1;
 }
+div[validationstate="error"] {
+  color: #f92626;
+}
+input[type=checkbox], input[type=radio] {
+  margin-left: -1.25rem;
+}
 /* END: ootstrap issue (due to different versions exist among diff npm */

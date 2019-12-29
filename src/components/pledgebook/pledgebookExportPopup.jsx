@@ -2,10 +2,11 @@ import React, { Component } from 'react';
 import './pledgebookExportPopup.css';
 import { PLEDGEBOOK_EXPORT } from '../../core/sitemap';
 import { convertToLocalTime, dateFormatter } from '../../utilities/utility';
-import { Container, Row, Col, FormGroup, FormLabel, FormControl, HelpBlock, InputGroup, Button, Glyphicon, FormCheck } from 'react-bootstrap';
+import { Container, Form, Row, Col, FormGroup, FormLabel, FormControl, HelpBlock, InputGroup, Button, Glyphicon, FormCheck } from 'react-bootstrap';
 import axios from 'axios';
 import { getAccessToken } from '../../core/storage';
 import DateRangePicker from '../dateRangePicker/dataRangePicker';
+import GSCheckbox from '../ui/gs-checkbox/checkbox';
 
 export default class PledgebookExportPopup extends Component {
     constructor(props) {        
@@ -79,9 +80,17 @@ export default class PledgebookExportPopup extends Component {
                 </Row>
                 <Row className='gs-card margin-top-30'>
                     <Col className='gs-card-content'>
-                        <FormCheck type='radio' name='billstatus' checked={this.state.billStatusFlag=='all'} value='all' onChange={(e) => this.onChangeBillStatusFlag(e, 'all')}>All</FormCheck>
-                        <FormCheck type='radio' name='billstatus' checked={this.state.billStatusFlag=='pending'} value='pending' onChange={(e) => this.onChangeBillStatusFlag(e, 'pending')}>Pending</FormCheck>
-                        <FormCheck type='radio' name='billstatus' checked={this.state.billStatusFlag=='closed'} value='closed' onChange={(e) => this.onChangeBillStatusFlag(e, 'closed')}>Closed</FormCheck>
+                        <Form>
+                            <Form.Group>
+                                <Form.Check id='billstatus-1' type='radio' name='billstatus' checked={this.state.billStatusFlag=='all'} value='all' onChange={(e) => this.onChangeBillStatusFlag(e, 'all')} label='All'/>
+                            </Form.Group>
+                            <Form.Group>
+                                <Form.Check id='billstatus-2' type='radio' name='billstatus' checked={this.state.billStatusFlag=='pending'} value='pending' onChange={(e) => this.onChangeBillStatusFlag(e, 'pending')} label='Pending'/>
+                            </Form.Group>
+                            <Form.Group>
+                                <Form.Check id='billstatus-3' type='radio' name='billstatus' checked={this.state.billStatusFlag=='closed'} value='closed' onChange={(e) => this.onChangeBillStatusFlag(e, 'closed')} label='Closed'/>
+                            </Form.Group>
+                        </Form>
                     </Col>
                 </Row>
                 <Row>

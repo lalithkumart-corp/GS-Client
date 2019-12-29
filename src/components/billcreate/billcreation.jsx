@@ -1533,7 +1533,8 @@ class BillCreation extends Component {
                                         value: this.state.formData.cname.inputVal,
                                         onChange: (e, {newValue, method}) => this.reactAutosuggestControls.onChange(e, {newValue, method}, 'cname'),
                                         onKeyUp: (e) => this.reactAutosuggestControls.onKeyUp(e, {currElmKey: 'cname'}),
-                                        className: "react-autosuggest__input cust-name"
+                                        className: "react-autosuggest__input cust-name",
+                                        readOnly: this.props.billCreation.loading
                                     }}
                                     ref = {(domElm) => { this.domElmns.cname = domElm?domElm.input:domElm; }}
                                 />
