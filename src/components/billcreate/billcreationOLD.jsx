@@ -5,14 +5,14 @@
 
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import { Container, Row, Col, Form, FormGroup, FormLabel, FormControl, HelpBlock, InputGroup, Button, Glyphicon } from 'react-bootstrap';
+import { Container, Row, Col, FormGroup, FormLabel, FormControl, HelpBlock, InputGroup, Button, Glyphicon } from 'react-bootstrap';
 import DatePicker from 'react-datepicker';
 //import DatePicker from 'react-16-bootstrap-date-picker';
 import 'react-datepicker/dist/react-datepicker.css';
 import './billcreation.css';
 import './picture-upload.css';
 import moment from 'moment';
-//import Autosuggest, { ItemAdapter } from 'react-bootstrap-autosuggest' //https://affinipay.github.io/react-bootstrap-autosuggest/#playground
+import Autosuggest, { ItemAdapter } from 'react-bootstrap-autosuggest' //https://affinipay.github.io/react-bootstrap-autosuggest/#playground
 import * as ReactAutosuggest from 'react-autosuggest';
 import _ from 'lodash';
 import axios from "axios";
@@ -36,22 +36,22 @@ const SPACE_KEY = 32;
 var domList = new DoublyLinkedList();
 domList.add('billno', {type: 'formControl', enabled: true});
 domList.add('amount', {type: 'formControl', enabled: true});
-domList.add('date', {type: 'datePicker', enabled: false});
+//domList.add('date', {type: 'datePicker', enabled: true});
 domList.add('cname', {type: 'rautosuggest', enabled: true});
-domList.add('gaurdianName', {type: 'rautosuggest', enabled: true});
-domList.add('address', {type: 'rautosuggest', enabled: true});
-domList.add('place', {type: 'rautosuggest', enabled: true});
-domList.add('city', {type: 'rautosuggest', enabled: true});
-domList.add('pincode', {type: 'rautosuggest', enabled: true});
-domList.add('mobile', {type: 'rautosuggest', enabled: true});
+domList.add('gaurdianName', {type: 'autosuggest', enabled: true});
+domList.add('address', {type: 'autosuggest', enabled: true});
+domList.add('place', {type: 'autosuggest', enabled: true});
+domList.add('city', {type: 'autosuggest', enabled: true});
+domList.add('pincode', {type: 'autosuggest', enabled: true});
+domList.add('mobile', {type: 'autosuggest', enabled: true});
 domList.add('moreDetailsHeader', {type: 'defaultInput', enabled: true});
-domList.add('moreCustomerDetailField', {type: 'rautosuggest', enabled: false});
+domList.add('moreCustomerDetailField', {type: 'autosuggest', enabled: false});
 domList.add('moreCustomerDetailValue', {type: 'formControl', enabled: false});
-domList.add('ornItem1', {type: 'rautosuggest', enabled: true});
+domList.add('ornItem1', {type: 'autosuggest', enabled: true});
 domList.add('ornNos1', {type: 'defaultInput', enabled: true});
 domList.add('ornGWt1', {type: 'defaultInput', enabled: true});
 domList.add('ornNWt1', {type: 'defaultInput', enabled: true});
-domList.add('ornSpec1', {type: 'rautosuggest', enabled: true});
+domList.add('ornSpec1', {type: 'autosuggest', enabled: true});
 domList.add('submitBtn', {type: 'defaultInput', enabled: true});
 domList.add('updateBtn', {type: 'defaultInput', enabled: false});
 
@@ -67,9 +67,9 @@ class BillCreation extends Component {
             showMoreInputs: false,             
             formData: {
                 date: {
-                    inputVal: moment().format('DD-MM-YYYY'),
+                    inputVal: new Date().toISOString(),
                     hasError: false,
-                    _inputVal: new Date().toISOString()
+                    inputVal1: moment()
                 },
                 billseries: {
                     inputVal: props.billCreation.billSeries,
@@ -92,38 +92,32 @@ class BillCreation extends Component {
                 gaurdianName: {
                     inputVal: '',
                     hasError: false,
-                    list: ['Loading...'],
-                    limitedList: ['Loading...']
+                    list: ['Loading...']
                 },
                 address: {
                     inputVal: '',
                     hasError: false,
-                    list: ['Loading...'],
-                    limitedList: ['Loading...']
+                    list: ['Loading...']
                 },
                 place: {
                     inputVal: '',
                     hasError: false,
-                    list: ['Loading...'],
-                    limitedList: ['Loading...']
+                    list: ['Loading...']
                 },
                 city: {
                     inputVal: '',
                     hasError: false,
-                    list: ['Loading...'],
-                    limitedList: ['Loading...']
+                    list: ['Loading...']
                 },
                 pincode: {
                     inputVal: '',
                     hasError: false,
-                    list: ['Loading...'],
-                    limitedList: ['Loading...']
+                    list: ['Loading...']              
                 },
                 mobile: {
                     inputVal: '',
                     hasError: false,
-                    list: ['Loading...'],
-                    limitedList: ['Loading...']
+                    list: ['Loading...']
                 },
                 orn: {                    
                     inputs: {
@@ -136,9 +130,7 @@ class BillCreation extends Component {
                         }
                     },
                     list: ['Loading...'],
-                    limitedList: ['Loading...'],
                     specList: ['Damage', 'Bend', 'Tread', 'Without Thiruvani', 'Stone missing', 'Full Stone'], //TODO: Map with Database
-                    specLimitedList: [],
                     rowCount: 1
                 },
                 moreDetails: {
@@ -147,8 +139,7 @@ class BillCreation extends Component {
                     currCustomerInputVal: '',
                     customerInfo: [],                    
                     billRemarks: '',
-                    list: ['Aadhar card', 'Pan Card', 'License Number', 'SBI Bank Account Number', 'Email'],
-                    limitedList: []
+                    list: ['Aadhar card', 'Pan Card', 'License Number', 'SBI Bank Account Number', 'Email']
                 },
                 selectedCustomer: {}                
             },
@@ -170,7 +161,7 @@ class BillCreation extends Component {
             this.updateDomList('resetOrnTableRows', this.state);
             this.updateDomList('ornInputFields');
         }
-        this.domElmns["amount"].focus();
+       // this.domElmns["amount"].focus();
     }
 
     componentWillReceiveProps(nextProps) {
@@ -185,7 +176,7 @@ class BillCreation extends Component {
             this.props.updateClearEntriesFlag(false);
         }
         this.setState(newState);
-        this.domElmns["amount"].focus();
+        //this.domElmns["amount"].focus();
     }
     /* END: Lifecycle methods */
 
@@ -443,12 +434,12 @@ class BillCreation extends Component {
 
     getInputValFromCustomSources(identifier) {
         let returnVal;
-        if(identifier == 'moreDetails')
+        if(identifier == 'moreDetails') {
             returnVal = this.state.formData[identifier].customerInfo;
-        else
-            returnVal = this.state.formData[identifier].inputVal;
-        
-        if(!this.state.formData[identifier].hasTextUpdated && this.state.selectedCustomer) {
+        }else {
+            returnVal = this.state.formData[identifier].inputVal;        
+        }
+        if(this.state.selectedCustomer) {
             
             if(identifier == 'cname') identifier = 'name';
             if(identifier == 'moreDetails') identifier = 'otherDetails';
@@ -516,42 +507,16 @@ class BillCreation extends Component {
         );
     }
     
-    getSuggestionValue = (suggestion, identifier) => {
-        if(identifier == 'cname')
-            return suggestion.name;    
-        else
-            return suggestion;
-    }
+    getSuggestionValue = suggestion => suggestion.name;
 
     // Use your imagination to render suggestions.
-    renderSuggestion = (suggestion, identifier) => {
-        let theDom;
-        switch(identifier) {
-            case 'cname':
-                theDom = (
-                    <div className="customer-list-item" id={suggestion.hashKey + 'parent'}>
-                        <div id={suggestion.hashKey+ '1'}><span className='customer-list-item-maindetail'>{suggestion.name}  <span  className='customer-list-item-maindetail' style={{"fontSize":"8px"}}>&nbsp;c/of &nbsp;&nbsp;</span> {suggestion.gaurdianName}</span></div>
-                        <div id={suggestion.hashKey+ '2'}><span className='customer-list-item-subdetail'>{suggestion.address}</span></div>
-                        <div id={suggestion.hashKey+ '3'}><span className='customer-list-item-subdetail'>{suggestion.place}, {suggestion.city} - {suggestion.pincode}</span></div>
-                    </div>
-                );
-                break;
-            case 'moreCustomerDetailsField':
-                theDom = (
-                    <div className='react-auto-suggest-list-item'>
-                        <span>{suggestion.value}</span>
-                    </div>
-                );
-                break;
-            default:
-                theDom = (
-                    <div className='react-auto-suggest-list-item'>
-                        <span>{suggestion}</span>
-                    </div>
-                )
-        }
-        return theDom;
-    }
+    renderSuggestion = suggestion => (
+        <div className="customer-list-item" id={suggestion.hashKey + 'parent'}>
+            <div id={suggestion.hashKey+ '1'}><span className='customer-list-item-maindetail'>{suggestion.name}  <span  className='customer-list-item-maindetail' style={{"fontSize":"8px"}}>&nbsp;c/of &nbsp;&nbsp;</span> {suggestion.gaurdianName}</span></div>
+            <div id={suggestion.hashKey+ '2'}><span className='customer-list-item-subdetail'>{suggestion.address}</span></div>
+            <div id={suggestion.hashKey+ '3'}><span className='customer-list-item-subdetail'>{suggestion.place}, {suggestion.city} - {suggestion.pincode}</span></div>
+        </div>
+    );
 
     getSelectedCustId = () => {
         //return this.state.selectedCustomer?this.state.selectedCustomer.customerId:"notfound";
@@ -598,11 +563,11 @@ class BillCreation extends Component {
                 let ornsCount = this.state.formData.orn.rowCount;
                 let iteration = 2; //start with adding up from second row in domList
                 while(iteration <= ornsCount) {
-                    domList.insertAfter('ornSpec'+(iteration-1), 'ornItem'+iteration, {type: 'rautosuggest', enabled: true});
+                    domList.insertAfter('ornSpec'+(iteration-1), 'ornItem'+iteration, {type: 'autosuggest', enabled: true});
                     domList.insertAfter('ornItem'+iteration, 'ornNos'+iteration, {type: 'defaultInput', enabled: true});
                     domList.insertAfter('ornNos'+iteration, 'ornGWt'+iteration, {type: 'defaultInput', enabled: true});
                     domList.insertAfter('ornGWt'+iteration, 'ornNWt'+iteration, {type: 'defaultInput', enabled: true});
-                    domList.insertAfter('ornNWt'+iteration, 'ornSpec'+iteration, {type: 'rautosuggest', enabled: true});
+                    domList.insertAfter('ornNWt'+iteration, 'ornSpec'+iteration, {type: 'autosuggest', enabled: true});
                     iteration++;
                 }
         }
@@ -627,17 +592,18 @@ class BillCreation extends Component {
             nextElm = this.getPrevElm(currentElmKey);
         try{
             if(nextElm) {
-                if(nextElm.value.indexOf('orn') !== 0) { //If not Orn Input field
-                    if(nextElm.type == 'autosuggest')
+                if(nextElm.value.indexOf('orn') !== 0) { //If not Orn Input field                
+                    if(nextElm.type == 'autosuggest' || nextElm.type == 'datePicker'){
                         this.domElmns[nextElm.key].refs.input.focus();
-                    else if(nextElm.type == 'datePicker')
-                        this.domElmns[nextElm.key].input.focus();
-                    else if (nextElm.type == 'rautosuggest' || nextElm.type == 'defaultInput' || nextElm.type == 'formControl')
+                    }else if (nextElm.type == 'defaultInput' || nextElm.type == 'formControl'){                    
                         this.domElmns[nextElm.key].focus();
-                } else { //Hanlding Orn Input fields
+                    } else if(nextElm.type == 'rautosuggest') {
+                        this.domElmns[nextElm.key].focus()
+                    }
+                } else { //Hanlding Orn Input fields                
                     if(nextElm.type == 'autosuggest')
                         this.domElmns.orn[nextElm.key].refs.input.focus();
-                    else if (nextElm.type == 'rautosuggest' || nextElm.type == 'defaultInput' || nextElm.type == 'formControl')
+                    else if (nextElm.type == 'defaultInput' || nextElm.type == 'formControl')
                         this.domElmns.orn[nextElm.key].focus();
                 }
             }
@@ -656,11 +622,11 @@ class BillCreation extends Component {
             newState.formData.orn.inputs[nextSerialNo] = {ornItem: '', ornGWt: '', ornNWt: '', ornSpec: '', ornNos: ''};
 
             let currentSerialNo = nextSerialNo-1;
-            domList.insertAfter('ornSpec'+currentSerialNo, 'ornItem'+nextSerialNo, {type: 'rautosuggest', enabled: true});
+            domList.insertAfter('ornSpec'+currentSerialNo, 'ornItem'+nextSerialNo, {type: 'autosuggest', enabled: true});
             domList.insertAfter('ornItem'+nextSerialNo, 'ornNos'+nextSerialNo, {type: 'defaultInput', enabled: true});
             domList.insertAfter('ornNos'+nextSerialNo, 'ornGWt'+nextSerialNo, {type: 'defaultInput', enabled: true});
             domList.insertAfter('ornGWt'+nextSerialNo, 'ornNWt'+nextSerialNo, {type: 'defaultInput', enabled: true});
-            domList.insertAfter('ornNWt'+nextSerialNo, 'ornSpec'+nextSerialNo, {type: 'rautosuggest', enabled: true});
+            domList.insertAfter('ornNWt'+nextSerialNo, 'ornSpec'+nextSerialNo, {type: 'autosuggest', enabled: true});
             
             await this.setState(newState);
         }
@@ -699,51 +665,32 @@ class BillCreation extends Component {
         this.props.hideEditDetailModal();
     }
 
-    async verifySelectedCustomerBy(identifier) {
+    verifySelectedCustomerByGName() {
         let newState = {...this.state};
-        if(!newState.formData[identifier].hasTextUpdated)
+        if(!newState.formData.gaurdianName.hasTextUpdated)
             return;
-        let valInState = newState.formData[identifier].inputVal || '';
-        valInState = valInState.toLowerCase();
-
-        let selectedCustomer = newState.selectedCustomer || {};
-        let valInSelectedCustomer = (selectedCustomer[identifier] || '').toLowerCase();
-        console.log('NOT RESET', valInState, valInSelectedCustomer);
-        if((valInState != valInSelectedCustomer)) {
-            console.log('RESETTING', valInState, valInSelectedCustomer);
-            newState.selectedCustomer = {};
-        }
-        await this.setState(newState);
-    }
-    async verifySelectedCustomerByGName() {
-        let newState = {...this.state};
-        // if(!newState.formData.gaurdianName.hasTextUpdated)
-        //     return;
         let gaurdianName = newState.formData.gaurdianName.inputVal || '';
         gaurdianName = gaurdianName.toLowerCase();
 
         let selectedCustomer = newState.selectedCustomer || {};
         let selCustGuardianName = (selectedCustomer.gaurdianName || '').toLowerCase();
         if((gaurdianName != selCustGuardianName)) {
-            console.log('RESETTING', gaurdianName, selCustGuardianName);
             newState.selectedCustomer = {};
-            await this.setState(newState);
-            console.log('RESETTED>>>>>>>.');
+            this.setState(newState);
         }
     }
 
-    async verifySelectedCustomerByAddr() {
+    verifySelectedCustomerByAddr() {
         let newState = {...this.state};
-        // if(!newState.formData.address.hasTextUpdated)
-        //     return;        
+        if(!newState.formData.address.hasTextUpdated)
+            return;        
         let address = newState.formData.address.inputVal || '';
         address = address.toLowerCase();
         let selectedCustomer = newState.selectedCustomer || {};
         let selCustAddress = (selectedCustomer.address || '').toLowerCase();
         if((address != selCustAddress)) {
-            console.log('RESETTING2');
             newState.selectedCustomer = {};
-            await this.setState(newState);
+            this.setState(newState);
         }
     }
 
@@ -827,20 +774,18 @@ class BillCreation extends Component {
             this.transferFocus(e, options.currElmKey);
         }
     }
-    handleKeyUp(e, options) {
-        e.persist();
+    handleKeyUp(e, options) {        
         if(e.keyCode == ENTER_KEY)
             this.handleEnterKeyPress(e, options);        
         else if(e.keyCode == SPACE_KEY)
             this.handleSpaceKeyPress(e, options);
 
     }
-    async handleEnterKeyPress(evt, options) {
-        await this.updateInputVal(evt, options);
+    async handleEnterKeyPress(e, options) {        
         if(options && options.isOrnSpecsInput && (this.canAppendNewRow(options))) {
-            await this.appendNewRow(evt, options.nextSerialNo);
+            await this.appendNewRow(e, options.nextSerialNo);
         } else if(options && options.isOrnItemInput) {
-            options = await this.checkOrnRowClearance(evt, options);
+            options = await this.checkOrnRowClearance(e, options);
         } else if(options && options.isOrnGwtInput) {
             this.fillNetWtValue(options.serialNo);
         } else if(options && options.isToAddMoreDetail) {
@@ -850,17 +795,15 @@ class BillCreation extends Component {
                 await this.updateDomList('disableMoreDetailValueDom');
             else
                 await this.updateDomList('enableMoreDetailValueDom');        
-        } else if(options && (options.currElmKey == 'gaurdianName' || options.currElmKey == 'address' || options.currElmKey == 'place' || options.currElmKey == 'city' || options.currElmKey == 'pincode')) {
-            await this.verifySelectedCustomerBy(options.currElmKey);
-        // } else if(options && options.isGuardianNameInput) {
-        //     await this.verifySelectedCustomerByGName();
-        // } else if(options && options.isAddressInput) {
-        //     await this.verifySelectedCustomerByAddr();
+        } else if(options && options.isGuardianNameInput) {
+            this.verifySelectedCustomerByGName();
+        } else if(options && options.isAddressInput) {
+            this.verifySelectedCustomerByAddr();
         }else if(options && options.isSubmitBtn) {
             this.handleSubmit();
         }
-        if(this.canTransferFocus(evt, options.currElmKey))
-            this.transferFocus(evt, options.currElmKey, options.traverseDirection);
+        if(this.canTransferFocus(e, options.currElmKey))
+            this.transferFocus(e, options.currElmKey, options.traverseDirection);
     }
 
     handleSpaceKeyPress(e, options) {
@@ -908,36 +851,24 @@ class BillCreation extends Component {
         await this.setState(newState);
     }
 
-    async updateInputVal(e, options) {
-        let newState = {...this.state};
-        if(options) {
-            if(options.currElmKey == 'gaurdianName' || options.currentElmKey == 'address'
-                || options.currElmKey == 'place' || options.currentElmKey == 'city'
-                || options.currentElmKey == 'pincode' ) {
-                newState.formData[options.currElmKey].inputVal = e.target.value;
-                this.setState(newState);
-            }
-        }
-    }
-
     autuSuggestionControls = {
         onChange: (val, identifier, options) => {                        
             let newState = {...this.state};
             if(identifier.indexOf('orn') == 0) { //starts with 'orn'
                 let inputs = newState.formData.orn.inputs;
-                inputs[options.serialNo] = inputs[options.serialNo] || {};
+                inputs[options.serialNo] = inputs[options.serialNo] || {};                
                 inputs[options.serialNo][identifier] = val;
             } else if(identifier == 'moreCustomerDetailsField') {
                 let anObj = this.parseCustomerDetailsVal(val);                
                 newState.formData.moreDetails.currCustomerInputField = anObj.value;
-                newState.formData.moreDetails.currCustomerInputKey = anObj.key;
+                newState.formData.moreDetails.currCustomerInputKey = anObj.key;                
             } else if(identifier == "cname"){
                 if(!val || typeof val == 'string') {
                     newState.formData[identifier].inputVal = val;
                     // this.updateSelectedCustomer({name: val});
                     newState.selectedCustomer = {};
                 } else {
-                    newState.formData[identifier].inputVal = val.name || '';
+                    newState.formData[identifier].inputVal = val.name || '';                
                     // this.updateSelectedCustomer(val);
                     newState.selectedCustomer = val;
                 }
@@ -979,45 +910,11 @@ class BillCreation extends Component {
     }
 
     reactAutosuggestControls = {
-        onSuggestionsFetchRequested: ({ value }, identifier) => {
+        onSuggestionsFetchRequested: ({ value }) => {
+            let suggestionsList = this.getCustomerListSuggestions(value);
             let newState = {...this.state};
-            let suggestionsList = [];
-            switch(identifier) {
-                case 'cname':
-                    suggestionsList = this.getCustomerListSuggestions(value);
-                    suggestionsList = suggestionsList.slice(0, 35);
-                    newState.formData.cname.limitedList = suggestionsList;                    
-                    break;
-                case 'gaurdianName':
-                case 'address':
-                case 'place':
-                case 'city':
-                case 'pincode':
-                case 'mobile':
-                    var lowerCaseVal = value.toLowerCase();
-                    suggestionsList = this.state.formData[identifier].list.filter(aSuggestion => aSuggestion.toLowerCase().slice(0, lowerCaseVal.length) === lowerCaseVal);
-                    suggestionsList = suggestionsList.slice(0, 35);
-                    newState.formData[identifier].limitedList = suggestionsList;
-                    break;
-                case 'moreDetails':
-                    var lowerCaseVal = value.toLowerCase();
-                    suggestionsList = this.state.formData[identifier].list.filter(aSuggestion => aSuggestion.value.toLowerCase().indexOf(lowerCaseVal) != -1);
-                    suggestionsList = suggestionsList.slice(0, 35);
-                    newState.formData[identifier].limitedList = suggestionsList;
-                    break;
-                case 'ornItem':
-                    var lowerCaseVal = value.toLowerCase();
-                    suggestionsList = this.state.formData.orn.list.filter(aSuggestion => aSuggestion.toLowerCase().indexOf(lowerCaseVal) != -1);
-                    suggestionsList = suggestionsList.slice(0, 35);
-                    newState.formData.orn.limitedList = suggestionsList;
-                    break;
-                case 'ornSpec':
-                    var lowerCaseVal = value.toLowerCase();
-                    suggestionsList = this.state.formData.orn.specList.filter(aSuggestion => aSuggestion.toLowerCase().indexOf(lowerCaseVal) != -1);
-                    suggestionsList = suggestionsList.slice(0, 35);
-                    newState.formData.orn.specLimitedList = suggestionsList;
-                    break;
-            }
+            suggestionsList = suggestionsList.slice(0, 35);
+            newState.formData.cname.limitedList = suggestionsList;
             this.setState(newState);
         },
         // onSuggestionsClearRequested: () => {
@@ -1028,62 +925,18 @@ class BillCreation extends Component {
         //     console.log(newState);
         //     this.setState(newState);
         // },
-        onChange: async (event, { newValue, method }, identifier, options) => {
+        onChange: (event, { newValue, method }) => {
             let newState = {...this.state};
-            switch(identifier) {
-                case 'cname':
-                    newState.formData.cname.inputVal = newValue;
-                    newState.formData[identifier].hasTextUpdated = true;
-                    console.log(newState);
-                    await this.setState(newState);
-                    console.log('RESSETED<<<<<', newState.selectedCustomer);
-                    break;
-                case 'gaurdianName':
-                case 'address':
-                case 'place':
-                case 'city':
-                case 'pincode':
-                case 'mobile':
-                case 'ornItem':
-                case 'ornSpec':
-                case 'moreCustomerDetailsField':
-                    this.autuSuggestionControls.onChange(newValue, identifier, options);
-                    break;
-            }
-            
+            newState.formData.cname.inputVal = newValue;
+            this.setState(newState);
         },
-        onKeyUp: (e, options) => {
-            e.persist();
-            if(e.keyCode == ENTER_KEY)
-                this.handleEnterKeyPress(e, options);
-            else if(e.keyCode == SPACE_KEY)
-                this.handleSpaceKeyPress(e, options);
+        onKeyUp: (event, options) => {
+            if(event.keyCode == ENTER_KEY)
+                this.handleEnterKeyPress(event, options);
         },
-        onSuggestionSelected: (event, { suggestion, suggestionValue, suggestionIndex, sectionIndex, method }, identifier, options) => {
+        onSuggestionSelected: (event, { suggestion, suggestionValue, suggestionIndex, sectionIndex, method }) => {
             let newState = {...this.state};
-            switch(identifier) {
-                case 'cname':
-                    newState.selectedCustomer = suggestion;
-                    newState.formData.gaurdianName.hasTextUpdated = false;
-                    newState.formData.address.hasTextUpdated = false;
-                    newState.formData.place.hasTextUpdated = false;
-                    newState.formData.city.hasTextUpdated = false;
-                    newState.formData.pincode.hasTextUpdated = false;
-                    newState.formData.mobile.hasTextUpdated = false;
-                    break;
-                case 'gaurdianName':
-                case 'address':
-                case 'place':
-                case 'city':
-                case 'pincode':
-                case 'mobile':                
-                case 'ornItem':
-                case 'ornSpec':
-                case 'moreCustomerDetailsField':
-                    this.autuSuggestionControls.onChange(suggestion, identifier, options);
-                    break;
-            }
-            
+            newState.selectedCustomer = suggestion;
             this.setState(newState);
         }
     }
@@ -1108,11 +961,7 @@ class BillCreation extends Component {
                     this.props.updateBillNoInStore(newState.formData.billseries.inputVal, val);
                     break;
                 case 'date':                    
-                    newState.formData[identifier].inputVal = moment(val).format('DD-MM-YYYY');
-                    newState.formData[identifier]._inputVal = getDateInUTC(val);
-                    setTimeout(() => {
-                        this.transferFocus(e, options.currElmKey, options.traverseDirection);
-                    }, 300);
+                    newState.formData[identifier].inputVal = getDateInUTC(val);
                     break;
                 case 'billRemarks':
                     newState.formData.moreDetails.billRemarks = val;
@@ -1161,8 +1010,8 @@ class BillCreation extends Component {
             return (
                 <thead>
                     <tr>
-                        <th className='serial-no-header'>No</th>
-                        <th>Orn</th>
+                        <th>S.No</th>
+                        <th>Orn Name</th>
                         <th>Nos</th>
                         <th>G-Wt</th>
                         <th>N-Wt</th>
@@ -1174,9 +1023,9 @@ class BillCreation extends Component {
         let getARow = (serialNo) => {
             return (
                 <tr key={serialNo+'-row'}>
-                    <td className='serial-no-col'>{serialNo}</td>
+                    <td>{serialNo}</td>
                     <td>
-                        {/* <Autosuggest
+                        <Autosuggest
                             datalist={this.state.formData.orn.list}
                             itemAdapter={CommonAdaptor.instance}
                             placeholder="Enter Ornament"
@@ -1186,22 +1035,6 @@ class BillCreation extends Component {
                             ref = {(domElm) => { this.domElmns.orn['ornItem'+ serialNo] = domElm; }}
                             onKeyUp = {(e) => this.handleKeyUp(e, {currElmKey: 'ornItem'+ serialNo, isOrnItemInput: true,  serialNo: serialNo}) }
                             readOnly={this.props.billCreation.loading}
-                        /> */}
-                        <ReactAutosuggest
-                            suggestions={this.state.formData.orn.limitedList}
-                            onSuggestionsFetchRequested={({value}) => this.reactAutosuggestControls.onSuggestionsFetchRequested({value}, 'ornItem')}
-                            // onSuggestionsClearRequested={this.reactAutosuggestControls.onSuggestionsClearRequested}
-                            getSuggestionValue={(suggestion, e) => this.getSuggestionValue(suggestion, 'ornItem')}
-                            renderSuggestion={(suggestion) => this.renderSuggestion(suggestion, 'ornItem')}
-                            onSuggestionSelected={(event, { suggestion, suggestionValue, suggestionIndex, sectionIndex, method}) => this.reactAutosuggestControls.onSuggestionSelected(event, { suggestion, suggestionValue, suggestionIndex, sectionIndex, method }, 'ornItem', {serialNo: serialNo})}
-                            inputProps={{
-                                placeholder: 'Type Orn name',
-                                value: this.state.formData.orn.inputs[serialNo].ornItem,
-                                onChange: (e, {newValue, method}) => this.reactAutosuggestControls.onChange(e, {newValue, method}, 'ornItem', {serialNo: serialNo}),
-                                onKeyUp: (e) => this.reactAutosuggestControls.onKeyUp(e, {currElmKey: 'ornItem'+ serialNo, isOrnItemInput: true,  serialNo: serialNo}),
-                                className: "react-autosuggest__input orn gs-input-cell"
-                            }}
-                            ref = {(domElm) => { this.domElmns.orn['ornItem'+ serialNo] = domElm?domElm.input:domElm; }}
                         />
                     </td>
                     <td>
@@ -1241,7 +1074,7 @@ class BillCreation extends Component {
                             />
                     </td>
                     <td>
-                        {/* <Autosuggest 
+                        <Autosuggest 
                             datalist={this.state.formData.orn.specList}
                             itemAdapter={CommonAdaptor.instance}
                             placeholder="Any Specification ?"
@@ -1250,23 +1083,7 @@ class BillCreation extends Component {
                             onKeyUp = {(e) => this.handleKeyUp(e, {currElmKey: 'ornSpec'+ serialNo, isOrnSpecsInput: true, nextSerialNo: serialNo+1}) }
                             onChange={ (val) => this.autuSuggestionControls.onChange(val, 'ornSpec', {serialNo: serialNo}) }
                             readOnly={this.props.billCreation.loading}
-                            /> */}
-                        <ReactAutosuggest
-                            suggestions={this.state.formData.orn.specLimitedList}
-                            onSuggestionsFetchRequested={({value}) => this.reactAutosuggestControls.onSuggestionsFetchRequested({value}, 'ornSpec')}
-                            // onSuggestionsClearRequested={this.reactAutosuggestControls.onSuggestionsClearRequested}
-                            getSuggestionValue={(suggestion, e) => this.getSuggestionValue(suggestion, 'ornSpec')}
-                            renderSuggestion={(suggestion) => this.renderSuggestion(suggestion, 'ornSpec')}
-                            onSuggestionSelected={(event, { suggestion, suggestionValue, suggestionIndex, sectionIndex, method}) => this.reactAutosuggestControls.onSuggestionSelected(event, { suggestion, suggestionValue, suggestionIndex, sectionIndex, method }, 'ornSpec', {serialNo: serialNo})}
-                            inputProps={{
-                                placeholder: '',
-                                value: this.state.formData.orn.inputs[serialNo].ornSpec,
-                                onChange: (e, {newValue, method}) => this.reactAutosuggestControls.onChange(e, {newValue, method}, 'ornSpec', {serialNo: serialNo}),
-                                onKeyUp: (e) => this.reactAutosuggestControls.onKeyUp(e, {currElmKey: 'ornSpec'+ serialNo, isOrnSpecsInput: true, nextSerialNo: serialNo+1}),
-                                className: "react-autosuggest__input orn spec gs-input-cell"
-                            }}
-                            ref = {(domElm) => { this.domElmns.orn['ornSpec' + serialNo] = domElm?domElm.input:domElm; }}
-                        />                            
+                            />
                     </td>
                 </tr>
             )
@@ -1296,7 +1113,7 @@ class BillCreation extends Component {
                 <Row>
                     <Col xs={12} className='font-weight-bold' style={{marginBottom: '5px'}}>Customer Information</Col>                    
                     <Col xs={6} md={6}>
-                        {/* <Autosuggest
+                        <Autosuggest
                             datalist={this.state.formData.moreDetails.list}
                             placeholder="select any key"
                             itemAdapter={CustomerInfoAdaptor.instance}
@@ -1306,22 +1123,6 @@ class BillCreation extends Component {
                             onKeyUp={(e) => this.handleKeyUp(e, {currElmKey: 'moreCustomerDetailField', isMoreDetailInputKey: true})} 
                             ref = {(domElm) => { this.domElmns.moreCustomerDetailField = domElm; }}
                             readOnly={this.props.billCreation.loading}                            
-                        /> */}
-                        <ReactAutosuggest
-                            suggestions={this.state.formData.moreDetails.limitedList}
-                            onSuggestionsFetchRequested={({value}) => this.reactAutosuggestControls.onSuggestionsFetchRequested({value}, 'moreDetails')}
-                            // onSuggestionsClearRequested={this.reactAutosuggestControls.onSuggestionsClearRequested}
-                            getSuggestionValue={(suggestion, e) => this.getSuggestionValue(suggestion, 'moreCustomerDetailsField')}
-                            renderSuggestion={(suggestion) => this.renderSuggestion(suggestion, 'moreCustomerDetailsField')}
-                            onSuggestionSelected={(event, { suggestion, suggestionValue, suggestionIndex, sectionIndex, method}) => this.reactAutosuggestControls.onSuggestionSelected(event, { suggestion, suggestionValue, suggestionIndex, sectionIndex, method }, 'moreCustomerDetailsField')}
-                            inputProps={{
-                                placeholder: '',
-                                value: this.state.formData.moreDetails.currCustomerInputField,
-                                onChange: (e, {newValue, method}) => this.reactAutosuggestControls.onChange(e, {newValue, method}, 'moreCustomerDetailsField'),
-                                onKeyUp: (e) => this.reactAutosuggestControls.onKeyUp(e, {currElmKey: 'moreCustomerDetailField', isMoreDetailInputKey: true}),
-                                className: "react-autosuggest__input morecustdetail"
-                            }}
-                            ref = {(domElm) => { this.domElmns.moreCustomerDetailField = domElm?domElm.input:domElm; }}
                         />
                     </Col>
                     <Col xs={6} md={6}>
@@ -1376,26 +1177,22 @@ class BillCreation extends Component {
             return (                
                 <Row className='bill-remarks-adder-dom'>
                     <Col xs={12} md={12}>
-                        <Form.Group>
-                            <InputGroup>
-                                <InputGroup.Prepend>
-                                    <InputGroup.Text>Bill Notes</InputGroup.Text>
-                                </InputGroup.Prepend>
-                                <FormControl as="textarea" 
-                                    placeholder="Type here..." 
-                                    value={this.state.formData.moreDetails.billRemarks} 
-                                    onChange={(e) => this.inputControls.onChange(null, e.target.value, "billRemarks")}
-                                    readOnly={this.props.billCreation.loading}
+                        <FormGroup controlId="bill-remarks-textarea">
+                            <FormLabel>Add Notes for this bill</FormLabel>
+                            <FormControl componentClass="textarea" 
+                                placeholder="Type here..." 
+                                value={this.state.formData.moreDetails.billRemarks} 
+                                onChange={(e) => this.inputControls.onChange(null, e.target.value, "billRemarks")}
+                                readOnly={this.props.billCreation.loading}
                                 />
-                            </InputGroup>
-                        </Form.Group>
+                        </FormGroup>
                     </Col>
                 </Row>
             )
         }
 
         return (
-            <Col xs={12}>
+            <span>
                 <div className='add-more-header'>
                     <input type='text' 
                         className='show-more'
@@ -1411,7 +1208,7 @@ class BillCreation extends Component {
                     {getCustomerInfoDisplayDom()}
                     {getBillRemarksDom()}
                 </Collapse>
-            </Col>
+            </span>
         );
     }
     /* END: DOM Getter's */    
@@ -1419,369 +1216,247 @@ class BillCreation extends Component {
     render(){
         return(
             <Container className="bill-creation-container">
-                <Form>
-                <Col className="left-pane" xs={8} md={8}>
-                    <Row>
-                        <Col xs={3} md={3}>
-                            <Form.Group
-                                validationState= {this.state.formData.billno.hasError ? "error" :null}
-                                >
-                                <Form.Label>Bill No</Form.Label>
-                                <InputGroup>
-                                    {/* <InputGroup.Addon readOnly={this.props.billCreation.loading}>{this.state.formData.billseries.inputVal}</InputGroup.Addon> */}
-                                    <InputGroup.Prepend>
-                                        <InputGroup.Text id="basic-addon1">{this.state.formData.billseries.inputVal}</InputGroup.Text>
-                                    </InputGroup.Prepend>
-                                    <FormControl
-                                        type="text"
-                                        value={this.state.formData.billno.inputVal}
-                                        placeholder=""
-                                        className="bill-number-field"
-                                        onChange={(e) => this.inputControls.onChange(null, e.target.value, "billno")}
-                                        onFocus={(e) => this.onTouched('billno')}
-                                        inputRef = {(domElm) => { this.domElmns.billno = domElm; }}
-                                        onKeyUp = {(e) => this.handleKeyUp(e, {currElmKey: 'billno'}) }
-                                        readOnly={this.props.billCreation.loading}
-                                    />
-                                    <FormControl.Feedback />
-                                </InputGroup>
-                            </Form.Group>
-                        </Col>
-                        <Col xs={3} md={3} className='customer-id'>
-                        </Col>
-                        <Col xs={3} md={3} >
-                            <Form.Group
-                                validationState= {this.state.formData.amount.hasError ? "error" :null}
-                                >
-                                <Form.Label>Pledge Amount</Form.Label>
-                                <InputGroup>
-                                    {/* <InputGroup.Addon readOnly={this.props.billCreation.loading}>Rs:</InputGroup.Addon> */}
-                                    <InputGroup.Prepend>
-                                        <InputGroup.Text id="rupee-addon1">Rs:</InputGroup.Text>
-                                    </InputGroup.Prepend>
-                                    <FormControl
-                                        type="text"
-                                        value={this.state.formData.amount.inputVal}
-                                        placeholder="0.00"
-                                        className="principal-amt-field"
-                                        onChange={(e) => this.inputControls.onChange(null, e.target.value, "amount")}
-                                        onFocus={(e) => this.onTouched('amount')}
-                                        ref={(domElm) => { this.domElmns.amount = domElm; }}
-                                        onKeyUp = {(e) => this.handleKeyUp(e, {currElmKey: 'amount'}) }
-                                        readOnly={this.props.billCreation.loading}
-                                    />
-                                    <FormControl.Feedback />
-                                </InputGroup>
-                            </Form.Group>
-                        </Col>
-                        <Col xs={3} md={3} className="date-picker-container">
-                            {/* <DatePicker 
-                                selected={this.state.formData.date.inputVal}
-                                onChange={(e) => this.handleChange('date', e) }
-                                isClearable={true}
-                                showWeekNumbers
-                                shouldCloseOnSelect={false}
-                                ref = {(domElm) => { this.domElmns.date = domElm; }}
-                                onKeyUp = {(e) => this.handleKeyUp(e, {currElmKey: 'date'}) }
-                                /> */}
-                                <Form.Group
-                                    validationState= {this.state.formData.date.hasError ? "error" :null}
+                <Row>
+                    <Col className="left-pane" xs={8} md={8}>
+                        <Row>
+                            <Col xs={3} md={3}>
+                                <FormGroup
+                                    validationState= {this.state.formData.billno.hasError ? "error" :null}
                                     >
-                                    <DatePicker
-                                        id="example-datepicker" 
-                                        value={this.state.formData.date.inputVal} 
-                                        onChange={(fullDateVal, dateVal) => {this.inputControls.onChange(null, fullDateVal, 'date', {currElmKey: 'date'})} }
-                                        ref = {(domElm) => { this.domElmns.date = domElm; }}
-                                        onKeyUp = {(e) => this.handleKeyUp(e, {currElmKey: 'date'}) }
-                                        readOnly={this.props.billCreation.loading}
-                                        showMonthDropdown
-                                        className='gs-input-cell'
+                                    <FormLabel>Bill No</FormLabel>
+                                    <InputGroup>
+                                        {/* <InputGroup.Addon readOnly={this.props.billCreation.loading}>{this.state.formData.billseries.inputVal}</InputGroup.Addon> */}
+                                        <FormControl
+                                            type="text"
+                                            value={this.state.formData.billno.inputVal}
+                                            placeholder=""
+                                            className="bill-number-field"
+                                            onChange={(e) => this.inputControls.onChange(null, e.target.value, "billno")}
+                                            onFocus={(e) => this.onTouched('billno')}
+                                            inputRef = {(domElm) => { this.domElmns.billno = domElm; }}
+                                            onKeyUp = {(e) => this.handleKeyUp(e, {currElmKey: 'billno'}) }
+                                            readOnly={this.props.billCreation.loading}
                                         />
-                                </Form.Group>
-                        </Col>
-                    </Row>
-                    <Row className='second-row'>
-                        <Col xs={6} md={6} className="r-a-s-dropdown customer-name-field-container">
-                            <Form.Group
-                                validationState= {this.state.formData.cname.hasError ? "error" :null}
-                                >
-                                <Form.Label>Customer Name</Form.Label>
-                                {/* <Autosuggest
-                                    datalist={this.state.formData.cname.limitedList}
-                                    itemAdapter={CustomerListAdaptor.instance}
-                                    placeholder="Enter CustomerName"
-                                    valueIsItem={true}
-                                    value={this.getInputValFromCustomSources('cname')}
-                                    onChange={ (val) => {this.autuSuggestionControls.onChange(val, 'cname') }}
-                                    ref = {(domElm) => { this.domElmns.cname = domElm; }}
-                                    onKeyUp = {(e) => this.handleKeyUp(e, {currElmKey: 'cname', isCustomerNameInput: true}) }
-                                    // onSelect = {(dontknow) => this.autuSuggestionControls.onInputSelect(dontknow, 'cname')}
-                                    // inputSelect = {(e) => this.autuSuggestionControls.inputSelect(e)}
-                                    readOnly={this.props.billCreation.loading}                                    
-                                    searchDebounce={250}
-                                    onSearch={(e) => this.autuSuggestionControls.onCustomerSearch(e)}
-                                /> */}
-                                <ReactAutosuggest
-                                    suggestions={this.state.formData.cname.limitedList}
-                                    onSuggestionsFetchRequested={({value}) => this.reactAutosuggestControls.onSuggestionsFetchRequested({value}, 'cname')}
-                                    // onSuggestionsClearRequested={this.reactAutosuggestControls.onSuggestionsClearRequested}
-                                    getSuggestionValue={(suggestion, e) => this.getSuggestionValue(suggestion, 'cname')}
-                                    renderSuggestion={(suggestion) => this.renderSuggestion(suggestion, 'cname')}
-                                    onSuggestionSelected={(event, { suggestion, suggestionValue, suggestionIndex, sectionIndex, method}) => this.reactAutosuggestControls.onSuggestionSelected(event, { suggestion, suggestionValue, suggestionIndex, sectionIndex, method }, 'cname')}
-                                    inputProps={{
-                                        placeholder: 'Type a Customer name',
-                                        value: this.state.formData.cname.inputVal,
-                                        onChange: (e, {newValue, method}) => this.reactAutosuggestControls.onChange(e, {newValue, method}, 'cname'),
-                                        onKeyUp: (e) => this.reactAutosuggestControls.onKeyUp(e, {currElmKey: 'cname'}),
-                                        className: "react-autosuggest__input cust-name",
-                                        readOnly: this.props.billCreation.loading
-                                    }}
-                                    ref = {(domElm) => { this.domElmns.cname = domElm?domElm.input:domElm; }}
-                                />
-                            </Form.Group>
-                        </Col>
-                        <Col xs={6} md={6} className='r-a-s-dropdown'>
-                            <Form.Group
-                                validationState= {this.state.formData.gaurdianName.hasError ? "error" :null}
-                                >
-                                <Form.Label>Guardian Name</Form.Label>                                
-                                {/* <Autosuggest
-                                    className='gaurdianname-autosuggest'
-                                    datalist={this.state.formData.gaurdianName.list}
-                                    placeholder="Enter Guardian Name"
-                                    value={this.getInputValFromCustomSources('gaurdianName')}
-                                    onChange={ (val) => this.autuSuggestionControls.onChange(val, 'gaurdianName') }
-                                    ref = {(domElm) => { this.domElmns.gaurdianName = domElm; }}
-                                    onKeyUp = {(e) => this.handleKeyUp(e, {currElmKey: 'gaurdianName', isGuardianNameInput: true}) }
-                                    readOnly={this.props.billCreation.loading}
-                                /> */}
-                                <ReactAutosuggest 
-                                    suggestions={this.state.formData.gaurdianName.limitedList}
-                                    onSuggestionsFetchRequested={({value}) => this.reactAutosuggestControls.onSuggestionsFetchRequested({value}, 'gaurdianName')}
-                                    getSuggestionValue={(suggestion, e) => this.getSuggestionValue(suggestion)}
-                                    renderSuggestion={this.renderSuggestion}
-                                    inputProps={{
-                                        placeholder: 'Type Guardian name',
-                                        value: this.getInputValFromCustomSources('gaurdianName'),
-                                        onChange: (e, {newValue, method}) => this.reactAutosuggestControls.onChange(e, {newValue, method}, 'gaurdianName'),
-                                        onKeyUp: (e) => this.reactAutosuggestControls.onKeyUp(e, {currElmKey: 'gaurdianName', isGuardianNameInput: true}),
-                                        className: "react-autosuggest__input guardian-name",
-                                        readOnly: this.props.billCreation.loading
-                                    }}
-                                    ref = {(domElm) => { this.domElmns.gaurdianName = domElm?domElm.input:domElm; }}
-                                />
-                                <FormControl.Feedback />
-                            </Form.Group>
-                        </Col>
-                    </Row>
-                    <Row className='third-row'>
-                        <Col xs={12} md={12} className='r-a-s-dropdown'>
-                            <Form.Group
-                                validationState= {this.state.formData.address.hasError ? "error" :null}
-                                >
-                                <Form.Label>Address</Form.Label>                                
-                                {/* <Autosuggest
-                                    datalist={this.state.formData.address.list}
-                                    placeholder="Enter Address"
-                                    value={this.getInputValFromCustomSources('address')}
-                                    onChange={ (val) => this.autuSuggestionControls.onChange(val, 'address') }
-                                    ref = {(domElm) => { this.domElmns.address = domElm; }}
-                                    onKeyUp = {(e) => this.handleKeyUp(e, {currElmKey: 'address', isAddressInput: true}) }
-                                    readOnly={this.props.billCreation.loading}
-                                /> */}
-                                <ReactAutosuggest 
-                                    suggestions={this.state.formData.address.limitedList}
-                                    onSuggestionsFetchRequested={({value}) => this.reactAutosuggestControls.onSuggestionsFetchRequested({value}, 'address')}
-                                    getSuggestionValue={(suggestion, e) => this.getSuggestionValue(suggestion)}
-                                    renderSuggestion={this.renderSuggestion}
-                                    inputProps={{
-                                        placeholder: 'Type address',
-                                        value: this.getInputValFromCustomSources('address'),
-                                        onChange: (e, {newValue, method}) => this.reactAutosuggestControls.onChange(e, {newValue, method}, 'address'),
-                                        onKeyUp: (e) => this.reactAutosuggestControls.onKeyUp(e, {currElmKey: 'address'}),
-                                        className: "react-autosuggest__input address",
-                                        readOnly: this.props.billCreation.loading
-                                    }}
-                                    ref = {(domElm) => { this.domElmns.address = domElm?domElm.input:domElm; }}
-                                />
-                                <FormControl.Feedback />
-                            </Form.Group>
-                        </Col>
-                    </Row>
-                    <Row className='fourth-row'>
-                        <Col xs={6} md={6} className='r-a-s-dropdown'>
-                            <Form.Group
-                                validationState= {this.state.formData.place.hasError ? "error" :null}
-                                >
-                                <Form.Label>Place</Form.Label>                                
-                                {/* <Autosuggest
-                                    datalist={this.state.formData.place.list}
-                                    placeholder="Enter Place"
-                                    value={this.getInputValFromCustomSources('place')}
-                                    onChange={ (val) => this.autuSuggestionControls.onChange(val, 'place') }
-                                    ref = {(domElm) => { this.domElmns.place = domElm; }}
-                                    onKeyUp = {(e) => this.handleKeyUp(e, {currElmKey: 'place'}) }
-                                    readOnly={this.props.billCreation.loading}
-                                /> */}
-                                <ReactAutosuggest 
-                                    suggestions={this.state.formData.place.limitedList}
-                                    onSuggestionsFetchRequested={({value}) => this.reactAutosuggestControls.onSuggestionsFetchRequested({value}, 'place')}
-                                    getSuggestionValue={(suggestion, e) => this.getSuggestionValue(suggestion)}
-                                    renderSuggestion={this.renderSuggestion}
-                                    inputProps={{
-                                        placeholder: 'Type place',
-                                        value: this.getInputValFromCustomSources('place'),
-                                        onChange: (e, {newValue, method}) => this.reactAutosuggestControls.onChange(e, {newValue, method}, 'place'),
-                                        onKeyUp: (e) => this.reactAutosuggestControls.onKeyUp(e, {currElmKey: 'place'}),
-                                        className: "react-autosuggest__input place",
-                                        readOnly: this.props.billCreation.loading
-                                    }}
-                                    ref = {(domElm) => { this.domElmns.place = domElm?domElm.input:domElm; }}
-                                />
-                                <FormControl.Feedback />
-                            </Form.Group>
-                        </Col>
-                        <Col xs={6} md={6} className='r-a-s-dropdown'>
-                            <Form.Group
-                                validationState= {this.state.formData.city.hasError ? "error" :null}
-                                >
-                                <Form.Label>City</Form.Label>                               
-                                {/* <Autosuggest
-                                    datalist={this.state.formData.city.list}
-                                    placeholder="Enter City"
-                                    value={this.getInputValFromCustomSources('city')}
-                                    onChange={ (val) => this.autuSuggestionControls.onChange(val, 'city') }
-                                    ref = {(domElm) => { this.domElmns.city = domElm; }}
-                                    onKeyUp = {(e) => this.handleKeyUp(e, {currElmKey: 'city'}) }
-                                    readOnly={this.props.billCreation.loading}
-                                /> */}
-                                <ReactAutosuggest 
-                                    suggestions={this.state.formData.city.limitedList}
-                                    onSuggestionsFetchRequested={({value}) => this.reactAutosuggestControls.onSuggestionsFetchRequested({value}, 'city')}
-                                    getSuggestionValue={(suggestion, e) => this.getSuggestionValue(suggestion)}
-                                    renderSuggestion={this.renderSuggestion}
-                                    inputProps={{
-                                        placeholder: 'Type city',
-                                        value: this.getInputValFromCustomSources('city'),
-                                        onChange: (e, {newValue, method}) => this.reactAutosuggestControls.onChange(e, {newValue, method}, 'city'),
-                                        onKeyUp: (e) => this.reactAutosuggestControls.onKeyUp(e, {currElmKey: 'city'}),
-                                        className: "react-autosuggest__input city",
-                                        readOnly: this.props.billCreation.loading
-                                    }}
-                                    ref = {(domElm) => { this.domElmns.city = domElm?domElm.input:domElm; }}
-                                />
-                                <FormControl.Feedback />
-                            </Form.Group>
-                        </Col>                            
-                    </Row>
-                    <Row className='fifth-row'>
-                        <Col xs={6} md={6} className='r-a-s-dropdown'>
-                            <Form.Group
-                                validationState= {this.state.formData.pincode.hasError ? "error" :null}
-                                >
-                                <Form.Label>Pincode</Form.Label>
-                                {/* <Autosuggest
-                                    datalist={this.state.formData.pincode.list}
-                                    placeholder="Enter Pincode"
-                                    value={this.getInputValFromCustomSources('pincode')}
-                                    onChange={ (val) => this.autuSuggestionControls.onChange(val, 'pincode') }
-                                    ref = {(domElm) => { this.domElmns.pincode = domElm; }}
-                                    onKeyUp = {(e) => this.handleKeyUp(e, {currElmKey: 'pincode'}) }
-                                    readOnly={this.props.billCreation.loading}
-                                /> */}
-                                <ReactAutosuggest 
-                                    suggestions={this.state.formData.pincode.limitedList}
-                                    onSuggestionsFetchRequested={({value}) => this.reactAutosuggestControls.onSuggestionsFetchRequested({value}, 'pincode')}
-                                    getSuggestionValue={(suggestion, e) => this.getSuggestionValue(suggestion)}
-                                    renderSuggestion={this.renderSuggestion}
-                                    inputProps={{
-                                        placeholder: 'Type pincode',
-                                        value: this.getInputValFromCustomSources('pincode'),
-                                        onChange: (e, {newValue, method}) => this.reactAutosuggestControls.onChange(e, {newValue, method}, 'pincode'),
-                                        onKeyUp: (e) => this.reactAutosuggestControls.onKeyUp(e, {currElmKey: 'pincode'}),
-                                        className: "react-autosuggest__input pincode",
-                                        readOnly: this.props.billCreation.loading
-                                    }}
-                                    ref = {(domElm) => { this.domElmns.pincode = domElm?domElm.input:domElm; }}
-                                />
-                                <FormControl.Feedback />
-                            </Form.Group>
-                        </Col>
-                        <Col xs={6} md={6} className='r-a-s-dropdown'>
-                            <Form.Group
-                                validationState= {this.state.formData.mobile.hasError ? "error" :null}
-                                >
-                                <Form.Label>Mobile</Form.Label>
-                                {/* <Autosuggest
-                                    datalist={this.state.formData.mobile.list}
-                                    placeholder="Enter Mobile No."
-                                    value={this.getInputValFromCustomSources('mobile')}
-                                    onChange={ (val) => this.autuSuggestionControls.onChange(val, 'mobile') }
-                                    ref = {(domElm) => { this.domElmns.mobile = domElm; }}
-                                    onKeyUp = {(e) => this.handleKeyUp(e, {currElmKey: 'mobile'}) }
-                                    readOnly={this.props.billCreation.loading}
-                                /> */}
-                                <ReactAutosuggest 
-                                    suggestions={this.state.formData.mobile.limitedList}
-                                    onSuggestionsFetchRequested={({value}) => this.reactAutosuggestControls.onSuggestionsFetchRequested({value}, 'mobile')}
-                                    getSuggestionValue={(suggestion, e) => this.getSuggestionValue(suggestion)}
-                                    renderSuggestion={this.renderSuggestion}
-                                    inputProps={{
-                                        placeholder: 'Mobile No...',
-                                        value: this.getInputValFromCustomSources('mobile'),
-                                        onChange: (e, {newValue, method}) => this.reactAutosuggestControls.onChange(e, {newValue, method}, 'mobile'),
-                                        onKeyUp: (e) => this.reactAutosuggestControls.onKeyUp(e, {currElmKey: 'mobile'}),
-                                        className: "react-autosuggest__input mobile",
-                                        readOnly: this.props.billCreation.loading
-                                    }}
-                                    ref = {(domElm) => { this.domElmns.mobile = domElm?domElm.input:domElm; }}
-                                />
-                                <FormControl.Feedback />
-                            </Form.Group>
-                        </Col>
-                    </Row>
-                    <Row>
-                        {this.getMoreElmnsContainer()}
-                    </Row>
-                    <Row>
-                        <Col className='ornament-dom-container'>
-                            {this.getOrnContainerDOM()}
-                        </Col>                        
-                    </Row>
-                    <Row>
-                        <Col xs={{span: 3, offset: 4}} md={{span: 3, offset: 4}} className='submit-container'>
-                            { !this.props.loadedInPledgebook &&
-                                <input 
-                                    type="button"
-                                    className='gs-button'
-                                    ref={(domElm) => {this.domElmns.submitBtn = domElm}}
-                                    // onKeyUp= { (e) => this.handleKeyUp(e, {currElmKey:'submitBtn', isSubmitBtn: true})}
-                                    onClick={(e) => this.handleSubmit()}
-                                    value='Add Bill'
+                                        <FormControl.Feedback />
+                                    </InputGroup>
+                                </FormGroup>
+                            </Col>
+                            <Col xs={3} md={3} className='customer-id'>
+                            </Col>
+                            <Col xs={3} md={3} >
+                                <FormGroup
+                                    validationState= {this.state.formData.amount.hasError ? "error" :null}
+                                    >
+                                    <FormLabel>Pledge Amount</FormLabel>
+                                    <InputGroup>
+                                        {/* <InputGroup.Addon readOnly={this.props.billCreation.loading}>Rs:</InputGroup.Addon> */}
+                                        <FormControl
+                                            type="text"
+                                            value={this.state.formData.amount.inputVal}
+                                            placeholder="0.00"
+                                            className="principal-amt-field"
+                                            onChange={(e) => this.inputControls.onChange(null, e.target.value, "amount")}
+                                            onFocus={(e) => this.onTouched('amount')}
+                                            inputRef={(domElm) => { this.domElmns.amount = domElm; }}
+                                            onKeyUp = {(e) => this.handleKeyUp(e, {currElmKey: 'amount'}) }
+                                            readOnly={this.props.billCreation.loading}
+                                        />
+                                        <FormControl.Feedback />
+                                    </InputGroup>
+                                </FormGroup>
+                            </Col>
+                            <Col xs={3} md={3} className="date-picker-container">
+                                    <FormGroup
+                                        validationState= {this.state.formData.date.hasError ? "error" :null}
+                                        >
+                                        <DatePicker
+                                            id="example-datepicker" 
+                                            value={this.state.formData.date.inputVal} 
+                                            onChange={(fullDateVal, dateVal) => {this.inputControls.onChange(null, fullDateVal, 'date')} }
+                                            ref = {(domElm) => { this.domElmns.date = domElm; }}
+                                            onKeyUp = {(e) => this.handleKeyUp(e, {currElmKey: 'date'}) }
+                                            readOnly={this.props.billCreation.loading}
+                                            dateFormat="DD-MM-YYYY"
+                                            />
+                                    </FormGroup>
+                            </Col>
+                        </Row>
+                        <Row>
+                            <Col xs={6} md={6} className="customer-name-field-container">
+                                <FormGroup
+                                    validationState= {this.state.formData.cname.hasError ? "error" :null}
+                                    >
+                                    <FormLabel>Customer Name</FormLabel>
+                                    <ReactAutosuggest
+                                        suggestions={this.state.formData.cname.limitedList}
+                                        onSuggestionsFetchRequested={this.reactAutosuggestControls.onSuggestionsFetchRequested}
+                                        // onSuggestionsClearRequested={this.reactAutosuggestControls.onSuggestionsClearRequested}
+                                        getSuggestionValue={(suggestion, e) => this.getSuggestionValue(suggestion, e)}
+                                        renderSuggestion={this.renderSuggestion}
+                                        onSuggestionSelected={(event, { suggestion, suggestionValue, suggestionIndex, sectionIndex, method }) => this.reactAutosuggestControls.onSuggestionSelected(event, { suggestion, suggestionValue, suggestionIndex, sectionIndex, method })}
+                                        inputProps={{
+                                            placeholder: 'Type a Customer name',
+                                            value: this.state.formData.cname.inputVal,
+                                            onChange: this.reactAutosuggestControls.onChange,
+                                            onKeyUp: (e) => this.reactAutosuggestControls.onKeyUp(e, {currElmKey: 'cname'}),
+                                            className: "react-autosuggest__input cust-name"
+                                        }}
+                                        ref = {(domElm) => { this.domElmns.cname = domElm?domElm.input:domElm; }}
                                     />
-                            }
-                            {
-                                this.props.loadedInPledgebook &&
-                                <input 
-                                    type="button"
-                                    className='gs-button'
-                                    ref={(domElm) => {this.domElmns.updateBtn = domElm}}
-                                    onClick={(e) => this.handleUpdate()}
-                                    value='Update Bill'
+                                </FormGroup>
+                            </Col>
+                            <Col xs={6} md={6}>
+                                <FormGroup
+                                    validationState= {this.state.formData.gaurdianName.hasError ? "error" :null}
+                                    >
+                                    <FormLabel>Guardian Name</FormLabel>                                
+                                    <Autosuggest
+                                        className='gaurdianname-autosuggest'
+                                        datalist={this.state.formData.gaurdianName.list}
+                                        placeholder="Enter Guardian Name"
+                                        value={this.getInputValFromCustomSources('gaurdianName')}
+                                        onChange={ (val) => this.autuSuggestionControls.onChange(val, 'gaurdianName') }
+                                        ref = {(domElm) => { this.domElmns.gaurdianName = domElm; }}
+                                        onKeyUp = {(e) => this.handleKeyUp(e, {currElmKey: 'gaurdianName', isGuardianNameInput: true}) }
+                                        readOnly={this.props.billCreation.loading}
                                     />
-                            }
-                        </Col>
-                    </Row>
-                </Col>
-                <Col className="right-pane" xs={4} md={4}>
-                    <Picture picData={this.getUserImageData()} updatePictureData={this.updatePictureData} canShowActionButtons={!(this.isExistingCustomer() || this.props.loadedInPledgebook)}/>
-                    <Picture picData={this.state.ornPicture} updatePictureData={this.updateOrnPictureData} />
-                    <Row className="orn-history-div">
-                        <BillHistoryView custId={this.getSelectedCustId()}/>
-                    </Row>
-                </Col>
-                <EditDetailsDialog {...this.state.editModalContent} update={this.updateItemInMoreDetail} />
-                </Form>
+                                    <FormControl.Feedback />
+                                </FormGroup>
+                            </Col>
+                        </Row>
+                        <Row>
+                            <Col xs={12} md={12}>
+                                <FormGroup
+                                    validationState= {this.state.formData.address.hasError ? "error" :null}
+                                    >
+                                    <FormLabel>Address</FormLabel>                                
+                                    <Autosuggest
+                                        datalist={this.state.formData.address.list}
+                                        placeholder="Enter Address"
+                                        value={this.getInputValFromCustomSources('address')}
+                                        onChange={ (val) => this.autuSuggestionControls.onChange(val, 'address') }
+                                        ref = {(domElm) => { this.domElmns.address = domElm; }}
+                                        onKeyUp = {(e) => this.handleKeyUp(e, {currElmKey: 'address', isAddressInput: true}) }
+                                        readOnly={this.props.billCreation.loading}
+                                    />
+                                    <FormControl.Feedback />
+                                </FormGroup>
+                            </Col>
+                        </Row>
+                        <Row>
+                            <Col xs={6} md={6}>
+                                <FormGroup
+                                    validationState= {this.state.formData.place.hasError ? "error" :null}
+                                    >
+                                    <FormLabel>Place</FormLabel>                                
+                                    <Autosuggest
+                                        datalist={this.state.formData.place.list}
+                                        placeholder="Enter Place"
+                                        value={this.getInputValFromCustomSources('place')}
+                                        onChange={ (val) => this.autuSuggestionControls.onChange(val, 'place') }
+                                        ref = {(domElm) => { this.domElmns.place = domElm; }}
+                                        onKeyUp = {(e) => this.handleKeyUp(e, {currElmKey: 'place'}) }
+                                        readOnly={this.props.billCreation.loading}
+                                    />
+                                    <FormControl.Feedback />
+                                </FormGroup>
+                            </Col>
+                            <Col xs={6} md={6}>
+                                <FormGroup
+                                    validationState= {this.state.formData.city.hasError ? "error" :null}
+                                    >
+                                    <FormLabel>City</FormLabel>                               
+                                    <Autosuggest
+                                        datalist={this.state.formData.city.list}
+                                        placeholder="Enter City"
+                                        value={this.getInputValFromCustomSources('city')}
+                                        onChange={ (val) => this.autuSuggestionControls.onChange(val, 'city') }
+                                        ref = {(domElm) => { this.domElmns.city = domElm; }}
+                                        onKeyUp = {(e) => this.handleKeyUp(e, {currElmKey: 'city'}) }
+                                        readOnly={this.props.billCreation.loading}
+                                    />
+                                    <FormControl.Feedback />
+                                </FormGroup>
+                            </Col>                            
+                        </Row>
+                        <Row>
+                            <Col xs={6} md={6}>
+                                <FormGroup
+                                    validationState= {this.state.formData.pincode.hasError ? "error" :null}
+                                    >
+                                    <FormLabel>Pincode</FormLabel>
+                                    <Autosuggest
+                                        datalist={this.state.formData.pincode.list}
+                                        placeholder="Enter Pincode"
+                                        value={this.getInputValFromCustomSources('pincode')}
+                                        onChange={ (val) => this.autuSuggestionControls.onChange(val, 'pincode') }
+                                        ref = {(domElm) => { this.domElmns.pincode = domElm; }}
+                                        onKeyUp = {(e) => this.handleKeyUp(e, {currElmKey: 'pincode'}) }
+                                        readOnly={this.props.billCreation.loading}
+                                    />
+                                    <FormControl.Feedback />
+                                </FormGroup>
+                            </Col>
+                            <Col xs={6} md={6}>
+                                <FormGroup
+                                    validationState= {this.state.formData.mobile.hasError ? "error" :null}
+                                    >
+                                    <FormLabel>Mobile</FormLabel>
+                                    <Autosuggest
+                                        datalist={this.state.formData.mobile.list}
+                                        placeholder="Enter Mobile No."
+                                        value={this.getInputValFromCustomSources('mobile')}
+                                        onChange={ (val) => this.autuSuggestionControls.onChange(val, 'mobile') }
+                                        ref = {(domElm) => { this.domElmns.mobile = domElm; }}
+                                        onKeyUp = {(e) => this.handleKeyUp(e, {currElmKey: 'mobile'}) }
+                                        readOnly={this.props.billCreation.loading}
+                                    />
+                                    <FormControl.Feedback />
+                                </FormGroup>
+                            </Col>
+                        </Row>
+                        <Row>
+                            {this.getMoreElmnsContainer()}
+                        </Row>
+                        <Row>
+                            <Col className='ornament-dom-container'>
+                                {this.getOrnContainerDOM()}
+                            </Col>                        
+                        </Row>
+                        <Row>
+                            <Col md={{ span: 4, offset: 4 }} xs={{ span: 4, offset: 4 }} className='submit-container'>
+                                { !this.props.loadedInPledgebook &&
+                                    <input 
+                                        type="button"
+                                        className='gs-button'
+                                        ref={(domElm) => {this.domElmns.submitBtn = domElm}}
+                                        // onKeyUp= { (e) => this.handleKeyUp(e, {currElmKey:'submitBtn', isSubmitBtn: true})}
+                                        onClick={(e) => this.handleSubmit()}
+                                        value='Add Bill'
+                                        />
+                                }
+                                {
+                                    this.props.loadedInPledgebook &&
+                                    <input 
+                                        type="button"
+                                        className='gs-button'
+                                        ref={(domElm) => {this.domElmns.updateBtn = domElm}}
+                                        onClick={(e) => this.handleUpdate()}
+                                        value='Update Bill'
+                                        />
+                                }
+                            </Col>
+                        </Row>
+                    </Col>
+                    <Col className="right-pane" xs={4} md={4}>
+                        <Picture picData={this.getUserImageData()} updatePictureData={this.updatePictureData} canShowActionButtons={!(this.isExistingCustomer() || this.props.loadedInPledgebook)}/>
+                        <Picture picData={this.state.ornPicture} updatePictureData={this.updateOrnPictureData} />
+                        <Row className="orn-history-div">
+                            <BillHistoryView custId={this.getSelectedCustId()}/>
+                        </Row>
+                    </Col>
+                    <EditDetailsDialog {...this.state.editModalContent} update={this.updateItemInMoreDetail} /> 
+                </Row>
             </Container>
         )
     }    
@@ -1794,3 +1469,170 @@ const mapStateToProps = (state) => {
 };
 
 export default connect(mapStateToProps, {insertNewBill, updateBill, updateClearEntriesFlag, showEditDetailModal, hideEditDetailModal, getBillNoFromDB, disableReadOnlyMode, updateBillNoInStore})(BillCreation);
+
+
+class CommonAdaptor extends ItemAdapter {
+    renderItem(item) {
+        return (
+            <div className='list-item'>
+                <span>{item}</span>
+            </div>
+        )
+    }
+}
+CommonAdaptor.instance = new CommonAdaptor()
+
+/* class OrnamentAdaptor extends ItemAdapter {
+    itemInclusionRankForInput(item, foldedValue) {
+        let contains = false
+        for (let text of this.getTextRepresentations(item)) {
+            const index = text.indexOf(foldedValue)
+            if (index === 0)
+                return 0
+            
+            if (index > 0)
+                contains = true
+            
+        }
+        return contains ? 1 : 2;
+    }  
+
+    itemIncludedByInput(item, foldedVal) {        
+        let canInclude = false;
+        let name = item.name || '';
+        debugger;
+        name = name.toLowerCase();
+        foldedVal = foldedVal.toLowerCase();
+        if(name.indexOf(foldedVal) == 0)
+            canInclude = true;
+        return canInclude;        
+    }
+    getInputValue(item) {
+        if(typeof item == 'string')
+            return item.toString();
+        else        
+            return (item.name).toString();
+    }
+
+    //Our custom method to form the react key value fr list items
+    getReactKey(item) {
+        return (+new Date())+'-menu-item';
+    }
+    renderItem(item) {        
+        return (
+            <div className='list-item'>
+                <span>{item.name}</span>
+            </div>
+        )
+    }
+}
+OrnamentAdaptor.instance = new OrnamentAdaptor();
+*/
+
+class CustomerListAdaptor extends ItemAdapter {
+
+    /* itemMatchesInput(item, foldedValue) {
+        let matched = false;
+        let inputVal = '';
+        let dbVal = '';
+
+        if(foldedValue)
+            inputVal = foldedValue.toLowerCase();        
+        if(item && item.name)
+            dbVal = item.name.toLowerCase();
+        console.log(inputVal, dbVal);
+        if(inputVal && dbVal) {
+            if(dbVal.indexOf(inputVal) == 0)
+                matched = true;
+        }
+        console.log(matched);
+        return matched;
+    } */
+
+    // itemMatchesInput(item, foldedValue) {
+    //     for (let text of this.getTextRepresentations(item)) {
+    //       if (text === foldedValue) {
+    //         return true
+    //       }
+    //     }
+    //     return false
+    //   }
+
+    itemInclusionRankForInput(item, foldedValue) {
+        let contains = false
+        for (let text of this.getTextRepresentations(item)) {
+            const index = text.indexOf(foldedValue)
+            if (index === 0)
+                return 0
+            
+            if (index > 0)
+                contains = true
+            
+        }
+        return contains ? 1 : 2;
+    }  
+
+    itemIncludedByInput(item, foldedVal) {        
+        let canInclude = false;
+        let customerName = item.name || '';
+        customerName = customerName.toLowerCase();
+        foldedVal = foldedVal.toLowerCase();
+        if(customerName.indexOf(foldedVal) == 0)
+            canInclude = true;
+        return canInclude;        
+    }
+    // itemMatchesInput(item, foldedVal) {
+    //     console.log(foldedVal);
+    // }
+    getInputValue(item) {
+        if(typeof item == 'string')
+            return item.toString();
+        else        
+            return (item.name).toString();
+    }
+
+    //Our custom method to form the react key value fr list items
+    getReactKey(item) {
+        return item.hashKey+'menu-item';
+    }
+
+    renderItem(item) {
+        return (
+            <div className="customer-list-item" id={item.hashKey + 'parent'}>
+                <div id={item.hashKey+ '1'}><span>{item.name}  <span style={{"fontSize":"8px"}}>c/of</span> {item.gaurdianName}</span></div>
+                <div id={item.hashKey+ '2'}><span>{item.address}</span></div>
+                <div id={item.hashKey+ '3'}><span>{item.place}, {item.city} - {item.pincode}</span></div>
+            </div>
+        )
+    }
+}
+CustomerListAdaptor.instance = new CustomerListAdaptor();
+
+class CustomerInfoAdaptor extends ItemAdapter {
+    // getInputValue(item) {
+    //     return item.value.toString();
+    // }
+    
+    // Render middleware for dropdown items list
+    /* renderSuggested(item) {
+        return <div className="suggested-list-item">
+          {item.key + ' - '} {item.value}
+        </div>
+    }*/
+
+    // Render middleware for selected item 
+    /* renderSelected(){
+        return <div className="suggested-list-item">
+          {item.key + ' - '} {item.value}
+        </div>  
+    } */
+
+    renderItem(item) {
+        return (
+            <div className='list-item'>
+                <span>{item.value}</span>
+            </div>
+        )
+    }
+}
+CustomerInfoAdaptor.instance = new CustomerInfoAdaptor();

@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import BillCreation from '../billcreate/billcreation';
-import { Grid, Row, Col, FormGroup, ControlLabel, FormControl, HelpBlock, InputGroup, Button, Glyphicon } from 'react-bootstrap';
+import {Row, Col, FormGroup, FormLabel, FormControl, HelpBlock, InputGroup, Button, Glyphicon } from 'react-bootstrap';
 import "./pledgebookModal.css";
 import { connect } from 'react-redux';
 import { enableReadOnlyMode, disableReadOnlyMode } from '../../actions/billCreation';

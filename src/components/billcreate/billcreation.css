@@ -76,29 +76,45 @@
     border: 1px solid lightgray;
     min-height: 160px;
     /* margin-top: 25px; */
-    padding: 15px;
+    padding: 0 !important;
+    margin-left: 15px;
 }
 .ornament-dom-container .form-control {
     border: none;
     box-shadow: none;
     padding: 6px 12px 6px 0;
 }
+.ornament-dom-container thead {
+    background-color: #e9ecef;
+    color: #495057;
+    font-weight: 100;
+}
+.ornament-dom-container .serial-no-header {
+    padding: 4px;
+}
+.ornament-dom-container .serial-no-col {
+    /* background-color: #e9ecef;
+    color: #495057; */
+    text-align: right;
+    padding-right: 10px;
+}
+
 /* .orn-input-cell:focus,
 .orn-input-cell:hover, */
 
 .bill-creation-container .form-control:focus,
-.cust-name:focus,
+.react-autosuggest__input.cust-name:focus,
+.react-autosuggest__input.guardian-name:focus,
+.react-autosuggest__input.address:focus,
+.react-autosuggest__input.place:focus,
+.react-autosuggest__input.city:focus,
+.react-autosuggest__input.pincode:focus,
+.react-autosuggest__input.mobile:focus,
 .ornament-dom-container .form-control:focus {
     border-color: rgb(204, 204, 204);
     border-bottom: 2px solid #0acfee;
     box-shadow: none;
     outline: none;
-}
-
-.bill-creation-container .form-control:hover,
-.cust-name:hover,
-.ornament-dom-container .form-control:hover {
-    
 }
 
 .ornament-dom-container .input-group {
@@ -212,4 +228,26 @@
     padding-right: 0;
     background-color: transparent;
     border: none;
+}
+
+.bill-creation-container .second-row,
+.bill-creation-container .third-row,
+.bill-creation-container .fourth-row,
+.bill-creation-container .fifth-row {
+    margin-bottom: 10px;
+}
+.orn.gs-input-cell{
+    border: none;
+    width: calc(100% - 15px);
+    padding: 6px 12px 6px 0;
+    outline: none;
+    box-shadow: none;
+}
+
+.react-autosuggest__input.orn.gs-input-cell + .react-autosuggest__suggestions-container {
+    width: 150px;
+}
+
+.react-autosuggest__input.orn.spec.gs-input-cell + .react-autosuggest__suggestions-container {
+    width: 120px;
 }

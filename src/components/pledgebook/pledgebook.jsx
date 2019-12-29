@@ -3,7 +3,7 @@ import { getPendingBills, setRefreshFlag } from '../../actions/pledgebook';
 import { parseResponse } from './helper';
 import { connect } from 'react-redux';
 import _ from 'lodash';
-import { Grid, Row, Col, FormGroup, ControlLabel, FormControl, HelpBlock, InputGroup, Button, Glyphicon, Radio } from 'react-bootstrap';
+import { Container, Form, Row, Col, FormGroup, FormLabel, FormControl, HelpBlock, InputGroup, Button, Glyphicon, FormCheck } from 'react-bootstrap';
 import moment from 'moment';
 import './pledgebook.css';
 import CommonModal from '../common-modal/commonModal.jsx';
@@ -60,7 +60,7 @@ class Pledgebook extends Component {
             columns : [{
                     id: 'Date',
                     displayText: 'Pledged Date',
-                    width: '18%',
+                    width: '25%',
                     formatter: (column, columnIndex, row, rowIndex) => {
                         if(row['closed_date']) {
                             let closed_date = convertToLocalTime(row['closed_date'], {excludeTime: true});
@@ -108,10 +108,19 @@ class Pledgebook extends Component {
                                             //arrowStyle={{ opacity: 0.7 }}
                                         >                                        
                                             <div className='status-popover-content' onChange={this.onStatusPopoverChange}>
-                                                <Radio name='billstatus' checked={this.state.billDisplayFlag=='all'} value='all'>All</Radio>
-                                                <Radio name='billstatus' checked={this.state.billDisplayFlag=='pending'} value='pending'>Pending</Radio>
-                                                <Radio name='billstatus' checked={this.state.billDisplayFlag=='closed'} value='closed'>Closed</Radio>
-                                                <input 
+
+                                            <Form>
+                                                <Form.Group>
+                                                    <Form.Check id='billstatus-11' type='radio' name='billstatus' checked={this.state.billDisplayFlag=='all'} value='all' label='All'/>
+                                                </Form.Group>
+                                                <Form.Group>
+                                                    <Form.Check id='billstatus-22' type='radio' name='billstatus' checked={this.state.billDisplayFlag=='pending'} value='pending' label='Pending'/>
+                                                </Form.Group>
+                                                <Form.Group>
+                                                    <Form.Check id='billstatus-33' type='radio' name='billstatus' checked={this.state.billDisplayFlag=='closed'} value='closed' label='Closed'/>
+                                                </Form.Group>
+                                            </Form>
+                                               <input 
                                                     type="button"
                                                     className='gs-button'
                                                     onClick={(e) => this.onStatusPopoverSubmit()}
@@ -455,8 +464,8 @@ class Pledgebook extends Component {
                             <thead>
                                 <tr>
                                     <td>Orn Name</td>
-                                    <td>Gross Wt</td>
-                                    <td>Net Wt</td>
+                                    <td>G-Wt</td>
+                                    <td>N-Wt</td>
                                     <td>Specs</td>
                                     <td>Qty</td>
                                 </tr>
@@ -505,7 +514,7 @@ class Pledgebook extends Component {
 
     render() {                    
         return (
-            <Grid className="pledgebook-page-content">
+            <Container className="pledgebook-page-content">
                 <Row className='first-row'>
                     <Col xs={6}>
                         <p style={{fontSize: "20px"}}>Pledgebook</p>
@@ -515,7 +524,7 @@ class Pledgebook extends Component {
                     </Col>
                 </Row>
                 <Row className='second-row'>
-                    <div className='action-container'>
+                    <Col xs={3} className='action-container'>
                         <span className='export-btn action-btn' onClick={this.onExportClick}>
                             <FontAwesomeIcon icon='file-excel'/>
                         </span>
@@ -555,8 +564,8 @@ class Pledgebook extends Component {
                                     <FontAwesomeIcon icon='filter'/>
                                 </span>
                         </Popover>
-                    </div>
-                    <div className='row-count gs-button'>
+                    </Col>
+                    <Col xs={{span: 2, offset: 1, order: 3}} className='row-count gs-button'>
                         <span>Rows Count</span>
                         <select className="selectpicker" onChange={this.handlePageCountChange}>
                             <option selected={this.state.pageLimit=="10" && "selected"}>10</option>
@@ -565,8 +574,8 @@ class Pledgebook extends Component {
                             <option selected={this.state.pageLimit=="100" && "selected"}>100</option>
                             <option selected={this.state.pageLimit=="200" && "selected"}>200</option>
                         </select>
-                    </div>
-                    <div className='pagination-container'>
+                    </Col>
+                    <Col xs={{span: 6}} className='pagination-container'>
                         <ReactPaginate previousLabel={"<"}
                             nextLabel={">"}
                             breakLabel={"..."}
@@ -579,7 +588,7 @@ class Pledgebook extends Component {
                             subContainerClassName={"pages pagination"}
                             activeClassName={"active"}
                             forcePage={this.state.selectedPageIndex} />
-                    </div>
+                    </Col>
                 </Row>
                 <Row>
                     <GSTable 
@@ -603,7 +612,7 @@ class Pledgebook extends Component {
                 <CommonModal modalOpen={this.state.displayExportPopup} secClass="export-pledgebook-popup" handleClose={this.handleExportPopupClose}>
                     <PledgebookExportPopup handleClose={this.handleExportPopupClose}/>
                 </CommonModal>
-            </Grid>
+            </Container>
         )
     }
 }

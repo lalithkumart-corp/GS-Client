@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import { Grid, Row, Col, FormGroup, ControlLabel, FormControl, HelpBlock, InputGroup, Button, } from 'react-bootstrap';
+import { Row, Col, FormGroup, FormLabel, FormControl, HelpBlock, InputGroup, Button, } from 'react-bootstrap';
 import { hideEditDetailModal } from '../../actions/billCreation';
 import Modal from 'react-modal';
 import './editDetailsDialog.css';

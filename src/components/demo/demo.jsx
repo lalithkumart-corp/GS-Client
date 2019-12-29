@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import { Grid, Row, Col, FormGroup, ControlLabel, FormControl, HelpBlock } from 'react-bootstrap';
+import { Container, Row, Col, FormGroup, FormLabel, FormControl, Form } from 'react-bootstrap';
 import _ from 'lodash';
 import { validateCName, validateFGName } from '../../utilities/validation';
 import Autosuggest from 'react-autosuggest'; //https://react-autosuggest.js.org/
@@ -132,14 +132,14 @@ class Demo extends Component{
 
     render() {
         return(
-            <Grid>
-                <Row className="show-grid">
+            <Container>
+                <Row className="show-Container">
                     <Col xs={12} md={8}>
                     <FormGroup
                         controlId="formBasicText"
                         validationState= {this.state.formData.cname.hasError ? "error" : "success"}
                         >
-                        <ControlLabel>Working example with validation</ControlLabel>
+                        <FormLabel>Working example with validation</FormLabel>
                         <FormControl
                             type="text"
                             value={this.state.formData.cname.val}
@@ -148,7 +148,7 @@ class Demo extends Component{
                             onFocus={(e) => this.onTouched('cname')}
                         />
                         <FormControl.Feedback />
-                        {this.state.formData.cname.hasError && <HelpBlock>{this.state.formData.cname.errorText}</HelpBlock>}
+                        {this.state.formData.cname.hasError && <Form.Text>{this.state.formData.cname.errorText}</Form.Text>}
                         </FormGroup>                        
                     </Col>
                     <Col xs={6} md={4}>
@@ -156,7 +156,7 @@ class Demo extends Component{
                             controlId="formBasicText"
                             validationState= {this.state.formData.fgname.hasError ? "error" : "success"}
                             >
-                            <ControlLabel>Working example with validation</ControlLabel>
+                            <FormLabel>Working example with validation</FormLabel>
                             <FormControl
                                 type="text"
                                 value={this.state.formData.fgname.val}
@@ -165,7 +165,7 @@ class Demo extends Component{
                                 onFocus={(e) => this.onTouched('fgname')}
                             />
                             <FormControl.Feedback />
-                            {this.state.formData.fgname.hasError && <HelpBlock>{this.state.formData.fgname.errorText}</HelpBlock>}
+                            {this.state.formData.fgname.hasError && <Form.Text>{this.state.formData.fgname.errorText}</Form.Text>}
                         </FormGroup>
                     </Col>
                 </Row>
@@ -181,7 +181,7 @@ class Demo extends Component{
                         />
                     </Col>
                 </Row>
-            </Grid>
+            </Container>
         )
     }
 }

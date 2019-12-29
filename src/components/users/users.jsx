@@ -1,10 +1,20 @@
 import React, { Component } from 'react';
 import axios from 'axios';
-import { Grid, Row, Col } from 'react-bootstrap';
+import { Container, Row, Col } from 'react-bootstrap';
 import { USERS_LIST } from '../../core/sitemap';
 import { getAccessToken } from '../../core/storage';
+import AddUser from './addUser/addUser';
+import CommonModal from '../common-modal/commonModal';
 
 export default class Users extends Component {
+    constructor(props) {
+        super(props);
+        this.state = {
+            addUserModalOpen: false
+        }
+        this.onAddUserBtnClick = this.onAddUserBtnClick.bind(this);
+        this.handleAddUserModalClose = this.handleAddUserModalClose.bind(this);
+    }
     componentDidMount() {
         //axios.get('USER_LIST')
     }
@@ -19,16 +29,37 @@ export default class Users extends Component {
             }
         )
     }
+    getUserListDOM() {
+        return (
+            <Row>
+                NULL
+            </Row>
+        )        
+    }
+
+    onAddUserBtnClick(e) {
+        this.setState({addUserModalOpen: !this.state.addUserModalOpen});
+    }
+
+    handleAddUserModalClose() {
+        this.setState({addUserModalOpen: false});
+    }
+
     render() {
         return (
-            <Grid>
+            <Container>
                 <Row className='add-user-container'>
-
+                    <Col xs={3} md={3}>
+                        <input type='button' className='gs-button' value='ADD' onClick={this.onAddUserBtnClick}/>
+                    </Col>
                 </Row>
                 <Row className='userlist-container'>
-                    IN-PROGESS...
+                    {this.getUserListDOM()}
                 </Row>
-            </Grid>
+                <CommonModal modalOpen={this.state.addUserModalOpen} handleClose={this.handleAddUserModalClose} secClass='add-user-modal'>
+                    <AddUser onSubmit={this.AddUserSubmit}/>
+                </CommonModal>
+            </Container>
         )
     }
 }

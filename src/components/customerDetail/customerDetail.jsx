@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Grid, Row, Col, FormGroup, ControlLabel, FormControl, HelpBlock, InputGroup, Button, Glyphicon, Tabs, Tab } from 'react-bootstrap';
+import { Container, Row, Col, FormGroup, FormLabel, FormControl, HelpBlock, InputGroup, Button, Glyphicon, Tabs, Tab } from 'react-bootstrap';
 import axios from 'axios';
 import { PLEDGEBOOK_METADATA, PLEDGEBOOK_FETCH_CUSTOMER_HISTORY } from '../../core/sitemap';
 import { getAccessToken } from '../../core/storage';
@@ -153,48 +153,54 @@ class CustomerDetail extends Component {
     getPagination() {
         return (
             <Row>
-                <ReactPaginate previousLabel={"<"}
-                    nextLabel={">"}
-                    breakLabel={"..."}
-                    breakClassName={"break-me"}
-                    pageCount={this.getPageCount()}
-                    marginPagesDisplayed={2}
-                    pageRangeDisplayed={5}
-                    onPageChange={this.handlePageClick}
-                    containerClassName={"pledgebook pagination"}
-                    subContainerClassName={"pages pagination"}
-                    activeClassName={"active"}
-                    forcePage={this.state.selectedPageIndex} />
+                <Col xs={12} md={12}>
+                    <ReactPaginate previousLabel={"<"}
+                        nextLabel={">"}
+                        breakLabel={"..."}
+                        breakClassName={"break-me"}
+                        pageCount={this.getPageCount()}
+                        marginPagesDisplayed={2}
+                        pageRangeDisplayed={5}
+                        onPageChange={this.handlePageClick}
+                        containerClassName={"pledgebook pagination"}
+                        subContainerClassName={"pages pagination"}
+                        activeClassName={"active"}
+                        forcePage={this.state.selectedPageIndex} />
+                </Col>
             </Row>
         )
     }
     getSearchBox() {
         return (
             <Row className='head-section'>
-                <FormGroup
-                    className='cname-input-box'>
-                    <FormControl
-                        type="text"
-                        className="autosuggestion-box"
-                        placeholder="Enter cust/guardian"
-                        onChange={(e) => this.inputControls.onChange(null, e.target.value, 'custOrGuardianName')} 
-                        //onKeyUp={(e) => this.handleKeyUp(e, {currElmKey: 'moreCustomerDetailValue', isToAddMoreDetail: true, traverseDirection: 'backward'})} 
-                        value={this.state.searchVal}
-                    />
-                    <FormControl.Feedback />
-                </FormGroup>
+                <Col xs={12} md={12}>
+                    <FormGroup
+                        className='cname-input-box'>
+                        <FormControl
+                            type="text"
+                            className="autosuggestion-box"
+                            placeholder="Enter cust/guardian"
+                            onChange={(e) => this.inputControls.onChange(null, e.target.value, 'custOrGuardianName')} 
+                            //onKeyUp={(e) => this.handleKeyUp(e, {currElmKey: 'moreCustomerDetailValue', isToAddMoreDetail: true, traverseDirection: 'backward'})} 
+                            value={this.state.searchVal}
+                        />
+                        <FormControl.Feedback />
+                    </FormGroup>
+                </Col>
                 <Col xs={12} md={12} style={{textAlign: 'center', marginBottom: '10px', color: 'lightgrey', fontSize: '12px'}}><span>(OR)</span></Col>
-                <FormGroup>
-                    <FormControl
-                        type="text"
-                        className="autosuggestion-box"
-                        placeholder="Enter CustId"
-                        onChange={(e) => this.inputControls.onChange(null, e.target.value, 'custId')} 
-                        //onKeyUp={(e) => this.handleKeyUp(e, {currElmKey: 'moreCustomerDetailValue', isToAddMoreDetail: true, traverseDirection: 'backward'})} 
-                        value={this.state.filters.hashKey}
-                    />
-                    <FormControl.Feedback />
-                </FormGroup>
+                <Col xs={12} md={12}>
+                    <FormGroup>
+                        <FormControl
+                            type="text"
+                            className="autosuggestion-box"
+                            placeholder="Enter CustId"
+                            onChange={(e) => this.inputControls.onChange(null, e.target.value, 'custId')} 
+                            //onKeyUp={(e) => this.handleKeyUp(e, {currElmKey: 'moreCustomerDetailValue', isToAddMoreDetail: true, traverseDirection: 'backward'})} 
+                            value={this.state.filters.hashKey}
+                        />
+                        <FormControl.Feedback />
+                    </FormGroup>
+                </Col>
             </Row>
         )
     }
@@ -208,9 +214,9 @@ class CustomerDetail extends Component {
                 color = 'green';
             buffer.push(
                 <Row className={(isSelected?'isSelected ':'') +'a-customer-card' } onClick={(e) => this.onCardClick(e, aCust, index)}>
-                    <Col id={index+ '1'} style={{color: color}}><span> <b>{aCust.name}</b>  <span style={{"fontSize":"8px"}}>c/of</span> <b>{aCust.gaurdianName}</b></span></Col>
-                    <Col id={index+ '2'}><span>{aCust.address}</span></Col>
-                    <Col id={index+ '3'}><span>{aCust.place}, {aCust.city} - {aCust.pincode}</span></Col>
+                    <Col xs={12} md={12} id={index+ '1'} style={{color: color}}><span> <b>{aCust.name}</b>  <span style={{"fontSize":"8px"}}>c/of</span> <b>{aCust.gaurdianName}</b></span></Col>
+                    <Col xs={12} md={12} id={index+ '2'}><span>{aCust.address}</span></Col>
+                    <Col xs={12} md={12} id={index+ '3'}><span>{aCust.place}, {aCust.city} - {aCust.pincode}</span></Col>
                 </Row>
             )
         });
@@ -220,7 +226,7 @@ class CustomerDetail extends Component {
     getDetailView() {
         let buffer = [];
         if(this.state.selectedCust){
-            buffer.push(<Tabs defaultActiveKey="general">
+            buffer.push(<Tabs defaultActiveKey="general" variant='pills' id='uncontrollerd'>
                 <Tab eventKey="general" title="General" >
                     <GeneralInfo {...this.state} refreshCustomerList={this.refreshCustomerList}/>
                 </Tab>
@@ -242,16 +248,18 @@ class CustomerDetail extends Component {
 
     render() {
         return (
-            <Grid className="customer-detail-container">
-                <Col className="left-pane" xs={3} md={3}>
-                    {this.getPagination()}
-                    {this.getSearchBox()}
-                    {this.getCustomerListView()}
-                </Col>
-                <Col className="right-pane" xs={9} md={9}>
-                    {this.getDetailView()}
-                </Col>
-            </Grid>
+            <Container className="customer-detail-container">
+                <Row>
+                    <Col className="left-pane" xs={3} md={3}>
+                        {this.getPagination()}
+                        {this.getSearchBox()}
+                        {this.getCustomerListView()}
+                    </Col>
+                    <Col className="right-pane" xs={9} md={9}>
+                        {this.getDetailView()}
+                    </Col>
+                </Row>
+            </Container>
         )
     }
 }

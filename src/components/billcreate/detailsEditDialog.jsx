@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Grid, Row, Col } from 'react-bootstrap';
+import { Container, Row, Col } from 'react-bootstrap';
 
 class DetailsEditDialog extends Component {
     constructor(props) {
@@ -27,7 +27,7 @@ class DetailsEditDialog extends Component {
         return (
             <div className='details-edit-dialog'>
                 <h4>EDIT</h4>
-                <Grid>
+                <Container>
                     <Row>
                         <Col md={4} xs={4}>
                             {this.state.field}
@@ -39,7 +39,7 @@ class DetailsEditDialog extends Component {
                     <Row>
                         <input type="button" className="gs-button" value="Update" onClick={(e) => this.handleUpdateClick(e)}/>
                     </Row>
-                </Grid>
+                </Container>
             </div>
         );
     }

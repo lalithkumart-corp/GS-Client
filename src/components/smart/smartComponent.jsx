@@ -21,6 +21,7 @@ import './smartComponent.css';
 import SignUpPage from '../signup/signup';
 import Settings from '../settings/settings';
 import BackupRestore from '../backup_restore/backupRestore';
+import 'bootstrap/dist/css/bootstrap.min.css';
 
 class SmartComponent extends Component {
     constructor(props) {

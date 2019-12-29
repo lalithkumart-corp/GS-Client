@@ -1,0 +1,18 @@
+.add-user-modal {
+    width: 50%;
+    background-color: white;
+    /* padding: 35px; */
+    margin-top: 5%;
+}
+.add-user-container {
+    padding-left: 15px;
+    padding-right: 15px;
+    margin-top: 20px;
+}
+.add-user-container .form-group .input-group {
+    width: 100%;
+}
+
+.add-user-container .form-group .form-control {
+    border-radius: 4px;
+}

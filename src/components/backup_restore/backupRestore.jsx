@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Grid, Row, Col, FormGroup, ControlLabel, FormControl, HelpBlock, InputGroup, Button, Glyphicon } from 'react-bootstrap';
+import { Container, Row, Col, FormGroup, FormLabel, FormControl, HelpBlock, InputGroup, Button, Glyphicon } from 'react-bootstrap';
 import Axios from 'axios';
 import { EXPORT_FULL_DB } from '../../core/sitemap';
 import { toast } from 'react-toastify';
@@ -31,11 +31,11 @@ export default class BackupRestore extends Component{
     }
     render() {
         return (
-            <Grid>
+            <Container>
                 <Row>
                     <input type='button' className='gs-button' onClick={this.makeExport} value='Backup' />
                 </Row>
-            </Grid>
+            </Container>
         )
     }
 }

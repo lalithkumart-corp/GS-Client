@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Grid, Row, Col } from 'react-bootstrap';
+import { Row, Col } from 'react-bootstrap';
 import { GET_INTEREST_RATES, UPDATE_INTEREST_RATES } from '../../../core/sitemap';
 import { getAccessToken } from '../../../core/storage';
 import { getInterestRate } from '../../../utilities/utility';

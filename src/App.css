@@ -1,3 +1,6 @@
+html {
+  font-size: 14px;
+}
 .App {
   text-align: center;
 }
@@ -206,4 +209,21 @@
   border-bottom-left-radius: 0;
   border-bottom-right-radius: 0;
 }
+
+.react-auto-suggest-list-item {
+  padding: 5px 10px;
+}
 /* END: React-Autosuggest css */
+
+
+/* START: Fixing, Bootstrap issue (due to different versions exist among diff npm */
+.tab-content>.active.show {
+  opacity: 1;
+}
+div[validationstate="error"] {
+  color: #f92626;
+}
+input[type=checkbox], input[type=radio] {
+  margin-left: -1.25rem;
+}
+/* END: ootstrap issue (due to different versions exist among diff npm */
