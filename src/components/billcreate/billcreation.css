@@ -110,7 +110,8 @@
 .react-autosuggest__input.city:focus,
 .react-autosuggest__input.pincode:focus,
 .react-autosuggest__input.mobile:focus,
-.ornament-dom-container .form-control:focus {
+.ornament-dom-container .form-control:focus,
+.react-autosuggest__input.morecustdetail:focus {
     border-color: rgb(204, 204, 204);
     border-bottom: 2px solid #0acfee;
     box-shadow: none;

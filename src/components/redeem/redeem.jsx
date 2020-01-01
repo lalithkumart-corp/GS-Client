@@ -533,7 +533,7 @@ class Redeem extends Component {
                             renderSuggestion={(suggestion) => this.reactAutosuggestControls.renderSuggestion(suggestion, 'billno')}
                             onSuggestionSelected={(event, { suggestion, suggestionValue, suggestionIndex, sectionIndex, method}) => this.reactAutosuggestControls.onSuggestionSelected(event, { suggestion, suggestionValue, suggestionIndex, sectionIndex, method }, 'billno')}
                             inputProps={{
-                                placeholder: 'Type ...',
+                                placeholder: 'Bill No',
                                 value: this.state.formData.billNo.inputVal || '',
                                 onChange: (e, {newValue, method}) => this.reactAutosuggestControls.onChange(e, {newValue, method}, 'billno'),//this.setState({billno: e.target.value}),
                                 onKeyUp: (e) => this.reactAutosuggestControls.handleKeyUp(e, {currElmKey: 'billno'}),

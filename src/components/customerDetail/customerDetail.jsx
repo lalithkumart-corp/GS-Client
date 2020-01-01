@@ -226,7 +226,7 @@ class CustomerDetail extends Component {
     getDetailView() {
         let buffer = [];
         if(this.state.selectedCust){
-            buffer.push(<Tabs defaultActiveKey="general" variant='pills' id='uncontrollerd'>
+            buffer.push(<Tabs defaultActiveKey="general" id='uncontrollerd'>
                 <Tab eventKey="general" title="General" >
                     <GeneralInfo {...this.state} refreshCustomerList={this.refreshCustomerList}/>
                 </Tab>

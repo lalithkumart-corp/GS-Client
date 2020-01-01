@@ -333,13 +333,27 @@ class GeneralInfo extends Component {
                 reqParams.append('imgContentType', 'file'); //Type of image contetn passed to API
                 reqParams.append('storeAs', 'FILE'); // Suggesting API to save in mentioned format
                 reqParams.append('pic', picture.holder.file); // Image content
-                uploadedImageDetail = await axios.post(SAVE_BINARY_IMAGE_AND_GET_ID, reqParams);
+                try {
+                    uploadedImageDetail = await axios.post(SAVE_BINARY_IMAGE_AND_GET_ID, reqParams);
+                    if(uploadedImageDetail.data.STATUS == 'ERROR')
+                        alert(uploadedImageDetail.data.MSG || 'Error in saving image in Database...');
+                } catch(e) {
+                    console.log(e);
+                    alert('Error in uploading Image in database');
+                }
             } else {
                 reqParams.imgContentType = 'base64'; //Type of image contetn passed to API
                 reqParams.storeAs = 'FILE'; // Suggesting API to save in mentioned format                
                 reqParams.format = picture.holder.confirmedImgSrc.split(',')[0];
                 reqParams.pic = picture.holder.confirmedImgSrc.split(',')[1]; // Image content
-                uploadedImageDetail = await axios.post(SAVE_BASE64_IMAGE_AND_GET_ID, reqParams);
+                try {
+                    uploadedImageDetail = await axios.post(SAVE_BASE64_IMAGE_AND_GET_ID, reqParams);
+                    if(uploadedImageDetail.data.STATUS == 'ERROR')
+                        alert(uploadedImageDetail.data.MSG || 'Error in saving image in Database...');
+                } catch(e) {
+                    console.log(e);
+                    alert('Error in uploading Image in database');
+                }
             }
             let currState = {...this.state};
             currState.userPicture.loading = false;

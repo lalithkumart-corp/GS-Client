@@ -242,13 +242,27 @@ class BillCreation extends Component {
                 reqParams.append('imgContentType', 'file'); //Type of image contetn passed to API
                 reqParams.append('storeAs', 'FILE'); // Suggesting API to save in mentioned format
                 reqParams.append('pic', picture.holder.file); // Image content
-                uploadedImageDetail = await axios.post(SAVE_BINARY_IMAGE_AND_GET_ID, reqParams);
+                try {
+                    uploadedImageDetail = await axios.post(SAVE_BINARY_IMAGE_AND_GET_ID, reqParams);
+                    if(uploadedImageDetail.data.STATUS == 'ERROR')
+                        alert(uploadedImageDetail.data.MSG || 'Error in saving image in Database...');
+                } catch(e) {
+                    console.log(e);
+                    alert('Error in uploading Image in database');
+                }
             } else {
                 reqParams.imgContentType = 'base64'; //Type of image contetn passed to API
                 reqParams.storeAs = 'FILE'; // Suggesting API to save in mentioned format                
                 reqParams.format = picture.holder.confirmedImgSrc.split(',')[0];
                 reqParams.pic = picture.holder.confirmedImgSrc.split(',')[1]; // Image content
-                uploadedImageDetail = await axios.post(SAVE_BASE64_IMAGE_AND_GET_ID, reqParams);
+                try {
+                    uploadedImageDetail = await axios.post(SAVE_BASE64_IMAGE_AND_GET_ID, reqParams);
+                    if(uploadedImageDetail.data.STATUS == 'ERROR')
+                        alert(uploadedImageDetail.data.MSG || 'Error in saving image in Database...');
+                } catch(e) {
+                    console.log(e);
+                    alert('Error in uploading Image in database');
+                }
             }
             let currState = {...this.state};
             currState.userPicture.loading = false;
@@ -280,18 +294,32 @@ class BillCreation extends Component {
                 reqParams.append('storeAs', 'FILE'); // Suggesting API to save in mentioned format
                 reqParams.append('pic', picture.holder.file); // Image content
                 reqParams.append('imgCategory', 'ORN');
-                uploadedImageDetail = await axios.post(SAVE_BINARY_IMAGE_AND_GET_ID, reqParams);
+                try {
+                    uploadedImageDetail = await axios.post(SAVE_BINARY_IMAGE_AND_GET_ID, reqParams);
+                    if(uploadedImageDetail.data.STATUS == 'ERROR')
+                        alert(uploadedImageDetail.data.MSG || 'Error in saving image in Database...');
+                } catch(e) {
+                    console.log(e);
+                    alert('Error in uploading Image in database');
+                }
             } else {
                 reqParams.imgContentType = 'base64'; //Type of image contetn passed to API
                 reqParams.storeAs = 'FILE'; // Suggesting API to save in mentioned format                
                 reqParams.format = picture.holder.confirmedImgSrc.split(',')[0];
                 reqParams.pic = picture.holder.confirmedImgSrc.split(',')[1]; // Image content
                 reqParams.imgCategory = 'ORN';
-                uploadedImageDetail = await axios.post(SAVE_BASE64_IMAGE_AND_GET_ID, reqParams);
+                try {
+                    uploadedImageDetail = await axios.post(SAVE_BASE64_IMAGE_AND_GET_ID, reqParams);
+                    if(uploadedImageDetail.data.STATUS == 'ERROR')
+                        alert(uploadedImageDetail.data.MSG || 'Error in saving image in Database...');
+                } catch(e) {
+                    console.log(e);
+                    alert('Error in uploading Image in database');
+                }
             }
             let currState = {...this.state};
             currState.ornPicture.loading = false;
-            currState.ornPicture.id = uploadedImageDetail.data.ID;            
+            currState.ornPicture.id = uploadedImageDetail.data.ID;
             this.setState(currState);
         } else if(action == 'del') {
             if(imageId) {
@@ -1315,7 +1343,7 @@ class BillCreation extends Component {
                             renderSuggestion={(suggestion) => this.renderSuggestion(suggestion, 'moreCustomerDetailsField')}
                             onSuggestionSelected={(event, { suggestion, suggestionValue, suggestionIndex, sectionIndex, method}) => this.reactAutosuggestControls.onSuggestionSelected(event, { suggestion, suggestionValue, suggestionIndex, sectionIndex, method }, 'moreCustomerDetailsField')}
                             inputProps={{
-                                placeholder: '',
+                                placeholder: 'Enter Id Name',
                                 value: this.state.formData.moreDetails.currCustomerInputField,
                                 onChange: (e, {newValue, method}) => this.reactAutosuggestControls.onChange(e, {newValue, method}, 'moreCustomerDetailsField'),
                                 onKeyUp: (e) => this.reactAutosuggestControls.onKeyUp(e, {currElmKey: 'moreCustomerDetailField', isMoreDetailInputKey: true}),
@@ -1328,16 +1356,16 @@ class BillCreation extends Component {
                         <FormGroup>
                             <FormControl
                                 type="text"
-                                placeholder="Enter text"
+                                placeholder="Enter Value"
                                 onChange={(e) => this.inputControls.onChange(null, e.target.value, 'moreCustomerDetailsValue')} 
                                 onKeyUp={(e) => this.handleKeyUp(e, {currElmKey: 'moreCustomerDetailValue', isToAddMoreDetail: true, traverseDirection: 'backward'})} 
                                 value={this.state.formData.moreDetails.currCustomerInputVal}
-                                inputRef = {(domElm) => { this.domElmns.moreCustomerDetailValue = domElm; }}
+                                ref = {(domElm) => { this.domElmns.moreCustomerDetailValue = domElm; }}
                                 readOnly={this.props.billCreation.loading}
                             />
                             <FormControl.Feedback />
                         </FormGroup>
-                    </Col>                    
+                    </Col>
                 </Row>
             )
         }
@@ -1382,7 +1410,7 @@ class BillCreation extends Component {
                                     <InputGroup.Text>Bill Notes</InputGroup.Text>
                                 </InputGroup.Prepend>
                                 <FormControl as="textarea" 
-                                    placeholder="Type here..." 
+                                    placeholder="Type notes/remarks reg this bill..." 
                                     value={this.state.formData.moreDetails.billRemarks} 
                                     onChange={(e) => this.inputControls.onChange(null, e.target.value, "billRemarks")}
                                     readOnly={this.props.billCreation.loading}
