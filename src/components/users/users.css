@@ -1,0 +1,9 @@
+.my-users-list-table {
+    table-layout: fixed;
+}
+.my-users-list-table .edit-icon,
+.my-users-list-table .delete-icon {
+    color: #2196f3;
+    cursor: pointer;
+    padding-left: 5px;
+}

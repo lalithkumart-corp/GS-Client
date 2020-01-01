@@ -18,7 +18,8 @@ class DatePicker extends Component {
                 'Last Month': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')],
                 'This Year': [moment().startOf('year'), moment().endOf('year')],
                 'Last 2 Years': [moment().subtract(1, 'year').startOf('year'), moment().endOf('year')],
-                'Last 3 Years': [moment().subtract(2, 'year').startOf('year'), moment().endOf('year')]
+                'Last 3 Years': [moment().subtract(2, 'year').startOf('year'), moment().endOf('year')],
+                'Last 4 Years': [moment().subtract(3, 'year').startOf('year'), moment().endOf('year')]
             },
             startDate: dates.startDate,
             endDate: dates.endDate,

@@ -3,9 +3,10 @@ import { Row, Col, Form, FormGroup, FormLabel, FormControl, HelpBlock, InputGrou
 import './addUser.css';
 import Axios from 'axios';
 import { getAccessToken } from '../../../core/storage';
-import { FETCH_ROLES_LIST } from '../../../core/sitemap';
+import { ADD_USER, FETCH_ROLES_LIST } from '../../../core/sitemap';
 import _ from 'lodash';
 import { DoublyLinkedList } from '../../../utilities/doublyLinkedList';
+import { toast } from 'react-toastify';
 
 const ENTER_KEY = 13;
 const SPACE_KEY = 32;
@@ -37,32 +38,15 @@ export default class Users extends Component {
                 name: {
                     inputVal: '',
                     hasError: false
-                },
-                storeName: {
-                    inputVal: '',
-                    hasError: false
-                },
-                phone: {
-                    inputVal: '',
-                    hasError: false
                 }
             },
             loading: false,
-            rolesList: [{rank: 3,
-                id: 3,
-                name: "Employee",
-                description: "employee",
-                created: null,
-                modified: null}]
+            rolesList: []
         }
     }
 
     componentDidMount() {
-        try {
-            //this.fetchRolesList();
-        } catch(e) {
-
-        }
+        this.fetchRolesList();
     }
 
     async fetchRolesList() {
@@ -74,6 +58,7 @@ export default class Users extends Component {
                 this.setState(newState);
             }
         } catch(e) {
+            toast.error('Exception');//TODO show proper err message
             console.log(e);
         }
     }
@@ -90,17 +75,54 @@ export default class Users extends Component {
         this.transerFocus();
     }
 
-    onClickAddUserBtn() {
-        if(this.validation()) {
+    getApiParams() {
+        return {
+            email: this.state.formData.email.inputVal,
+            password: this.state.formData.password.inputVal,
+            confirmPassword: this.state.formData.confirmPassword.inputVal,
+            userName: this.state.formData.name.inputVal,
+        }
+    }
 
+    onClickAddUserBtn() {
+        let validationRes = this.validation();
+        if(!validationRes.status)
+            toast.error(validationRes.errors.join(' || '));
+        else
+            this.makeAddUserAPICall();
+    }
+
+    async makeAddUserAPICall() {
+        try {
+            let accessToken = getAccessToken();
+            let resp = await Axios.post(ADD_USER, {accessToken: accessToken, formData: this.getApiParams()});
+            if(resp.data.STATUS.toLowerCase() == 'success') {
+                toast.success('Added new user successfully');
+            } else {
+                let errMsg = "Couldn't able to add new user";
+                if(resp.data.ERRORS && resp.data.ERRORS.length) {
+                    errMsg = resp.data.ERRORS.join(' || ');
+                }
+                toast.error(errMsg);
+            }
+        } catch(e) {
+            toast.error('Exception occured while adding new user...');
         }
     }
 
     validation() {
-        let status = true;
         let errors = [];
-        
-        return status;
+        if(this.state.formData.email.inputVal.length == 0)
+            errors.push('Email is invalid');
+        if(this.state.formData.password.inputVal.length == 0)
+            errors.push('Password is empty');
+        if(this.state.formData.confirmPassword.inputVal.length == 0)
+            errors.push('Confirm Password is empty');
+        if(this.state.formData.email.inputVal.length == 0 )
+            errors.push('User name is emtty');
+        if(this.state.formData.password.inputVal !== this.state.formData.confirmPassword.inputVal)
+            errors.push('Password and Confirm-password should match');
+        return {status: errors.length?0: 1, errors: errors};
     }
 
     transferFocus(e, currentElmKey, direction='forward') {
@@ -178,7 +200,7 @@ export default class Users extends Component {
                                     <FormControl
                                         type="text"
                                         value={this.state.formData.email.inputVal}
-                                        placeholder=""
+                                        placeholder="Enter E-Mail Id..."
                                         onChange={(e) => this.inputControls.onChange(e, e.target.value, "email")}
                                         inputRef = {(domElm) => { this.domElmns.email = domElm; }}
                                         onKeyUp = {(e) => this.handleKeyUp(e, {currElmKey: 'email'}) }
@@ -199,7 +221,7 @@ export default class Users extends Component {
                                     <FormControl
                                         type="password"
                                         value={this.state.formData.password.inputVal}
-                                        placeholder=""
+                                        placeholder="Password"
                                         onChange={(e) => this.inputControls.onChange(e, e.target.value, "password")}
                                         inputRef = {(domElm) => { this.domElmns.password = domElm; }}
                                         onKeyUp = {(e) => this.handleKeyUp(e, {currElmKey: 'password'}) }
@@ -218,7 +240,7 @@ export default class Users extends Component {
                                     <FormControl
                                         type="password"
                                         value={this.state.formData.confirmPassword.inputVal}
-                                        placeholder=""
+                                        placeholder="Re-type Password"
                                         onChange={(e) => this.inputControls.onChange(null, e.target.value, "confirmPassword")}
                                         inputRef = {(domElm) => { this.domElmns.confirmPassword = domElm; }}
                                         onKeyUp = {(e) => this.handleKeyUp(e, {currElmKey: 'confirmPassword'}) }
@@ -239,7 +261,7 @@ export default class Users extends Component {
                                     <FormControl
                                         type="text"
                                         value={this.state.formData.name.inputVal}
-                                        placeholder=""
+                                        placeholder="User name"
                                         onChange={(e) => this.inputControls.onChange(null, e.target.value, "name")}
                                         inputRef = {(domElm) => { this.domElmns.name = domElm; }}
                                         onKeyUp = {(e) => this.handleKeyUp(e, {currElmKey: 'name'}) }
