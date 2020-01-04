@@ -53,14 +53,35 @@ export default class Users extends Component {
         try {
             let newState = {...this.state};
             let rolesResp = await Axios.get(FETCH_ROLES_LIST+`?access_token=${getAccessToken()}`);
-            if(rolesResp && rolesResp.data) {
-                newState.rolesList = rolesResp.data.list;
+            if(rolesResp && rolesResp.data && rolesResp.data.list) {
+                let flag = false;
+                newState.rolesList = rolesResp.data.list.map((aRoleObj) => {
+                    if(!flag){
+                        aRoleObj.selected = true;
+                        flag = true;
+                    } else {
+                        aRoleObj.selected = false;
+                    }
+                    return aRoleObj;
+                });
                 this.setState(newState);
             }
         } catch(e) {
             toast.error('Exception');//TODO show proper err message
             console.log(e);
         }
+    }
+
+    onDropdownChange(e) {
+        let selectedRoleId = e.target.value;
+        let newState = {...this.state};
+        _.each(newState.rolesList, (aRoleObj, index) => {
+            if(aRoleObj.id == selectedRoleId)
+                aRoleObj.selected = true;
+            else 
+                aRoleObj.selected = false;
+        });
+        this.setState(newState);
     }
 
     handleKeyUp(e, options) {
@@ -81,7 +102,19 @@ export default class Users extends Component {
             password: this.state.formData.password.inputVal,
             confirmPassword: this.state.formData.confirmPassword.inputVal,
             userName: this.state.formData.name.inputVal,
+            roleId: this.getSelectedRoleId()
         }
+    }
+
+    getSelectedRoleId() {
+        let roleId;
+        if(this.state.rolesList.length > 0) {
+            _.each(this.state.rolesList, (aRole, index) => {
+                if(aRole.selected)
+                    roleId = aRole.id;
+            });
+        }
+        return roleId;
     }
 
     onClickAddUserBtn() {
@@ -106,6 +139,7 @@ export default class Users extends Component {
                 toast.error(errMsg);
             }
         } catch(e) {
+            console.log(e);
             toast.error('Exception occured while adding new user...');
         }
     }
@@ -122,6 +156,8 @@ export default class Users extends Component {
             errors.push('User name is emtty');
         if(this.state.formData.password.inputVal !== this.state.formData.confirmPassword.inputVal)
             errors.push('Password and Confirm-password should match');
+        if(!this.getSelectedRoleId())
+            errors.push('Select Role or the User');
         return {status: errors.length?0: 1, errors: errors};
     }
 
@@ -154,7 +190,7 @@ export default class Users extends Component {
         return nextNode;
     }
 
-    getPrevElm(currElmKey) {        
+    getPrevElm(currElmKey) {
         let currNode = domList.findNode(currElmKey);
         let prevNode = currNode.prev;
         if(prevNode && !prevNode.enabled)
@@ -180,7 +216,7 @@ export default class Users extends Component {
         let list = [];
         _.each(this.state.rolesList, (aRoleObj, index) => { // <Dropdown.Item key={'dropdown'+index} eventKey={aRoleObj.id}>{ aRoleObj.name }</Dropdown.Item>
             list.push(
-                <option key={'dropdown'+index}>{ aRoleObj.name }</option>
+                <option key={'dropdown'+index} value={aRoleObj.id}>{ aRoleObj.name }</option>
             );
         });
         return list;
@@ -274,7 +310,7 @@ export default class Users extends Component {
                         <Col>
                             <Form.Group>
                                 <Form.Label>Role</Form.Label>
-                                <Form.Control as="select">
+                                <Form.Control as="select" onChange={(e) => this.onDropdownChange(e)} value={this.getSelectedRoleId()}>
                                     {this.getRolesDOMList()}
                                 </Form.Control>
                             </Form.Group>
