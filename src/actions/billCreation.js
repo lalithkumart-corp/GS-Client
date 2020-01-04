@@ -2,6 +2,7 @@ import axios from 'axios';
 import { PLEDGEBOOK_ADD_RECORD, GET_LAST_BILL_NO, PLEDGEBOOK_UPDATE_RECORD } from '../core/sitemap';
 import { toast } from 'react-toastify';
 import { getAccessToken } from '../core/storage';
+import axiosMiddleware from '../core/axios';
 
 export const insertNewBill = (requestParams) => {
     return (dispatch) => {
@@ -9,7 +10,7 @@ export const insertNewBill = (requestParams) => {
             type: 'ENABLE_LOADING'
         });
         let accessToken = getAccessToken();
-        axios.post(PLEDGEBOOK_ADD_RECORD, {accessToken, requestParams})
+        axiosMiddleware.post(PLEDGEBOOK_ADD_RECORD, {accessToken, requestParams})
             .then(
                 (resp) => {
                     if(resp.data.STATUS == 'ERROR') {
@@ -18,7 +19,7 @@ export const insertNewBill = (requestParams) => {
                         dispatch({
                             type: 'NEW_BILL_INSERTION_ERROR',
                             data: {msg: resp.data.ERROR}
-                        });                    
+                        });
                     } else {
                         toast.success('New bill added successfully'); //TODO: Hide this msg automatically after some timeout
                         dispatch({
@@ -36,6 +37,15 @@ export const insertNewBill = (requestParams) => {
                     console.log(resp.data);
                 },
                 (errResp) => {
+                    let msg = 'Unknown Error occured while inserting new bill';
+                    if(errResp.response && errResp.response.data && errResp.response.data.error && errResp.response.data.error.message)
+                        msg = errResp.response.data.error.message;
+                    dispatch({
+                        type: 'NEW_BILL_INSERTION_ERROR',
+                        data: {msg: msg}
+                    });
+                    if(!errResp._IsDeterminedError)
+                        toast.error(msg);
                     console.log(errResp);
                 }
             )
@@ -53,7 +63,7 @@ export const updateBill = (requestParams) => {
             type: 'ENABLE_LOADING'
         });
         let accessToken = getAccessToken();
-        axios.post(PLEDGEBOOK_UPDATE_RECORD, {accessToken, requestParams})
+        axiosMiddleware.post(PLEDGEBOOK_UPDATE_RECORD, {accessToken, requestParams})
             .then(
                 (resp) => {
                     if(resp.data.STATUS == 'ERROR') {
@@ -78,6 +88,8 @@ export const updateBill = (requestParams) => {
                     console.log(resp.data);
                 },
                 (errResp) => {
+                    if(!errResp._IsDeterminedError)
+                        toast.error('Error response returned while updating the bill.');
                     console.log(errResp);
                 }
             )
@@ -133,7 +145,7 @@ export const disableReadOnlyMode = () => {
 export const getBillNoFromDB = () => {
     return (dispatch) => {
         let accessToken = getAccessToken();
-        axios.get(GET_LAST_BILL_NO+`?access_token=${accessToken}`)
+        axiosMiddleware.get(GET_LAST_BILL_NO+`?access_token=${accessToken}`)
             .then(
                 (successResp) => {                                        
                     dispatch({                        
@@ -142,7 +154,8 @@ export const getBillNoFromDB = () => {
                     })
                 },
                 (errResp) => {
-                    toast.error('Error in fetching th elast etered Bill number series');
+                    if(!errResp._IsDeterminedError)
+                        toast.error('Error in fetching th elast etered Bill number series');
                 }
             )
             .catch(

@@ -8,6 +8,8 @@ import CommonModal from '../common-modal/commonModal';
 import GSTable from '../../components/gs-table/GSTable';
 import './users.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import axiosMiddleware from '../../core/axios';
+import { toast } from 'react-toastify';
 
 export default class Users extends Component {
     constructor(props) {
@@ -58,7 +60,7 @@ export default class Users extends Component {
     }
 
     fetchUsersList() {
-        axios.get(USERS_LIST+`?access_token=${getAccessToken()}`)
+        axiosMiddleware.get(USERS_LIST+`?access_token=${getAccessToken()}`)
         .then(
             (successResp) => {
                 if(successResp.data.STATUS == "success") {
@@ -66,6 +68,8 @@ export default class Users extends Component {
                 }
             },
             (errResp) => {
+                if(!errResp._IsDeterminedError)
+                    toast.error('Error reponse returned while fetching Users List');
                 console.log(errResp);
             }
         )
@@ -105,7 +109,7 @@ export default class Users extends Component {
                     {this.getUserListTable()}
                 </Row>
                 <CommonModal modalOpen={this.state.addUserModalOpen} handleClose={this.handleAddUserModalClose} secClass='add-user-modal'>
-                    <AddUser onSubmit={this.AddUserSubmit}/>
+                    <AddUser/>
                 </CommonModal>
             </Container>
         )

@@ -10,6 +10,8 @@ import History from './history';
 import Notes from './notes';
 import Settings from './settings';
 import ReactPaginate from 'react-paginate';
+import axiosMiddleware from '../../core/axios';
+import { toast } from 'react-toastify';
 
 class CustomerDetail extends Component {
     constructor(props) {
@@ -86,14 +88,25 @@ class CustomerDetail extends Component {
     }
 
     async _fetchCustomers() {
-        let accessToken = getAccessToken();
-        let offsetStart = (this.state.selectedPageIndex*this.state.pageLimit);
-        let response = await axios.get(PLEDGEBOOK_METADATA + `?access_token=${accessToken}&identifiers=["all", "otherDetails"]&offsetStart=${offsetStart}&limit=${this.state.pageLimit}&filters=${JSON.stringify(this.state.filters)}`);
-        //let response = await axios.get(PLEDGEBOOK_METADATA + `?access_token=${accessToken}&identifiers=["all", "otherDetails"]`);
-        return {
-            list: this.parseCustomerDataList(response.data.customers.list),
-            count: response.data.customers.count
-        };
+        let list = [];
+        let count = 0;
+        try {
+            let accessToken = getAccessToken();
+            let offsetStart = (this.state.selectedPageIndex*this.state.pageLimit);
+            let response = await axiosMiddleware.get(PLEDGEBOOK_METADATA + `?access_token=${accessToken}&identifiers=["all", "otherDetails"]&offsetStart=${offsetStart}&limit=${this.state.pageLimit}&filters=${JSON.stringify(this.state.filters)}`);
+            //let response = await axios.get(PLEDGEBOOK_METADATA + `?access_token=${accessToken}&identifiers=["all", "otherDetails"]`);
+            list = this.parseCustomerDataList(response.data.customers.list);
+            count = response.data.customers.count;
+        } catch(e) {
+            if(!e._IsDeterminedError)
+                toast.error('Exception in fetching the Cunstomers list.');
+        } finally {
+            return {
+                list: list,
+                count: count
+            };
+        }
+        
     }
 
     parseCustomerDataList(rawCustomerDataList) {
