@@ -1,14 +1,22 @@
 import React, { Component } from 'react';
 import { Nav, Navbar, NavDropdown, NavItem, DropdownItem } from 'react-bootstrap';
-import { LinkContainer } from 'react-router-bootstrap';
+import { getUserPreference } from '../../core/storage';
 
 class NavbarComp extends Component {
     constructor(props) {
         super(props);
     }
+    getTitie() {
+        let title = 'Welcome';
+        debugger;
+        let userPreferences = getUserPreference();
+        if(userPreferences && userPreferences.username)
+            title += ` ${userPreferences.username}`;
+        return title;
+    }
     render() {
         return (
-            <Navbar>
+            <Navbar bg="light" expand="lg">
                 <Navbar.Collapse id="basic-navbar-nav">
                     <Nav className="mr-auto">
                         <Nav.Link href="/">Home</Nav.Link>
@@ -27,7 +35,11 @@ class NavbarComp extends Component {
                             <NavDropdown.Item href="/demo">Demo</NavDropdown.Item>
                             <NavDropdown.Item href="/backup_restore">Backup/Restore</NavDropdown.Item>
                         </NavDropdown>
-                        <Nav.Link href="/logout">Logout</Nav.Link>
+                    </Nav>
+                    <Nav>
+                        <NavDropdown title={this.getTitie()}>
+                            <NavDropdown.Item href="/logout">Logout</NavDropdown.Item>
+                        </NavDropdown>
                     </Nav>
                 </Navbar.Collapse>
             </Navbar>

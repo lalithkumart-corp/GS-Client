@@ -103,7 +103,12 @@ const _getCookieOptions = (options = {}) => {
 }
 
 export const getUserPreference = () => {
-    return _read(keys.userPreferences);
+    let userPreferences = _read(keys.userPreferences);
+    try {
+        return JSON.parse(userPreferences);
+    } catch(e) {
+        return userPreferences;
+    }
 };
 
 export const setUserPreference = (data) => {

@@ -98,9 +98,9 @@ class LoginPage extends Component {
         return (
             <Container className='login-container'>
                 <Row>
-                    <Col className='login-card' mdOffset= {4} md={4}>
+                    <Col className='login-card' md={{span: 4, offset: 4}}>
                         <Row>
-                            <Col md={10}>
+                            <Col md={{span: 10, offset: 1}}>
                                 <FormGroup
                                     controlId="formBasicText"
                                     validationState= {this.state.formData.email.hasError ? "error" : "success"}
@@ -119,7 +119,7 @@ class LoginPage extends Component {
                             </Col>
                         </Row>
                         <Row>
-                            <Col md={10}>
+                            <Col md={{span: 10, offset: 1}}>
                                 <FormGroup
                                     controlId="formBasicText"
                                     validationState= {this.state.formData.password.hasError ? "error" : "success"}
@@ -138,7 +138,7 @@ class LoginPage extends Component {
                             </Col>
                         </Row>
                         <Row>
-                            <Col md={10}>
+                            <Col md={{span: 4, offset: 1}}>
                                 <ButtonToolbar>
                                     <Button onClick={this.onLoginClick}> 
                                         Login
@@ -151,6 +151,9 @@ class LoginPage extends Component {
                                             />
                                     </Button>
                                 </ButtonToolbar>
+                            </Col>
+                            <Col md={{span: 3, offset: 3}} className='gs-button'>
+                                <a href='/signup'>Sign Up</a>
                             </Col>
                         </Row>
                     </Col>

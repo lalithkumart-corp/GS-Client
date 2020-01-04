@@ -13,12 +13,12 @@ class Logout extends Component {
         return (
             <div>
                 {this.props.auth.isAuthenticated && <p>Logging you Out</p>}
-                {!this.props.auth.isAuthenticated && <p>Logged out successfully</p>}
+                {!this.props.auth.isAuthenticated && <p>Logged Out. Please <a href='/'>click here to Login</a></p>}
             </div>
         )
     }
 }
-const mapStateToProps = (state) => { 
+const mapStateToProps = (state) => {
     return {
         auth: state.auth
     };

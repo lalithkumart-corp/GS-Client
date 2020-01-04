@@ -3,6 +3,7 @@ import { getAccessToken, saveSession, clearSession } from '../core/storage';
 import { LOGIN, LOGOUT } from '../core/sitemap';
 import { toast } from 'react-toastify';
 import history from '../history';
+import axiosMiddleware from '../core/axios';
 
 export const enableLoader = (params) => {
     return (dispatch) => {
@@ -14,7 +15,7 @@ export const enableLoader = (params) => {
 
 export const doAuthentication = (params) => {
     return (dispatch) => {
-        axios.post(LOGIN, params)
+        axiosMiddleware.post(LOGIN, params)
         .then(
             (successResp) => {                
                 let data = successResp.data;
@@ -27,14 +28,15 @@ export const doAuthentication = (params) => {
                     data: data
                 });
             },
-            (errorResponse) => {                
+            (errorResponse) => {
                 let errorMsg ='Error while login into application...';
                 let errorCode = 'AUTH_ERROR';
-                if(errorResponse.response || errorResponse.response.data.error){
+                if(errorResponse.response && errorResponse.response.data.error){
                     errorMsg = errorResponse.response.data.error.message;
                     errorCode = errorResponse.response.data.error.code;
                 }
-                toast.error(errorMsg);
+                if(!errorResponse._IsDeterminedError)
+                    toast.error(errorMsg);
                 console.log(errorResponse);
                 
                 dispatch({
