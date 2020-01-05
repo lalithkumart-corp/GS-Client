@@ -8,7 +8,6 @@ class NavbarComp extends Component {
     }
     getTitie() {
         let title = 'Welcome';
-        debugger;
         let userPreferences = getUserPreference();
         if(userPreferences && userPreferences.username)
             title += ` ${userPreferences.username}`;

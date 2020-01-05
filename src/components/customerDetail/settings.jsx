@@ -23,7 +23,7 @@ export default class Settings extends Component {
         let disableCheckcboxTicked = this.state.disableCheckcboxTicked;
         if(nextProps.selectedCust)
             disableCheckcboxTicked = nextProps.selectedCust.custStatus?false:true;
-        this.setState({disableCheckcboxTicked: disableCheckcboxTicked, billHistory: nextProps.billHistory, custDetail: nextProps.selectedCust, mergetoCustomerHashkey: null, mergeToCustomerInfo: null});
+        this.setState({disableCheckcboxTicked: disableCheckcboxTicked, billHistory: nextProps.billHistory, custDetail: nextProps.selectedCust, mergetoCustomerHashkey: '', mergeToCustomerInfo: ''});
     }
     
     onCustomerHashKeyChange(e) {
@@ -141,9 +141,30 @@ export default class Settings extends Component {
                         <div className='gs-card-content'>
                             <h4 style={{marginBottom: '40px'}}>Update Customer - Merging into other</h4>
                             <Row>
-                                <Col xs={3} md={3}><input type='text' className='gs-input' value={this.state.custDetail.hashKey} readonly='true'/></Col>
-                                <Col xs={3} md={3}><input type='text' className='gs-input' value={this.state.mergetoCustomerHashkey} onChange={(e) => this.onCustomerHashKeyChange(e)}/></Col>
-                                <Col xs={3} md={3}><input type='button' className='gs-button' onClick={this.fetchCustomerData} value='check'/></Col>
+                                <Col xs={3} md={3}>
+                                    <FormGroup>
+                                        <FormControl
+                                            type="text"
+                                            value={this.state.custDetail.hashKey}
+                                            readOnly={true}
+                                        />
+                                        <FormControl.Feedback />
+                                    </FormGroup>
+                                </Col>
+                                <Col xs={3} md={3}>
+                                    <FormGroup>
+                                        <FormControl
+                                            placeholder="Enter Cust Id/Key where you merge this customer"
+                                            type="text"
+                                            value={this.state.mergetoCustomerHashkey}
+                                            onChange={(e) => this.onCustomerHashKeyChange(e)}
+                                        />
+                                        <FormControl.Feedback />
+                                    </FormGroup>
+                                </Col>
+                                <Col xs={3} md={3}>
+                                    <input type='button' className='gs-button' onClick={this.fetchCustomerData} value='check'/>
+                                </Col>
                             </Row>
                             {
                                 this.state.mergeToCustomerInfo && 

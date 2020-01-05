@@ -49,7 +49,6 @@ class Redeem extends Component {
     async componentDidMount() {
         this.getBillNos();
         let rates = await getInterestRate();
-        console.log('-------49');
         this.setState({interestRates: rates});
     }
     /* START: API related methods */
@@ -59,7 +58,6 @@ class Redeem extends Component {
             .then(
                 (successResp) => {
                     let list = successResp.data.list;
-                    console.log('-------59');
                     this.setState({totalBillNoList: list, fetchingBillNoList: false});                    
                     this.transferFocus(null, 'submitBtn', 'previous');
                 },
@@ -84,17 +82,14 @@ class Redeem extends Component {
                     if(successResp.data && successResp.data && successResp.data.billDetails && successResp.data.billDetails[0]){
                         let selectedBillData = successResp.data.billDetails[0];
                         selectedBillData = this.parseResponse(selectedBillData);
-                        console.log('-------84');
                         this.setState({selectedBillData: selectedBillData, billNotFound: false});
                         this.transferFocus(null, 'billInputBox');
                     }else{
-                        console.log('-------88');
                         this.setState({selectedBillData: null, billNotFound: true});
                         toast.error(`${billNo} Bill Data not found or might be redeemed already`);
                     }
                 },
                 (errResp) => {
-                    console.log('-------94');
                     this.setState({selectedBillData: null, error: true});
                     toast.error('Error in fetching the bill details');
                     console.log(errResp);
@@ -102,7 +97,6 @@ class Redeem extends Component {
             )
             .catch(
                 (exception) => {
-                    console.log('------102');
                     this.setState({selectedBillData: null, error: true});
                     toast.error('Exception occured in fetching the billDetails');
                     console.log(exception)
@@ -112,13 +106,9 @@ class Redeem extends Component {
     /* END: API related methods */
     autuSuggestionControls = {
         onChange: async (billnoVal, identifier) => {
-            console.log(billnoVal, 'Before state update>>>>>>>', this.state.formData.billNo.inputVal);
             let newState = {...this.state};
             newState.formData.billNo.inputVal = billnoVal;
-            newState.lalith = billnoVal;
-            console.log('-------116');
-            this.setState(newState, () => {console.log('CALLBACK', this.state.lalith, this.state.formData.billNo.inputVal)});
-            console.log('After state update<<<<<<<', this.state.formData.billNo.inputVal);
+            this.setState(newState);
         },
         onBillNoSearch: (val) => {
             let newState = {...this.state};
@@ -137,7 +127,6 @@ class Redeem extends Component {
                     currListSize++;
                 }
             });
-            console.log('-------137', newState.lalith, newState.billno);
             this.setState(newState);
         },
         onSelect: (val, identifier) => {
@@ -167,8 +156,8 @@ class Redeem extends Component {
             this.handleKeyUp(e, options);
         },
         onChange: async (event, { newValue, method }, identifier) => {
-            await this.autuSuggestionControls.onChange(newValue, identifier);
-            console.log('RAS- after update state', this.state.formData.billNo.inputVal);
+            console.log(newValue);
+            this.autuSuggestionControls.onChange(newValue, identifier);
         }
     }
     inputControls = {
@@ -176,7 +165,6 @@ class Redeem extends Component {
             let newState = {...this.state};
             switch(identifier) {
                 case 'date':
-                    debugger;
                     newState.date.inputVal = getDateInUTC(val);
                     newState.date._inputVal = moment(val).format('DD/MM/YYYY');
                     break;
@@ -191,7 +179,6 @@ class Redeem extends Component {
                     newState.selectedBillData._totalValue = newState.selectedBillData.Amount + newState.selectedBillData._totalInterestValue - newState.selectedBillData._discountValue;
                     break;
             }
-            console.log('-------190');
             this.setState(newState);
         }
     }
@@ -207,7 +194,6 @@ class Redeem extends Component {
         switch(options.currElmKey) {
             case 'billno':
                 let billNo = e.target.value;
-                console.log('-------206');
                 this.setState({selectedBillNo: billNo});
                 if(billNo)
                     this.fetchBillData(billNo);
@@ -217,7 +203,6 @@ class Redeem extends Component {
         if(canTransferFocus)
             this.transferFocus(e, options.currElmKey, options.traverseDirection);
 
-        console.log('-------ENTER key pressed');
     }
     
     handleSpaceKeyPress(e, options) {
@@ -258,13 +243,17 @@ class Redeem extends Component {
         //     defaultBillNoPrefix = this.props.billCreation.billSeries + '.';
 
         //Adding the last typed bill number's prefix(bill series..ie: if A.4521 is last typed bill no, then 4521 nly be cleared, and "A." will be remained
+        let newState = {...this.state};
         let existingBillNo = this.state.formData.billNo.inputVal || '';
         let splits = existingBillNo.split('.');
         let nextBillnoSuggestion = '';
         if(splits.length > 1)
             nextBillnoSuggestion= splits[0]+'.' || '';
-        console.log('-------252');
-        await this.setState({billno: nextBillnoSuggestion, selectedBillData: null, fetchingBillNoList: true});
+        newState.formData.billNo.inputVal = nextBillnoSuggestion;
+        newState.selectedBillData = null;
+        newState.fetchingBillNoList = true;
+        //this.setState({billno: {inputVal: nextBillnoSuggestion} , selectedBillData: null, fetchingBillNoList: true});
+        this.setState(newState);
         this.transferFocus(null, 'submitBtn', 'previous');
         this.getBillNos();
     }
