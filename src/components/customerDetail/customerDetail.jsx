@@ -114,6 +114,7 @@ class CustomerDetail extends Component {
         _.each(rawCustomerDataList, (aCustData, index) => {
             try{
                 aCustData.otherDetails = JSON.parse(aCustData.otherDetails);
+                aCustData.secMobile = aCustData.secMobile || ''; //REACT issue: Field not cleared if set to null. SO, To avoid issue, setting as empty string.
                 parsedData.push(aCustData);
             } catch(e) {
                 alert(e);
