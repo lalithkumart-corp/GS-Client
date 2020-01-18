@@ -52,10 +52,10 @@ class Notes extends Component {
         _.each(this.state.billHistory, (aRec, index) => {
             if(aRec.Remarks) {
                 theDOM .push(
-                    <div className='bill-remark-display'>
-                        <p><span>{aRec.BillNo}</span> <span className='float-right'>{aRec.Date}</span></p>
-                        <p>{aRec.Remarks}</p>
-                    </div>
+                    <Row xs={12} md={12} className='bill-remark-display'>
+                        <Col xs={12} md={12}><p><span>{aRec.BillNo}</span> <span className='float-right'>{aRec.Date}</span></p></Col>
+                        <Col xs={12} md={12}><p>{aRec.Remarks}</p></Col>
+                    </Row>
                 );
             }
         });
@@ -111,8 +111,8 @@ class Notes extends Component {
                     {this.getCustomRemarks()}
                 </Row>
                 <Row style={{marginTop: '25px'}}>
-                    <h4>Collected from all Bills:</h4>
-                    {this.getRemarksByBill()}
+                    <Col xs={12} md={12}><h4>Collected from all Bills:</h4></Col>
+                    <Col xs={12} md={12}>{this.getRemarksByBill()}</Col>
                 </Row>
             </Container>
         )

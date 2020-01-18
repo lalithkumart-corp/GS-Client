@@ -608,12 +608,16 @@ class BillCreation extends Component {
         }
     }
 
-    canTransferFocus(e, currElmKey) {
+    canTransferFocus(e, currElmKey, options) {
         let flag = true;
         if(currElmKey == 'amount') {
             if(this.state.formData.amount.inputVal == '')
                 flag = false;
             if(this.props.billCreation.loading)
+                flag = false;
+        }
+        if(options && options.isOrnItemInput) {
+            if(!options._removedEmptyRow && e.target.value === "") //If orn item is empty, then prevent transferring of focus to next input
                 flag = false;
         }
         return flag;
@@ -682,6 +686,9 @@ class BillCreation extends Component {
             await this.setState(newState);
 
             options.currElmKey = 'ornSpec'+(serialNo-1); //update current Element key            
+            options._removedEmptyRow = true;
+        } else {
+            options._removedEmptyRow = false;
         }
         return options;
     }
@@ -859,7 +866,7 @@ class BillCreation extends Component {
         }else if(options && options.isSubmitBtn) {
             this.handleSubmit();
         }
-        if(this.canTransferFocus(evt, options.currElmKey))
+        if(this.canTransferFocus(evt, options.currElmKey, options))
             this.transferFocus(evt, options.currElmKey, options.traverseDirection);
     }
 
