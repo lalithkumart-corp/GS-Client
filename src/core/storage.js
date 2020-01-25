@@ -2,6 +2,7 @@ import cookie from 'react-cookies';
 
 const keys = {
     userId: 'userId',
+    session: 'session',
     userPreferences: 'userPreferences',
     accessToken: 'accessToken',
     interestRates: 'interestRates'
@@ -11,7 +12,8 @@ const keyMaps = {
     local: [
         keys.userId,
         keys.userPreferences,
-        keys.interestRates
+        keys.interestRates,
+        keys.session
     ],
     session: [
 
@@ -123,9 +125,22 @@ export const storeAccessToken = (data) => {
     _save(keys.accessToken, data);
 };
 
-export const saveSession = (data) => {    
+export const saveSession = (data) => {
     storeAccessToken(data.id);
-    setUserPreference(data);    
+    _save(keys.session, data);
+};
+
+export const getSession = () => {
+    let session = _read(keys.session);
+    try {
+        return JSON.parse(session);
+    } catch(e) {
+        return session;
+    }
+}
+
+export const saveUserPreferences = (data) => {
+    setUserPreference(data);
 };
 
 export const getAccessToken = (data) => {

@@ -102,19 +102,19 @@ class BillCreation extends Component {
                     limitedList: ['Loading...']
                 },
                 place: {
-                    inputVal: '',
+                    inputVal: this.getDefaultFromStore('place') || '',
                     hasError: false,
                     list: ['Loading...'],
                     limitedList: ['Loading...']
                 },
                 city: {
-                    inputVal: '',
+                    inputVal: this.getDefaultFromStore('city') || '',
                     hasError: false,
                     list: ['Loading...'],
                     limitedList: ['Loading...']
                 },
                 pincode: {
-                    inputVal: '',
+                    inputVal: this.getDefaultFromStore('pincode') || '',
                     hasError: false,
                     list: ['Loading...'],
                     limitedList: ['Loading...']
@@ -181,6 +181,7 @@ class BillCreation extends Component {
         if(nextProps.billCreation.clearEntries) {
             this.updateDomList('resetOrnTableRows', newState);
             newState = resetState(nextProps, newState);
+            this.injectDefaults(newState);
             this.updateDomList('disableMoreDetailsInputElmns');
             this.props.updateClearEntriesFlag(false);
         }
@@ -360,6 +361,11 @@ class BillCreation extends Component {
     /* END: API accessors */
 
     /* START: SETTERS */    
+    injectDefaults(newState) {
+        newState.formData.place.inputVal = this.getDefaultFromStore('place') || '';
+        newState.formData.city.inputVal = this.getDefaultFromStore('city') || '';
+        newState.formData.pincode.inputVal = this.getDefaultFromStore('pincode') || '';
+    }
     updateFieldValuesInState(data) {
         let newState = {...this.state};
         newState.formData.date.inputVal = data.Date;
@@ -425,6 +431,24 @@ class BillCreation extends Component {
     /* END: SETTERS */
 
     /* START: GETTERS */
+    getDefaultFromStore(identifier) {
+        let val = '';
+        switch(identifier) {
+            case 'place':
+                if(this.props.auth && this.props.auth.userPreferences)
+                    val = this.props.auth.userPreferences.bill_create_place_default || '';
+                break;
+            case 'city':
+                if(this.props.auth && this.props.auth.userPreferences)
+                    val = this.props.auth.userPreferences.bill_create_city_default || '';
+                break;
+            case 'pincode':
+                if(this.props.auth && this.props.auth.userPreferences)
+                    val = this.props.auth.userPreferences.bill_create_pincode_default || '';
+                break;
+        }
+        return val;
+    }
     getNextElm(currElmKey) {    
         let currNode = domList.findNode(currElmKey);
         let nextNode = currNode.next;
@@ -611,9 +635,12 @@ class BillCreation extends Component {
     canTransferFocus(e, currElmKey, options) {
         let flag = true;
         if(currElmKey == 'amount') {
-            if(this.state.formData.amount.inputVal == '')
+            if(this.state.formData.amount.inputVal.trim() == '')
                 flag = false;
             if(this.props.billCreation.loading)
+                flag = false;
+        } else if (currElmKey == 'cname') {
+            if(this.state.formData.cname.inputVal.trim() == '')
                 flag = false;
         }
         if(options && options.isOrnItemInput) {
@@ -1794,8 +1821,9 @@ class BillCreation extends Component {
     }    
 }
 
-const mapStateToProps = (state) => { 
+const mapStateToProps = (state) => {
     return {
+        auth: state.auth,
         billCreation: state.billCreation
     };
 };

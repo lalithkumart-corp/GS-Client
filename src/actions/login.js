@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { getAccessToken, saveSession, clearSession } from '../core/storage';
+import { getAccessToken, saveSession, clearSession, saveUserPreferences } from '../core/storage';
 import { LOGIN, LOGOUT } from '../core/sitemap';
 import { toast } from 'react-toastify';
 import history from '../history';
@@ -17,11 +17,12 @@ export const doAuthentication = (params) => {
     return (dispatch) => {
         axiosMiddleware.post(LOGIN, params)
         .then(
-            (successResp) => {                
+            (successResp) => {
                 let data = successResp.data;
                 // let accessToken = data.id;
                 // storeAccessToken(accessToken);
-                saveSession(data);
+                saveSession(data.session);
+                saveUserPreferences(data.userPreferences);
                 // history.push('/billcreate'); // TIP: Enable this line, if want to land directly on 'billCreation' page after successfull Login
                 dispatch({
                     type: 'AUTH_SUCCESS',
