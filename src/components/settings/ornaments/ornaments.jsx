@@ -5,6 +5,7 @@ import { getAccessToken } from '../../../core/storage';
 import { toast } from 'react-toastify';
 import _ from 'lodash';
 import { Row, Col} from 'react-bootstrap';
+import './ornaments.css';
 
 class Ornaments extends Component {
     constructor(props) {
@@ -58,7 +59,7 @@ class Ornaments extends Component {
                 <Col xs={12} className='gs-card'>
                     <Row className='gs-card-content'>
                         <h3>Ornaments</h3>
-                        <Col xs={12}>
+                        <Col xs={12} className='orn-list-div'>
                             {this.getOrnamentsListDOM()}
                         </Col>
                     </Row>
