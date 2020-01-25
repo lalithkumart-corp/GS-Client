@@ -30,9 +30,9 @@ class NavbarComp extends Component {
                         <NavDropdown title="Others" id="basic-nav-dropdown">
                             <NavDropdown.Item as={Link} to="/customerdetail">Customer Detail</NavDropdown.Item>
                             <NavDropdown.Item as={Link} to="/settings">Settings</NavDropdown.Item>
-                            <NavDropdown.Item as={Link} to="/picture">Webcam</NavDropdown.Item>
+                            {/* <NavDropdown.Item as={Link} to="/picture">Webcam</NavDropdown.Item>
                             <NavDropdown.Item as={Link} to="/uploadpicdemo">Upload Pic Demo</NavDropdown.Item>
-                            <NavDropdown.Item as={Link} to="/demo">Demo</NavDropdown.Item>
+                            <NavDropdown.Item as={Link} to="/demo">Demo</NavDropdown.Item> */}
                             <NavDropdown.Item as={Link} to="/backup_restore">Backup/Restore</NavDropdown.Item>
                         </NavDropdown>
                     </Nav>

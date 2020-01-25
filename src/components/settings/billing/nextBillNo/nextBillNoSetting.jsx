@@ -1,15 +1,13 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import { getBillNoFromDB } from '../../../actions/billCreation';
+import { getBillNoFromDB } from '../../../../actions/billCreation';
 import { Row, Col } from 'react-bootstrap';
-import { UPDATE_BILL_NO_SETTINGS } from '../../../core/sitemap';
-import { getAccessToken } from '../../../core/storage';
+import { UPDATE_BILL_NO_SETTINGS } from '../../../../core/sitemap';
+import { getAccessToken } from '../../../../core/storage';
 import axios from 'axios';
 import { toast } from 'react-toastify';
-import InterestRates from '../interestRate/InterestRate';
-import DefaultInputSuggestions from '../inputSuggestions/DefaultInputSuggestions';
 
-class BillingSettings extends Component {
+class NextBillNumber extends Component {
     constructor(props) {
         super(props);
         this.state = {
@@ -78,34 +76,34 @@ class BillingSettings extends Component {
 
     render() {
         return (
-            <div>
-                <div className='gs-card'>
-                    <div className='gs-card-content'>
-                        <h3>Bill number Setting</h3>
-                        <Row>
-                            <Col xs={4} md={4}>
-                                Serial:
-                            </Col>
-                            <Col xs={8} md={8}>
-                                <input className='gs-input-cell' type='text' value={this.state.billSeries} onChange={(e) => this.onChange(e, 'series')}/>
-                            </Col>
-                        </Row>
-                        <Row>
-                            <Col xs={4} md={4}>
-                                Next Bill Number:
-                            </Col>
-                            <Col xs={8} md={8}>
-                                <input className='gs-input-cell' type='number' value={this.state.billNumber} onChange={(e) => this.onChange(e, 'billNumber')}/>
-                            </Col>
-                        </Row>
-                        <Row className='text-align-right'>
-                            <input type='button' className='gs-button' value='Update' onClick={this.updateInDB}/>
-                        </Row>
-                    </div>
-                </div>
-                <InterestRates {...this.props}/>
-                <DefaultInputSuggestions />
-            </div>
+            <Row xs={12}>
+                <Col xs={12} className='gs-card'>
+                    <Row xs={12} className='gs-card-content'>
+                        <Col xs={12}>
+                            <h3 style={{marginBottom: '30px'}}>Bill number Setting</h3>
+                            <Row>
+                                <Col xs={4} md={4}>
+                                    Serial:
+                                </Col>
+                                <Col xs={8} md={8}>
+                                    <input className='gs-input-cell' type='text' value={this.state.billSeries} onChange={(e) => this.onChange(e, 'series')}/>
+                                </Col>
+                            </Row>
+                            <Row>
+                                <Col xs={4} md={4}>
+                                    Next Bill Number:
+                                </Col>
+                                <Col xs={8} md={8}>
+                                    <input className='gs-input-cell' type='number' value={this.state.billNumber} onChange={(e) => this.onChange(e, 'billNumber')}/>
+                                </Col>
+                            </Row>
+                            <Row className='text-align-right'>
+                                <input type='button' className='gs-button' value='Update' onClick={this.updateInDB}/>
+                            </Row>
+                        </Col>
+                    </Row>
+                </Col>
+            </Row>
         )
     }
 }
@@ -115,4 +113,4 @@ const mapStateToProps = (state) => {
     };
 };
 
-export default connect(mapStateToProps, { getBillNoFromDB })(BillingSettings);
+export default connect(mapStateToProps, { getBillNoFromDB })(NextBillNumber);

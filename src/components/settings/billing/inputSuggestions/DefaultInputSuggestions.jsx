@@ -1,9 +1,9 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { Row, Col, FormGroup, FormControl } from 'react-bootstrap';
-import axiosMiddleware from '../../../core/axios';
-import { UPDATE_USER_PREFERENCES } from '../../../core/sitemap';
-import { getAccessToken } from '../../../core/storage';
+import axiosMiddleware from '../../../../core/axios';
+import { UPDATE_USER_PREFERENCES } from '../../../../core/sitemap';
+import { getAccessToken } from '../../../../core/storage';
 import { toast } from 'react-toastify';
 
 class DefaultInputSuggestions extends Component {
@@ -75,9 +75,7 @@ class DefaultInputSuggestions extends Component {
                 <Col xs={12} className='gs-card'>
                     <Row xs={12} className='gs-card-content'>
                         <Col>
-                            <Row>
-                                <h3>Bill Creation - Defaults</h3>
-                            </Row>
+                            <h3 style={{marginBottom: '30px'}}>Bill Creation - Defaults</h3>
                             <Row>
                                 <Col xs={4}>
                                     <Row>
