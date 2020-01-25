@@ -7,6 +7,7 @@ import { getAccessToken } from '../../../core/storage';
 import axios from 'axios';
 import { toast } from 'react-toastify';
 import InterestRates from '../interestRate/InterestRate';
+import DefaultInputSuggestions from '../inputSuggestions/DefaultInputSuggestions';
 
 class BillingSettings extends Component {
     constructor(props) {
@@ -103,6 +104,7 @@ class BillingSettings extends Component {
                     </div>
                 </div>
                 <InterestRates {...this.props}/>
+                <DefaultInputSuggestions />
             </div>
         )
     }
