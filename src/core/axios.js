@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { getAccessToken } from '../core/storage';
 import { toast } from 'react-toastify';
 let axiosMiddleware = {
     get: (urlPath, configs) => {
@@ -25,6 +26,9 @@ let axiosMiddleware = {
     post: (urlPath, data, configs) => {
         return new Promise( (resolve, reject) => {
             try {
+                let accessToken = getAccessToken();
+                if(data && !data.accessToken)
+                    data.accessToken = accessToken;
                 axios.post(urlPath, data, configs)
                 .then(
                     (successResp) => {
