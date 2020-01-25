@@ -1,9 +1,10 @@
 import React, { Component } from 'react';
 import {Tabs, Tab} from 'react-bootstrap';
-import BillingSettings from './billing/BillingSettingsMain';
+import BillingSettings from './billing/main';
 import AccountSettings from './account/AccountSettings';
 import InterestRates from './interestRate/InterestRate';
 import './settings.css';
+import Ornaments from './ornaments/ornaments';
 
 export default class Settings extends Component {
     constructor(props) {
@@ -19,6 +20,9 @@ export default class Settings extends Component {
                     </Tab>
                     <Tab eventKey="interest" title="Interest Rate" >
                         <InterestRates {...this.state}/>
+                    </Tab>
+                    <Tab eventKey="ornament" title="Ornaments" >
+                        <Ornaments {...this.state}/>
                     </Tab>
                     <Tab eventKey="Account" title="Account Setup">
                         <AccountSettings {...this.state} />
