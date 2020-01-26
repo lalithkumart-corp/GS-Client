@@ -233,3 +233,7 @@ input[type=checkbox], input[type=radio] {
   margin-left: -1.25rem;
 }
 /* END: ootstrap issue (due to different versions exist among diff npm */
+
+.react-tiny-popover-container {
+  z-index: 2;
+}

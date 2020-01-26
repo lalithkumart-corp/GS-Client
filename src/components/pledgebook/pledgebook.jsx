@@ -17,6 +17,7 @@ import ImageZoom from 'react-medium-image-zoom';
 import Popover, {ArrowContainer} from 'react-tiny-popover'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import PledgebookExportPopup from './pledgebookExportPopup';
+import { toast } from 'react-toastify';
 
 class Pledgebook extends Component {
     constructor(props) {
@@ -44,6 +45,17 @@ class Pledgebook extends Component {
                 address: '',
                 billNo: '',
                 amount: '',
+                custom: {
+                    mobile: {
+                        enabled: false,
+                        inputVal: ''
+                    },
+                    pledgeAmt: {
+                        grt: 2000,
+                        lsr: 2500,
+                        enabled: false
+                    }
+                }
             },
             selectedPageIndex: 0,
             selectedIndexes: [],
@@ -171,7 +183,7 @@ class Pledgebook extends Component {
                     id: 'Amount',
                     displayText: 'Amount',
                     width: '10%',
-                    isFilterable: true,
+                    isFilterable: false,
                     filterCallback: this.filterCallbacks.onAmountChange,
                     className: 'pb-amount-col'
                 }, {
@@ -215,8 +227,9 @@ class Pledgebook extends Component {
         this.onExportClick = this.onExportClick.bind(this);
         this.handleExportPopupClose = this.handleExportPopupClose.bind(this);
         this.onMoreFilterPopoverTrigger = this.onMoreFilterPopoverTrigger.bind(this);
-        this.onMoreFilterPopoverChange.gtrThanAmount = this.onMoreFilterPopoverChange.gtrThanAmount.bind(this);
-        this.onMoreFilterPopoverChange.lessThanAmount = this.onMoreFilterPopoverChange.lessThanAmount.bind(this);
+        // this.onMoreFilterPopoverChange.gtrThanAmount = this.onMoreFilterPopoverChange.gtrThanAmount.bind(this);
+        // this.onMoreFilterPopoverChange.lessThanAmount = this.onMoreFilterPopoverChange.lessThanAmount.bind(this);
+        this.shouldDisableCustomFilterApplyBtn = this.shouldDisableCustomFilterApplyBtn.bind(this);
     }
 
     componentDidMount() {
@@ -243,6 +256,37 @@ class Pledgebook extends Component {
         
     }    
     // START: Listeners
+    customFilters = {
+        onChange: (e, val, identifier) => {
+            let newState = {...this.state};
+            switch(identifier) {
+                case 'grt':
+                    //newState.moreFilter.perGramRange.gtrThanVal = val;
+                    newState.filters.custom.pledgeAmt.grt = val;
+                    break;
+                case 'lsr':
+                    //newState.moreFilter.perGramRange.lessThanVal = val;
+                    newState.filters.custom.pledgeAmt.lsr = val;
+                    break;
+                case 'mobile':
+                    newState.filters.custom.mobile.inputVal = val;
+                    break;
+                case 'pledgeAmtCheckbox':
+                    newState.filters.custom.pledgeAmt.enabled = val;    
+                    break;
+                case 'mobileCheckbox':
+                    newState.filters.custom.mobile.enabled = val;
+                    break;
+            }
+            this.setState(newState);
+        },
+        onApply: () => {
+            let newState = {...this.state};
+            newState.moreFilter.popoverOpen = false;
+            this.setState(newState);
+            this.initiateFetchPledgebookAPI();
+        }
+    }
     async handlePageCountChange(e) {
         let selectedPageLimit = e.target.value;        
         await this.setState({pageLimit: selectedPageLimit, selectedPageIndex: 0});        
@@ -326,7 +370,7 @@ class Pledgebook extends Component {
             newState.filters.cName = val;            
             newState.selectedPageIndex = 0;
             await this.setState(newState);
-            this.initiateFetchPledgebookAPI();            
+            this.initiateFetchPledgebookAPI();
         },
         onGuardianNameChange: async (e, col, colIndex) => {
             let val = e.target.value;
@@ -352,22 +396,18 @@ class Pledgebook extends Component {
         this.setState(newState);
     }
 
-    onMoreFilterPopoverChange = {
-        gtrThanAmount: (e) => {
-            let newState = {...this.state};
-            newState.moreFilter.perGramRange.gtrThanVal = e.target.value;
-            this.setState(newState);
-        },
-        lessThanAmount: (e) => {
-            let newState = {...this.state};
-            newState.moreFilter.perGramRange.lessThanVal = e.target.value;
-            this.setState(newState);
-        }
-    }
-
-    onMoreFilterPopoverSubmit() {
-        
-    }
+    // onMoreFilterPopoverChange = {//todo: remove
+    //     gtrThanAmount: (e) => {
+    //         let newState = {...this.state};
+    //         newState.moreFilter.perGramRange.gtrThanVal = e.target.value;
+    //         this.setState(newState);
+    //     },
+    //     lessThanAmount: (e) => {
+    //         let newState = {...this.state};
+    //         newState.moreFilter.perGramRange.lessThanVal = e.target.value;
+    //         this.setState(newState);
+    //     }
+    // }
 
     onPopupTriggerClick() {
         this.setState({statusPopupVisibility: !this.state.statusPopupVisibility});
@@ -416,7 +456,7 @@ class Pledgebook extends Component {
     getFilters() {                
         let endDate = new Date(this.state.filters.date.endDate);
         endDate.setHours(23,59,59,999);
-        return {            
+        let filters = {            
             date: {
                 startDate: dateFormatter(this.state.filters.date.startDate),
                 endDate: dateFormatter(endDate)
@@ -426,8 +466,19 @@ class Pledgebook extends Component {
             cName: this.state.filters.cName,
             gName: this.state.filters.gName,
             address: this.state.filters.address,
-            include: this.state.billDisplayFlag //"all" or "pending" or "closed"
-        }
+            include: this.state.billDisplayFlag, //"all" or "pending" or "closed"
+            custom: {
+
+            }
+        };
+        if(this.state.filters.custom.mobile.enabled)
+            filters.custom.mobile = this.state.filters.custom.mobile.inputVal;
+        if(this.state.filters.custom.pledgeAmt.enabled)
+            filters.custom.pledgeAmt = {
+                grt: this.state.filters.custom.pledgeAmt.grt,
+                lsr: this.state.filters.custom.pledgeAmt.lsr
+            }
+        return filters;
     }
 
     getPageCount() {        
@@ -437,14 +488,47 @@ class Pledgebook extends Component {
 
     initiateFetchPledgebookAPI() {
         clearTimeout(this.timer);
-        this.timer = setTimeout(() => {            
-            let params = this.getAPIParams();
-            this.props.getPendingBills(params);
+        this.timer = setTimeout(() => {
+            let validation = this.doValidation();
+            if(validation.status == 'success') {
+                let params = this.getAPIParams();
+                this.props.getPendingBills(params);
+            } else {
+
+            }
         }, this.timeOut);        
+    }
+
+    doValidation() {
+        let status = 'success';
+        let errors = [];
+        if(this.state.filters.custom.pledgeAmt.enabled) {
+            if(this.state.filters.custom.pledgeAmt.grt > this.state.filters.custom.pledgeAmt.lsr) {
+                status = 'error';
+                errors.push('Check the Custom Filter - Amount filter value. "Greater than" input value should be greater than "lesser than" input value.')
+            }
+        }
+        if(errors.length > 0)
+            toast.error(errors.join(' || '));
+        return {status: status};
     }
 
     refresh() {
         this.initiateFetchPledgebookAPI();
+    }
+
+    shouldDisableCustomFilterApplyBtn() {
+        //return !this.isAnyCustomFiltersEnabled()
+        return false;
+    }
+
+    isAnyCustomFiltersEnabled() {
+        let flag = false;
+        if(this.state.filters.custom.pledgeAmt.enabled)
+            flag = true;
+        else if(this.state.filters.custom.mobile.enabled)
+            flag = true;
+        return flag;
     }
 
     expandRow = {
@@ -510,6 +594,54 @@ class Pledgebook extends Component {
         showIndicator: true,
         expandByColumnOnly: true
     }
+
+    getCustomFilterOptions() {
+        return (
+            <Row className='custom-filter-popover-main'>
+                <Col xs={12}>
+                    <Row>
+                        <Col xs={1}>
+                            <input type='checkbox' className='gs-checkbox' checked={this.state.filters.custom.pledgeAmt.enabled} onChange={(e) => this.customFilters.onChange(e, e.target.checked, 'pledgeAmtCheckbox')}/>
+                        </Col>
+                        <Col xs={11}>
+                            <Row>
+                                <Col xs={12}><h5 className='inline-block'>Amount Range</h5></Col>
+                                <Col xs={4}>
+                                    <input type='number' className='gtr-input-val gs-input-cell' value={this.state.filters.custom.pledgeAmt.grt} onChange={(e) => this.customFilters.onChange(e, e.target.value, 'grt')}/>
+                                </Col>
+                                <Col xs={4}>
+                                    <span className='gtr-label-less'> To </span>
+                                </Col>
+                                <Col xs={4}>
+                                    <input type='number' className='less-input-val gs-input-cell' value={this.state.filters.custom.pledgeAmt.lsr} onChange={(e) => this.customFilters.onChange(e, e.target.value, 'lsr')}/>
+                                </Col>
+                            </Row>
+                        </Col>
+                    </Row>
+                    <Row>
+                        <Col xs={1}>
+                            <input type='checkbox' className='gs-checkbox' checked={this.state.filters.custom.mobile.enabled} onChange={(e) => this.customFilters.onChange(e, e.target.checked, 'mobileCheckbox')}/>
+                        </Col>
+                        <Col xs={11}>
+                            <Row>
+                                <Form.Group>
+                                    <Form.Label>Mobile No:</Form.Label>
+                                    <InputGroup>
+                                        <Form.Control
+                                            type="text"
+                                            value={this.state.filters.custom.mobile.inputVal}
+                                            placeholder="Type mobile number..."
+                                            onChange={(e) => this.customFilters.onChange(e, e.target.value, "mobile")}
+                                        />
+                                    </InputGroup>
+                                </Form.Group>
+                            </Row>
+                        </Col>
+                    </Row>
+                </Col>
+            </Row>
+        )
+    }
     // END: Helper's
 
     render() {                    
@@ -541,26 +673,19 @@ class Pledgebook extends Component {
                                         arrowColor={'white'}
                                         arrowSize={10}
                                     >
-                                        <div className='gs-card'>
-                                            <div className='gs-card-content'>
-                                                <div>
-                                                    <input type='checkbox' className='gs-checkbox'/>
-                                                    <h5 className='inline-block'>Amount Range between (per/gram)</h5>
-                                                    <br></br>
-                                                    <input type='number' className='gtr-input-val gs-input-cell' value={this.state.moreFilter.perGramRange.gtrThanVal} onChange={(e) => this.onMoreFilterPopoverChange.gtrThanAmount(e)}/>
-                                                    <span className='gtr-label-less'> To </span>
-                                                    <input type='number' className='less-input-val gs-input-cell' value={this.state.moreFilter.perGramRange.lessThanVal} onChange={(e) => this.onMoreFilterPopoverChange.lessThanAmount(e)}/>
-                                                </div>
-                                                <div className='text-align-right'>
-                                                    <input type='button' className='gs-button' value='Filter' onClick={this.onMoreFilterPopoverSubmit}/>
-                                                </div>
-                                            </div>
-                                        </div>
+                                        <Row className='gs-card'>
+                                            <Col className='gs-card-content'>
+                                                {this.getCustomFilterOptions()}
+                                                <Row className='text-align-right'>
+                                                    <input type='button' className='gs-button' value='Apply' disabled={this.shouldDisableCustomFilterApplyBtn()} onClick={this.customFilters.onApply}/>
+                                                </Row>
+                                            </Col>
+                                        </Row>
                                     </ArrowContainer>
                                 )
                             }}
                             >
-                                <span className='more-filter-popover-trigger action-btn' onClick={this.onMoreFilterPopoverTrigger}>
+                                <span className={(this.isAnyCustomFiltersEnabled()?'custom-filters ':'') + 'more-filter-popover-trigger action-btn'} onClick={this.onMoreFilterPopoverTrigger}>
                                     <FontAwesomeIcon icon='filter'/>
                                 </span>
                         </Popover>

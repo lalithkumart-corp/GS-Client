@@ -166,10 +166,19 @@
 .pledgebook-page-content .second-row .row-count,
 .pledgebook-page-content .second-row .pagination-container {
     float: right;
+    z-index: 1;
 }
 .gtr-input-val,
 .gtr-label-less,
 .less-input-val {
-    width: 25% !important;
+    /* width: 25% !important; */
     display: inline-block;
+}
+
+.custom-filter-popover-main {
+    width: 400px;
+}
+
+.custom-filters.more-filter-popover-trigger.action-btn{
+    color: orange;
 }
