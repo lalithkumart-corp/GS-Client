@@ -46,6 +46,9 @@ html {
   /* background-color: #337ab7;
   border-color: #2e6da4; */
 }
+.gs-button.red {
+  color: #c73232;
+}
 .gs-button.bordered {
   border: 1px solid;
 }
@@ -61,7 +64,10 @@ html {
   background-color: rgba(33, 150, 243, 0.08);
   outline: none;
 }
-
+.gs-button.red:hover,
+.gs-button.red:focus {
+  background-color: rgba(239, 15, 15, 0.08);
+}
 .no-scroll {
   overflow: hidden;
 }

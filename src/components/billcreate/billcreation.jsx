@@ -343,7 +343,7 @@ class BillCreation extends Component {
                 (successResp) => {
                     let newState = {...this.state};
                     if(successResp.data.STATUS == 'SUCCESS')
-                        newState.formData.orn.list = successResp.data.RESPONSE;
+                        newState.formData.orn.list = successResp.data.RESPONSE.map(anItem => anItem.title);
                     else
                         newState.formData.orn.list = [];
                     this.setState(newState);
