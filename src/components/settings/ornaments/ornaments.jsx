@@ -108,6 +108,7 @@ class Ornaments extends Component {
                 case 'itemsearch':
                     newState.orn.searchVal = val;
                     newState.selectedOrn = null;
+                    newState.orn.list.map( (anItem) => {anItem.selected = false});
                     break;
             }
             this.setState(newState);
@@ -218,12 +219,12 @@ class Ornaments extends Component {
 
     render() {
         return (
-            <Row>
+            <Row className='ornament-module'>
                 <Col xs={12} className='gs-card'>
                     <Row className='gs-card-content'>
-                        <Col xs={12}><h3>Ornaments</h3></Col>
+                        <Col xs={12}><h3 style={{marginBottom: '20x'}}>Ornaments</h3></Col>
                         <Col xs={4} style={{marginTop: '20px'}}>
-                            <h5>Add new Ornament</h5>
+                            <h4 style={{color: 'grey', marginBottom: '20px'}}>Add new Ornament</h4>
                             <Row>
                                 <Col xs={12}>
                                     <Form.Group>
@@ -250,6 +251,26 @@ class Ornaments extends Component {
                                     <input type='button' className='gs-button' value='Create' onClick = {this.onCreateClick}/>
                                 </Col>
                             </Row>
+                            <Row className='ornament-detail-container'>
+                                <Col xs={6}>
+                                    Gold Ornaments
+                                </Col>
+                                <Col xs={6}>
+                                    {this.state.orn.rawList.filter( (anItem) => {if(anItem.category == 'G') return true;}).length}
+                                </Col>
+                                <Col xs={6}>
+                                    Silver Ornaments
+                                </Col>
+                                <Col xs={6}>
+                                    {this.state.orn.rawList.filter( (anItem) => {if(anItem.category == 'S') return true;}).length}
+                                </Col>
+                                <Col xs={6}>
+                                    Brass Ornaments
+                                </Col>
+                                <Col xs={6}>
+                                    {this.state.orn.rawList.filter( (anItem) => {if(anItem.category == 'B') return true;}).length}
+                                </Col>
+                            </Row>
                         </Col>
                         <Col xs={4} style={{marginTop: '20px'}}>
                             <Row>
@@ -261,7 +282,7 @@ class Ornaments extends Component {
                         </Col>
                         {this.state.selectedOrn && 
                         <Col xs={4} style={{marginTop: '20px'}}>
-                            <h5>Edit Ornament</h5>
+                            <h4 style={{color: 'grey', marginBottom: '20px'}}>Edit Ornament</h4>
                             <Row>
                                 <Col xs={12}>
                                     <Form.Group>
