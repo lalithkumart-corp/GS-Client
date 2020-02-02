@@ -14,7 +14,7 @@ export const insertNewBill = (requestParams) => {
             .then(
                 (resp) => {
                     if(resp.data.STATUS == 'ERROR') {
-                        let errorText = resp.data.ERROR;
+                        let errorText = resp.data.MSG;
                         toast.error('Error in adding new bill to pledgebook - ' + errorText);
                         dispatch({
                             type: 'NEW_BILL_INSERTION_ERROR',

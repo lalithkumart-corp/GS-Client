@@ -237,3 +237,13 @@ input[type=checkbox], input[type=radio] {
 .react-tiny-popover-container {
   z-index: 2;
 }
+
+.gold-color {
+  color: gold;
+}
+.silver-color {
+  color: silver;
+}
+.brass-color {
+  color: #B5A642;
+}

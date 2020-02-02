@@ -22,6 +22,28 @@ export const defaultPictureState = {
     uploadMethod: 'DIRECT_UPLOAD'
 };
 
+export const defaultOrnPictureState = {
+    holder: {
+        show: true,
+        imgSrc: '',
+        confirmedImgSrc: '',
+        defaultSrc: 'images/noimage.png'
+    },
+    webcamTool: {
+        show: false,
+    },
+    actions: {
+        camera: true,
+        upload: true,
+        capture: false,
+        cancel: false,
+        save: false,
+        clear: false,
+    },
+    status: 'UNSAVED',
+    uploadMethod: 'DIRECT_UPLOAD'
+};
+
 export const buildRequestParams = (thatState = {}) => {
     let state = {...thatState}; //for preventing reference issue  
     state.selectedCustomer = state.selectedCustomer || {};  
@@ -41,7 +63,9 @@ export const buildRequestParams = (thatState = {}) => {
         billRemarks: _getBillRemarks(thatState),
         moreDetails: _getMoreData(thatState),
         userPicture: getPicData(thatState),
-        ornPicture: getOrnPicData(thatState)
+        ornPicture: getOrnPicData(thatState),
+        ornCategory: thatState.formData.orn.category,
+        totalWeight: thatState.formData.orn.totalWeight
     };
     return params;
 }
@@ -62,6 +86,8 @@ export const buildRequestParamsForUpdate = (thatState = {}) => {
         pinCode: !isNull(state.selectedCustomer.pincode)?(state.selectedCustomer.pincode):(state.formData.pincode.inputVal),
         mobile: _getMobileNumber(state),
         orn: _getOrnamentsData(thatState),
+        ornCategory: state.formData.orn.category,
+        totalWeight: state.formData.orn.totalWeight,
         billRemarks: _getBillRemarks(thatState),
         userPicture: getPicData(thatState),
         ornPicture: getOrnPicData(thatState),
@@ -213,6 +239,8 @@ export const resetState = (nextProps, newState) => {
                 ornNos: ''
             }};
             anItem.rowCount = 1;
+            anItem.category = 'U';
+            anItem.totalWeight = 0.00;
         } else if(index == 'moreDetails') {
             anItem.currCustomerInputKey = anItem.currCustomerInputField = anItem.currCustomerInputVal = anItem.billRemarks = '';                
             anItem.customerInfo = [];            

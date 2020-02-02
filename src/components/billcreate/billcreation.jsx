@@ -23,7 +23,7 @@ import sh from 'shorthash';
 import EditDetailsDialog from './editDetailsDialog';
 import { insertNewBill, updateBill, updateClearEntriesFlag, showEditDetailModal, hideEditDetailModal, getBillNoFromDB, disableReadOnlyMode, updateBillNoInStore } from '../../actions/billCreation';
 import { DoublyLinkedList } from '../../utilities/doublyLinkedList';
-import { getGaurdianNameList, getAddressList, getPlaceList, getCityList, getPincodeList, getMobileList, buildRequestParams, buildRequestParamsForUpdate, updateBillNumber, resetState, defaultPictureState, validateFormValues } from './helper';
+import { getGaurdianNameList, getAddressList, getPlaceList, getCityList, getPincodeList, getMobileList, buildRequestParams, buildRequestParamsForUpdate, updateBillNumber, resetState, defaultPictureState, defaultOrnPictureState, validateFormValues } from './helper';
 import { getAccessToken } from '../../core/storage';
 import { getDateInUTC } from '../../utilities/utility';
 import Picture from '../profilePic/picture';
@@ -64,7 +64,7 @@ class BillCreation extends Component {
         this.domOrders = domList;                
         this.state = {
             showPreview: false,  
-            showMoreInputs: false,             
+            showMoreInputs: false,
             formData: {
                 date: {
                     inputVal: moment().format('DD-MM-YYYY'),
@@ -138,6 +138,10 @@ class BillCreation extends Component {
                     list: ['Loading...'],
                     limitedList: ['Loading...'],
                     specList: ['Damage', 'Bend', 'Tread', 'Without Thiruvani', 'Stone missing', 'Full Stone'], //TODO: Map with Database
+                    validCategoryList: ['G', 'S', 'B'],
+                    category: 'U', //unknown
+                    totalWeight: 0.00,
+                    weightUnit: 'grams',
                     specLimitedList: [],
                     rowCount: 1
                 },
@@ -153,7 +157,7 @@ class BillCreation extends Component {
                 selectedCustomer: {}                
             },
             userPicture: JSON.parse(JSON.stringify(defaultPictureState)),
-            ornPicture: JSON.parse(JSON.stringify(defaultPictureState))
+            ornPicture: JSON.parse(JSON.stringify(defaultOrnPictureState))
         };
         this.bindMethods();        
     }    
@@ -303,7 +307,7 @@ class BillCreation extends Component {
             let currState = {...this.state};
             currState.ornPicture.loading = false;
             currState.ornPicture.id = null;
-            currState.ornPicture.holder = JSON.parse(JSON.stringify(defaultPictureState.holder));
+            currState.ornPicture.holder = JSON.parse(JSON.stringify(defaultOrnPictureState.holder));
             this.setState(currState);
         }
         
@@ -343,7 +347,7 @@ class BillCreation extends Component {
                 (successResp) => {
                     let newState = {...this.state};
                     if(successResp.data.STATUS == 'SUCCESS')
-                        newState.formData.orn.list = successResp.data.RESPONSE.map(anItem => anItem.title);
+                        newState.formData.orn.list = successResp.data.RESPONSE.map(anItem => anItem.category + ' ' + anItem.title );
                     else
                         newState.formData.orn.list = [];
                     this.setState(newState);
@@ -391,8 +395,9 @@ class BillCreation extends Component {
         newState.formData.moreDetails.customerInfo = JSON.parse(data.OtherDetails) || [];  
         newState.formData.moreDetails.billRemarks = data.Remarks || '';  
         newState.userPicture = JSON.parse(JSON.stringify(defaultPictureState));
-        newState.ornPicture = JSON.parse(JSON.stringify(defaultPictureState));
-
+        newState.ornPicture = JSON.parse(JSON.stringify(defaultOrnPictureState));
+        newState.formData.orn.totalWeight = data.TotalWeight || 0.00;
+        newState.formData.orn.category = data.OrnCategory || 0.00;
         if(data.UserImageBlob && data.UserImageBlob.data) {
             let buff = new Buffer(data.UserImageBlob.data, "base64"); //.toString('base64');
             let img = buff.toString('ascii');
@@ -720,6 +725,38 @@ class BillCreation extends Component {
         return options;
     }
 
+    setOrnCategDetail(e, options) {
+        // let value = e.target.value || '';
+        // value = value.trim();
+        // let categ = value.split(' ')[0];
+        // let newState = {...this.state};
+        // if(newState.formData.orn.categList.indexOf(categ) != -1) {
+        //     if(newState.formData.orn.currentOrnCategories.indexOf(categ) == -1)
+        //         newState.formData.orn.currentOrnCategories.push(categ);
+        // } else {
+        //     if(newState.formData.orn.currentOrnCategories.indexOf('U') == -1)
+        //         newState.formData.orn.currentOrnCategories.push('U');
+        // }
+        // this.setState(newState);
+        let categListObserved = [];
+        let newState = {...this.state};
+        _.each(newState.formData.orn.inputs, (anOrnRowObj, index) => {
+            let value = anOrnRowObj.ornItem;
+            value = value.trim();
+            let categ = value.split(' ')[0];
+            categ = categ.toUpperCase();
+            if(newState.formData.orn.validCategoryList.indexOf(categ) == -1)
+                categ = 'U'; // Unknown category
+            if(categListObserved.indexOf(categ) == -1)
+                categListObserved.push(categ);
+        });
+        if(categListObserved.length > 1)
+            newState.formData.orn.category = 'M'; //mixed
+        else
+            newState.formData.orn.category = categListObserved[0];
+        this.setState(newState);
+    }
+
     canAppendNewRow(options) {
         let canAppend = false;
         if(this.state.formData.orn.rowCount < options.nextSerialNo)
@@ -827,6 +864,14 @@ class BillCreation extends Component {
         return isExistingCustomer;
     }
 
+    updateOrnTotalWeight(val) {
+        let newState = {...this.state};
+        val = val || 0.00;
+        newState.formData.orn.totalWeight += parseFloat(val);
+        console.log(newState.formData.orn.totalWeight);
+        this.setState(newState);
+    }
+
      // TODO: remove this, if not in use.
     /* updateSelectedCustomer(params) {
         let newState = {...this.state};
@@ -875,8 +920,11 @@ class BillCreation extends Component {
             await this.appendNewRow(evt, options.nextSerialNo);
         } else if(options && options.isOrnItemInput) {
             options = await this.checkOrnRowClearance(evt, options);
+            this.setOrnCategDetail(evt, options);
         } else if(options && options.isOrnGwtInput) {
             this.fillNetWtValue(options.serialNo);
+        } else if(options && options.isOrnNwtInput) {
+            this.updateOrnTotalWeight(evt.target.value);
         } else if(options && options.isToAddMoreDetail) {
             await this.insertItemIntoMoreBucket();
         } else if(options && options.isMoreDetailInputKey){
@@ -1130,10 +1178,13 @@ class BillCreation extends Component {
                     newState.formData.moreDetails.currCustomerInputVal = val;
                     break;
                 case 'ornGWt':
-                case 'ornNWt':
                 case 'ornNos':
                     newState.formData.orn.inputs[options.serialNo][identifier] = val;
-                    break;                
+                    break;
+                case 'ornNWt':
+                    newState.formData.orn.inputs[options.serialNo][identifier] = val;
+                    this.updateOrnTotalWeight(val);
+                    break;
                 case 'amount':
                     newState.formData[identifier].inputVal = val;
                     break;
@@ -1178,7 +1229,18 @@ class BillCreation extends Component {
 
 
     /* START: DOM Getter's */
-    getOrnContainerDOM() {        
+    getOrnCategoryView() {
+        let categ = this.state.formData.orn.category;
+        let view = <span></span>;
+        if(categ == 'G')
+            view = <span className='gold-color'>&nbsp;&nbsp;GOLD</span>;
+        else if(categ == 'S')
+            view = <span className='silver-color'>&nbsp;&nbsp;SILVER</span>;
+        else if(categ == 'B')
+            view = <span className='brass-color'>&nbsp;&nbsp;BRASS</span>;
+        return view;
+    };
+    getOrnContainerDOM() {
         let getColGroup = () => {
             return (
                 <colgroup>
@@ -1196,7 +1258,7 @@ class BillCreation extends Component {
                 <thead>
                     <tr>
                         <th className='serial-no-header'>No</th>
-                        <th>Orn</th>
+                        <th>Orn {this.getOrnCategoryView()}</th>
                         <th>Nos</th>
                         <th>G-Wt</th>
                         <th>N-Wt</th>
@@ -1264,7 +1326,7 @@ class BillCreation extends Component {
                     </td>
                     <td>
                         <input 
-                            type="text" 
+                            type="number" 
                             className="gs-input-cell orn-input-cell"
                             placeholder="0.00"
                             value={this.state.formData.orn.inputs[serialNo].ornNWt}
@@ -1647,7 +1709,7 @@ class BillCreation extends Component {
                             <Form.Group
                                 validationState= {this.state.formData.place.hasError ? "error" :null}
                                 >
-                                <Form.Label>Place</Form.Label>                                
+                                <Form.Label>Place</Form.Label>
                                 {/* <Autosuggest
                                     datalist={this.state.formData.place.list}
                                     placeholder="Enter Place"
