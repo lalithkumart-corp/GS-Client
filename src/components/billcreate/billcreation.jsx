@@ -436,6 +436,39 @@ class BillCreation extends Component {
     /* END: SETTERS */
 
     /* START: GETTERS */
+    getOrnFilteredList(value) {
+        var lowerCaseInput = value.toLowerCase();
+        let originalList = JSON.parse(JSON.stringify(this.state.formData.orn.list));
+        let structuredList = originalList.map( (aSuggestion) => {
+            let inputSplits = lowerCaseInput.split(' ');
+            let match = 0;
+            let suggestionTermsLength = aSuggestion.split(' ').length;
+            let inputTermsLength = inputSplits.length;
+            _.each(inputSplits, (term, index) => {
+                let matches = aSuggestion.toLowerCase().indexOf(term);
+                if(matches >= 0)
+                    match++;
+            });
+            return {
+                text: aSuggestion,
+                match: match,
+                suggestionTermsLength: suggestionTermsLength,
+                inputTermsLength: inputTermsLength,
+                score: suggestionTermsLength-match
+            }
+        });
+
+        structuredList = structuredList.filter(anObj => anObj.match);
+
+        structuredList.sort((a, b) => {
+            return a.score-b.score;
+        });
+
+        let filteredList = structuredList.map((anObj) => {
+            return anObj.text;
+        });
+        return filteredList.slice(0, 20);
+    }
     getDefaultFromStore(identifier) {
         let val = '';
         switch(identifier) {
@@ -1090,8 +1123,7 @@ class BillCreation extends Component {
                     newState.formData[identifier].limitedList = suggestionsList;
                     break;
                 case 'ornItem':
-                    var lowerCaseVal = value.toLowerCase();
-                    suggestionsList = this.state.formData.orn.list.filter(aSuggestion => aSuggestion.toLowerCase().indexOf(lowerCaseVal) != -1);
+                    suggestionsList = this.getOrnFilteredList(value);
                     suggestionsList = suggestionsList.slice(0, 35);
                     newState.formData.orn.limitedList = suggestionsList;
                     break;
