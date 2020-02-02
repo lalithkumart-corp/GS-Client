@@ -152,8 +152,8 @@
 }
 .customer-info-display-row {
     border-bottom: 1px dashed lightgray;
-    margin-left: 0;
-    margin-right: 0;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
     padding-top: 5px;
 }
 .customer-info-display-row > div {
