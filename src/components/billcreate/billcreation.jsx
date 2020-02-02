@@ -25,7 +25,7 @@ import { insertNewBill, updateBill, updateClearEntriesFlag, showEditDetailModal,
 import { DoublyLinkedList } from '../../utilities/doublyLinkedList';
 import { getGaurdianNameList, getAddressList, getPlaceList, getCityList, getPincodeList, getMobileList, buildRequestParams, buildRequestParamsForUpdate, updateBillNumber, resetState, defaultPictureState, defaultOrnPictureState, validateFormValues } from './helper';
 import { getAccessToken } from '../../core/storage';
-import { getDateInUTC } from '../../utilities/utility';
+import { getDateInUTC, currencyFormatter } from '../../utilities/utility';
 import Picture from '../profilePic/picture';
 import { toast } from 'react-toastify';
 import BillHistoryView from './billHistoryView';
@@ -640,7 +640,7 @@ class BillCreation extends Component {
     canTransferFocus(e, currElmKey, options) {
         let flag = true;
         if(currElmKey == 'amount') {
-            if(this.state.formData.amount.inputVal.trim() == '')
+            if(!this.state.formData.amount.inputVal || this.state.formData.amount.inputVal == 0)
                 flag = false;
             if(this.props.billCreation.loading)
                 flag = false;
@@ -864,12 +864,14 @@ class BillCreation extends Component {
         return isExistingCustomer;
     }
 
-    updateOrnTotalWeight(val) {
-        let newState = {...this.state};
-        val = val || 0.00;
-        newState.formData.orn.totalWeight += parseFloat(val);
-        console.log(newState.formData.orn.totalWeight);
-        this.setState(newState);
+    updateOrnTotalWeight() {
+        let newState2 = {...this.state};
+        let wt = 0.00;
+        _.each(newState2.formData.orn.inputs, (anOrnObj, index) => {
+            wt = parseFloat(wt) + parseFloat(anOrnObj.ornNWt || 0.00);
+        });
+        newState2.formData.orn.totalWeight = wt; //+= parseFloat(val);
+        this.setState(newState2);
     }
 
      // TODO: remove this, if not in use.
@@ -924,7 +926,7 @@ class BillCreation extends Component {
         } else if(options && options.isOrnGwtInput) {
             this.fillNetWtValue(options.serialNo);
         } else if(options && options.isOrnNwtInput) {
-            this.updateOrnTotalWeight(evt.target.value);
+            this.updateOrnTotalWeight();
         } else if(options && options.isToAddMoreDetail) {
             await this.insertItemIntoMoreBucket();
         } else if(options && options.isMoreDetailInputKey){
@@ -1183,7 +1185,7 @@ class BillCreation extends Component {
                     break;
                 case 'ornNWt':
                     newState.formData.orn.inputs[options.serialNo][identifier] = val;
-                    this.updateOrnTotalWeight(val);
+                    this.updateOrnTotalWeight();
                     break;
                 case 'amount':
                     newState.formData[identifier].inputVal = val;
@@ -1202,7 +1204,7 @@ class BillCreation extends Component {
                 case 'billRemarks':
                     newState.formData.moreDetails.billRemarks = val;
                     break;
-            }            
+            }
             this.setState(newState);
         },
         onKeyUp: (e, val, identifier) => {
@@ -1331,7 +1333,7 @@ class BillCreation extends Component {
                             placeholder="0.00"
                             value={this.state.formData.orn.inputs[serialNo].ornNWt}
                             ref= {(domElm) => {this.domElmns.orn['ornNWt' + serialNo] = domElm; }}
-                            onKeyUp = {(e) => this.handleKeyUp(e, {currElmKey: 'ornNWt'+ serialNo}) }
+                            onKeyUp = {(e) => this.handleKeyUp(e, {currElmKey: 'ornNWt'+ serialNo, isOrnNwtInput: true}) }
                             onChange={ (e) => this.inputControls.onChange(null, e.target.value, 'ornNWt', {serialNo: serialNo}) }
                             readOnly={this.props.billCreation.loading}
                             />
@@ -1556,7 +1558,7 @@ class BillCreation extends Component {
                                         <InputGroup.Text id="rupee-addon1">Rs:</InputGroup.Text>
                                     </InputGroup.Prepend>
                                     <FormControl
-                                        type="text"
+                                        type="number"
                                         value={this.state.formData.amount.inputVal}
                                         placeholder="0.00"
                                         className="principal-amt-field"
@@ -1705,7 +1707,7 @@ class BillCreation extends Component {
                         </Col>
                     </Row>
                     <Row className='fourth-row'>
-                        <Col xs={6} md={6} className='r-a-s-dropdown'>
+                        <Col xs={3} md={3} className='r-a-s-dropdown'>
                             <Form.Group
                                 validationState= {this.state.formData.place.hasError ? "error" :null}
                                 >
@@ -1737,7 +1739,7 @@ class BillCreation extends Component {
                                 <FormControl.Feedback />
                             </Form.Group>
                         </Col>
-                        <Col xs={6} md={6} className='r-a-s-dropdown'>
+                        <Col xs={3} md={3} className='r-a-s-dropdown'>
                             <Form.Group
                                 validationState= {this.state.formData.city.hasError ? "error" :null}
                                 >
@@ -1769,9 +1771,9 @@ class BillCreation extends Component {
                                 <FormControl.Feedback />
                             </Form.Group>
                         </Col>                            
-                    </Row>
-                    <Row className='fifth-row'>
-                        <Col xs={6} md={6} className='r-a-s-dropdown'>
+                    {/* </Row>
+                    <Row className='fifth-row'> */}
+                        <Col xs={3} md={3} className='r-a-s-dropdown'>
                             <Form.Group
                                 validationState= {this.state.formData.pincode.hasError ? "error" :null}
                                 >
@@ -1803,7 +1805,7 @@ class BillCreation extends Component {
                                 <FormControl.Feedback />
                             </Form.Group>
                         </Col>
-                        <Col xs={6} md={6} className='r-a-s-dropdown'>
+                        <Col xs={3} md={3} className='r-a-s-dropdown'>
                             <Form.Group
                                 validationState= {this.state.formData.mobile.hasError ? "error" :null}
                                 >
@@ -1843,6 +1845,14 @@ class BillCreation extends Component {
                         <Col className='ornament-dom-container'>
                             {this.getOrnContainerDOM()}
                         </Col>                        
+                    </Row>
+                    <Row className='weight-amt-preview-dom'>
+                        <Col xs={6} md={6}>
+                            <span style={{fontWeight: 'bold', fontSize: '20px'}}>Net Wt. {parseFloat(this.state.formData.orn.totalWeight).toFixed(3)}</span>
+                        </Col>
+                        <Col xs={6} md={6} style={{textAlign: 'right'}}>
+                            <span style={{fontWeight: 'bold', fontSize: '20px'}}>RS: {currencyFormatter(this.state.formData.amount.inputVal) || 0.00}</span>
+                        </Col>
                     </Row>
                     <Row>
                         <Col xs={{span: 3, offset: 4}} md={{span: 3, offset: 4}} className='submit-container'>

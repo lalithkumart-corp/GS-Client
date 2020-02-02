@@ -255,7 +255,7 @@ export const resetState = (nextProps, newState) => {
     newState.selectedCustomer = {};
     newState.showMoreInputs = false; //!newState.showMoreInputs;
     newState.userPicture = JSON.parse(JSON.stringify(defaultPictureState));
-    newState.ornPicture = JSON.parse(JSON.stringify(defaultPictureState));
+    newState.ornPicture = JSON.parse(JSON.stringify(defaultOrnPictureState));
     return newState;
 }
 
