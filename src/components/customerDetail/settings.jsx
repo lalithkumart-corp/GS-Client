@@ -6,6 +6,7 @@ import axios from 'axios';
 import './settings.css';
 import { toast } from 'react-toastify';
 import _ from 'lodash';
+import GSCheckbox from '../ui/gs-checkbox/checkbox';
 
 export default class Settings extends Component {
     constructor(props) {
@@ -220,7 +221,10 @@ export default class Settings extends Component {
                                     Disable: 
                                 </Col>
                                 <Col xs={3} md={3}>
-                                    <input type='checkbox' className='gs-checkbox' checked={this.state.disableCheckcboxTicked} onClick={(e) => this.updateDisableButtonTick(e)}/>
+                                    {/* <input type='checkbox' className='gs-checkbox' checked={this.state.disableCheckcboxTicked} onClick={(e) => this.updateDisableButtonTick(e)}/> */}
+                                    <GSCheckbox labelText="" 
+                                        checked={this.state.disableCheckcboxTicked} 
+                                        onChangeListener = {(e) => {this.updateDisableButtonTick(e)}} />
                                 </Col>
                                 <Col>
                                     <input type='button' className='gs-button' value='Apply' disabled={this.canDisableApplyBtn()} onClick={(e) => this.onDisableUpdateApply()}/>
