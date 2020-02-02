@@ -18,6 +18,7 @@ import Popover, {ArrowContainer} from 'react-tiny-popover'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import PledgebookExportPopup from './pledgebookExportPopup';
 import { toast } from 'react-toastify';
+import GSCheckbox from '../ui/gs-checkbox/checkbox';
 
 class Pledgebook extends Component {
     constructor(props) {
@@ -109,6 +110,7 @@ class Pledgebook extends Component {
                                     className='status-popover'
                                     isOpen={this.state.statusPopupVisibility}
                                     position={'right'} // preferred position
+                                    onClickOutside={() => this.setState({ statusPopupVisibility: false })}
                                     content={({ position, targetRect, popoverRect }) => {
                                         return (
                                         <ArrowContainer // if you'd like an arrow, you can import the ArrowContainer!
@@ -390,9 +392,11 @@ class Pledgebook extends Component {
         }         
     }    
 
-    onMoreFilterPopoverTrigger() {
+    onMoreFilterPopoverTrigger(flag) {
         let newState = {...this.state};
-        newState.moreFilter.popoverOpen = !newState.moreFilter.popoverOpen;
+        if(typeof flag == 'undefined')
+            flag = !newState.moreFilter.popoverOpen;
+        newState.moreFilter.popoverOpen = flag;
         this.setState(newState);
     }
 
@@ -601,7 +605,10 @@ class Pledgebook extends Component {
                 <Col xs={12}>
                     <Row>
                         <Col xs={1}>
-                            <input type='checkbox' className='gs-checkbox' checked={this.state.filters.custom.pledgeAmt.enabled} onChange={(e) => this.customFilters.onChange(e, e.target.checked, 'pledgeAmtCheckbox')}/>
+                            {/* <input type='checkbox' className='gs-checkbox' checked={this.state.filters.custom.pledgeAmt.enabled} onChange={(e) => this.customFilters.onChange(e, e.target.checked, 'pledgeAmtCheckbox')}/> */}
+                            <GSCheckbox labelText="" 
+                                checked={this.state.filters.custom.pledgeAmt.enabled} 
+                                onChangeListener = {(e) => {this.customFilters.onChange(e, e.target.checked, 'pledgeAmtCheckbox')}} />
                         </Col>
                         <Col xs={11}>
                             <Row>
@@ -620,22 +627,23 @@ class Pledgebook extends Component {
                     </Row>
                     <Row>
                         <Col xs={1}>
-                            <input type='checkbox' className='gs-checkbox' checked={this.state.filters.custom.mobile.enabled} onChange={(e) => this.customFilters.onChange(e, e.target.checked, 'mobileCheckbox')}/>
+                            {/* <input type='checkbox' className='gs-checkbox' checked={this.state.filters.custom.mobile.enabled} onChange={(e) => this.customFilters.onChange(e, e.target.checked, 'mobileCheckbox')}/> */}
+                            <GSCheckbox labelText="" 
+                                checked={this.state.filters.custom.mobile.enabled} 
+                                onChangeListener = {(e) => {this.customFilters.onChange(e, e.target.checked, 'mobileCheckbox')}} />
                         </Col>
                         <Col xs={11}>
-                            <Row>
-                                <Form.Group>
-                                    <Form.Label>Mobile No:</Form.Label>
-                                    <InputGroup>
-                                        <Form.Control
-                                            type="text"
-                                            value={this.state.filters.custom.mobile.inputVal}
-                                            placeholder="Type mobile number..."
-                                            onChange={(e) => this.customFilters.onChange(e, e.target.value, "mobile")}
-                                        />
-                                    </InputGroup>
-                                </Form.Group>
-                            </Row>
+                            <Form.Group>
+                                <Form.Label>Mobile No:</Form.Label>
+                                <InputGroup>
+                                    <Form.Control
+                                        type="text"
+                                        value={this.state.filters.custom.mobile.inputVal}
+                                        placeholder="Type mobile number..."
+                                        onChange={(e) => this.customFilters.onChange(e, e.target.value, "mobile")}
+                                    />
+                                </InputGroup>
+                            </Form.Group>
                         </Col>
                     </Row>
                 </Col>
@@ -663,6 +671,7 @@ class Pledgebook extends Component {
                         <Popover
                             className='more-filter-popover'
                             isOpen={this.state.moreFilter.popoverOpen}
+                            onClickOutside={() => this.onMoreFilterPopoverTrigger(false)}
                             position={'right'}
                             content={({position, targetRect, popoverRect}) => {
                                 return (
