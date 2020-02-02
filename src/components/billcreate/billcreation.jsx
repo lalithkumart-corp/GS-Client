@@ -437,6 +437,8 @@ class BillCreation extends Component {
 
     /* START: GETTERS */
     getOrnFilteredList(value) {
+        if(value && value.trim().length < 2)
+            return [];
         var lowerCaseInput = value.toLowerCase();
         let originalList = JSON.parse(JSON.stringify(this.state.formData.orn.list));
         let structuredList = originalList.map( (aSuggestion) => {
@@ -1635,7 +1637,7 @@ class BillCreation extends Component {
                             <Form.Group
                                 validationState= {this.state.formData.cname.hasError ? "error" :null}
                                 >
-                                <Form.Label>Customer Name</Form.Label>
+                                <Form.Label>Customer Name {(this.state.selectedCustomer && this.state.selectedCustomer.name)?'':'  (New Customer)'} </Form.Label>
                                 {/* <Autosuggest
                                     datalist={this.state.formData.cname.limitedList}
                                     itemAdapter={CustomerListAdaptor.instance}
@@ -1663,7 +1665,7 @@ class BillCreation extends Component {
                                         value: this.state.formData.cname.inputVal,
                                         onChange: (e, {newValue, method}) => this.reactAutosuggestControls.onChange(e, {newValue, method}, 'cname'),
                                         onKeyUp: (e) => this.reactAutosuggestControls.onKeyUp(e, {currElmKey: 'cname'}),
-                                        className: "react-autosuggest__input cust-name",
+                                        className: ((this.state.selectedCustomer && this.state.selectedCustomer.name)?'existing-customer':'new-customer') + " react-autosuggest__input cust-name",
                                         readOnly: this.props.billCreation.loading
                                     }}
                                     ref = {(domElm) => { this.domElmns.cname = domElm?domElm.input:domElm; }}
