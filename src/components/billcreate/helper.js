@@ -65,7 +65,11 @@ export const buildRequestParams = (thatState = {}) => {
         userPicture: getPicData(thatState),
         ornPicture: getOrnPicData(thatState),
         ornCategory: thatState.formData.orn.category,
-        totalWeight: thatState.formData.orn.totalWeight
+        totalWeight: thatState.formData.orn.totalWeight,
+        interestPercent: thatState.formData.interest.percent,
+        interestValue: thatState.formData.interest.value,
+        otherCharges: thatState.formData.interest.other,
+        landedCost: thatState.formData.amount.landedCost
     };
     return params;
 }
@@ -88,6 +92,10 @@ export const buildRequestParamsForUpdate = (thatState = {}) => {
         orn: _getOrnamentsData(thatState),
         ornCategory: state.formData.orn.category,
         totalWeight: state.formData.orn.totalWeight,
+        interestPercent: state.formData.interest.percent,
+        interestValue: state.formData.interest.value,
+        otherCharges: state.formData.interest.other,
+        landedCost: state.formData.amount.landedCost,
         billRemarks: _getBillRemarks(thatState),
         userPicture: getPicData(thatState),
         ornPicture: getOrnPicData(thatState),

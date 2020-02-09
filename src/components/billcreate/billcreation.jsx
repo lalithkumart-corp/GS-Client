@@ -25,10 +25,12 @@ import { insertNewBill, updateBill, updateClearEntriesFlag, showEditDetailModal,
 import { DoublyLinkedList } from '../../utilities/doublyLinkedList';
 import { getGaurdianNameList, getAddressList, getPlaceList, getCityList, getPincodeList, getMobileList, buildRequestParams, buildRequestParamsForUpdate, updateBillNumber, resetState, defaultPictureState, defaultOrnPictureState, validateFormValues } from './helper';
 import { getAccessToken } from '../../core/storage';
-import { getDateInUTC, currencyFormatter } from '../../utilities/utility';
+import { getDateInUTC, currencyFormatter, getInterestRate } from '../../utilities/utility';
+import { getRateOfInterest } from '../redeem/helper';
 import Picture from '../profilePic/picture';
 import { toast } from 'react-toastify';
 import BillHistoryView from './billHistoryView';
+import Popover from 'react-tiny-popover'
 
 const ENTER_KEY = 13;
 const SPACE_KEY = 32;
@@ -61,7 +63,7 @@ class BillCreation extends Component {
         this.domElmns = {
             orn: {}
         };
-        this.domOrders = domList;                
+        this.domOrders = domList;
         this.state = {
             showPreview: false,  
             showMoreInputs: false,
@@ -79,9 +81,16 @@ class BillCreation extends Component {
                     inputVal: props.billCreation.billNumber,
                     hasError: false
                 },
+                interest: {
+                    percent: 0,
+                    value: 0,
+                    other: 0,
+                    autoFetch: true
+                },
                 amount: {
                     inputVal: '',
-                    hasError: false
+                    hasError: false,
+                    landedCost: 0
                 },
                 cname: {
                     inputVal: '',
@@ -156,11 +165,12 @@ class BillCreation extends Component {
                 },
                 selectedCustomer: {}                
             },
+            amountPopoverOpen: false,
             userPicture: JSON.parse(JSON.stringify(defaultPictureState)),
             ornPicture: JSON.parse(JSON.stringify(defaultOrnPictureState))
         };
-        this.bindMethods();        
-    }    
+        this.bindMethods();
+    }
 
     /* START: Lifecycle methods */
     componentDidMount() {
@@ -174,6 +184,7 @@ class BillCreation extends Component {
             this.updateDomList('resetOrnTableRows', this.state);
             this.updateDomList('ornInputFields');
         }
+        this.setInterestRates();
         this.domElmns["amount"].focus();
     }
 
@@ -207,6 +218,8 @@ class BillCreation extends Component {
         this.updateItemInMoreDetail = this.updateItemInMoreDetail.bind(this);  
         this.updatePictureData = this.updatePictureData.bind(this);  
         this.updateOrnPictureData = this.updateOrnPictureData.bind(this);
+        this.amtPopoverTrigger = this.amtPopoverTrigger.bind(this);
+        this.calcLandedCost = this.calcLandedCost.bind(this);
     }
 
     /*async uploadImage(e) {
@@ -398,6 +411,10 @@ class BillCreation extends Component {
         newState.ornPicture = JSON.parse(JSON.stringify(defaultOrnPictureState));
         newState.formData.orn.totalWeight = data.TotalWeight || 0.00;
         newState.formData.orn.category = data.OrnCategory || 0.00;
+        newState.formData.interest.percent = data.IntPercent || 0;
+        newState.formData.interest.value = data.IntVal || 0;
+        newState.formData.interest.other = data.OtherCharges || 0;
+        newState.formData.amount.landedCost = data.LandedCost || (data.Amount - data.IntVal - data.OtherCharges);
         if(data.UserImageBlob && data.UserImageBlob.data) {
             let buff = new Buffer(data.UserImageBlob.data, "base64"); //.toString('base64');
             let img = buff.toString('ascii');
@@ -433,6 +450,46 @@ class BillCreation extends Component {
         
         this.setState(newState);
     }
+    async setInterestRates() {
+        let rates = await getInterestRate();
+        this.setState({interestRates: rates});
+    }
+
+    /*async calcInterestDetails(thatState, options) {
+        let newState = thatState;
+        if(!newState)
+            newState = {...this.state};
+        
+        //Interest Percentage
+        if(options && options.interestPercent != -1)
+            newState.formData.interest.percent = options.interestPercent;
+        else
+            newState.formData.interest.percent = getRateOfInterest(this.state.interestRates, this.state.formData.amount.inputVal, {orn: this.state.formData.orn.inputs});
+        
+        newState.formData.interest.value =  (newState.formData.amount.inputVal * newState.formData.interest.percent)/100;
+
+        if(thatState)
+            return newState;
+        else
+            this.setState(newState);
+    }*/
+
+    calcLandedCost(thatState) {
+        let newState = thatState;
+        if(!newState)
+            newState = {...this.state};
+        if(newState.formData.interest.autoFetch) //!newState.formData.interest.percent
+            newState.formData.interest.percent = getRateOfInterest(newState.interestRates, newState.formData.amount.inputVal, {orn: newState.formData.orn.inputs});
+        newState.formData.interest.value =  (newState.formData.amount.inputVal * newState.formData.interest.percent)/100;
+        //newState = this.calcInterestDetails(newState);
+        newState.formData.amount.landedCost = newState.formData.amount.inputVal - newState.formData.interest.value - newState.formData.interest.other;
+
+        if(thatState)
+            return newState;
+        else
+            this.setState(newState);
+    }
+
     /* END: SETTERS */
 
     /* START: GETTERS */
@@ -958,6 +1015,7 @@ class BillCreation extends Component {
         } else if(options && options.isOrnItemInput) {
             options = await this.checkOrnRowClearance(evt, options);
             this.setOrnCategDetail(evt, options);
+            this.calcLandedCost();
         } else if(options && options.isOrnGwtInput) {
             this.fillNetWtValue(options.serialNo);
         } else if(options && options.isOrnNwtInput) {
@@ -1152,9 +1210,7 @@ class BillCreation extends Component {
                 case 'cname':
                     newState.formData.cname.inputVal = newValue;
                     newState.formData[identifier].hasTextUpdated = true;
-                    console.log(newState);
                     await this.setState(newState);
-                    console.log('RESSETED<<<<<', newState.selectedCustomer);
                     break;
                 case 'gaurdianName':
                 case 'address':
@@ -1223,6 +1279,8 @@ class BillCreation extends Component {
                     break;
                 case 'amount':
                     newState.formData[identifier].inputVal = val;
+                    newState.formData.interest.autoFetch = true;
+                    newState = this.calcLandedCost(newState);
                     break;
                 case 'billno':
                     newState.formData[identifier].inputVal = val;
@@ -1237,6 +1295,15 @@ class BillCreation extends Component {
                     break;
                 case 'billRemarks':
                     newState.formData.moreDetails.billRemarks = val;
+                    break;
+                case 'interestPercent':
+                    newState.formData.interest.percent = val;
+                    newState.formData.interest.autoFetch = false;
+                    newState = this.calcLandedCost(newState);
+                    break;
+                case 'other':
+                    newState.formData.interest.other = val;
+                    newState = this.calcLandedCost(newState);
                     break;
             }
             this.setState(newState);
@@ -1259,6 +1326,14 @@ class BillCreation extends Component {
             }            
             this.setState(newState); */
         }
+    }
+
+    amtPopoverTrigger(flag) {
+        let newState = {...this.state};
+        if(typeof flag == 'undefined')
+            flag = !newState.amountPopoverOpen;
+        newState.amountPopoverOpen = flag;
+        this.setState(newState);
     }
 
     /* END: Action/Event listeners */    
@@ -1881,11 +1956,77 @@ class BillCreation extends Component {
                         </Col>                        
                     </Row>
                     <Row className='weight-amt-preview-dom'>
-                        <Col xs={6} md={6}>
+                        <Col xs={6} md={6} style={{paddingTop: '4px'}}>
                             <span style={{fontWeight: 'bold', fontSize: '20px'}}>Net Wt. {parseFloat(this.state.formData.orn.totalWeight).toFixed(3)}</span>
                         </Col>
-                        <Col xs={6} md={6} style={{textAlign: 'right'}}>
-                            <span style={{fontWeight: 'bold', fontSize: '20px'}}>RS: {currencyFormatter(this.state.formData.amount.inputVal) || 0.00}</span>
+                        <Col xs={6} md={6} style={{textAlign: 'right', paddingTop: '4px'}}>
+                            <Popover
+                                className='amount-popover'
+                                isOpen={this.state.amountPopoverOpen}
+                                onClickOutside={() => this.amtPopoverTrigger(false)}
+                                position={'top'}
+                                padding={0}
+                                content={({position, targetRect, popoverRect}) => {
+                                    return (
+                                        <Container className='gs-card arrow-box bottom amount-popover-content' style={{width: '250px', height: '200px'}}>
+                                            <Row>
+                                                <Col xs={7}>
+                                                    Principal
+                                                </Col>
+                                                <Col xs={5}>
+                                                    <span style={{fontWeight: 'bold'}}> {currencyFormatter(this.state.formData.amount.inputVal) || 0.00} </span>
+                                                </Col>
+                                            </Row>
+                                            <Row>
+                                                <Col xs={7}>
+                                                    Interest %
+                                                </Col>
+                                                <Col xs={5}>
+                                                    {/* <Form.Group>
+                                                        <Form.Control
+                                                            placeholder=""
+                                                            type="number"
+                                                            value={this.state.formData.amount.interestPercent}
+                                                            onChange={(e) => this.calcInterestDetails(null, {interestPercent: e.target.value})}
+                                                        />
+                                                    </Form.Group> */}
+                                                    <input type='number' class='gs-input-cell' 
+                                                        value={this.state.formData.interest.percent}
+                                                        onChange={(e) => this.inputControls.onChange(e, e.target.value, 'interestPercent')}
+                                                    />
+                                                </Col>
+                                            </Row>
+                                            <Row>
+                                                <Col xs={7}>
+                                                    Interest Val
+                                                </Col>
+                                                <Col xs={5}>
+                                                    {/* <span> {(this.state.formData.amount.inputVal*this.state.formData.amount.interestPercent)/100} </span> */}
+                                                    <span> {this.state.formData.interest.value }</span>
+                                                </Col>
+                                            </Row>
+                                            <Row>
+                                                <Col xs={7}>
+                                                    Other Charges
+                                                </Col>
+                                                <Col xs={5}>
+                                                    <input type='number' class='gs-input-cell' 
+                                                        value={this.state.formData.interest.other}
+                                                        onChange={(e) => this.inputControls.onChange(e, e.target.value, 'other') }
+                                                    />
+                                                </Col>
+                                            </Row>
+                                            <Row>
+                                                <Col xs={{span: 5, offset: 7}}>
+                                                <span>{this.state.formData.amount.landedCost}</span>
+                                                </Col>
+                                            </Row>
+                                        </Container>
+                                    )
+                                }}
+                                >
+                                    <span className='amount-display-text' style={{fontWeight: 'bold', fontSize: '20px'}} onClick={(e) => this.amtPopoverTrigger()}>RS: {currencyFormatter(this.state.formData.amount.inputVal) || 0.00}</span>
+                            </Popover>
                         </Col>
                     </Row>
                     <Row>

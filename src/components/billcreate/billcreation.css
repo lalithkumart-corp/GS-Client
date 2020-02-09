@@ -256,3 +256,20 @@
 /* .react-autosuggest__input.new-customer {
     box-shadow: 0px 1px 4px 0px #e7ae2f;
 } */
+
+.amount-display-text {
+    cursor: pointer;
+}
+.amount-display-text:hover,
+.amount-display-text:focus {
+    color: #2196f3;
+}
+.amount-popover-content {
+    padding-top: 10px;
+}
+.amount-popover-content .row {
+    padding-bottom: 10px;
+}
+.amount-popover-content .gs-input-cell {
+    padding: 2px 12px 2px 0;
+}

@@ -108,40 +108,34 @@ class Pledgebook extends Component {
                                 
                                 <Popover
                                     className='status-popover'
+                                    padding={0}
                                     isOpen={this.state.statusPopupVisibility}
                                     position={'right'} // preferred position
                                     onClickOutside={() => this.setState({ statusPopupVisibility: false })}
                                     content={({ position, targetRect, popoverRect }) => {
                                         return (
-                                        <ArrowContainer // if you'd like an arrow, you can import the ArrowContainer!
-                                            position={position}
-                                            targetRect={targetRect}
-                                            popoverRect={popoverRect}
-                                            arrowColor={'white'}
-                                            arrowSize={10}
-                                            //arrowStyle={{ opacity: 0.7 }}
-                                        >                                        
-                                            <div className='status-popover-content' onChange={this.onStatusPopoverChange}>
+                                            <div className='gs-card arrow-box left'>
+                                                <div className='status-popover-content' onChange={this.onStatusPopoverChange}>
 
-                                            <Form>
-                                                <Form.Group>
-                                                    <Form.Check id='billstatus-11' type='radio' name='billstatus' checked={this.state.billDisplayFlag=='all'} value='all' label='All'/>
-                                                </Form.Group>
-                                                <Form.Group>
-                                                    <Form.Check id='billstatus-22' type='radio' name='billstatus' checked={this.state.billDisplayFlag=='pending'} value='pending' label='Pending'/>
-                                                </Form.Group>
-                                                <Form.Group>
-                                                    <Form.Check id='billstatus-33' type='radio' name='billstatus' checked={this.state.billDisplayFlag=='closed'} value='closed' label='Closed'/>
-                                                </Form.Group>
-                                            </Form>
-                                               <input 
-                                                    type="button"
-                                                    className='gs-button'
-                                                    onClick={(e) => this.onStatusPopoverSubmit()}
-                                                    value='Load'
-                                                />
+                                                <Form>
+                                                    <Form.Group>
+                                                        <Form.Check id='billstatus-11' type='radio' name='billstatus' checked={this.state.billDisplayFlag=='all'} value='all' label='All'/>
+                                                    </Form.Group>
+                                                    <Form.Group>
+                                                        <Form.Check id='billstatus-22' type='radio' name='billstatus' checked={this.state.billDisplayFlag=='pending'} value='pending' label='Pending'/>
+                                                    </Form.Group>
+                                                    <Form.Group>
+                                                        <Form.Check id='billstatus-33' type='radio' name='billstatus' checked={this.state.billDisplayFlag=='closed'} value='closed' label='Closed'/>
+                                                    </Form.Group>
+                                                </Form>
+                                                    <input 
+                                                        type="button"
+                                                        className='gs-button'
+                                                        onClick={(e) => this.onStatusPopoverSubmit()}
+                                                        value='Load'
+                                                    />
+                                                </div>
                                             </div>
-                                        </ArrowContainer>
                                         )
                                     }
                                 }                                                                 

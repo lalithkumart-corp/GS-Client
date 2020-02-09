@@ -5,6 +5,8 @@ export const getRateOfInterest = (interestRatesDB, amount, options={}) => {
     let rateOfInterest = 0;
     if(typeof interestRatesDB == 'string')
         interestRatesDB = JSON.parse(interestRatesDB);
+    if(typeof amount == 'string')
+        amount = parseInt(amount);
     let type = options.type;    
     if(!type && options.orn)
         type = getTypeBasedOnOrn(options.orn);
@@ -26,11 +28,11 @@ export const getTypeBasedOnOrn = (orn) => {
         ornObj = orn;
     let ornItem = ornObj[1].ornItem;
     if(ornItem.indexOf('S') == 0)
-        type = 'silver';
+        type = 'S';//'silver';
     else if(ornItem.indexOf('B') == 0)
-        type = 'brass';
+        type = 'B';//'brass';
     else
-        type = 'gold';
+        type = 'G';//'gold';
     return type;
 }
 
