@@ -10,7 +10,7 @@ export const getRateOfInterest = (interestRatesDB, amount, options={}) => {
     let type = options.type;    
     if(!type && options.orn)
         type = getTypeBasedOnOrn(options.orn);
-    if(type) {           
+    if(type) {
         _.each(interestRatesDB, (aRateObj, index) => {
             if(type == aRateObj.type && amount >= aRateObj.rangeFrom && amount <= aRateObj.rangeTo ) {
                 rateOfInterest = aRateObj.rateOfInterest;
@@ -28,11 +28,11 @@ export const getTypeBasedOnOrn = (orn) => {
         ornObj = orn;
     let ornItem = ornObj[1].ornItem;
     if(ornItem.indexOf('S') == 0)
-        type = 'S';//'silver';
+        type = 'silver';
     else if(ornItem.indexOf('B') == 0)
-        type = 'B';//'brass';
+        type = 'brass';
     else
-        type = 'G';//'gold';
+        type = 'gold';
     return type;
 }
 

@@ -1990,7 +1990,7 @@ class BillCreation extends Component {
                                                             onChange={(e) => this.calcInterestDetails(null, {interestPercent: e.target.value})}
                                                         />
                                                     </Form.Group> */}
-                                                    <input type='number' class='gs-input-cell' 
+                                                    <input type='number' className='gs-input-cell' 
                                                         value={this.state.formData.interest.percent}
                                                         onChange={(e) => this.inputControls.onChange(e, e.target.value, 'interestPercent')}
                                                     />
@@ -2010,7 +2010,7 @@ class BillCreation extends Component {
                                                     Other Charges
                                                 </Col>
                                                 <Col xs={5}>
-                                                    <input type='number' class='gs-input-cell' 
+                                                    <input type='number' className='gs-input-cell' 
                                                         value={this.state.formData.interest.other}
                                                         onChange={(e) => this.inputControls.onChange(e, e.target.value, 'other') }
                                                     />

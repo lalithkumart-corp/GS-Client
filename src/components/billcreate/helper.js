@@ -252,12 +252,19 @@ export const resetState = (nextProps, newState) => {
         } else if(index == 'moreDetails') {
             anItem.currCustomerInputKey = anItem.currCustomerInputField = anItem.currCustomerInputVal = anItem.billRemarks = '';                
             anItem.customerInfo = [];            
+        } else if(index == 'interest') {
+            anItem.percent = 0;
+            anItem.value = 0;
+            anItem.other = 0;
+            anItem.autoFetch = true;
         } else {
             if(index !== 'date' && index !== 'billseries') {
                 anItem.hasError = false;
                 anItem.hasTextUpdated = false;
                 anItem.inputVal = '';
             }
+            if(index == 'amount')
+                anItem.landedCost = 0;
         }            
     });
     newState.selectedCustomer = {};
