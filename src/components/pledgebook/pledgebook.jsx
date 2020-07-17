@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { getPendingBills, setRefreshFlag } from '../../actions/pledgebook';
+import { getPledgebookData, getPledgebookData2, setRefreshFlag } from '../../actions/pledgebook';
 import { parseResponse } from './helper';
 import { connect } from 'react-redux';
 import _ from 'lodash';
@@ -528,7 +528,7 @@ class Pledgebook extends Component {
             let validation = this.doValidation();
             if(validation.status == 'success') {
                 let params = this.getAPIParams();
-                this.props.getPendingBills(params);
+                this.props.getPledgebookData(params);
             } else {
 
             }
@@ -792,4 +792,4 @@ const mapStateToProps = (state) => {
     };
 };
 
-export default connect(mapStateToProps, { getPendingBills, setRefreshFlag })(Pledgebook);
+export default connect(mapStateToProps, { getPledgebookData, setRefreshFlag })(Pledgebook);

@@ -7,7 +7,7 @@ import './tallyPage.css';
 import moment from 'moment';
 import DatePicker from 'react-datepicker';
 import { getDateInUTC, dateFormatterV2 } from '../../utilities/utility';
-import { getPendingBills , setRefreshFlag } from '../../actions/pledgebook';
+import { getPledgebookData, getPledgebookData2 , setRefreshFlag } from '../../actions/pledgebook';
 import { connect } from 'react-redux';
 import { parseResponse } from '../pledgebook/helper';
 class TallyPage extends Component {
@@ -20,34 +20,27 @@ class TallyPage extends Component {
             endDateObj: moment(),
             endDate: moment().format('DD-MM-YYYY'),
             _endDateUTC: new Date(new Date().setHours(23,59,59,59)).toISOString(),
-            loanPreview: {
-                selectedPageIndex: 0,
-                pageLimit: 10,
-                loanList: [],
-                loanListTotalCount: 0
-            },
+            refreshLoanPreviewTable: false,
             redeemPreview: {
                 selectedPageIndex: 0,
-                pageLimit: 10,
+                pageLimit: 1000,
                 redeemedList: [],
                 redeemedListTotalCount: 0
             }
         }
+        this.bindMethods();
+    }
+    bindMethods() {
+        this.setRefreshLoanPreviewTableFlag = this.setRefreshLoanPreviewTableFlag.bind(this);
     }
     componentWillReceiveProps(nextProps) {
-        let newState = {...this.state};        
-        if(nextProps.pledgeBook && nextProps.pledgeBook.list && nextProps.pledgeBook.refreshTable) {
-            this.props.setRefreshFlag(false);
-            if(nextProps.pledgeBook.billStatus == 'pending') {
-                newState.loanPreview.loanList = parseResponse(nextProps.pledgeBook.list);
-                newState.loanPreview.loanListTotalCount = nextProps.pledgeBook.totalCount;
-            } else if (nextProps.pledgeBook.billStatus == 'redeemed') {
-                newState.redeemPreview.loanList = parseResponse(nextProps.pledgeBook.list);
-                newState.redeemPreview.loanListTotalCount = nextProps.pledgeBook.totalCount;
-            }
-        }
-        this.setState(newState);
+
     }
+
+    setRefreshLoanPreviewTableFlag(flag) {
+        this.setState({refreshLoanPreviewTable: flag});
+    }
+
     actionListener = {
         dateChangeListener: (dateVal, identifier) => {
             let newState = {...this.state}
@@ -65,41 +58,52 @@ class TallyPage extends Component {
             }
             this.setState(newState);
         },
-        onDateSubmitClick: (e) => {
-            let apiParams = {
-                startDate: dateFormatterV2(this.state._startDateUTC, {formatForMysql: true}),
-                endDate: dateFormatterV2(this.state._endDateUTC, {formatForMysql: true})
-            }
-            console.log(apiParams);
-            this.fetchLoanBills(apiParams);
-            this.fetchRedeemedBills(apiParams);
+        onDateSubmitClick: async (e) => {
+            this.setRefreshLoanPreviewTableFlag(true);
         }
     }
 
-    fetchLoanBills(apiParams) {
-        let offsets = this.getLoanPreviewOffsets();
-        let params = {
-            offsetStart: offsets[0] || 0,
-            offsetEnd: offsets[1] || 10,
-            filters: {
-                date: {
-                    startDate: apiParams.startDate,
-                    endDate: apiParams.endDate
-                },
-                include: "all"
-            }
-        }
-        this.props.getPendingBills(params);
-    }
+    // async fetchLoanBills(apiParams) {
+    //     let offsets = this.getLoanPreviewOffsets();
+    //     let params = {
+    //         offsetStart: offsets[0] || 0,
+    //         offsetEnd: offsets[1] || 10,
+    //         filters: {
+    //             date: {
+    //                 startDate: apiParams.startDate,
+    //                 endDate: apiParams.endDate
+    //             },
+    //             include: "all",
+    //             custom: {
+    //                 ornCategory: []
+    //             }
+    //         }
+    //     }
+        
+    //     params.filters.custom.ornCategory = ['G'];
+    //     let goldOrnamentBills = await getPledgebookData2(params);
 
-    getLoanPreviewOffsets() {        
-        let pageNumber = parseInt(this.state.loanPreview.selectedPageIndex);
-        let offsetStart = pageNumber * parseInt(this.state.loanPreview.pageLimit);
-        let offsetEnd = offsetStart + parseInt(this.state.loanPreview.pageLimit);
-        return [offsetStart, offsetEnd];
-    }
+    //     params.filters.custom.ornCategory = ['S'];
+    //     let silverOrnamentBills = await getPledgebookData2(params);
 
-    fetchRedeemedBills(apiParams) {
+    //     let newState = {...this.state};
+    //     newState.loanPreview.goldOrnamentBills = parseResponse(goldOrnamentBills.results);
+    //     newState.loanPreview.goldOrnamentBillCount = goldOrnamentBills.totalCount;
+
+    //     newState.loanPreview.silverOrnamentBills = parseResponse(silverOrnamentBills.results);
+    //     newState.loanPreview.silverOrnamentBillCount = silverOrnamentBills.totalCount;
+
+    //     this.setState(newState);
+    // }
+
+    // getLoanPreviewOffsets() {        
+    //     let pageNumber = parseInt(this.state.loanPreview.selectedPageIndex);
+    //     let offsetStart = pageNumber * parseInt(this.state.loanPreview.pageLimit);
+    //     let offsetEnd = offsetStart + parseInt(this.state.loanPreview.pageLimit);
+    //     return [offsetStart, offsetEnd];
+    // }
+
+    async fetchRedeemedBills(apiParams) {
         let offsets = this.fetchRedeemPreviewOffsets();
         let params = {
             offsetStart: offsets[0] || 0,
@@ -109,10 +113,27 @@ class TallyPage extends Component {
                     startDate: apiParams.startDate,
                     endDate: apiParams.endDate
                 },
-                include: "closed"
+                include: "closed",
+                custom: {
+                    ornCategory: []
+                }
             }
         }
-        this.props.getPendingBills(params);
+        
+        params.filters.custom.ornCategory = ['G'];
+        let redeemedBillsGold = await getPledgebookData2(params);
+
+        params.filters.custom.ornCategory = ['S'];
+        let redeemedBillsSilver = await getPledgebookData2(params);
+        
+        let newState = {...this.state};
+        newState.redeemPreview.goldOrnamentBills = parseResponse(redeemedBillsGold.results);
+        newState.redeemPreview.goldOrnamentBillCount = redeemedBillsGold.totalCount;
+
+        newState.redeemPreview.silverOrnamentBills = parseResponse(redeemedBillsSilver.results);
+        newState.redeemPreview.silverOrnamentBillCount = redeemedBillsSilver.totalCount;
+        
+        this.setState(newState);
     }
 
     fetchRedeemPreviewOffsets() {
@@ -151,7 +172,11 @@ class TallyPage extends Component {
                     <Col xs={12} style={{padding: 0}}>
                         <Tabs defaultActiveKey="loan" className='gs-tabs'>
                             <Tab eventKey="loan" title="Loan" >
-                                <LoanPreview loanPreview={this.state.loanPreview} />
+                                <LoanPreview 
+                                    _startDateUTC={this.state._startDateUTC}
+                                    _endDateUTC={this.state._endDateUTC}
+                                    refreshLoanPreviewTable={this.state.refreshLoanPreviewTable} 
+                                    setRefreshLoanPreviewTableFlag={this.setRefreshLoanPreviewTableFlag} />
                             </Tab>
                             <Tab eventKey="redeem" title="Redeemption" >
                                 <RedeemptionPreview redeemPreview={this.state.redeemPreview} />
@@ -172,4 +197,4 @@ const mapStateToProps = (state) => {
         pledgeBook: state.pledgeBook        
     };
 };
-export default connect(mapStateToProps, { getPendingBills, setRefreshFlag })(TallyPage);
+export default connect(mapStateToProps, { getPledgebookData, setRefreshFlag })(TallyPage);

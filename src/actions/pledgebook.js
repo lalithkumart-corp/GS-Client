@@ -2,7 +2,7 @@ import axios from 'axios';
 import { GET_PENDING_BILLS } from '../core/sitemap';
 import { toast } from 'react-toastify';
 import { getAccessToken } from '../core/storage';
-export const getPendingBills = (args) => {    
+export const getPledgebookData = (args) => {    
     return (dispatch) => {
         enableLoading();        
         axios.get(`${GET_PENDING_BILLS}?access_token=${getAccessToken()}&params=${JSON.stringify(args)}`)
@@ -28,6 +28,19 @@ export const getPendingBills = (args) => {
                 toast.error('Exception occured in fetching the Pending bill list...');
             }
         )
+    }
+}
+
+export const getPledgebookData2 = async (args) => {
+    try {
+        let successResp = await axios.get(`${GET_PENDING_BILLS}?access_token=${getAccessToken()}&params=${JSON.stringify(args)}`)
+        return successResp.data;
+    } catch(errResp) {
+        let msg = 'Error occured in fetching the Pending bill list...';
+        if(errResp.response && errResp.response.data && errResp.response.data.error && errResp.response.data.error.message)
+            msg = errResp.response.data.error.message;
+        toast.error(msg);
+        return null;
     }
 }
 

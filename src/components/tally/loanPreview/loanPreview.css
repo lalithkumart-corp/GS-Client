@@ -5,18 +5,50 @@
     font-weight: bold;
     font-size: 20px;
 }
-.loan-preview-panel .bill-record {
-
+.loan-preview-panel .bill-record.even {
+    background-color: lightgray;
 }
-
+.loan-preview-panel .totals-row-content {
+    background-color: lightgray;
+    padding: 10px;
+    font-size: 16px;
+}
 .loan-preview-panel .totals-row{
-    margin-top: 10px;
-    border: 1px solid;
+    /* border: 1px solid lightgray; */
     border-left: none;
     border-right: none;
 }
 
 .loan-preview-panel .no-bill-view {
     text-align: center;
-    margin-top: 40px;
+    /* margin-top: 40px; */
+    background-color: #eaeaea;
+    padding: 40px;
+    font-family: serif;
+    border-radius: 2%;
+    max-height: 100px;
+}
+.loan-preview-panel .bill-list-view {
+    overflow-x: hidden;
+    max-height: 200px;
+    border: 1px solid lightgray;
+}
+
+.loan-preview.pagination {
+    /* margin: 20px 0 0 20px; */
+    /* margin: 13px 0 0 0; */
+    margin: 0;
+    font-size: 12px;
+    float: right;
+}
+.loan-preview.pagination li>a {
+    border: none;
+    border-radius: 50%;
+    outline: none;
+    color: black;
+    font-weight: normal;
+    padding: 3px 8px;
+}
+.loan-preview.pagination>.active>a {
+    color: white;
 }
