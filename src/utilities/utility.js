@@ -2,26 +2,56 @@ import { getInterestRates, setInterestRates, clearInterestRates, getAccessToken 
 import { GET_INTEREST_RATES } from '../core/sitemap';
 import axios from 'axios';
 
-export const getDateInUTC = (theDate) => {
-    let currentDate = new Date();
-    let currHr = currentDate.getHours();
-    let currMin = currentDate.getMinutes();
-    let currSec = currentDate.getSeconds();
-    let currMilliSec = currentDate.getMilliseconds();
+export const getDateInUTC = (theDate, options) => {
+    options = options || {};
+    let hour;
+    let minute;
+    let second;
+    let milliseconds;
+    if(options.time == 'start') {
+        hour = 0;
+        minute = 0;
+        second = 0;
+        milliseconds = 0;
+    } else if(options.time == 'end') {
+        hour = 23;
+        minute = 59;
+        second = 59;
+        milliseconds = 59;
+    } else { //current time
+        let currentDate = new Date();
+        hour = currentDate.getHours();
+        minute = currentDate.getMinutes();
+        second = currentDate.getSeconds();
+        milliseconds = currentDate.getMilliseconds();
+    }
+    
     let selectedDate = new Date(theDate);
-    selectedDate.setHours(currHr);
-    selectedDate.setMinutes(currMin);
-    selectedDate.setSeconds(currSec);
-    selectedDate.setMilliseconds(currMilliSec);
+    selectedDate.setHours(hour);
+    selectedDate.setMinutes(minute);
+    selectedDate.setSeconds(second);
+    selectedDate.setMilliseconds(milliseconds);
     let selectedDateInUTC = selectedDate.toISOString(); // (val.slice(0,10) + 'T' + currUTCHr + ':'+ currUTCMin + ':' + currUTCSec + '.' + currUTCMilliSec + 'Z');
     return selectedDateInUTC;
 }
 
-export const dateFormatter = (theDate, options) => {        
-    let formattedDate = theDate.toISOString().replace('T', ' ').slice(0,19);        
-    if(options && options.onlyDate)
-        formattedDate = formattedDate.slice(0, 10);
+export const dateFormatter = (theDate, options) => {
+    let formattedDate = theDate.toISOString().replace('T', ' ').slice(0,19);
+    if(options) {
+        if(options.onlyDate)
+            formattedDate = formattedDate.slice(0, 10);
+    }
     return formattedDate;
+}
+
+export const dateFormatterV2 = (theDate, options) => {
+    options = options || {};
+    let dateVal = theDate;
+    if(options.convertToISO)
+        dateVal = dateVal.toISOString();
+    if(options.formatForMysql)
+        dateVal = dateVal.replace('T', ' ').slice(0,19);
+    return dateVal;
 }
 
 export const getInterestRate = () => {

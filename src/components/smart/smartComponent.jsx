@@ -21,6 +21,7 @@ import './smartComponent.css';
 import SignUpPage from '../signup/signup';
 import Settings from '../settings/settings';
 import BackupRestore from '../backup_restore/backupRestore';
+import TallyPage from '../tally/tallyPage';
 import 'bootstrap/dist/css/bootstrap.min.css';
 
 class SmartComponent extends Component {
@@ -55,6 +56,7 @@ class SmartComponent extends Component {
                                 <Route path= '/uploadpicdemo' component={UploadPicDemo} />
                                 <Route path= '/settings' component={Settings} />
                                 <Route path= '/backup_restore' component={BackupRestore} />
+                                <Route path= '/tally' component={TallyPage} />
                             </div>
                         </div>
                 </Router>

@@ -182,3 +182,7 @@
 .custom-filters.more-filter-popover-trigger.action-btn{
     color: orange;
 }
+
+.orn-categ-card h5, .bill-status-card h5{
+   padding-bottom: 10px;
+}

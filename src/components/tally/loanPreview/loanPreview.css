@@ -1,0 +1,22 @@
+.loan-preview-panel .bill-header {
+    margin-top: 25px;
+    margin-left: 0px;
+    margin-bottom: 5px;
+    font-weight: bold;
+    font-size: 20px;
+}
+.loan-preview-panel .bill-record {
+
+}
+
+.loan-preview-panel .totals-row{
+    margin-top: 10px;
+    border: 1px solid;
+    border-left: none;
+    border-right: none;
+}
+
+.loan-preview-panel .no-bill-view {
+    text-align: center;
+    margin-top: 40px;
+}

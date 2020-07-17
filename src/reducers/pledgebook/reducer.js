@@ -10,6 +10,14 @@ export default function pledgeBookReducer(state= defaultState, action) {
             newState.totalCount = action.payload.totalCount;
             newState.loading = false;
             newState.refreshTable = true;
+            newState.billStatus = "pending";
+            break;
+        case 'GET_REDEEMED_BILLS':
+            newState.list = action.payload.results;
+            newState.totalCount = action.payload.totalCount;
+            newState.loading = false;
+            newState.refreshTable = true;
+            newState.billStatus = "redeemed";
             break;
         case 'SET_REFRESH_FLAG':
             newState.refreshTable = false;

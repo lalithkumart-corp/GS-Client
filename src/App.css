@@ -236,6 +236,7 @@ input[type=checkbox], input[type=radio] {
 
 .react-tiny-popover-container {
   z-index: 2;
+  padding-right: 20px;
 }
 
 .gold-color {
@@ -263,13 +264,12 @@ input[type=checkbox], input[type=radio] {
 }
 .arrow-box:after {
   border-color: rgba(136, 183, 213, 0);
-	border-width: 14px;
+  border-width: 21px;
 }
 .arrow-box:before {
 	border-color: rgba(194, 225, 245, 0);
 	border-width: 20px;
 }
-
 
 /* arrow bottom */
 .arrow-box.bottom {
@@ -317,8 +317,10 @@ input[type=checkbox], input[type=radio] {
 }
 .arrow-box.left:after {
   border-right-color: white; /* #88b7d5; */
-  margin-top: -15px;
+  margin-top: -21px;
+  right: 98%;
 }
+
 .arrow-box.left:before {
   border-right-color: #c2e1f5;
   margin-top: -21px;

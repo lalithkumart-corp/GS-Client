@@ -56,6 +56,11 @@ class Pledgebook extends Component {
                         lsr: 2500,
                         enabled: false
                     }
+                },
+                ornCategory: {
+                    gold: true,
+                    silver: true,
+                    brass: true
                 }
             },
             selectedPageIndex: 0,
@@ -114,28 +119,46 @@ class Pledgebook extends Component {
                                     onClickOutside={() => this.setState({ statusPopupVisibility: false })}
                                     content={({ position, targetRect, popoverRect }) => {
                                         return (
-                                            <div className='gs-card arrow-box left'>
-                                                <div className='status-popover-content' onChange={this.onStatusPopoverChange}>
-
-                                                <Form>
-                                                    <Form.Group>
-                                                        <Form.Check id='billstatus-11' type='radio' name='billstatus' checked={this.state.billDisplayFlag=='all'} value='all' label='All'/>
-                                                    </Form.Group>
-                                                    <Form.Group>
-                                                        <Form.Check id='billstatus-22' type='radio' name='billstatus' checked={this.state.billDisplayFlag=='pending'} value='pending' label='Pending'/>
-                                                    </Form.Group>
-                                                    <Form.Group>
-                                                        <Form.Check id='billstatus-33' type='radio' name='billstatus' checked={this.state.billDisplayFlag=='closed'} value='closed' label='Closed'/>
-                                                    </Form.Group>
-                                                </Form>
-                                                    <input 
-                                                        type="button"
-                                                        className='gs-button'
-                                                        onClick={(e) => this.onStatusPopoverSubmit()}
-                                                        value='Load'
-                                                    />
-                                                </div>
-                                            </div>
+                                            <Container className='gs-card arrow-box left'>
+                                                <Row className='status-popover-content' >
+                                                    <Col xs={{span: 6}} md={{span: 6}} className="orn-categ-card">
+                                                        <h5>Category</h5>
+                                                        <Form>
+                                                            <Form.Group>
+                                                                <Form.Check id='orn-categ-g' type='checkbox' checked={this.state.filters.ornCategory.gold} value='G' label='Gold' onChange={(e)=>this.onOrnCategoryFilterChange(e, 'gold')}/>
+                                                            </Form.Group>
+                                                            <Form.Group>
+                                                                <Form.Check id='orn-categ-s' type='checkbox' checked={this.state.filters.ornCategory.silver} value='S' label='Silver' onChange={(e)=>this.onOrnCategoryFilterChange(e, 'silver')}/>
+                                                            </Form.Group>
+                                                            <Form.Group>
+                                                                <Form.Check id='orn-categ-b' type='checkbox' checked={this.state.filters.ornCategory.brass} value='B' label='Brass' onChange={(e)=>this.onOrnCategoryFilterChange(e, 'brass')}/>
+                                                            </Form.Group>
+                                                        </Form>
+                                                    </Col>
+                                                    <Col xs={{span: 6}} md={{span: 6}} className="bill-status-card">
+                                                        <h5>Bills</h5>
+                                                        <Form onChange={this.onStatusPopoverChange}>
+                                                            <Form.Group>
+                                                                <Form.Check id='billstatus-11' type='radio' name='billstatus' checked={this.state.billDisplayFlag=='all'} value='all' label='All'/>
+                                                            </Form.Group>
+                                                            <Form.Group>
+                                                                <Form.Check id='billstatus-22' type='radio' name='billstatus' checked={this.state.billDisplayFlag=='pending'} value='pending' label='Pending'/>
+                                                            </Form.Group>
+                                                            <Form.Group>
+                                                                <Form.Check id='billstatus-33' type='radio' name='billstatus' checked={this.state.billDisplayFlag=='closed'} value='closed' label='Closed'/>
+                                                            </Form.Group>
+                                                        </Form>
+                                                    </Col>
+                                                    <Col xs={{span: 12}} md={{soan: 12}} style={{textAlign: "center", marginBottom: 20}}>
+                                                        <input 
+                                                            type="button"
+                                                            className='gs-button'
+                                                            onClick={(e) => this.onStatusPopoverSubmit()}
+                                                            value='Apply Filters'
+                                                        />
+                                                    </Col>
+                                                </Row>
+                                            </Container>
                                         )
                                     }
                                 }                                                                 
@@ -219,6 +242,7 @@ class Pledgebook extends Component {
         this.refresh = this.refresh.bind(this);
         this.onPopupTriggerClick = this.onPopupTriggerClick.bind(this);
         this.onStatusPopoverChange = this.onStatusPopoverChange.bind(this);
+        this.onOrnCategoryFilterChange = this.onOrnCategoryFilterChange.bind(this);
         this.onStatusPopoverSubmit = this.onStatusPopoverSubmit.bind(this);
         this.onExportClick = this.onExportClick.bind(this);
         this.handleExportPopupClose = this.handleExportPopupClose.bind(this);
@@ -415,6 +439,12 @@ class Pledgebook extends Component {
         this.setState({billDisplayFlag: e.target.value});
     }
 
+    onOrnCategoryFilterChange(e, category) {
+        let newState = {...this.state};
+        newState.filters.ornCategory[category] = !newState.filters.ornCategory[category];
+        this.setState(newState);
+    }
+
     async onStatusPopoverSubmit() {
         await this.setState({statusPopupVisibility: false});
         this.initiateFetchPledgebookAPI();
@@ -476,6 +506,14 @@ class Pledgebook extends Component {
                 grt: this.state.filters.custom.pledgeAmt.grt,
                 lsr: this.state.filters.custom.pledgeAmt.lsr
             }
+
+        filters.custom.ornCategory = [];
+        if(this.state.filters.ornCategory.gold)
+            filters.custom.ornCategory.push('G');
+        if(this.state.filters.ornCategory.silver)
+            filters.custom.ornCategory.push('S');
+        if(this.state.filters.ornCategory.brass)
+            filters.custom.ornCategory.push('B');
         return filters;
     }
 
@@ -506,6 +544,8 @@ class Pledgebook extends Component {
                 errors.push('Check the Custom Filter - Amount filter value. "Greater than" input value should be greater than "lesser than" input value.')
             }
         }
+        if(!this.state.filters.ornCategory.gold && !this.state.filters.ornCategory.silver && !this.state.filters.ornCategory.brass )
+            errors.push('Select any Ornament Group');
         if(errors.length > 0)
             toast.error(errors.join(' || '));
         return {status: status};

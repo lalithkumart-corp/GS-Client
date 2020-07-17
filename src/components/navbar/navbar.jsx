@@ -26,6 +26,7 @@ class NavbarComp extends Component {
                             <NavDropdown.Divider />
                             <NavDropdown.Item as={Link} to="/pledgebook">PledgeBook</NavDropdown.Item>
                         </NavDropdown>
+                        <Nav.Link as={Link} to="/tally">Tally</Nav.Link>
                         <Nav.Link as={Link} to="/users">User</Nav.Link>
                         <NavDropdown title="Others" id="basic-nav-dropdown">
                             <NavDropdown.Item as={Link} to="/customerdetail">Customer Detail</NavDropdown.Item>

@@ -7,9 +7,12 @@ export const getPendingBills = (args) => {
         enableLoading();        
         axios.get(`${GET_PENDING_BILLS}?access_token=${getAccessToken()}&params=${JSON.stringify(args)}`)
         .then(
-            (successResp) => {                
+            (successResp) => {       
+                let dispatchType = 'GET_PENDING_BILLS';
+                if(args.filters && args.filters.include == "closed")      
+                    dispatchType = 'GET_REDEEMED_BILLS';
                 dispatch({
-                    type: 'GET_PENDING_BILLS',
+                    type: dispatchType,
                     payload: successResp.data
                 })
             },
