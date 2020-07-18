@@ -6,6 +6,7 @@ import './loanPreview.css';
 import { getPledgebookData2 } from '../../../actions/pledgebook';
 import { parseResponse } from '../../pledgebook/helper';
 import { dateFormatterV2 } from '../../../utilities/utility';
+import { format } from 'currency-formatter';
 
 const GOLD = "goldOrnamentBills";
 const SILVER = "silverOrnamentBills";
@@ -112,13 +113,14 @@ class LoanPreview extends Component {
                     intVal: response.results.intVal || 0,
                     totalWeight: response.results.totalWeight || 0.00
                 }
-
+                this.props.updateCommonStore('goldLoanTotals', response.results);
             } else if(ornSymbol == 'S') {
                 newState.silverOrnamentBills.totals ={
                     amount: response.results.amount || 0,
                     intVal: response.results.intVal || 0,
                     totalWeight: response.results.totalWeight || 0.00
                 }
+                this.props.updateCommonStore('silverLoanTotals', response.results);
             }
             this.setState(newState);
         }
@@ -178,7 +180,7 @@ class LoanPreview extends Component {
             totals.weight += bill.TotalWeight;
         });
         if(bills.length) {
-            dom.push(<Col xs={{offset: 2, span: 7}} md={{offset:2, span: 7}} className="bill-list-view" style={{fontWeight: "bold"}}>
+            dom.push(<Col xs={{offset: 1, span: 9}} md={{offset:1, span: 9}} className="bill-list-view" style={{fontWeight: "bold"}}>
                 <Row key={'header-for-bills'}>
                     <Col xs={{span: 1}}>S.No</Col>
                     <Col xs={{span: 2}}>Bill</Col>
@@ -188,16 +190,16 @@ class LoanPreview extends Component {
                     <Col xs={{span: 2}}>N.Wt</Col>
                 </Row>
             </Col>);
-            dom.push(<Col xs={{offset: 2, span: 7}} md={{offset:2, span: 7}} className="bill-list-view">{bills}</Col>);
+            dom.push(<Col xs={{offset: 1, span: 9}} md={{offset: 1, span: 9}} className="bill-list-view">{bills}</Col>);
             dom.push(
-                <Col xs={{offset: 2, span: 7}} md={{offset: 2, span: 7}} className="totals-row-content">
+                <Col xs={{offset: 1, span: 9}} md={{offset: 1, span: 9}} className="totals-row-content">
                     <Row key={'totals-row'} className="totals-row">
                         <Col xs={{span: 1}}></Col>
                         <Col xs={{span: 2}}></Col>
                         <Col xs={{span: 3}}></Col>
-                        <Col xs={{span: 2}}>{this.state[category].totals.amount}</Col>
-                        <Col xs={{span: 2}}>{this.state[category].totals.intVal}</Col>
-                        <Col xs={{span: 2}}>{this.state[category].totals.totalWeight.toFixed(2)}</Col>
+                        <Col xs={{span: 2}} style={{padding: 0}}>{format(this.state[category].totals.amount, {code: 'INR'})}</Col>
+                        <Col xs={{span: 2}} style={{padding: 0}}>{format(this.state[category].totals.intVal, {code: 'INR'})}</Col>
+                        <Col xs={{span: 2}} style={{padding: 0}}>{this.state[category].totals.totalWeight.toFixed(2)}</Col>
                     </Row>
                 </Col>
             )
@@ -217,9 +219,9 @@ class LoanPreview extends Component {
                 <Row style={{fontFamily: 'monospace'}}>
                     <Col>
                         <Row className="bill-header">
-                            <Col xs={{offset: 2, span: 2}} md={{offset: 2, span: 2}} style={{paddingLeft: 0}}>GOLD</Col>
+                            <Col xs={{offset: 1, span: 2}} md={{offset: 1, span: 2}} style={{paddingLeft: 0}}>GOLD</Col>
                             {(this.state.goldOrnamentBills.totalCount > this.state.goldOrnamentBills.pageLimit) &&
-                            <Col xs={{span: 5}} md={{span: 5}}>
+                            <Col xs={{span: 7}} md={{span: 7}}>
                                 <ReactPaginate previousLabel={"<"}
                                     nextLabel={">"}
                                     breakLabel={"..."}
@@ -238,9 +240,9 @@ class LoanPreview extends Component {
                             {this.getBillsDom(GOLD)}
                         </Row>
                         <Row className="bill-header">
-                            <Col xs={{offset: 2, span: 2}} md={{offset: 2, span: 2}} style={{paddingLeft: 0}}>SILVER</Col>
+                            <Col xs={{offset: 1, span: 2}} md={{offset: 1, span: 2}} style={{paddingLeft: 0}}>SILVER</Col>
                             {(this.state.silverOrnamentBills.totalCount > this.state.silverOrnamentBills.pageLimit) &&
-                            <Col xs={{span: 5}} md={{span: 5}}>
+                            <Col xs={{span: 7}} md={{span: 7}}>
                                 <ReactPaginate previousLabel={"<"}
                                     nextLabel={">"}
                                     breakLabel={"..."}

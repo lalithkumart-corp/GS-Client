@@ -112,13 +112,14 @@ class RedeemptionPreview extends Component {
                     intVal: response.results.intVal || 0,
                     totalWeight: response.results.totalWeight || 0.00
                 }
-
+                this.props.updateCommonStore('goldRedeemTotals', response.results);
             } else if(ornSymbol == 'S') {
                 newState.silverOrnamentBills.totals ={
                     amount: response.results.amount || 0,
                     intVal: response.results.intVal || 0,
                     totalWeight: response.results.totalWeight || 0.00
                 }
+                this.props.updateCommonStore('silverRedeemTotals', response.results);
             }
             this.setState(newState);
         }

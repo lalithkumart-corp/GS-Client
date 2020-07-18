@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import {Tabs, Tab, Container, Row, Col} from 'react-bootstrap';
-import OverallCalculation from './calc/calculation';
+import BalanceSheet from './balanceSheet/balanceSheet';
 import LoanPreview from './loanPreview/loanPreview';
 import RedeemptionPreview from './redeemptionPreview/redeemptionPreview';
 import './tallyPage.css';
@@ -21,21 +21,24 @@ class TallyPage extends Component {
             endDate: moment().format('DD-MM-YYYY'),
             _endDateUTC: new Date(new Date().setHours(23,59,59,59)).toISOString(),
             refreshLoanPreviewTable: false,
-            redeemPreview: {
-                selectedPageIndex: 0,
-                pageLimit: 1000,
-                redeemedList: [],
-                redeemedListTotalCount: 0
-            }
+            refreshRedeemPreviewTable: false,
+            commonStore: {}
         }
         this.bindMethods();
     }
     bindMethods() {
         this.setRefreshLoanPreviewTableFlag = this.setRefreshLoanPreviewTableFlag.bind(this);
         this.setRefreshRedeemPreviewTableFlag = this.setRefreshRedeemPreviewTableFlag.bind(this);
+        this.updateMyState = this.updateMyState.bind(this);
     }
     componentWillReceiveProps(nextProps) {
 
+    }
+
+    updateMyState(key, value) {
+        let newState = {...this.state};
+        newState.commonStore[key] = value;
+        this.setState(newState);
     }
 
     setRefreshLoanPreviewTableFlag(flag) {
@@ -69,91 +72,11 @@ class TallyPage extends Component {
         }
     }
 
-    // async fetchLoanBills(apiParams) {
-    //     let offsets = this.getLoanPreviewOffsets();
-    //     let params = {
-    //         offsetStart: offsets[0] || 0,
-    //         offsetEnd: offsets[1] || 10,
-    //         filters: {
-    //             date: {
-    //                 startDate: apiParams.startDate,
-    //                 endDate: apiParams.endDate
-    //             },
-    //             include: "all",
-    //             custom: {
-    //                 ornCategory: []
-    //             }
-    //         }
-    //     }
-        
-    //     params.filters.custom.ornCategory = ['G'];
-    //     let goldOrnamentBills = await getPledgebookData2(params);
-
-    //     params.filters.custom.ornCategory = ['S'];
-    //     let silverOrnamentBills = await getPledgebookData2(params);
-
-    //     let newState = {...this.state};
-    //     newState.loanPreview.goldOrnamentBills = parseResponse(goldOrnamentBills.results);
-    //     newState.loanPreview.goldOrnamentBillCount = goldOrnamentBills.totalCount;
-
-    //     newState.loanPreview.silverOrnamentBills = parseResponse(silverOrnamentBills.results);
-    //     newState.loanPreview.silverOrnamentBillCount = silverOrnamentBills.totalCount;
-
-    //     this.setState(newState);
-    // }
-
-    // getLoanPreviewOffsets() {        
-    //     let pageNumber = parseInt(this.state.loanPreview.selectedPageIndex);
-    //     let offsetStart = pageNumber * parseInt(this.state.loanPreview.pageLimit);
-    //     let offsetEnd = offsetStart + parseInt(this.state.loanPreview.pageLimit);
-    //     return [offsetStart, offsetEnd];
-    // }
-
-    async fetchRedeemedBills(apiParams) {
-        let offsets = this.fetchRedeemPreviewOffsets();
-        let params = {
-            offsetStart: offsets[0] || 0,
-            offsetEnd: offsets[1] || 10,
-            filters: {
-                date: {
-                    startDate: apiParams.startDate,
-                    endDate: apiParams.endDate
-                },
-                include: "closed",
-                custom: {
-                    ornCategory: []
-                }
-            }
-        }
-        
-        params.filters.custom.ornCategory = ['G'];
-        let redeemedBillsGold = await getPledgebookData2(params);
-
-        params.filters.custom.ornCategory = ['S'];
-        let redeemedBillsSilver = await getPledgebookData2(params);
-        
-        let newState = {...this.state};
-        newState.redeemPreview.goldOrnamentBills = parseResponse(redeemedBillsGold.results);
-        newState.redeemPreview.goldOrnamentBillCount = redeemedBillsGold.totalCount;
-
-        newState.redeemPreview.silverOrnamentBills = parseResponse(redeemedBillsSilver.results);
-        newState.redeemPreview.silverOrnamentBillCount = redeemedBillsSilver.totalCount;
-        
-        this.setState(newState);
-    }
-
-    fetchRedeemPreviewOffsets() {
-        let pageNumber = parseInt(this.state.redeemPreview.selectedPageIndex);
-        let offsetStart = pageNumber * parseInt(this.state.redeemPreview.pageLimit);
-        let offsetEnd = offsetStart + parseInt(this.state.redeemPreview.pageLimit);
-        return [offsetStart, offsetEnd];
-    }
-
     render() {
         return (
             <Container className='tally-main-page'>
                 <Row className='date-picker-row'>
-                    <Col xs={6}>
+                    <Col xs={2} className="start-date-container">
                         <DatePicker
                             value={this.state.startDate}
                             //selected={this.state.startDate}
@@ -162,6 +85,8 @@ class TallyPage extends Component {
                             startDate={this.state.startDateObj}
                             endDate={this.state.endDateObj}
                         />
+                    </Col>
+                    <Col xs={2} className="end-date-container">
                         <DatePicker
                             value={this.state.endDate}
                             //selected={this.state.endDate}
@@ -171,7 +96,9 @@ class TallyPage extends Component {
                             endDate={this.state.endDateObj}
                             minDate={this.state.startDateObj}
                         />
-                        <input type='button' className='gs-button' value='SUBMIT' onClick={(e) => this.actionListener.onDateSubmitClick(e)}/>
+                    </Col>
+                    <Col xs={1}>
+                        <input type='button' className='gs-button' value='VIEW' onClick={(e) => this.actionListener.onDateSubmitClick(e)}/>
                     </Col>
                 </Row>
                 <Row className='tab-view'>
@@ -182,17 +109,19 @@ class TallyPage extends Component {
                                     _startDateUTC={this.state._startDateUTC}
                                     _endDateUTC={this.state._endDateUTC}
                                     refreshLoanPreviewTable={this.state.refreshLoanPreviewTable} 
-                                    setRefreshLoanPreviewTableFlag={this.setRefreshLoanPreviewTableFlag} />
+                                    setRefreshLoanPreviewTableFlag={this.setRefreshLoanPreviewTableFlag}
+                                    updateCommonStore = {this.updateMyState} />
                             </Tab>
                             <Tab eventKey="redeem" title="Redeemption" >
                                 <RedeemptionPreview 
                                     _startDateUTC={this.state._startDateUTC}
                                     _endDateUTC={this.state._endDateUTC}
                                     refreshRedeemPreviewTable={this.state.refreshRedeemPreviewTable} 
-                                    setRefreshRedeemPreviewTableFlag={this.setRefreshRedeemPreviewTableFlag} />
+                                    setRefreshRedeemPreviewTableFlag={this.setRefreshRedeemPreviewTableFlag} 
+                                    updateCommonStore = {this.updateMyState} />
                             </Tab>
-                            <Tab eventKey="calculation" title="Calculation" >
-                                <OverallCalculation {...this.state} />
+                            <Tab eventKey="balancesheet" title="Balance Sheet" >
+                                <BalanceSheet {...this.state.commonStore} />
                             </Tab>
                         </Tabs>
                     </Col>
