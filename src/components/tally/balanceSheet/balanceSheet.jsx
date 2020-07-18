@@ -96,6 +96,13 @@ class BalanceSheet extends Component {
                         </Row>
 
                         <Row className="overview-row">
+                            <Col xs={{span: 3}} className="cell border-right">Opening Balance</Col>
+                            <Col xs={{span: 3}} className="cell border-right"></Col>
+                            <Col xs={{span: 3}} className="cell border-right"></Col>
+                            <Col xs={{span: 3}} className="cell">{format(0, {code: 'INR'})}</Col>
+                        </Row>
+
+                        <Row className="overview-row">
                             <Col xs={{span: 3}} className="cell border-right">Loan Amount</Col>
                             <Col xs={{span: 3}} className="cell border-right"></Col>
                             <Col xs={{span: 3}} className="cell border-right">{format(this.getLoanAmount(), {code: 'INR'})}</Col>
