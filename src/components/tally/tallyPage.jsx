@@ -32,6 +32,7 @@ class TallyPage extends Component {
     }
     bindMethods() {
         this.setRefreshLoanPreviewTableFlag = this.setRefreshLoanPreviewTableFlag.bind(this);
+        this.setRefreshRedeemPreviewTableFlag = this.setRefreshRedeemPreviewTableFlag.bind(this);
     }
     componentWillReceiveProps(nextProps) {
 
@@ -39,6 +40,10 @@ class TallyPage extends Component {
 
     setRefreshLoanPreviewTableFlag(flag) {
         this.setState({refreshLoanPreviewTable: flag});
+    }
+
+    setRefreshRedeemPreviewTableFlag(flag) {
+        this.setState({refreshRedeemPreviewTable: flag});
     }
 
     actionListener = {
@@ -60,6 +65,7 @@ class TallyPage extends Component {
         },
         onDateSubmitClick: async (e) => {
             this.setRefreshLoanPreviewTableFlag(true);
+            this.setRefreshRedeemPreviewTableFlag(true);
         }
     }
 
@@ -179,7 +185,11 @@ class TallyPage extends Component {
                                     setRefreshLoanPreviewTableFlag={this.setRefreshLoanPreviewTableFlag} />
                             </Tab>
                             <Tab eventKey="redeem" title="Redeemption" >
-                                <RedeemptionPreview redeemPreview={this.state.redeemPreview} />
+                                <RedeemptionPreview 
+                                    _startDateUTC={this.state._startDateUTC}
+                                    _endDateUTC={this.state._endDateUTC}
+                                    refreshRedeemPreviewTable={this.state.refreshRedeemPreviewTable} 
+                                    setRefreshRedeemPreviewTableFlag={this.setRefreshRedeemPreviewTableFlag} />
                             </Tab>
                             <Tab eventKey="calculation" title="Calculation" >
                                 <OverallCalculation {...this.state} />

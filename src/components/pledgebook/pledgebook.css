@@ -183,6 +183,10 @@
     color: orange;
 }
 
-.orn-categ-card h5, .bill-status-card h5{
+.orn-categ-card h5, .bill-status-card h5, .bill-sort-order h5 {
    padding-bottom: 10px;
+}
+
+.orn-categ-card label, .bill-status-card label, .bill-sort-order label {
+    font-weight: normal;
 }

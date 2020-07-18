@@ -2,7 +2,6 @@ import React, { Component } from 'react';
 import {Tabs, Tab, Container, Row, Col} from 'react-bootstrap';
 import ReactPaginate from 'react-paginate';
 import _ from 'lodash';
-import Popover from 'react-tiny-popover'
 import './loanPreview.css';
 import { getPledgebookData2 } from '../../../actions/pledgebook';
 import { parseResponse } from '../../pledgebook/helper';
@@ -49,16 +48,16 @@ class LoanPreview extends Component {
         }
     }
 
-    getPageCount(ornIdentifier) {
-        let totalRecords = this.state[ornIdentifier].totalCount;
-        return (totalRecords/this.state[ornIdentifier].pageLimit);
-    }
-
     fetchLoanPreviewData() {
         this.fetchBills('G');
         this.fetchBills('S');
         this.fetchTotals('G');
         this.fetchTotals('S');
+    }
+
+    getPageCount(ornIdentifier) {
+        let totalRecords = this.state[ornIdentifier].totalCount;
+        return (totalRecords/this.state[ornIdentifier].pageLimit);
     }
 
     constructApiParams(ornSymbol) {
@@ -84,6 +83,7 @@ class LoanPreview extends Component {
         params.filters.custom.ornCategory = [ornSymbol];
         return params;
     }
+
     async fetchBills(ornSymbol) {
         let params = this.constructApiParams(ornSymbol);
         let response = await getPledgebookData2(params);

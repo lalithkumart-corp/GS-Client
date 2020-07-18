@@ -63,6 +63,8 @@ class Pledgebook extends Component {
                     brass: true
                 }
             },
+            sortBy: 'desc',
+            sortByColumn: 'pledgedDate',
             selectedPageIndex: 0,
             selectedIndexes: [],
             selectedRowJson: [],
@@ -121,7 +123,7 @@ class Pledgebook extends Component {
                                         return (
                                             <Container className='gs-card arrow-box left'>
                                                 <Row className='status-popover-content' >
-                                                    <Col xs={{span: 6}} md={{span: 6}} className="orn-categ-card">
+                                                    <Col xs={{span: 4}} md={{span: 4}} className="orn-categ-card">
                                                         <h5>Category</h5>
                                                         <Form>
                                                             <Form.Group>
@@ -135,7 +137,7 @@ class Pledgebook extends Component {
                                                             </Form.Group>
                                                         </Form>
                                                     </Col>
-                                                    <Col xs={{span: 6}} md={{span: 6}} className="bill-status-card">
+                                                    <Col xs={{span: 4}} md={{span: 4}} className="bill-status-card">
                                                         <h5>Bills</h5>
                                                         <Form onChange={this.onStatusPopoverChange}>
                                                             <Form.Group>
@@ -149,7 +151,27 @@ class Pledgebook extends Component {
                                                             </Form.Group>
                                                         </Form>
                                                     </Col>
-                                                    <Col xs={{span: 12}} md={{soan: 12}} style={{textAlign: "center", marginBottom: 20}}>
+                                                    <Col xs={{span: 4}} md={{span: 4}} className="bill-sort-order">
+                                                        <h5>Order By</h5>
+                                                        <Form onChange={this.onSortByColumnChange}>
+                                                            <Form.Group>
+                                                                <Form.Check id='sort-by-pledgedDate' type='radio' name='sortordercol' checked={this.state.sortByColumn=='pledgedDate'} value='pledgedDate' label='Pledged Date'/>
+                                                            </Form.Group>
+                                                            <Form.Group>
+                                                                <Form.Check id='sort-by-closedDate' type='radio' name='sortordercol' checked={this.state.sortByColumn=='closedDate'} value='closedDate' label='Closed Date'/>
+                                                            </Form.Group>
+                                                        </Form>
+                                                        <hr></hr>
+                                                        <Form onChange={this.onSortOrderChange}>
+                                                            <Form.Group>
+                                                                <Form.Check id='sort-asc' type='radio' name='sortorder' checked={this.state.sortBy=='asc'} value='asc' label='ASC'/>
+                                                            </Form.Group>
+                                                            <Form.Group>
+                                                                <Form.Check id='sort-desc' type='radio' name='sortorder' checked={this.state.sortBy=='desc'} value='desc' label='DESC'/>
+                                                            </Form.Group>
+                                                        </Form>
+                                                    </Col>
+                                                    <Col xs={{span: 12}} md={{span: 12}} style={{textAlign: "center", marginBottom: 20}}>
                                                         <input 
                                                             type="button"
                                                             className='gs-button'
@@ -243,6 +265,8 @@ class Pledgebook extends Component {
         this.onPopupTriggerClick = this.onPopupTriggerClick.bind(this);
         this.onStatusPopoverChange = this.onStatusPopoverChange.bind(this);
         this.onOrnCategoryFilterChange = this.onOrnCategoryFilterChange.bind(this);
+        this.onSortOrderChange = this.onSortOrderChange.bind(this);
+        this.onSortByColumnChange = this.onSortByColumnChange.bind(this);
         this.onStatusPopoverSubmit = this.onStatusPopoverSubmit.bind(this);
         this.onExportClick = this.onExportClick.bind(this);
         this.handleExportPopupClose = this.handleExportPopupClose.bind(this);
@@ -445,6 +469,14 @@ class Pledgebook extends Component {
         this.setState(newState);
     }
 
+    onSortOrderChange(e) {
+        this.setState({sortBy: e.target.value});
+    }
+
+    onSortByColumnChange(e) {
+        this.setState({sortByColumn: e.target.value});
+    }
+
     async onStatusPopoverSubmit() {
         await this.setState({statusPopupVisibility: false});
         this.initiateFetchPledgebookAPI();
@@ -468,10 +500,12 @@ class Pledgebook extends Component {
     getAPIParams() {
         let offsets = this.getOffsets();
         let filters = this.getFilters();
+        let sortOrder = this.getSortOrder();
         return {
             offsetStart: offsets[0] || 0,
             offsetEnd: offsets[1] || 10,
-            filters: filters
+            filters: filters,
+            sortOrder: sortOrder
         };
     }
     getOffsets() {        
@@ -515,6 +549,13 @@ class Pledgebook extends Component {
         if(this.state.filters.ornCategory.brass)
             filters.custom.ornCategory.push('B');
         return filters;
+    }
+
+    getSortOrder() {
+        return {
+            sortBy: this.state.sortBy,
+            sortByColumn: this.state.sortByColumn
+        }
     }
 
     getPageCount() {        
