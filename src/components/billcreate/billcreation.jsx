@@ -2077,12 +2077,12 @@ class BillCreation extends Component {
                             { !this.props.loadedInPledgebook &&
                                 
                                 <>
-                                    {/* <ReactToPrint
+                                    <ReactToPrint
                                         ref={(domElm) => {this.domElmns.printBtn = domElm}}
-                                        trigger={() => <a href="#">Print!</a>}
+                                        trigger={() => <a href="#"></a>}
                                         content={() => this.componentRef}
                                         className="print-hidden-btn"
-                                    /> */}
+                                    />
                                     <input 
                                         type="button"
                                         className='gs-button'
