@@ -498,7 +498,7 @@ class BillCreation extends Component {
             return [];
         var lowerCaseInput = value.toLowerCase();
         let originalList = JSON.parse(JSON.stringify(this.state.formData.orn.list));
-        let structuredList = originalList.map( (aSuggestion) => {
+        /* let structuredList = originalList.map( (aSuggestion) => {
             let inputSplits = lowerCaseInput.split(' ');
             let match = 0;
             let suggestionTermsLength = aSuggestion.split(' ').length;
@@ -526,6 +526,12 @@ class BillCreation extends Component {
         let filteredList = structuredList.map((anObj) => {
             return anObj.text;
         });
+        */
+       let filteredList = originalList.filter( aSuggestion => {
+           aSuggestion = aSuggestion.toLowerCase();
+            if(aSuggestion.indexOf(' '+ value.toLowerCase()) != -1)
+                return aSuggestion;
+       } );
         return filteredList.slice(0, 20);
     }
     getDefaultFromStore(identifier) {
