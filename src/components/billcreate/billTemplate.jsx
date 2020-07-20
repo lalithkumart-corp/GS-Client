@@ -4,6 +4,7 @@ import _ from 'lodash';
 import { format } from 'currency-formatter';
 import './billTemplate.css';
 import moment from 'moment';
+import Barcode from "react-barcode";
 
 export default class BillTemplate extends Component {
     constructor(props) {
@@ -143,8 +144,8 @@ export default class BillTemplate extends Component {
                             <Col xs={{span: 12}} md={{span: 12}} className="storeaddr2">Ch-600056, Mob: 9841458015</Col>
                         </Row>
                         <Row className="bill-no-date font16">
-                            <Col className="bill-no" xs={{span: 3}} md={{span: 3}}>{this.getBillNo()}</Col>
-                            <Col xs={{offset: 6, span: 3}} md={{offset: 6, span: 3}}>{this.getDate()}</Col>
+                            <Col className="bill-no" xs={{span: 8}} md={{span: 8}}>{this.getBillNo()} <Barcode value={this.getBillNo()} fontSize={20}  height={25} displayValue={false} style={{display: "inline-block"}}/></Col>
+                            <Col xs={{offset: 1, span: 3}} md={{offset: 1, span: 3}}>{this.getDate()}</Col>
                         </Row>
 
                         <Row>
