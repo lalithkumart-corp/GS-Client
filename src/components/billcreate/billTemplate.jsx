@@ -151,7 +151,7 @@ export default class BillTemplate extends Component {
                         <Row>
                             <Col xs={{span: 8}} md={{span: 8}} className="cust-info-col">
                                 <Row>
-                                    <Col xs={{span: 12}} md={{span: 12}}><b>Name:</b>&nbsp;&nbsp; <span className="font16">{this.state.data.cname}</span>   C/O   <span className="font16">{this.state.data.gaurdianName}</span></Col>
+                                    <Col xs={{span: 12}} md={{span: 12}}><b>Name:</b>&nbsp;&nbsp; <span className="font16" style={{textTransform: "uppercase"}}>{this.state.data.cname}</span>  &nbsp; <span className="font12">c/o</span>  &nbsp; <span className="font16" style={{textTransform: "uppercase"}}>{this.state.data.gaurdianName}</span></Col>
                                 </Row>
 
                                 <Row>

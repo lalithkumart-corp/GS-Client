@@ -66,6 +66,9 @@
     .signature-row {
         min-height: 60px;
     }
+    .font12 {
+        font-size: 12px;
+    }
     .font16 {
         font-size: 16px;
     }
