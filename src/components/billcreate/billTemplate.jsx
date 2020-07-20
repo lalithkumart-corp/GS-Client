@@ -154,23 +154,23 @@ export default class BillTemplate extends Component {
                                 </Row>
 
                                 <Row>
-                                    {/* <Col xs={{span: 3}} md={{span: 3}}><b>Address:</b></Col> */}
-                                    <Col xs={{span: 12}} md={{span: 12}}>
-                                        <b>Address:</b>&nbsp;&nbsp;{this.state.data.address}
+                                    <Col xs={{span: 3}} md={{span: 3}}><b>Address: &nbsp;</b></Col>
+                                    <Col xs={{span: 9}} md={{span: 9}} style={{paddingLeft: 0, paddingRight: 0}}>
+                                        {this.state.data.address}, {this.state.data.place}, {this.state.data.city}-{this.state.data.pinCode}
                                     </Col>
                                 </Row>
-                                <Row>
-                                    <Col xs={{span: 1.5}} md={{span: 1.5}}></Col>
-                                    <Col xs={{span: 9}} md={{span: 9}}>
+                                {/* <Row>
+                                    <Col xs={{span: 1}} md={{span: 1}}></Col>
+                                    <Col xs={{span: 10}} md={{span: 10}}>
                                         {this.state.data.place},
                                     </Col>
                                 </Row>
                                 <Row>
-                                    <Col xs={{span: 1.5}} md={{span: 1.5}}></Col>
+                                    <Col xs={{span: 1}} md={{span: 1}}></Col>
                                     <Col xs={{span: 9}} md={{span: 9}}>
                                         {this.state.data.city}-{this.state.data.pinCode}
                                     </Col>
-                                </Row>
+                                </Row> */}
                             </Col>
                             <Col xs={{span: 3}} md={{span: 3}} className="image-col user">
                                 {this.getImageSection('user')}

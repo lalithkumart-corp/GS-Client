@@ -14,7 +14,7 @@ export default class Settings extends Component {
     render() {
         return (
             <div className='container settings-main-container'>
-                <Tabs defaultActiveKey="ornament" className='gs-tabs'>
+                <Tabs defaultActiveKey="billing" className='gs-tabs'>
                     <Tab eventKey="billing" title="Billing" >
                         <BillingSettings {...this.state} />
                     </Tab>
