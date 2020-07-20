@@ -152,10 +152,11 @@ const _getBillRemarks = (thatState) => {
 export const getPicData = (thatState) => {    
     let picData = null;
     if(thatState.userPicture) {        
-        picData = {imageId: thatState.userPicture.id}
+        picData = {imageId: thatState.userPicture.id, url: thatState.userPicture.url}
     } else if(thatState.selectedCustomer && thatState.selectedCustomer.image && thatState.selectedCustomer.image.id) {        
         picData = {
-            imageId: thatState.selectedCustomer.image.id
+            imageId: thatState.selectedCustomer.image.id,
+            url: thatState.selectedCustomer.image.url
         };        
     }
     return picData;
@@ -271,6 +272,7 @@ export const resetState = (nextProps, newState) => {
     newState.showMoreInputs = false; //!newState.showMoreInputs;
     newState.userPicture = JSON.parse(JSON.stringify(defaultPictureState));
     newState.ornPicture = JSON.parse(JSON.stringify(defaultOrnPictureState));
+    //newState.printContent = {};
     return newState;
 }
 

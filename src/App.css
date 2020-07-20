@@ -341,3 +341,9 @@ input[type=checkbox], input[type=radio] {
 /* arrow right */
 
 /* END: ARROW BOX*/
+
+@media print {
+  @page {
+    size: auto;
+  }
+}

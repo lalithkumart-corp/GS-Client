@@ -11,6 +11,8 @@ import axios from 'axios';
 import { toast } from 'react-toastify';
 import { calculateData, getRequestParams, getReopenRequestParams } from '../redeem/helper';
 import moment from 'moment';
+import ReactToPrint from 'react-to-print';
+import BillTemplate from '../billcreate/billTemplate';
 
 class PledgebookModal extends Component {
     constructor(props) {
@@ -20,6 +22,7 @@ class PledgebookModal extends Component {
             cancelMode: true
         }
         this.canShowBtn = this.canShowBtn.bind(this);
+        this.onPrintClick = this.onPrintClick.bind(this);
     }
 
     componentDidMount() {
@@ -109,6 +112,25 @@ class PledgebookModal extends Component {
             )     
     }
 
+    async onPrintClick() {
+        let templateData = {
+            amount: this.props.currentBillData.Amount,
+            billNo: this.props.currentBillData.BillNo,
+            date: this.props.currentBillData.Date,
+            cname: this.props.currentBillData.Name,
+            gaurdianName: this.props.currentBillData.GaurdianName,
+            address: this.props.currentBillData.Address,
+            place: this.props.currentBillData.Place,
+            city: this.props.currentBillData.City,
+            pinCode: this.props.currentBillData.Pincode,
+            userPicture: {url: this.props.currentBillData.UserImagePath},
+            ornPicture: {url: this.props.currentBillData.OrnImagePath},
+            orn: JSON.parse(this.props.currentBillData.Orn)
+        }
+        await this.setState({printContent: templateData});
+        this.printBtn.handlePrint();
+    }
+
     canDisableBtn(btn) {
         let flag = false;
         switch(btn) {
@@ -129,6 +151,10 @@ class PledgebookModal extends Component {
                     flag = true;
                 break;
             case 'redeem':
+                if(!this.props.currentBillData.Status)
+                    flag = true;
+                break;
+            case 'print':
                 if(!this.props.currentBillData.Status)
                     flag = true;
                 break;
@@ -163,6 +189,13 @@ class PledgebookModal extends Component {
             <div className="pledgebook-modal-container">
                 <Row>
                     <Col xs={12} md={12} className='button-container'>
+                        <input 
+                            type="button"
+                            className={"gs-button bordered "}
+                            onClick={(e) => this.onPrintClick()}
+                            value='Print'
+                            disabled={this.canDisableBtn('print')}
+                            />
                         <input 
                             type="button"
                             className={"gs-button bordered "}
@@ -201,6 +234,13 @@ class PledgebookModal extends Component {
                     </Col>
                 </Row>
                 <BillCreation loadedInPledgebook={true} billData={this.props.currentBillData}/>
+                <ReactToPrint
+                    ref={(domElm) => {this.printBtn = domElm}}
+                    trigger={() => <a href="#"></a>}
+                    content={() => this.componentRef}
+                    className="print-hidden-btn"
+                />
+                <BillTemplate ref={el => (this.componentRef = el)} data={this.state.printContent} />
             </div>
         )
     }

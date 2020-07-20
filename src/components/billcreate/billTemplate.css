@@ -1,0 +1,87 @@
+.billreceipt-print {
+    display: none;
+}
+
+@media print {
+    .billreceipt-print {
+        display: block;
+    }
+    .billreceipt-print .bill-receipt-content {
+        padding: 15px 25px;
+        border: 1px solid lightgray;
+    }
+    .billreceipt-print .storename {
+        font-weight: bold;
+        font-size: 25px;
+        text-align: center;
+        margin-top: 10px;
+    }
+    .billreceipt-print .storeaddr {
+        text-align: center;
+    }
+    .billreceipt-print .storeaddr2 {
+        text-align: center;
+        margin-bottom: 25px;
+    }
+    .billreceipt-print .bill-no-date {
+        margin-bottom: 20px;
+    }
+    .billreceipt-print .bill-no {
+        font-weight: bold;   
+    }
+    .billreceipt-print .cust-info-col {
+        padding-right: 0;
+        margin-right: 15px;
+        /* background-color: blue !important; */
+    }
+    .billreceipt-print .row-name-3 {
+        margin-top: 20px;
+    }
+    .billreceipt-print .orn-info-col {
+        /* background-color: orange !important; */
+        border: 1px solid lightgray;
+        margin-right: 15px;
+        padding-left: 5px;
+    }
+  
+    .billreceipt-print .orn-info-col .image-col {
+        margin-top: 15px;
+    }
+    .billreceipt-print .orn-list-container {
+        min-height: 150px;
+    }
+    .billreceipt-print .amount-row {
+        margin-top: 20px;
+        padding-left: 0;
+    }
+    .bill-receipt-content {
+        /* background-color: yellow !important; */
+    }
+    .image-col {
+        padding-right: 15px;
+    }
+    .image-col.orn{
+        margin-top: 10px;
+    }
+    .signature-row {
+        min-height: 60px;
+    }
+    .font12 {
+        font-size: 12px;
+    }
+    .font16 {
+        font-size: 16px;
+    }
+    .font17 {
+        font-size: 17px;
+    }
+    .font18 {
+        font-size: 18px;
+    }
+
+    .orn-chit {
+        margin-top: 20px;
+        border: 1px solid lightgray;
+        padding: 2px 2px;
+    }
+}

@@ -30,7 +30,9 @@ import { getRateOfInterest } from '../redeem/helper';
 import Picture from '../profilePic/picture';
 import { toast } from 'react-toastify';
 import BillHistoryView from './billHistoryView';
-import Popover from 'react-tiny-popover'
+import Popover from 'react-tiny-popover';
+import BillTemplate from './billTemplate';
+import ReactToPrint from 'react-to-print';
 
 const ENTER_KEY = 13;
 const SPACE_KEY = 32;
@@ -63,6 +65,10 @@ class BillCreation extends Component {
         this.domElmns = {
             orn: {}
         };
+        // this.componentRef = useRef();
+        // this.handlePrint = useReactToPrint({
+        //     content: () => this.componentRef.current,
+        // });
         this.domOrders = domList;
         this.state = {
             showPreview: false,  
@@ -220,6 +226,7 @@ class BillCreation extends Component {
         this.updateOrnPictureData = this.updateOrnPictureData.bind(this);
         this.amtPopoverTrigger = this.amtPopoverTrigger.bind(this);
         this.calcLandedCost = this.calcLandedCost.bind(this);
+        this.printReceipt = this.printReceipt.bind(this);
     }
 
     /*async uploadImage(e) {
@@ -249,6 +256,17 @@ class BillCreation extends Component {
         }
     }*/
 
+    // initiatePrint() {
+    //     var content = document.getElementById("billreceipt");
+    //     var pri = document.getElementById("ifmcontentstoprint").contentWindow;
+    //     pri.document.open();
+    //     pri.document.write(content.innerHTML);
+    //     pri.document.body.innerHTML = content.innerHTML;
+    //     pri.document.close();
+    //     pri.focus();
+    //     pri.print();
+    // }
+
     async updatePictureData(picture, action, imageId) {        
         picture.loading = true;
         this.setState({userPicture: picture});
@@ -271,6 +289,7 @@ class BillCreation extends Component {
             let currState = {...this.state};
             currState.userPicture.loading = false;
             currState.userPicture.id = uploadedImageDetail.data.ID;
+            currState.userPicture.url = uploadedImageDetail.data.URL;
             this.setState(currState);
         } else if(action == 'del') {            
             if(imageId) {
@@ -281,6 +300,7 @@ class BillCreation extends Component {
             let currState = {...this.state};
             currState.userPicture.loading = false;
             currState.userPicture.id = null;
+            currState.userPicture.url = null;
             currState.userPicture.holder = JSON.parse(JSON.stringify(defaultPictureState.holder));            
             this.setState(currState);
         }     
@@ -309,7 +329,8 @@ class BillCreation extends Component {
             }
             let currState = {...this.state};
             currState.ornPicture.loading = false;
-            currState.ornPicture.id = uploadedImageDetail.data.ID;            
+            currState.ornPicture.id = uploadedImageDetail.data.ID;
+            currState.ornPicture.url = uploadedImageDetail.data.URL;
             this.setState(currState);
         } else if(action == 'del') {
             if(imageId) {
@@ -320,6 +341,7 @@ class BillCreation extends Component {
             let currState = {...this.state};
             currState.ornPicture.loading = false;
             currState.ornPicture.id = null;
+            currState.ornPicture.url = null;
             currState.ornPicture.holder = JSON.parse(JSON.stringify(defaultOrnPictureState.holder));
             this.setState(currState);
         }
@@ -1055,15 +1077,36 @@ class BillCreation extends Component {
         }
     }
 
-    handleSubmit() {
+    printReceipt() {
+        if(this.domElmns.printBtn) {
+            this.domElmns.printBtn.handlePrint();
+        } else {
+            alert("Couldn't able to print receipt! Please try again.");
+        }
+    }
+
+    async handleSubmit() {
         let requestParams = buildRequestParams(this.state);
         let validation = validateFormValues(requestParams);
         if(validation.errors.length) {
             toast.error(`${validation.errors.join(' , ')} `);        
         } else {
-            if(window.confirm('Are you Sure to create new Bill?'))
+            if(window.confirm('Are you Sure to create new Bill?')) {
+                if(this.isAutoPrintEnabled()) {
+                    await this.setState({printContent: JSON.parse(JSON.stringify(requestParams))});
+                    this.printReceipt();
+                }
                 this.props.insertNewBill(requestParams);
+            }
         }
+    }
+
+    isAutoPrintEnabled() {
+        let flag = false;
+        if(this.props.auth && this.props.auth.userPreferences 
+            && (this.props.auth.userPreferences.auto_print_receipt=='true' || this.props.auth.userPreferences.auto_print_receipt==true))
+            flag = true;
+        return flag;
     }
 
     handleUpdate() {
@@ -2038,14 +2081,23 @@ class BillCreation extends Component {
                     <Row>
                         <Col xs={{span: 3, offset: 4}} md={{span: 3, offset: 4}} className='submit-container'>
                             { !this.props.loadedInPledgebook &&
-                                <input 
-                                    type="button"
-                                    className='gs-button'
-                                    ref={(domElm) => {this.domElmns.submitBtn = domElm}}
-                                    // onKeyUp= { (e) => this.handleKeyUp(e, {currElmKey:'submitBtn', isSubmitBtn: true})}
-                                    onClick={(e) => this.handleSubmit()}
-                                    value='Add Bill'
+                                
+                                <>
+                                    <ReactToPrint
+                                        ref={(domElm) => {this.domElmns.printBtn = domElm}}
+                                        trigger={() => <a href="#"></a>}
+                                        content={() => this.componentRef}
+                                        className="print-hidden-btn"
                                     />
+                                    <input 
+                                        type="button"
+                                        className='gs-button'
+                                        ref={(domElm) => {this.domElmns.submitBtn = domElm}}
+                                        // onKeyUp= { (e) => this.handleKeyUp(e, {currElmKey:'submitBtn', isSubmitBtn: true})}
+                                        onClick={(e) => this.handleSubmit()}
+                                        value='Add Bill'
+                                        />
+                                    </>
                             }
                             {
                                 this.props.loadedInPledgebook &&
@@ -2068,6 +2120,7 @@ class BillCreation extends Component {
                     </Row>
                 </Col>
                 <EditDetailsDialog {...this.state.editModalContent} update={this.updateItemInMoreDetail} />
+                <BillTemplate ref={el => (this.componentRef = el)} data={this.state.printContent} />
                 </Form>
             </Container>
         )

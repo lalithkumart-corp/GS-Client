@@ -100,9 +100,9 @@ export default class Users extends Component {
     render() {
         return (
             <Container>
-                <Row className='add-user-container'>
+                <Row className='add-user-container' style={{marginBottom: "10px"}}>
                     <Col xs={{span: 3, offset: 9}} md={{span: 3, offset: 9}} style={{textAlign: 'right'}}>
-                        <input type='button' className='gs-button' value='ADD' onClick={this.onAddUserBtnClick}/>
+                        <input type='button' className='gs-button' value='ADD USER' onClick={this.onAddUserBtnClick}/>
                     </Col>
                 </Row>
                 <Row className='userlist-container'>
