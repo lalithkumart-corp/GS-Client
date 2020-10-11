@@ -67,7 +67,8 @@ export const doAuthentication = (params) => {
 export const logout = (accessToken) => {    
     let theAccessToken = getAccessToken();
     return (dispatch) => {
-        axios.post(LOGOUT+`?access_token=${theAccessToken}`)
+        if(theAccessToken) {
+            axios.post(LOGOUT+`?access_token=${theAccessToken}`)
             .then(
                 (successResp) => {
                     clearSession(theAccessToken);
@@ -88,5 +89,12 @@ export const logout = (accessToken) => {
                     console.log(exception);
                 }
             )
+        } else {
+            clearSession(theAccessToken);
+            dispatch({
+                type: 'LOGGED_OUT',
+                data: {}
+            });
+        }
     }
 }

@@ -11,6 +11,8 @@ import { toast } from 'react-toastify';
 import { doAuthentication, enableLoader } from '../../actions/login';
 import './login.css';
 
+const ENTER_KEY = 13;
+
 class LoginPage extends Component {
     constructor(props) {
         super(props);
@@ -48,6 +50,11 @@ class LoginPage extends Component {
         newState.formData[key].val = val;        
         newState.formData = this.validationEngine(newState.formData);
         this.setState(newState);
+    }
+
+    handleKeyUp(e) {
+        if(e.keyCode == ENTER_KEY)
+            this.onLoginClick();
     }
 
     onLoginClick() {        
@@ -130,6 +137,7 @@ class LoginPage extends Component {
                                         value={this.state.formData.password.val}
                                         placeholder="Enter email"
                                         onChange={(e) => this.handleChange(e.target.value, 'password')}
+                                        onKeyUp={(e) => this.handleKeyUp(e)}
                                         onFocus={(e) => this.onTouched('password')}
                                     />
                                     {this.state.formData.email.hasError && <FormControl.Feedback /> }
@@ -140,7 +148,7 @@ class LoginPage extends Component {
                         <Row>
                             <Col md={{span: 4, offset: 1}}>
                                 <ButtonToolbar>
-                                    <Button onClick={this.onLoginClick}> 
+                                    <Button onClick={this.onLoginClick} className={this.props.auth.loading?'loading':''}> 
                                         Login
                                         <ClipLoader
                                             className={"login-spinner"}
