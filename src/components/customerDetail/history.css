@@ -1,0 +1,37 @@
+.customer-detail-container .my-pledgebook-table {
+    width: 100%;
+    margin: 0;
+}
+.customer-detail-container .total-bill-count-span {
+    float: right;
+    padding-right: 20px;
+}
+.bill-count-notifier {
+    /* background-color: #6db1e6;
+    color: white;
+    border-radius: 50%;
+    padding: 1px 5px;
+    font-size: 10px;
+    position: absolute;
+    top: 4px;
+    right: 4px; */
+
+    background-color: #f38e27;
+    color: white;
+    border-radius: 30%;
+    padding: 2px 5px;
+    font-size: 10px;
+    display: inline-block;
+    float: right;
+    position: absolute;
+    top: 53px;
+}
+
+.customer-detail-container .uncontrollerd-tabpane-history .nav-item.nav-link {
+    height: 35px;
+}
+
+#uncontrollerd-tabpane-history a.nav-item.nav-link {
+    padding-right: 30px;
+    padding-left: 30px;
+}

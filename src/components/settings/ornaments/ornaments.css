@@ -1,0 +1,14 @@
+.orn-list-div {
+    max-height: 300px;
+    overflow-x: hidden;
+    border: 1px solid #8080806b;
+    min-height: 200px;
+}
+.an-orn.selected {
+    background-color: rgba(33, 150, 243, 0.08);
+}
+.ornament-module .ornament-detail-container {
+    color: darkgrey;
+    margin-top: 20px;
+    padding: 10px 0;
+}

@@ -1,0 +1,19 @@
+.pledgebook-modal-container .button-container{
+    text-align: right;
+    padding-right: 45px;
+    margin-bottom: 20px;
+    font-weight: 500;
+    margin-top: 20px;
+}
+
+.pledgebook-modal-container .button-container .gs-button {
+    margin-left: 15px;
+}
+
+.pledgebook-modal-container {
+    background-color: white;
+}
+
+.pledgebook-modal-container .gs-button .hidden {
+    display: none;
+}

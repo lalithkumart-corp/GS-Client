@@ -1,0 +1,33 @@
+.common-modal-wrapper{
+    position: fixed;
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.35);
+    z-index: 1;
+    overflow: auto;
+}
+.common-modal-content{
+    width: 80%;
+    margin: 3px auto;
+    /* background-color: #EDEFF0; */
+    padding: 20px;
+    position: relative;
+    border-radius: 3px;
+    overflow: hidden;
+}
+.common-modal-content .close-icon{
+    right: 5px;
+    position: absolute;    
+    top: 6px;
+    cursor: pointer;    
+    padding-right: 15px !important;
+    padding-left: 15px !important;    
+    z-index: 1;
+}
+
+.common-modal-content .close-icon:hover,
+.common-modal-content .close-icon:focus {
+    color: #2196f3;
+}

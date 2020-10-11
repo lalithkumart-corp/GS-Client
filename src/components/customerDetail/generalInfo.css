@@ -1,0 +1,14 @@
+.update-detail-btn{
+    margin-top: 35px;
+}
+.detail-edit-modal {
+    width: 25%;
+    margin-top: 10%;
+    background-color: white;
+    padding: 15px;
+}
+.cust-id-span {
+    color: grey;
+    margin-top: 17px;
+    margin-bottom: 8px;
+}

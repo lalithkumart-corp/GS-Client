@@ -1,0 +1,28 @@
+.overview-panel {
+    border: 1px solid lightgray;
+    margin: 20px;
+}
+.overview-header {
+    font-weight: bold;
+}
+.overview-header .cell{
+    padding: 10px 5px;
+}
+.overview-row {
+    border-top: 1px solid lightgray;
+}
+.overview-row .cell{
+    padding: 5px 5px;
+}
+.overview-footer {
+    background-color: lightgray;
+}
+.overview-footer .cell {
+    padding: 20px 5px;
+}
+/* .border-top {
+    border-top: 1px solid lightgray;
+} */
+.border-right {
+    border-right: 1px solid lightgray;
+}

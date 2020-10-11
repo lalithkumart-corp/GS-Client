@@ -1,0 +1,279 @@
+.bill-series {
+    width: 10px;
+}
+.principal-amt-field,
+.bill-number-field {
+    padding-right: 0 !important;
+}
+
+.bill-creation-container .autosuggest .input-group {
+    width: 100%
+}
+
+.bill-creation-container .autosuggest .input-group-btn {
+    display: none;
+}
+
+/*START: Custom styles for the Date Picker(to make it bigger font size looking */
+.date-picker-container {
+    margin-top: 27px;
+    z-index: 3;
+}
+.react-datepicker {
+    font-size: 1em;
+}
+.react-datepicker__header {
+    padding-top: 0.8em;
+}
+.react-datepicker__month {
+    margin: 0.4em 1em;
+}
+.react-datepicker__day-name, .react-datepicker__day {
+    width: 1.9em;
+    line-height: 1.9em;
+    margin: 0.166em;
+}
+.react-datepicker__current-month {
+    font-size: 1em;
+}
+.react-datepicker__navigation {
+    top: 1em;
+    line-height: 1.7em;
+    border: 0.45em solid transparent;
+}
+.react-datepicker__navigation--previous {
+    border-right-color: #ccc;
+    left: 1em;
+}
+.react-datepicker__navigation--next {
+    border-left-color: #ccc;
+    right: 1em;
+}
+/*END: Custom styles for the Date Picker(to make it bigger font size looking */
+
+.customer-name-field-container .dropdown-menu > li,
+.customer-list-item {
+    border-bottom: 1px dotted grey;
+    margin: 0 6px;
+}
+.customer-name-field-container .dropdown-menu > li > a {
+    padding: 3px 0;
+}
+.customer-list-item-maindetail {
+    font-weight: 600;
+}
+.customer-list-item-subdetail {
+    font-size: 10px;
+}
+
+/* .orn-input-cell {
+    border: none;    
+    width: calc(100% - 15px);
+    padding: 6px 12px 6px 0;
+    outline: none;
+} */
+.ornament-dom-container {
+    border: 1px solid lightgray;
+    min-height: 160px;
+    /* margin-top: 25px; */
+    padding: 0 !important;
+    margin-left: 15px;
+}
+.ornament-dom-container .form-control {
+    border: none;
+    box-shadow: none;
+    padding: 6px 12px 6px 0;
+}
+.ornament-dom-container thead {
+    background-color: #e9ecef;
+    color: #495057;
+    font-weight: 100;
+}
+.ornament-dom-container .serial-no-header {
+    padding: 4px;
+}
+.ornament-dom-container .serial-no-col {
+    /* background-color: #e9ecef;
+    color: #495057; */
+    text-align: right;
+    padding-right: 10px;
+}
+
+/* .orn-input-cell:focus,
+.orn-input-cell:hover, */
+
+.bill-creation-container .form-control:focus,
+.react-autosuggest__input.cust-name:focus,
+.react-autosuggest__input.guardian-name:focus,
+.react-autosuggest__input.address:focus,
+.react-autosuggest__input.place:focus,
+.react-autosuggest__input.city:focus,
+.react-autosuggest__input.pincode:focus,
+.react-autosuggest__input.mobile:focus,
+.ornament-dom-container .form-control:focus {
+    border-color: rgb(204, 204, 204);
+    border-bottom: 2px solid #0acfee;
+    box-shadow: none;
+    outline: none;
+}
+
+.ornament-dom-container .input-group {
+    width: calc(100% - 10px);
+}
+.ornament-dom-container .input-group-btn {
+    display: none;
+}
+
+
+
+.add-more-header {
+    margin-bottom: 10px;
+}
+.add-more-header .show-more {
+    color: #4db8e3;
+    cursor: pointer;
+    border: none;
+    width: 70px;
+}
+.add-more-header .show-more:hover,
+.add-more-header .show-more:focus {
+    color: #216ba5;
+}
+.horizontal-dashed-line:after{
+    content:"";
+    position: absolute;
+    /* bottom: 0; */
+    left: 75px;
+    right: 0;
+    height: 0.5em;
+    border-top: 1px solid #2196f3;
+    z-index: -1;
+    margin-top: 11px;
+}
+.customer-info-display-row {
+    border-bottom: 1px dashed lightgray;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+    padding-top: 5px;
+}
+.customer-info-display-row > div {
+    padding-left: 0;
+    padding-right: 0;
+}
+.bill-remarks-adder-dom {
+    margin-top: 15px;
+}
+
+.submit-container {
+    margin-top: 20px;
+    margin-bottom: 50px;
+}
+
+.hidden-btn {
+    display: none;
+}
+
+.sub-actions-div {
+    padding-left: 0 !important;
+    text-align: right;
+}
+.sub-actions-div .icon {
+    color: #2196f3;
+    cursor: pointer;
+}
+.sub-actions-div .edit-icon {
+    padding-right: 10px;
+}
+/* START: Modal Css */
+.ReactModal__Overlay {
+    z-index: 4;
+}
+/* END: Modal Css */
+
+/* START: Picture */
+.pic-action-container {
+    margin-top: 15px;
+    min-height: 30px;
+}
+.pic-action-container .icon{
+    color: #2196f3;
+    cursor: pointer;
+}
+.image-viewer {
+    max-height: 200px;
+    max-width: 200px;
+    max-width: 100%;
+    border-radius: 50%;
+}
+/* END: Picture */
+
+.bill-creation-container input[readonly]{
+    background-color: transparent;
+    opacity: 1;
+    border: none;
+    box-shadow: none;
+    outline: none;
+}
+
+.bill-creation-container .autosuggest .show-all:after{
+    content: 'Show Others';
+    font-style: italic;
+    font-size: 12px;
+    text-align: center;
+    /* margin: 0 auto; */
+    display: block;
+    padding-right: 15px;
+}
+
+.bill-creation-container span.input-group-addon[readonly] {
+    padding-right: 0;
+    background-color: transparent;
+    border: none;
+}
+
+.bill-creation-container .second-row,
+.bill-creation-container .third-row,
+.bill-creation-container .fourth-row,
+.bill-creation-container .fifth-row {
+    margin-bottom: 10px;
+}
+.orn.gs-input-cell{
+    border: none;
+    width: calc(100% - 15px);
+    padding: 6px 12px 6px 0;
+    outline: none;
+    box-shadow: none;
+}
+
+.react-autosuggest__input.orn.gs-input-cell + .react-autosuggest__suggestions-container {
+    width: 150px;
+}
+
+.react-autosuggest__input.orn.spec.gs-input-cell + .react-autosuggest__suggestions-container {
+    width: 120px;
+}
+
+/* .react-autosuggest__input.new-customer {
+    box-shadow: 0px 1px 4px 0px #e7ae2f;
+} */
+
+.amount-display-text {
+    cursor: pointer;
+}
+.amount-display-text:hover,
+.amount-display-text:focus {
+    color: #2196f3;
+}
+.amount-popover-content {
+    padding-top: 10px;
+}
+.amount-popover-content .row {
+    padding-bottom: 10px;
+}
+.amount-popover-content .gs-input-cell {
+    padding: 2px 12px 2px 0;
+}
+
+.print-hidden-btn {
+    visibility: hidden;
+}

@@ -1,0 +1,13 @@
+.tally-main-page .tab-view {
+    padding: 0;
+    min-height: 500px;
+    padding-bottom: 50px;
+}
+.tally-main-page .tab-content {
+    border: 1px solid lightgrey;
+    border-top: none;
+    padding-bottom: 50px;
+}
+.tally-main-page .start-date-container input, .tally-main-page .end-date-container input {
+    width: 100%;
+}

@@ -1,3 +1,6 @@
+html {
+  font-size: 14px;
+}
 .App {
   text-align: center;
 }
@@ -25,4 +28,322 @@
 @keyframes App-logo-spin {
   from { transform: rotate(0deg); }
   to { transform: rotate(360deg); }
+}
+
+.font-weight-bold {
+  font-weight: bold;
+}
+
+.gs-button {  
+  color: #2196f3;
+  border: none;
+  background-color: transparent;
+  padding: 8px 16px;
+  line-height: 1.4em;
+  border-radius: 4px;
+  text-transform: uppercase;
+  transition: background-color 250ms cubic-bezier(0.4, 0, 0.2, 1) 0ms,box-shadow 250ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;
+  /* background-color: #337ab7;
+  border-color: #2e6da4; */
+}
+.gs-button.red {
+  color: #c73232;
+}
+.gs-button.bordered {
+  border: 1px solid;
+}
+.gs-button[disabled] {
+    color: grey;
+}
+.gs-button.rounded {
+  border-radius: 50%;
+  padding: 12px;
+}
+.gs-button:hover,
+.gs-button:focus {
+  background-color: rgba(33, 150, 243, 0.08);
+  outline: none;
+}
+.gs-button.red:hover,
+.gs-button.red:focus {
+  background-color: rgba(239, 15, 15, 0.08);
+}
+.no-scroll {
+  overflow: hidden;
+}
+
+.text-align-right {
+  text-align: right;
+}
+
+.autosuggest .dropdown-menu {
+  max-height: 300px;
+  overflow-x: hidden;
+}
+
+.bgLightGrey {
+  background-color: lightgray;
+}
+.padding-b-3 {
+  padding-bottom: 3px;
+}
+.padding-b-5 {
+  padding-bottom: 5px;
+}
+.padding-t-3 {
+  padding-top: 3px;
+}
+.padding-t-5 {
+  padding-top: 5px;
+}
+.padding-t-10 {
+  padding-top: 10px;
+}
+
+.font-family-monospace {
+  font-family: monospace;
+}
+
+.no-padding {
+  padding: 0;
+}
+.lightgrey {
+  color: lightgrey;
+}
+.float-right {
+  float: right;
+}
+
+.inline-block {
+  display: inline-block;
+}
+
+.margin-top-30 {
+  margin-top: 30px !important;
+}
+
+/* TABS */
+.gs-tabs .tab-content {
+  margin-top: 20px;
+}
+.gs-tabs .nav-tabs>li>a {
+  border: none;
+}
+.gs-tabs .nav-tabs>li.active>a,
+.gs-tabs .nav-tabs>li.active>a:focus,
+.gs-tabs .nav-tabs>li.active>a:hover{
+  border-bottom: 2px solid #2196f3 !important;
+}
+/* END: TABS */
+
+/* CARD */
+.gs-card {
+  box-shadow: 0 2px 2px 0 rgba(0,0,0,0.14), 0 1px 5px 0 rgba(0,0,0,0.12), 0 3px 1px -2px rgba(0,0,0,0.2);
+  margin: 0.5rem 0 1rem 0;
+  background-color: #fff;
+  transition: box-shadow .25s;
+  border-radius: 2px;
+}
+.gs-card-content {
+  padding: 20px;
+}
+/* END: CARD */
+
+/* INPUT FIELD */
+.gs-input-cell {
+  border: none;    
+  width: calc(100% - 15px);
+  padding: 6px 12px 6px 0;
+  outline: none;
+}
+.gs-input-cell:focus {
+    border-bottom: 2px solid #0acfee;
+}
+/*END: INPUT FIELD */
+
+
+/* START: React-Autosuggest css */
+.react-autosuggest__input {
+  position: relative;
+  z-index: 2;
+  float: left;
+  width: 100%;
+  margin-bottom: 0;
+  height: 34px;
+  padding: 6px 12px;
+  font-size: 14px;
+  line-height: 1.42857143;
+  color: #555;
+  background-color: #fff;
+  background-image: none;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  -webkit-box-shadow: inset 0 1px 1px rgba(0,0,0,.075);
+  box-shadow: inset 0 1px 1px rgba(0,0,0,.075);
+  -webkit-transition: border-color;
+}
+.react-autosuggest__suggestions-list {
+  margin: 0;
+  padding: 0;
+  list-style-type: none;
+}
+
+.react-autosuggest__suggestion--focused,
+.react-autosuggest__suggestion--highlighted {
+  background-color: #0C7EAF;
+  color: #fff;
+}
+
+.react-autosuggest__suggestions-container--open {
+  display: block;
+  position: absolute;
+  top: 59px;
+  border: 1px solid #aaa;
+  background-color: #fff;
+  font-family: Helvetica, sans-serif;
+  font-weight: 300;
+  font-size: 13px;
+  border-bottom-left-radius: 4px;
+  border-bottom-right-radius: 4px;
+  z-index: 3;
+  max-height: 300px;
+  overflow-x: hidden;
+  width: calc(100% - 25px);
+}
+
+.react-autosuggest__input--open {
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
+}
+
+.react-auto-suggest-list-item {
+  padding: 5px 10px;
+}
+/* END: React-Autosuggest css */
+
+
+/* START: Fixing, Bootstrap issue (due to different versions exist among diff npm */
+.tab-content>.active.show {
+  opacity: 1;
+}
+div[validationstate="error"] {
+  color: #f92626;
+}
+input[type=checkbox], input[type=radio] {
+  margin-left: -1.25rem;
+}
+/* END: ootstrap issue (due to different versions exist among diff npm */
+
+.react-tiny-popover-container {
+  z-index: 2;
+  padding-right: 20px;
+}
+
+.gold-color {
+  color: gold;
+}
+.silver-color {
+  color: silver;
+}
+.brass-color {
+  color: #B5A642;
+}
+
+/* START: ARROW BOX ref: http://www.cssarrowplease.com/ */
+.arrow-box:after, .arrow-box:before {
+  border: solid transparent;
+	content: " ";
+	height: 0;
+	width: 0;
+	position: absolute;
+	pointer-events: none;
+}
+.arrow-box {
+  position: relative;
+  border: 4px solid #2296f366; /* background: #88b7d5; */
+}
+.arrow-box:after {
+  border-color: rgba(136, 183, 213, 0);
+  border-width: 21px;
+}
+.arrow-box:before {
+	border-color: rgba(194, 225, 245, 0);
+	border-width: 20px;
+}
+
+/* arrow bottom */
+.arrow-box.bottom {
+  margin-bottom: 1rem;
+}
+
+.arrow-box.bottom:after, .arrow-box.bottom:before {
+	top: 100%;
+	left: 50%;
+}
+.arrow-box.bottom:after {
+	border-top-color: white; /* #88b7d5; */
+	margin-left: -15px;
+}
+.arrow-box.bottom:before {
+	border-top-color: #c2e1f5;
+	margin-left: -21px;
+}
+/* arrow bottom */
+
+
+/* arrow top */
+.arrow-box.top {
+  margin-top: 1rem;
+}
+.arrow-box.top:after, .arrow-box.top:before {
+  bottom: 100%;
+  left: 50%;
+}
+.arrow-box.top:after {
+	border-bottom-color: white; /* #88b7d5; */
+}
+.arrow-box.top:before {
+	border-bottom-color: #c2e1f5;
+}
+/* arrow top */
+
+/* arrow left */
+.arrow-box.left {
+  margin-left: 1rem;
+}
+.arrow-box.left:after, .arrow-box.left:before {
+  right: 100%;
+  top: 50%;
+}
+.arrow-box.left:after {
+  border-right-color: white; /* #88b7d5; */
+  margin-top: -21px;
+  right: 98%;
+}
+
+.arrow-box.left:before {
+  border-right-color: #c2e1f5;
+  margin-top: -21px;
+}
+/* arrow left */
+
+/* arrow right */
+.arrow-box.right:after, .arrow-box.right:before {
+  left: 100%;
+  top: 50%;
+}
+.arrow-box.right:after {
+	border-left-color: white; /* #88b7d5; */
+}
+.arrow-box.right:before {
+	border-left-color: #c2e1f5;
+}
+/* arrow right */
+
+/* END: ARROW BOX*/
+
+@media print {
+  @page {
+    size: auto;
+  }
 }

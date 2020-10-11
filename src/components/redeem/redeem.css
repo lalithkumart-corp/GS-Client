@@ -1,0 +1,44 @@
+.bill-closing-container .bill-display-container{
+    margin-top: 25px;
+}
+.bill-closing-container .bill-data-container {
+    border: 1px solid lightgray;
+    border-top: none;
+}
+.bill-closing-container .bill-data-container .head-section {
+    background-color: lightgray;
+    font-weight: 700;
+}
+.bill-closing-container .bill-data-container .orn-section {
+    margin-top: 10px;
+}
+.bill-closing-container .bill-data-container .amount-field {
+    font-size: 20px;
+    padding-right: 10px;
+}
+.bill-closing-container .bill-data-container .tail-section {
+    margin-top: 10px;
+}
+.bill-closing-container .interest-value-input,
+.bill-closing-container .discount-value-input {
+    width: 50px;
+    border-bottom: 1px solid;
+    border-color: transparent;
+    border-top: none;
+    border-right: none;
+    border-left: none;
+}
+
+.bill-closing-container .interest-value-input:hover,
+.bill-closing-container .interest-value-input:focus,
+.bill-closing-container .discount-value-input:hover,
+.bill-closing-container .discount-value-input:focus {
+    border-color: #c2b8b8;
+    outline: none;
+}
+.bill-closing-container .calculation-container {
+    margin-top: 15px;
+}
+.bill-closing-container .total-value-field {
+    font-size: 20px;
+}
