@@ -1,0 +1,23 @@
+.jewellery-orn-list .orn-list-col {
+    border: 1px solid lightgray;
+    min-height: 300px;
+    overflow-x: hidden;
+}
+
+.jewellery-orn-list .search-row {
+    margin-top: 20px;
+}
+
+.jewellery-orn-list .an-orn-list-item {
+    padding: 4px 0;
+}
+
+.jewellery-orn-list .an-orn-list-item:hover {
+    background-color: lightgray;
+}
+
+.jewellery-orn-list .an-orn-list-item.selected {
+    background-color: #2f96f3;
+    color: white;
+}
+

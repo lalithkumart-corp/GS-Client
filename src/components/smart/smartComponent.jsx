@@ -19,9 +19,13 @@ import history from '../../history';
 import Users from '../users/users.jsx';
 import './smartComponent.css';
 import SignUpPage from '../signup/signup';
-import Settings from '../settings/settings';
+import LoanSetup from '../loan-setup/setup';
 import BackupRestore from '../backup_restore/backupRestore';
 import TallyPage from '../tally/tallyPage';
+//import Products from '../products/Products';
+import AddStock from '../stock/addStock/AddStock';
+import ViewStock from '../stock/viewStock/ViewStock';
+import StockSetup from '../stock/setup/StockSetup';
 import 'bootstrap/dist/css/bootstrap.min.css';
 
 class SmartComponent extends Component {
@@ -54,9 +58,13 @@ class SmartComponent extends Component {
                                 <Route path= '/picture' component={Picture} />
                                 <Route path= '/logout' component={Logout} />
                                 <Route path= '/uploadpicdemo' component={UploadPicDemo} />
-                                <Route path= '/settings' component={Settings} />
+                                <Route path= '/loan-settings' component={LoanSetup} />
                                 <Route path= '/backup_restore' component={BackupRestore} />
                                 <Route path= '/tally' component={TallyPage} />
+                                {/* <Route path= "/products" component={Products} /> */}
+                                <Route path= "/stock-add" component={AddStock} />
+                                <Route path= "/stock-view" component={ViewStock} />
+                                <Route path= "/stock-setup" component={StockSetup} />
                             </div>
                         </div>
                 </Router>

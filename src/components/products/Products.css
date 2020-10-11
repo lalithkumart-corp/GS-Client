@@ -1,0 +1,23 @@
+.products-page {
+    max-width: 100%;
+}
+.products-page .left-pane {
+    min-height: 500px;
+    padding: 20px 0;
+    background-color: #34313f;
+}
+.products-page .left-pane .nav-item:focus, .products-page .left-pane .nav-link:focus {
+    outline: none;
+}
+.products-page .left-pane .nav-link {
+    color: white;
+    padding-left: 40px;
+    margin-top: 5px;
+}
+.products-page .left-pane .nav-link.active {
+    background-color: rgba(35,33,43,.6);
+}
+.products-page .left-pane hr {
+    border-top: 1px solid white;
+    width: 80%;
+}

@@ -1034,8 +1034,8 @@ class BillCreation extends Component {
             this.handleEnterKeyPress(e, options);        
         else if(e.keyCode == SPACE_KEY)
             this.handleSpaceKeyPress(e, options);
-
     }
+    
     async handleEnterKeyPress(evt, options) {
         await this.updateInputVal(evt, options);
         if(options && options.isOrnSpecsInput && (this.canAppendNewRow(options))) {

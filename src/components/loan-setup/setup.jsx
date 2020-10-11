@@ -3,7 +3,7 @@ import {Tabs, Tab} from 'react-bootstrap';
 import BillingSettings from './billing/main';
 import AccountSettings from './account/AccountSettings';
 import InterestRates from './interestRate/InterestRate';
-import './settings.css';
+import './setup.css';
 import Ornaments from './ornaments/ornaments';
 
 export default class Settings extends Component {

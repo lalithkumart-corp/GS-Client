@@ -52,3 +52,6 @@ export const EXPORT_FULL_DB = `${config.proxy_protocol}://${config.proxy_api_hos
 export const UPDATE_CUSTOMER_BY_MERGING = `${config.proxy_protocol}://${config.proxy_api_host}:${config.proxy_api_port}/${config.restApiRoot}/Customers/update-by-merging`;
 export const UPDATE_CUSTOMER_STATUS = `${config.proxy_protocol}://${config.proxy_api_host}:${config.proxy_api_port}/${config.restApiRoot}/Customers/update-status`;
 export const FETCH_ROLES_LIST = `${config.proxy_protocol}://${config.proxy_api_host}:${config.proxy_api_port}/${config.restApiRoot}/GsRoles/fetch-list`;
+
+export const FETCH_ORN_LIST_JEWELLERY = `${config.proxy_protocol}://${config.proxy_api_host}:${config.proxy_api_port}/${config.restApiRoot}/JewellryOrnaments/fetch-orn-list`;
+export const FETCH_STOCK_LIST = `${config.proxy_protocol}://${config.proxy_api_host}:${config.proxy_api_port}/${config.restApiRoot}/Stocks/fetch-list`;

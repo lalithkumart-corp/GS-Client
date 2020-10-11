@@ -1,0 +1,101 @@
+.bill-meta-data-row .form-group {
+    margin: 0;
+}
+/* .bill-meta-data-row .react-datepicker-wrapper {
+    width: calc(100% - 43px);
+} */
+.bill-meta-data-row .react-datepicker__input-container input {
+    width: 100%;
+    padding: 5px 12px 6px 10px;
+}
+.bill-meta-data-row .bill-metal-table .input-group-prepend {
+    display: inline-block;
+}
+.bill-metal-table thead {
+    background-color: #fbbc04;
+    color: white;
+    font-weight: bold;
+}
+.bill-metal-table thead th {
+    padding: 5px 0;
+    text-align: center;
+    border: 1px solid lightyellow;
+}
+.bill-metal-table .form-control {
+    border-radius: 0;
+}
+.bill-metal-table .bill-date-picker {
+    border: 1px solid lightgray;
+    border-right: 0;
+}
+/* .bill-metal-table .border-right-none input,
+.bill-metal-table .border-right-none select {
+    border-right: none;
+} */
+/* .bill-meta-data-row .bill-metal-table th,
+.bill-meta-data-row .bill-metal-table td {
+    border: 1px solid lightgray;
+    border-collapse: collapse;
+    padding: 5px;
+} */
+.item-input-row {
+    margin-top: 20px;
+}
+.item-input-row thead{
+    background-color: #fbbc04;
+    color: white;
+    font-weight: bold;
+}
+.item-input-row thead th {
+    padding: 5px 0;
+    text-align: center;
+    border: 1px solid lightyellow;
+}
+.item-input-row .form-control {
+    border-radius: 0;
+}
+/* .item-input-row tbody td {
+    padding-left: 2px;
+    padding-right: 2px;
+} */
+.item-input-row .border-right-none {
+    border-right: none;
+}
+.item-input-row .form-control {
+    padding: 0 0 0 2px;
+}
+.item-input-row .product-name {
+    padding-left: 0;
+}
+.item-input-row .product-amt-total {
+    padding-right: 0;
+}
+.border-left-dashed {
+    border-left-style: dashed;
+    border-left-color: lightgray !important;
+}
+
+.bill-metal-table input:focus,
+.item-input-row input:focus,
+.bill-metal-table select:focus,
+.item-input-row select:focus {
+    border-color: lightgray;
+    box-shadow: none;
+}
+
+.add-stock-container .action-container {
+    text-align: right;
+}
+
+.add-stock-container .item-input-row .form-group {
+    margin-bottom: 0;
+}
+
+.add-stock-container .product-labour-charges,
+.add-stock-container .product-labour-charge-unit {
+    display: inline-block;
+    width: 60%;
+}
+.add-stock-container .product-labour-charge-unit {
+    width: 40%;
+}

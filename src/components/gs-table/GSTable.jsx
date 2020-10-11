@@ -236,7 +236,7 @@ class GSTable extends Component {
 
     getSelectAllwithExpandAllDOM(column, colIndex) {        
         return (
-            <th key={colIndex+"-inner-hedaer"} className={column.className + " inner-header a-cell"}>
+            <th key={colIndex+"-inner-hedaer"} className={column.className + "secondary-row-first-col inner-header a-cell"}>
                 {this.defaultFormatters.expndAllWithSelectAllCboxFormatter(column, colIndex)}
             </th>
         )
