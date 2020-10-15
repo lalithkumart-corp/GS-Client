@@ -44,6 +44,8 @@ class NavbarComp extends Component {
                             <NavDropdown.Item as={Link} to="/stock-view">View</NavDropdown.Item>
                             <NavDropdown.Divider />
                             <NavDropdown.Item as={Link} to="/stock-setup">Setup</NavDropdown.Item>
+                            <NavDropdown.Divider />
+                            <NavDropdown.Item as={Link} to="/tag-demo">Tagging</NavDropdown.Item>
                         </NavDropdown>
                     </Nav>
                     <Nav>

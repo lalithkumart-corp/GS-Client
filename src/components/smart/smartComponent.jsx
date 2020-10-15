@@ -26,6 +26,7 @@ import TallyPage from '../tally/tallyPage';
 import AddStock from '../stock/addStock/AddStock';
 import ViewStock from '../stock/viewStock/ViewStock';
 import StockSetup from '../stock/setup/StockSetup';
+import TagDemo from '../stock/tag/TagDemo';
 import 'bootstrap/dist/css/bootstrap.min.css';
 
 class SmartComponent extends Component {
@@ -65,6 +66,7 @@ class SmartComponent extends Component {
                                 <Route path= "/stock-add" component={AddStock} />
                                 <Route path= "/stock-view" component={ViewStock} />
                                 <Route path= "/stock-setup" component={StockSetup} />
+                                <Route path= "/tag-demo" component={TagDemo} />
                             </div>
                         </div>
                 </Router>
