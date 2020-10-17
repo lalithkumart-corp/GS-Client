@@ -99,3 +99,11 @@
 .add-stock-container .product-labour-charge-unit {
     width: 40%;
 }
+
+.add-stock-container select:focus {
+    color: blue;
+}
+
+.add-stock-container .preview-container {
+    margin-top: 50px;
+}
