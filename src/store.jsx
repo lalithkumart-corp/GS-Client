@@ -18,7 +18,7 @@ export const getStore = () => {
 
     const middleware = applyMiddleware(reduxThunk, logger);
 
-    let store = createStore(theReducers, compose(middleware, window.__REDUX_DEVTOOLS_EXTENSION__ && window.__REDUX_DEVTOOLS_EXTENSION__()));
+    let store = createStore(theReducers, compose(middleware)); //, window.__REDUX_DEVTOOLS_EXTENSION__ && window.__REDUX_DEVTOOLS_EXTENSION__()
         
     return store;
 }
