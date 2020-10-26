@@ -6,6 +6,7 @@ import 'react-datepicker/dist/react-datepicker.css';
 import moment from 'moment';
 import { getDateInUTC } from '../../../utilities/utility';
 import _ from 'lodash';
+import { DoublyLinkedList } from '../../../utilities/doublyLinkedList';
 
 const ENTER_KEY = 13;
 const SPACE_KEY = 32;
@@ -26,6 +27,33 @@ const PROD_PWT = 'productPWt';
 const PROD_IWT = 'productIWt';
 const PROD_PTOUCH = 'productPureTouch';
 const PROD_ITOUCH = 'productITouch';
+const PROD_LAB_CHARGES = 'productLabourCharges';
+const PROD_LAB_CALC_UNIT = 'productLabourCalcUnit';
+const PROD_CGST_PERCENT = 'productCgstPercent';
+const PROD_SGST_PERCENT = 'productSgstPercent';
+const PROD_IGST_PERCENT = 'productIgstPercent';
+const ADD_ENTRY = 'addEntry';
+
+var domList = new DoublyLinkedList();
+domList.add(METAL_PRICE, {type: 'formControl', enabled: true});
+domList.add(DLR_STORE_NAME, {type: 'formControl', enabled: true});
+domList.add(DLR_PERSON_NAME, {type: 'formControl', enabled: true});
+domList.add(PROD_CODE, {type: 'formControl', enabled: true});
+domList.add(PROD_NAME, {type: 'formControl', enabled: true});
+domList.add(PROD_CATEG, {type: 'formControl', enabled: true});
+domList.add(PROD_SUB_CATEG, {type: 'formControl', enabled: true});
+domList.add(PROD_DIM, {type: 'formControl', enabled: true});
+domList.add(PROD_QTY, {type: 'formControl', enabled: true});
+domList.add(PROD_GWT, {type: 'formControl', enabled: true});
+domList.add(PROD_NWT, {type: 'formControl', enabled: true});
+domList.add(PROD_PTOUCH, {type: 'formControl', enabled: true});
+domList.add(PROD_ITOUCH, {type: 'formControl', enabled: true});
+domList.add(PROD_LAB_CHARGES, {type: 'formControl', enabled: true});
+domList.add(PROD_LAB_CALC_UNIT, {type: 'formControl', enabled: false});
+domList.add(PROD_CGST_PERCENT, {type: 'formControl', enabled: true});
+domList.add(PROD_SGST_PERCENT, {type: 'formControl', enabled: true});
+domList.add(PROD_IGST_PERCENT, {type: 'formControl', enabled: true});
+domList.add(ADD_ENTRY, {type: 'defaultInput', enabled: true});
 
 
 export default class AddStock extends Component {
@@ -56,7 +84,7 @@ export default class AddStock extends Component {
                 productIWt: '',
                 calcAmtUptoIWt: '',
                 productLabourCharges: '',
-                productLabourCalcUnit: 'percent',
+                productLabourCalcUnit: 'fixed',
                 calcLabourVal: '',
                 calcAmtWithLabour: '',
                 //productFlatAmt: null,
@@ -71,11 +99,16 @@ export default class AddStock extends Component {
                 listItems: []
             }
         }
+        this.domElmns = {};
         this.bindMethods();
     }
 
     bindMethods() {
         this.inputControls.onChange = this.inputControls.onChange.bind(this);
+    }
+
+    componentDidMount() {
+        this.domElmns[METAL_PRICE].focus();
     }
 
     inputControls = {
@@ -143,6 +176,7 @@ export default class AddStock extends Component {
                     productIWt: fd.productIWt,
                     //productWst: fd.productWst,
                     productLabourCharges: fd.productLabourCharges,
+                    productLabourCalcUnit: fd.productLabourCalcUnit,
                    // productFlatAmt: fd.productFlatAmt,
                     productCgstPercent: fd.productCgstPercent,
                     productCgstAmt: fd.productCgstAmt,
@@ -154,31 +188,37 @@ export default class AddStock extends Component {
                 };
                 newState.formData = {
                     ...this.state.formData,
+                    productCode: "",
                     productName: '',
                     productCategory: '',
+                    productSubCategory: "",
                     productDimension: '',
-                    productQty: null,
-                    productGWt: null,
-                    productNWt: null,
-                    productPWt: null,
+                    productQty: "",
+                    productGWt: "",
+                    productNWt: "",
+                    productPWt: "",
                     productPureTouch: '',
                     productITouch: '',
                     productIWt: '',
-                   // productWst: '',
+                    calcAmtUptoIWt: "",
                     productLabourCharges: '',
-                    //productFlatAmt: null,
-                    productCgstPercent: null,
-                    productCgstAmt: null,
-                    productSgstPercent: null,
-                    productSgstAmt: null,
-                    productIgstPercent: null,
-                    productIgstAmt: null,
-                    productTotalAmt: null,
+                    productLabourCalcUnit: 'fixed',
+                    calcAmtWithLabour: "",
+                    productCgstPercent: "",
+                    productCgstAmt: "",
+                    productSgstPercent: "",
+                    productSgstAmt: "",
+                    productIgstPercent: "",
+                    productIgstAmt: "",
+                    productTotalAmt: "",
                 }
-                newState.items.push(itemObj);
+                newState.formData.listItems.push(itemObj);
                 break;
         }
         this.setState(newState);
+        setTimeout(() => {
+            this.domElmns[PROD_CODE].focus();
+        }, 400);
     }
 
     onDropdownChange(e, identifier) {
@@ -194,6 +234,7 @@ export default class AddStock extends Component {
                 break;
         }
         newState = this.setAutoFillups(newState);
+        this.transferFocus(e, identifier);
         this.setState(newState);
     }
 
@@ -207,12 +248,56 @@ export default class AddStock extends Component {
 
     handleEnterKeyPress(e, options) {
         let newState = {...this.state};
+        // switch(options.currElmKey) {
+        //     case ADD_ENTRY:
+        //         this.onButtonClicks(e, options.currElmKey);
+        //         break;
+        // }
         newState = this.setAutoFillups(newState);
         this.setState(newState);
+        this.transferFocus(e, options.currElmKey);
     }
 
     handleSpaceKeyPress(e, options) {
 
+    }
+
+    transferFocus(e, currentElmKey, direction='forward') {
+        let nextElm;
+        if(direction == 'forward')
+            nextElm = this.getNextElm(currentElmKey);
+        else
+            nextElm = this.getPrevElm(currentElmKey);
+        try{
+            if(nextElm) {
+                if(nextElm.type == 'autosuggest')
+                    this.domElmns[nextElm.key].refs.input.focus();
+                else if (nextElm.type == 'rautosuggest' || nextElm.type == 'defaultInput' || nextElm.type == 'formControl')
+                    this.domElmns[nextElm.key].focus();
+            }
+        } catch(e) {
+            //TODO: Remove this alert after completing development
+            alert("Exception occured in transferring focus...check console immediately");
+            console.log(e);
+            console.log(currentElmKey, nextElm.key, direction);
+        }
+    }
+
+    getNextElm(currElmKey) {
+        debugger;
+        let currNode = domList.findNode(currElmKey);
+        let nextNode = currNode.next;
+        if(nextNode && !nextNode.enabled)
+            nextNode = this.getNextElm(nextNode.key);        
+        return nextNode;
+    }
+
+    getPrevElm(currElmKey) {        
+        let currNode = domList.findNode(currElmKey);
+        let prevNode = currNode.prev;
+        if(prevNode && !prevNode.enabled)
+            prevNode = this.getPrevElm(prevNode.key);        
+        return prevNode;
     }
 
     setAutoFillups(newState) {
@@ -242,7 +327,7 @@ export default class AddStock extends Component {
             if(fd.productIgstPercent && fd.calcAmtWithLabour)
                 fd.productIgstAmt = (fd.calcAmtWithLabour * fd.productIgstPercent)/100;
             fd.productTotalAmt = fd.calcAmtWithLabour + (fd.productSgstAmt || 0) + (fd.productCgstAmt || 0) + (fd.productIgstAmt || 0);
-            debugger;
+
             if(fd.productTotalAmt)
                 fd.productTotalAmt = fd.productTotalAmt.toFixed(3);
         }
@@ -280,18 +365,16 @@ export default class AddStock extends Component {
                     <td>{anItem.productGWt}</td>
                     <td>{anItem.productNWt}</td>
                     <td>{anItem.productPureTouch}</td>
+                    <td>{anItem.productPWt}</td>
                     <td>{anItem.productITouch}</td>
                     <td>{anItem.productIWt}</td>
-                    <td>{anItem.productPWt}</td>
-                    {/* <td>{anItem.productWst}</td> */}
                     <td>{anItem.productLabourCharges}</td>
-                    {/* <td>{anItem.productFlatAmt}</td> */}
                     <td>{anItem.productCgstAmt+anItem.productSgstAmt+anItem.productIgstAmt}</td>
-                    <td></td>
+                    <td>{anItem.productTotalAmt}</td>
                 </tr>
             );
         });
-        dom.push();
+        return dom;
     }
 
     render() {
@@ -338,8 +421,10 @@ export default class AddStock extends Component {
                                             <Form.Control
                                                 type="text"
                                                 placeholder="MetalPrice"
-                                                onChange={(e) => this.inputControls.onChange(null, e.target.value, 'metalPrice')} 
+                                                onChange={(e) => this.inputControls.onChange(null, e.target.value, METAL_PRICE)} 
+                                                onKeyUp = {(e) => this.handleKeyUp(e, {currElmKey: METAL_PRICE}) }
                                                 value={this.state.formData.metalPrice}
+                                                ref= {(domElm) => {this.domElmns[METAL_PRICE] = domElm; }}
                                             />
                                         </Form.Group>
                                     </td>
@@ -348,8 +433,10 @@ export default class AddStock extends Component {
                                             <Form.Control
                                                 type="text"
                                                 placeholder="Dealer StoreName"
-                                                onChange={(e) => this.inputControls.onChange(null, e.target.value, 'dealerStoreName')} 
+                                                onChange={(e) => this.inputControls.onChange(null, e.target.value, DLR_STORE_NAME)} 
                                                 value={this.state.formData.dealerStoreName}
+                                                onKeyUp = {(e) => this.handleKeyUp(e, {currElmKey: DLR_STORE_NAME}) }
+                                                ref= {(domElm) => {this.domElmns[DLR_STORE_NAME] = domElm; }}
                                             />
                                         </Form.Group>
                                     </td>
@@ -358,8 +445,10 @@ export default class AddStock extends Component {
                                             <Form.Control
                                                 type="text"
                                                 placeholder="Dealer Person"
-                                                onChange={(e) => this.inputControls.onChange(null, e.target.value, 'dealerPersonName')} 
+                                                onChange={(e) => this.inputControls.onChange(null, e.target.value, DLR_PERSON_NAME)} 
                                                 value={this.state.formData.dealerPersonName}
+                                                onKeyUp = {(e) => this.handleKeyUp(e, {currElmKey: DLR_PERSON_NAME}) }
+                                                ref= {(domElm) => {this.domElmns[DLR_PERSON_NAME] = domElm; }}
                                             />
                                         </Form.Group>
                                     </td>
@@ -418,6 +507,7 @@ export default class AddStock extends Component {
                                                         onChange={(e) => this.inputControls.onChange(null, e.target.value, PROD_CODE)} 
                                                         onKeyUp={(e) => this.handleKeyUp(e, {currElmKey: PROD_CODE})}
                                                         value={this.state.formData.productCode}
+                                                        ref= {(domElm) => {this.domElmns[PROD_CODE] = domElm; }}
                                                     />
                                                 </Form.Group>
                                             </Col>
@@ -430,6 +520,7 @@ export default class AddStock extends Component {
                                                         onChange={(e) => this.inputControls.onChange(null, e.target.value, PROD_NAME)} 
                                                         onKeyUp={(e) => this.handleKeyUp(e, {currElmKey: PROD_NAME})}
                                                         value={this.state.formData.productName}
+                                                        ref= {(domElm) => {this.domElmns[PROD_NAME] = domElm; }}
                                                     />
                                                 </Form.Group>
                                             </Col>
@@ -439,6 +530,7 @@ export default class AddStock extends Component {
                                                         type="text"
                                                         placeholder="Category"
                                                         className="border-left-dashed border-right-none"
+                                                        ref= {(domElm) => {this.domElmns[PROD_CATEG] = domElm; }}
                                                         onChange={(e) => this.inputControls.onChange(null, e.target.value, PROD_CATEG)} 
                                                         onKeyUp={(e) => this.handleKeyUp(e, {currElmKey: PROD_CATEG})}
                                                         value={this.state.formData.productCategory}
@@ -455,6 +547,7 @@ export default class AddStock extends Component {
                                                 className="border-right-none"
                                                 onChange={(e) => this.inputControls.onChange(null, e.target.value, PROD_QTY)} 
                                                 onKeyUp={(e) => this.handleKeyUp(e, {currElmKey: PROD_QTY})}
+                                                ref= {(domElm) => {this.domElmns[PROD_QTY] = domElm; }}
                                                 value={this.state.formData.productQty}
                                             />
                                         </Form.Group>
@@ -469,6 +562,7 @@ export default class AddStock extends Component {
                                                         className="border-right-none"
                                                         onChange={(e) => this.inputControls.onChange(null, e.target.value, PROD_GWT)} 
                                                         onKeyUp={(e) => this.handleKeyUp(e, {currElmKey: PROD_GWT})}
+                                                        ref= {(domElm) => {this.domElmns[PROD_GWT] = domElm; }}
                                                         value={this.state.formData.productGWt}
                                                     />
                                                 </Form.Group>
@@ -481,6 +575,7 @@ export default class AddStock extends Component {
                                                         className="border-left-dashed border-right-none"
                                                         onChange={(e) => this.inputControls.onChange(null, e.target.value, PROD_NWT)} 
                                                         onKeyUp={(e) => this.handleKeyUp(e, {currElmKey: PROD_NWT})}
+                                                        ref= {(domElm) => {this.domElmns[PROD_NWT] = domElm; }}
                                                         value={this.state.formData.productNWt}
                                                     />
                                                 </Form.Group>
@@ -493,6 +588,7 @@ export default class AddStock extends Component {
                                                 onChange={(e) => this.onDropdownChange(e, PROD_PTOUCH)} 
                                                 value={this.state.formData.productPureTouch}
                                                 onKeyUp={(e) => this.handleKeyUp(e, {currElmKey: PROD_PTOUCH})}
+                                                ref= {(domElm) => {this.domElmns[PROD_PTOUCH] = domElm; }}
                                                 className="border-right-none">
                                                 {this.getTouchDom()}
                                             </Form.Control>
@@ -524,6 +620,7 @@ export default class AddStock extends Component {
                                                 className="border-right-none"
                                                 onChange={(e) => this.inputControls.onChange(null, e.target.value, PROD_ITOUCH)} 
                                                 onKeyUp={(e) => this.handleKeyUp(e, {currElmKey: PROD_ITOUCH})}
+                                                ref= {(domElm) => {this.domElmns[PROD_ITOUCH] = domElm; }}
                                                 value={this.state.formData.productITouch}
                                             />
                                         </Form.Group>
@@ -546,16 +643,19 @@ export default class AddStock extends Component {
                                                 type="text"
                                                 placeholder="Labour"
                                                 className="border-right-none product-labour-charges"
-                                                onChange={(e) => this.inputControls.onChange(null, e.target.value, 'productLabourCharges')}
-                                                onKeyUp={(e) => this.handleKeyUp(e, {currElmKey: 'productLabourCharges'})} 
+                                                onChange={(e) => this.inputControls.onChange(null, e.target.value, PROD_LAB_CHARGES)}
+                                                onKeyUp={(e) => this.handleKeyUp(e, {currElmKey: PROD_LAB_CHARGES})} 
                                                 value={this.state.formData.productLabourCharges}
+                                                ref= {(domElm) => {this.domElmns[PROD_LAB_CHARGES] = domElm; }}
                                             />
                                             <Form.Control as="select"
-                                                onChange={(e) => this.onDropdownChange(e, 'productLabourCalcUnit')} 
+                                                onChange={(e) => this.onDropdownChange(e, PROD_LAB_CALC_UNIT)} 
                                                 value={this.state.formData.productLabourCalcUnit}
-                                                className="border-right-none product-labour-charge-unit">
+                                                className="border-right-none product-labour-charge-unit"
+                                                onKeyUp={(e) => this.handleKeyUp(e, {currElmKey: PROD_LAB_CALC_UNIT})} 
+                                                ref= {(domElm) => {this.domElmns[PROD_LAB_CALC_UNIT] = domElm; }}>
+                                                    <option key='fixed-option' value='fixed'>FX</option>
                                                     <option key='percent-option' value='percent'>%</option>
-                                                    <option key='fixed-option' value='fixed'>Fixed</option>
                                             </Form.Control>
                                         </Form.Group>
                                     </td>
@@ -567,8 +667,10 @@ export default class AddStock extends Component {
                                                         type="text"
                                                         placeholder="%"
                                                         className="border-right-none"
-                                                        onChange={(e) => this.inputControls.onChange(null, e.target.value, 'productCgstPercent')} 
+                                                        onChange={(e) => this.inputControls.onChange(null, e.target.value, PROD_CGST_PERCENT)}
+                                                        onKeyUp={(e) => this.handleKeyUp(e, {currElmKey: PROD_CGST_PERCENT})}
                                                         value={this.state.formData.productCgstPercent}
+                                                        ref= {(domElm) => {this.domElmns[PROD_CGST_PERCENT] = domElm; }}
                                                     />
                                                 </Form.Group>
                                             </Col>
@@ -594,7 +696,9 @@ export default class AddStock extends Component {
                                                         type="text"
                                                         placeholder="%"
                                                         className="border-right-none"
-                                                        onChange={(e) => this.inputControls.onChange(null, e.target.value, 'productSgstPercent')} 
+                                                        onChange={(e) => this.inputControls.onChange(null, e.target.value, PROD_SGST_PERCENT)} 
+                                                        onKeyUp={(e) => this.handleKeyUp(e, {currElmKey: PROD_SGST_PERCENT})}
+                                                        ref= {(domElm) => {this.domElmns[PROD_SGST_PERCENT] = domElm; }}
                                                         value={this.state.formData.productSgstPercent}
                                                     />
                                                 </Form.Group>
@@ -621,7 +725,9 @@ export default class AddStock extends Component {
                                                         type="text"
                                                         placeholder="%"
                                                         className="border-right-none"
-                                                        onChange={(e) => this.inputControls.onChange(null, e.target.value, 'productIgstPercent')} 
+                                                        onChange={(e) => this.inputControls.onChange(null, e.target.value, PROD_IGST_PERCENT)}
+                                                        onKeyUp={(e) => this.handleKeyUp(e, {currElmKey: PROD_IGST_PERCENT})}
+                                                        ref= {(domElm) => {this.domElmns[PROD_IGST_PERCENT] = domElm; }}
                                                         value={this.state.formData.productIgstPercent}
                                                     />
                                                 </Form.Group>
@@ -661,8 +767,10 @@ export default class AddStock extends Component {
                                                         type="text"
                                                         placeholder="Sub-Categ"
                                                         className="border-right-none"
-                                                        onChange={(e) => this.inputControls.onChange(null, e.target.value, 'productSubCategory')} 
+                                                        onChange={(e) => this.inputControls.onChange(null, e.target.value, PROD_SUB_CATEG)} 
                                                         value={this.state.formData.productSubCategory}
+                                                        onKeyUp={(e) => this.handleKeyUp(e, {currElmKey: PROD_SUB_CATEG})}
+                                                        ref= {(domElm) => {this.domElmns[PROD_SUB_CATEG] = domElm; }}
                                                     />
                                                 </Form.Group>
                                             </Col>
@@ -672,8 +780,10 @@ export default class AddStock extends Component {
                                                         type="text"
                                                         placeholder="Size/Length"
                                                         className="border-left-dashed"
-                                                        onChange={(e) => this.inputControls.onChange(null, e.target.value, 'productDimension')} 
+                                                        onChange={(e) => this.inputControls.onChange(null, e.target.value, PROD_DIM)} 
+                                                        onKeyUp={(e) => this.handleKeyUp(e, {currElmKey: PROD_DIM})}
                                                         value={this.state.formData.productDimension}
+                                                        ref= {(domElm) => {this.domElmns[PROD_DIM] = domElm; }}
                                                     />
                                                 </Form.Group>
                                             </Col>
@@ -720,7 +830,16 @@ export default class AddStock extends Component {
                     </Col>
                 </Row>
                 <Row className="action-container">
-                    <Col><input type="button" className="gs-button" value="Add Entry" onClick={(e) => this.onButtonClicks(e, 'addEntry')}/></Col>
+                    <Col>
+                        <input 
+                            type="button" 
+                            className="gs-button" 
+                            value="Add Entry" 
+                            // onKeyUp={(e) => this.handleKeyUp(e, {currElmKey: ADD_ENTRY})}
+                            ref= {(domElm) => {this.domElmns[ADD_ENTRY] = domElm; }}
+                            onClick={(e) => this.onButtonClicks(e, ADD_ENTRY)}
+                        />
+                    </Col>
                 </Row>
                 <Row className="preview-container">
                     <Col>
@@ -731,11 +850,13 @@ export default class AddStock extends Component {
                                 <col style={{width: "10%"}}></col>
                                 <col style={{width: "3%"}}></col>
                                 <col style={{width: "5%"}}></col>
+
                                 <col style={{width: "5%"}}></col>
                                 <col style={{width: "5%"}}></col>
                                 <col style={{width: "5%"}}></col>
                                 <col style={{width: "5%"}}></col>
                                 <col style={{width: "5%"}}></col>
+
                                 <col style={{width: "5%"}}></col>
                                 <col style={{width: "5%"}}></col>
                                 <col style={{width: "10%"}}></col>
@@ -748,15 +869,16 @@ export default class AddStock extends Component {
                                     <th>Item</th>
                                     <th>Qty</th>
                                     <th>G-wt</th>
+
                                     <th>N-wt</th>
-                                    <th>Touch</th>
+                                    <th>P-Touch</th>
                                     <th>P-wt</th>
-                                    <th>Wst</th>
+                                    <th>I-Touch</th>
+                                    <th>I-Wt</th>
+                                    
                                     <th>Lab</th>
-                                    <th>Amt</th>
                                     <th>Taxes</th>
                                     <th>Total</th>
-                                    <th></th>
                                 </tr>
                             </thead>
                             <tbody>
