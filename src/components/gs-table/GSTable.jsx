@@ -71,6 +71,7 @@ class GSTable extends Component {
                 buffer.filterVal = aCol.filterVal || null;
                 buffer.filterCallback = aCol.filterCallback || this.defaults.filterCallback;
                 buffer.filterFormatter = aCol.filterFormatter || this.defaultFormatters.filter;
+                buffer.filterDataType = aCol.filterDataType || "text";
                 buffer.width = aCol.width || '0%';
                 buffer.tdClassNameGetter = aCol.tdClassNameGetter || this.defaults.tdClassNameGetter;
                 parsedData.columns.push(buffer);
@@ -183,9 +184,12 @@ class GSTable extends Component {
 
             return theDom;
         },
-        filter: (column, colIndex) => {            
+        filter: (column, colIndex) => {   
+            let dataType = 'text';
+            if(column.filterDataType)
+                dataType = column.filterDataType;                        
             return (                
-                <input type='text' value={undefined} onChange={(e) => column.filterCallback(e, column, colIndex)}/>                
+                <input type={dataType} value={undefined} onChange={(e) => column.filterCallback(e, column, colIndex)}/>
             );
         }
     }

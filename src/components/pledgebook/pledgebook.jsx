@@ -257,15 +257,21 @@ class Pledgebook extends Component {
                     filterCallback: this.filterCallbacks.onMobileChange,
                     className: 'pb-mobile-col',
                     formatter: (column, columnIndex, row, rowIndex) => {
-                        let mobile = row[column.id];
+                        let mobile = [];
+                        let mobileStr = '';
+                        if(row[column.id])
+                            mobile.push(row[column.id]);
                         if(row['SecMobile'])
-                            mobile += ' / ' + row['SecMobile'];
+                            mobile.push(row['SecMobile']);
+                        if(mobile.length > 0)
+                            mobileStr = mobile.join(' / ');
                         return (
-                            <span className='mobile-cell'>
-                                <span>{mobile}</span>
+                            <span className='mobile-cell' key={rowIndex+'-mobile-val'}>
+                                <span>{mobileStr}</span>
                             </span>
                         )
                     },
+                    filterDataType: 'number'
                 }
             ]
         }
@@ -830,7 +836,6 @@ class Pledgebook extends Component {
                     </Col>
                 </Row>
                 <Row>
-                    {this.state.pendingBillList.length > 0 && 
                     <GSTable 
                         columns={this.state.columns}
                         rowData={this.state.pendingBillList}
@@ -843,8 +848,7 @@ class Pledgebook extends Component {
                         globalCheckBoxListener = {this.handleGlobalCheckboxChange}
                         selectedIndexes = {this.state.selectedIndexes}
                         
-                    />}
-                    
+                    />
                 </Row>
                 <CommonModal modalOpen={this.state.PBmodalIsOpen} handleClose={this.handleClose}>
                     <PledgebookModal {...this.state} handleClose={this.handleClose} refresh={this.refresh}/>
