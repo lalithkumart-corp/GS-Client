@@ -1592,7 +1592,7 @@ class BillCreation extends Component {
                                 onChange={(e) => this.inputControls.onChange(null, e.target.value, 'moreCustomerDetailsValue')} 
                                 onKeyUp={(e) => this.handleKeyUp(e, {currElmKey: 'moreCustomerDetailValue', isToAddMoreDetail: true, traverseDirection: 'backward'})} 
                                 value={this.state.formData.moreDetails.currCustomerInputVal}
-                                inputRef = {(domElm) => { this.domElmns.moreCustomerDetailValue = domElm; }}
+                                ref = {(domElm) => { this.domElmns.moreCustomerDetailValue = domElm; }}
                                 readOnly={this.props.billCreation.loading}
                             />
                             <FormControl.Feedback />
