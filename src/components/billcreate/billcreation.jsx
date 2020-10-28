@@ -642,27 +642,31 @@ class BillCreation extends Component {
         if(inputLength === 0) {
             return [];
         } else {
-            
             let splits = inputValue.split('/');
             if(splits.length > 1 && splits[1].length > 0) {
                 return this.state.formData.cname.list.filter(anObj => {
-                    if(anObj.name.toLowerCase().indexOf(splits[0]) === 0) {
-                        
-                    }
-
-                    if(anObj.name.toLowerCase().slice(0, splits[0].length) === splits[0] && anObj.gaurdianName.toLowerCase().slice(0, splits[1].length) === splits[1]){
+                    let cnameLowercase = this.getLowerCase(anObj.name);
+                    let gaurdianNameLowerCase = this.getLowerCase(anObj.gaurdianName);
+                    if(cnameLowercase.slice(0, splits[0].length) === splits[0] && gaurdianNameLowerCase.slice(0, splits[1].length) === splits[1]){
                         return true;
                     } else {
                         return false;
                     }
                 });
             } else {
-                return this.state.formData.cname.list.filter(anObj => anObj.name.toLowerCase().slice(0, splits[0].length) === splits[0]);
+                return this.state.formData.cname.list.filter(anObj => this.getLowerCase(anObj.name).slice(0, splits[0].length) === splits[0]);
             }
         }
         return inputLength === 0 ? [] : this.state.formData.cname.list.filter(lang =>
             lang.name.toLowerCase().slice(0, inputLength) === inputValue
         );
+    }
+
+    getLowerCase(str) {
+        if(str)
+            return str.toLowerCase();
+        else
+            return '';
     }
     
     getSuggestionValue = (suggestion, identifier) => {
