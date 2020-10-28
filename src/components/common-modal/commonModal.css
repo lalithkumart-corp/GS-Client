@@ -25,6 +25,7 @@
     padding-right: 15px !important;
     padding-left: 15px !important;    
     z-index: 1;
+    font-size: 22px;
 }
 
 .common-modal-content .close-icon:hover,

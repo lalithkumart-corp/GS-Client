@@ -65,7 +65,7 @@ class PledgebookModal extends Component {
     }
 
     onCalculateClick() {
-         
+         alert('This module is IN-PROGRESS !');
     }
 
     onEdit() {

@@ -184,6 +184,8 @@ class BillCreation extends Component {
         if(!this.props.loadedInPledgebook) {            
             this.props.getBillNoFromDB();
             this.props.disableReadOnlyMode();
+            this.updateDomList('enableSubmitBtn');
+            this.domElmns["amount"].focus();
         } else {
             this.updateFieldValuesInState(this.props.billData);
             this.updateDomList('enableUpdateBtn');
@@ -191,7 +193,6 @@ class BillCreation extends Component {
             this.updateDomList('ornInputFields');
         }
         this.setInterestRates();
-        this.domElmns["amount"].focus();
     }
 
     componentWillReceiveProps(nextProps) {
@@ -516,8 +517,8 @@ class BillCreation extends Component {
 
     /* START: GETTERS */
     getOrnFilteredList(value) {
-        if(value && value.trim().length < 2)
-            return [];
+        // if(value && value.trim().length < 2)
+        //     return [];
         var lowerCaseInput = value.toLowerCase();
         let originalList = JSON.parse(JSON.stringify(this.state.formData.orn.list));
         /* let structuredList = originalList.map( (aSuggestion) => {
@@ -549,12 +550,26 @@ class BillCreation extends Component {
             return anObj.text;
         });
         */
-       let filteredList = originalList.filter( aSuggestion => {
-           aSuggestion = aSuggestion.toLowerCase();
-            if(aSuggestion.indexOf(' '+ value.toLowerCase()) != -1)
-                return aSuggestion;
-       } );
-        return filteredList.slice(0, 20);
+        let filteredList = originalList.filter( aSuggestion => {
+            aSuggestion = aSuggestion.toLowerCase();
+                if(aSuggestion.indexOf(' '+ lowerCaseInput) == 1)
+                    return aSuggestion;
+        });
+
+        let secondaryFilteredList = originalList.filter( aSuggestion => {
+            aSuggestion = aSuggestion.toLowerCase();
+                if(aSuggestion.indexOf(lowerCaseInput) != -1)
+                    return aSuggestion;
+        });
+
+        let finalList = [];
+        let totalList = [...filteredList, ...secondaryFilteredList];
+        totalList = totalList.filter((c, index) => {
+            if(!finalList.includes(c))
+                finalList.push(c);
+        });
+        
+        return finalList.slice(0, 10);
     }
     getDefaultFromStore(identifier) {
         let val = '';
@@ -735,6 +750,10 @@ class BillCreation extends Component {
             case 'enableUpdateBtn':
                 domList.disable('submitBtn');
                 domList.enable('updateBtn');
+                break;
+            case 'enableSubmitBtn':
+                domList.enable('submitBtn');
+                domList.disable('updateBtn');
                 break;
             case 'resetOrnTableRows':
                 _.each(options.formData.orn.inputs, (anInput, index) => {
@@ -1690,7 +1709,7 @@ class BillCreation extends Component {
                                 <InputGroup>
                                     {/* <InputGroup.Addon readOnly={this.props.billCreation.loading}>{this.state.formData.billseries.inputVal}</InputGroup.Addon> */}
                                     <InputGroup.Prepend>
-                                        <InputGroup.Text id="basic-addon1">{this.state.formData.billseries.inputVal}</InputGroup.Text>
+                                        <InputGroup.Text id="bill-no-addon" className={this.props.billCreation.loading?"readOnly": ""}>{this.state.formData.billseries.inputVal}</InputGroup.Text>
                                     </InputGroup.Prepend>
                                     <FormControl
                                         type="text"
@@ -1717,7 +1736,7 @@ class BillCreation extends Component {
                                 <InputGroup>
                                     {/* <InputGroup.Addon readOnly={this.props.billCreation.loading}>Rs:</InputGroup.Addon> */}
                                     <InputGroup.Prepend>
-                                        <InputGroup.Text id="rupee-addon1">Rs:</InputGroup.Text>
+                                        <InputGroup.Text id="rupee-addon" className={this.props.billCreation.loading?"readOnly": ""}>Rs:</InputGroup.Text>
                                     </InputGroup.Prepend>
                                     <FormControl
                                         type="number"
@@ -2110,6 +2129,7 @@ class BillCreation extends Component {
                                     className='gs-button'
                                     ref={(domElm) => {this.domElmns.updateBtn = domElm}}
                                     onClick={(e) => this.handleUpdate()}
+                                    disabled={this.props.billCreation.loading}
                                     value='Update Bill'
                                     />
                             }
