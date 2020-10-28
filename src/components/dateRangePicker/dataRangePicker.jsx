@@ -24,6 +24,7 @@ class DatePicker extends Component {
             },
             startDate: dates.startDate,
             endDate: dates.endDate,
+            canShowCalendarIcon: this.getIconOptionFromProps()
         };
         this.handleEvent = this.handleEvent.bind(this);
     }
@@ -38,6 +39,12 @@ class DatePicker extends Component {
             startDate: moment(sDate.getFullYear() + '-' + (sDate.getMonth()+1) + '-' + sDate.getDate()),
             endDate: moment(eDate.getFullYear() + '-' + (eDate.getMonth()+1) + '-' + eDate.getDate()),
         };
+    }
+    getIconOptionFromProps() {
+        let flag = true;
+        if(this.props.showIcon === false)
+            flag = false;
+        return flag;
     }
     handleEvent(event, picker) {
         event.preventDefault();
@@ -63,7 +70,7 @@ class DatePicker extends Component {
         return (
             <DateRangePicker className="dateRangebox" startDate={this.state.startDate} endDate={this.state.endDate} ranges={this.state.ranges} onApply={this.handleEvent}>
                 <button className={`selected-date-range-btn gs-button ${this.props.className}`}>
-                    <div className="calendar-icon-div pull-left"><FontAwesomeIcon icon="calendar" className='calendar-icon'/></div>
+                    {this.state.canShowCalendarIcon && <div className="calendar-icon-div pull-left"><FontAwesomeIcon icon="calendar" className='calendar-icon'/></div> }
                     <div className="pull-right">
                         <span>
                             {this.invalidate()}

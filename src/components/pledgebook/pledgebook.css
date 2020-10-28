@@ -1,5 +1,6 @@
 .pledgebook-page-content {
     width: 100%;
+    max-width: calc(100% - 100px);
 }
 .pledgebook-page-content .first-row,
 .pledgebook-page-content .second-row {
@@ -82,6 +83,7 @@
     /* margin: 20px 0 0 20px; */
     /* margin: 13px 0 0 0; */
     margin: 0;
+    float: right;
 }
 .pledgebook.pagination li>a {
     border: none;
@@ -189,4 +191,9 @@
 
 .orn-categ-card label, .bill-status-card label, .bill-sort-order label {
     font-weight: normal;
+}
+.gs-button.selected-date-range-btn.pledgebook-date-filter:hover,
+.gs-button.selected-date-range-btn.pledgebook-date-filter:focus {
+    color: #337ab7 !important;
+    background-color: transparent;
 }

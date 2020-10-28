@@ -80,7 +80,7 @@ class Pledgebook extends Component {
             columns : [{
                     id: 'Date',
                     displayText: 'Pledged Date',
-                    width: '25%',
+                    width: '22%',
                     formatter: (column, columnIndex, row, rowIndex) => {
                         if(row['closed_date']) {
                             let closed_date = convertToLocalTime(row['closed_date'], {excludeTime: true});
@@ -196,6 +196,7 @@ class Pledgebook extends Component {
                                     selectDateRange={this.filterCallbacks.date}
                                     startDate={this.state.filters.date.startDate}
                                     endDate={this.state.filters.date.endDate}
+                                    showIcon= {false}
                                 />
                             </div>                            
                         )
@@ -219,11 +220,11 @@ class Pledgebook extends Component {
                             </span>
                         )
                     },
-                    width: '10%'
+                    width: '7%'
                 },{
                     id: 'Amount',
                     displayText: 'Amount',
-                    width: '10%',
+                    width: '8%',
                     isFilterable: false,
                     filterCallback: this.filterCallbacks.onAmountChange,
                     className: 'pb-amount-col'
@@ -248,7 +249,25 @@ class Pledgebook extends Component {
                     isFilterable: true,
                     filterCallback: this.filterCallbacks.onAddressChange,
                     className: 'pb-address-col'
-                }]
+                },{
+                    id: 'Mobile',
+                    displayText: 'Mobile',
+                    width: '20%',
+                    isFilterable: true,
+                    filterCallback: this.filterCallbacks.onMobileChange,
+                    className: 'pb-mobile-col',
+                    formatter: (column, columnIndex, row, rowIndex) => {
+                        let mobile = row[column.id];
+                        if(row['SecMobile'])
+                            mobile += ' / ' + row['SecMobile'];
+                        return (
+                            <span className='mobile-cell'>
+                                <span>{mobile}</span>
+                            </span>
+                        )
+                    },
+                }
+            ]
         }
         let billDisplayFlag = this.state.billDisplayFlag;
         this.bindMethods();
@@ -431,7 +450,15 @@ class Pledgebook extends Component {
             newState.selectedPageIndex = 0;
             await this.setState(newState);
             this.initiateFetchPledgebookAPI();            
-        }         
+        },
+        onMobileChange: async (e, col, colIndex) => {
+            let val = e.target.value;
+            let newState = {...this.state};
+            newState.filters.mobile = val;            
+            newState.selectedPageIndex = 0;
+            await this.setState(newState);
+            this.initiateFetchPledgebookAPI();            
+        }
     }    
 
     onMoreFilterPopoverTrigger(flag) {
@@ -533,8 +560,11 @@ class Pledgebook extends Component {
 
             }
         };
-        if(this.state.filters.custom.mobile.enabled)
+        if(this.state.filters.mobile)
+            filters.custom.mobile = this.state.filters.mobile;
+        else if(this.state.filters.custom.mobile.enabled)
             filters.custom.mobile = this.state.filters.custom.mobile.inputVal;
+
         if(this.state.filters.custom.pledgeAmt.enabled)
             filters.custom.pledgeAmt = {
                 grt: this.state.filters.custom.pledgeAmt.grt,
@@ -774,7 +804,7 @@ class Pledgebook extends Component {
                                 </span>
                         </Popover>
                     </Col>
-                    <Col xs={{span: 2, offset: 1, order: 3}} className='row-count gs-button'>
+                    <Col xs={{span: 2, order: 3}} className='row-count gs-button'>
                         <span>Rows Count</span>
                         <select className="selectpicker" onChange={this.handlePageCountChange}>
                             <option selected={this.state.pageLimit=="10" && "selected"}>10</option>
@@ -784,7 +814,7 @@ class Pledgebook extends Component {
                             <option selected={this.state.pageLimit=="200" && "selected"}>200</option>
                         </select>
                     </Col>
-                    <Col xs={{span: 6}} className='pagination-container'>
+                    <Col xs={{span: 7}} className='pagination-container'>
                         <ReactPaginate previousLabel={"<"}
                             nextLabel={">"}
                             breakLabel={"..."}
@@ -800,6 +830,7 @@ class Pledgebook extends Component {
                     </Col>
                 </Row>
                 <Row>
+                    {this.state.pendingBillList.length > 0 && 
                     <GSTable 
                         columns={this.state.columns}
                         rowData={this.state.pendingBillList}
@@ -812,7 +843,8 @@ class Pledgebook extends Component {
                         globalCheckBoxListener = {this.handleGlobalCheckboxChange}
                         selectedIndexes = {this.state.selectedIndexes}
                         
-                    />
+                    />}
+                    
                 </Row>
                 <CommonModal modalOpen={this.state.PBmodalIsOpen} handleClose={this.handleClose}>
                     <PledgebookModal {...this.state} handleClose={this.handleClose} refresh={this.refresh}/>
