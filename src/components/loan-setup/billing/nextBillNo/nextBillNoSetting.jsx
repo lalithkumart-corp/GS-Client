@@ -97,8 +97,10 @@ class NextBillNumber extends Component {
                                     <input className='gs-input-cell' type='number' value={this.state.billNumber} onChange={(e) => this.onChange(e, 'billNumber')}/>
                                 </Col>
                             </Row>
-                            <Row className='text-align-right'>
-                                <input type='button' className='gs-button' value='Update' onClick={this.updateInDB}/>
+                            <Row>
+                                <Col xs={{span: 2, offset: 10}}>
+                                    <input type='button' className='gs-button' value='Update' onClick={this.updateInDB}/>
+                                </Col>
                             </Row>
                         </Col>
                     </Row>

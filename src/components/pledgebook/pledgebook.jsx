@@ -11,7 +11,7 @@ import PledgebookModal from './pledgebookModal';
 import GSTable from '../gs-table/GSTable';
 import ReactPaginate from 'react-paginate';
 import DateRangePicker from '../dateRangePicker/dataRangePicker';
-import { convertToLocalTime, dateFormatter } from '../../utilities/utility';
+import { convertToLocalTime, dateFormatter, currencyFormatter } from '../../utilities/utility';
 import ImageZoom from 'react-medium-image-zoom';
 //import Popover from 'react-simple-popover';
 import Popover, {ArrowContainer} from 'react-tiny-popover'
@@ -227,7 +227,14 @@ class Pledgebook extends Component {
                     width: '8%',
                     isFilterable: false,
                     filterCallback: this.filterCallbacks.onAmountChange,
-                    className: 'pb-amount-col'
+                    className: 'pb-amount-col',
+                    formatter: (column, columnIndex, row, rowIndex) => {
+                        return (
+                            <span className='amount-cell'>
+                                {currencyFormatter(row[column.id])}
+                            </span>
+                        )
+                    }
                 }, {
                     id: 'Name',
                     displayText: 'Customer Name',

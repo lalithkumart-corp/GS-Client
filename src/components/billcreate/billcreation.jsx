@@ -181,10 +181,12 @@ class BillCreation extends Component {
     /* START: Lifecycle methods */
     componentDidMount() {
         this.fetchMetaData(); //TODO: Refactor it to store in cache and not make api call eact time
-        if(!this.props.loadedInPledgebook) {            
+        
+        if(!this.props.loadedInPledgebook) { // Check: Is BillCreation Page
             this.props.getBillNoFromDB();
             this.props.disableReadOnlyMode();
             this.updateDomList('enableSubmitBtn');
+            this.updateDomList('disableMoreDetailsInputElmns');
             this.domElmns["amount"].focus();
         } else {
             this.updateFieldValuesInState(this.props.billData);
@@ -201,6 +203,10 @@ class BillCreation extends Component {
             newState = updateBillNumber(nextProps, newState);
         }
         if(nextProps.billCreation.clearEntries) {
+            
+            if(this.isNewCustomerInserted()) //IF NEW CUSTOMER BILL INSERTED, THE REFRESH THE AUTOSUGGESTION LIST
+                this.fetchMetaData();
+            
             this.updateDomList('resetOrnTableRows', newState);
             newState = resetState(nextProps, newState);
             this.injectDefaults(newState);
@@ -567,6 +573,12 @@ class BillCreation extends Component {
         totalList = totalList.filter((c, index) => {
             if(!finalList.includes(c))
                 finalList.push(c);
+        });
+
+        finalList = finalList.sort(function(a, b){
+            // ASC  -> a.length - b.length
+            // DESC -> b.length - a.length
+            return a.length - b.length;
         });
         
         return finalList.slice(0, 10);
@@ -1122,6 +1134,13 @@ class BillCreation extends Component {
                 this.props.insertNewBill(requestParams);
             }
         }
+    }
+
+    isNewCustomerInserted() {
+        let newCustomer = false;
+        if(this.state.selectedCustomer && Object.keys(this.state.selectedCustomer).length == 0)
+            newCustomer = true;
+        return newCustomer;
     }
 
     isAutoPrintEnabled() {

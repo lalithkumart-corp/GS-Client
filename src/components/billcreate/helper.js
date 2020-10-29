@@ -222,8 +222,10 @@ export const getPincodeList = (records) => {
 export const getMobileList = (records) => {
     let list = [];
     _.each(records, (aRecord, index) => {
-        if(list.indexOf(aRecord.mobile) == -1 && aRecord.mobile)
+        if(list.indexOf(aRecord.mobile) == -1 && aRecord.mobile && aRecord.mobile !== "null")
             list.push(aRecord.mobile);
+        if(list.indexOf(aRecord.secMobile) == -1 && aRecord.secMobile && aRecord.secMobile !== "null")
+            list.push(""+aRecord.secMobile); //CONVERT TO STRING AND SAVE
     });
     return list;
 }
