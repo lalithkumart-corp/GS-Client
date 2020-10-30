@@ -834,7 +834,8 @@ class BillCreation extends Component {
             }
         } catch(e) {
             //TODO: Remove this alert after completing development
-            alert("Exception occured in transferring focus...check console immediately");
+            alert(`ERROR Occured (${currentElmKey} - ${nextElm.key}) . Let me refresh.`);
+            window.location.reload(false);
             console.log(e);
             console.log(currentElmKey, nextElm.key, direction);
         }
