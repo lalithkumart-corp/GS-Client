@@ -131,14 +131,14 @@
     margin-bottom: 10px;
 }
 .add-more-header .show-more {
-    color: #4db8e3;
+    color: #219af5;
     cursor: pointer;
     border: none;
     width: 75px;
 }
 .add-more-header .show-more:hover,
 .add-more-header .show-more:focus {
-    color: #216ba5;
+    color: #fba200;
 }
 .horizontal-dashed-line:after{
     content:"";

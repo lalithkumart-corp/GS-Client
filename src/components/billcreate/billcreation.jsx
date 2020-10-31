@@ -1833,7 +1833,8 @@ class BillCreation extends Component {
                                         onChange: (e, {newValue, method}) => this.reactAutosuggestControls.onChange(e, {newValue, method}, 'cname'),
                                         onKeyUp: (e) => this.reactAutosuggestControls.onKeyUp(e, {currElmKey: 'cname'}),
                                         className: ((this.state.selectedCustomer && this.state.selectedCustomer.name)?'existing-customer':'new-customer') + " react-autosuggest__input cust-name",
-                                        readOnly: this.props.billCreation.loading
+                                        readOnly: this.props.billCreation.loading,
+                                        autocomplete:"no"
                                     }}
                                     ref = {(domElm) => { this.domElmns.cname = domElm?domElm.input:domElm; }}
                                 />
@@ -1865,7 +1866,8 @@ class BillCreation extends Component {
                                         onChange: (e, {newValue, method}) => this.reactAutosuggestControls.onChange(e, {newValue, method}, 'gaurdianName'),
                                         onKeyUp: (e) => this.reactAutosuggestControls.onKeyUp(e, {currElmKey: 'gaurdianName', isGuardianNameInput: true}),
                                         className: "react-autosuggest__input guardian-name",
-                                        readOnly: this.props.billCreation.loading
+                                        readOnly: this.props.billCreation.loading,
+                                        autocomplete:"no"
                                     }}
                                     ref = {(domElm) => { this.domElmns.gaurdianName = domElm?domElm.input:domElm; }}
                                 />
@@ -1899,7 +1901,8 @@ class BillCreation extends Component {
                                         onChange: (e, {newValue, method}) => this.reactAutosuggestControls.onChange(e, {newValue, method}, 'address'),
                                         onKeyUp: (e) => this.reactAutosuggestControls.onKeyUp(e, {currElmKey: 'address'}),
                                         className: "react-autosuggest__input address",
-                                        readOnly: this.props.billCreation.loading
+                                        readOnly: this.props.billCreation.loading,
+                                        autocomplete:"no"
                                     }}
                                     ref = {(domElm) => { this.domElmns.address = domElm?domElm.input:domElm; }}
                                 />
@@ -1933,7 +1936,8 @@ class BillCreation extends Component {
                                         onChange: (e, {newValue, method}) => this.reactAutosuggestControls.onChange(e, {newValue, method}, 'place'),
                                         onKeyUp: (e) => this.reactAutosuggestControls.onKeyUp(e, {currElmKey: 'place'}),
                                         className: "react-autosuggest__input place",
-                                        readOnly: this.props.billCreation.loading
+                                        readOnly: this.props.billCreation.loading,
+                                        autocomplete:"no"
                                     }}
                                     ref = {(domElm) => { this.domElmns.place = domElm?domElm.input:domElm; }}
                                 />
@@ -1965,7 +1969,8 @@ class BillCreation extends Component {
                                         onChange: (e, {newValue, method}) => this.reactAutosuggestControls.onChange(e, {newValue, method}, 'city'),
                                         onKeyUp: (e) => this.reactAutosuggestControls.onKeyUp(e, {currElmKey: 'city'}),
                                         className: "react-autosuggest__input city",
-                                        readOnly: this.props.billCreation.loading
+                                        readOnly: this.props.billCreation.loading,
+                                        autocomplete:"no"
                                     }}
                                     ref = {(domElm) => { this.domElmns.city = domElm?domElm.input:domElm; }}
                                 />
@@ -1999,7 +2004,8 @@ class BillCreation extends Component {
                                         onChange: (e, {newValue, method}) => this.reactAutosuggestControls.onChange(e, {newValue, method}, 'pincode'),
                                         onKeyUp: (e) => this.reactAutosuggestControls.onKeyUp(e, {currElmKey: 'pincode'}),
                                         className: "react-autosuggest__input pincode",
-                                        readOnly: this.props.billCreation.loading
+                                        readOnly: this.props.billCreation.loading,
+                                        autocomplete:"no"
                                     }}
                                     ref = {(domElm) => { this.domElmns.pincode = domElm?domElm.input:domElm; }}
                                 />
@@ -2134,7 +2140,7 @@ class BillCreation extends Component {
                                     />
                                     <input 
                                         type="button"
-                                        className='gs-button'
+                                        className='gs-button bordered'
                                         ref={(domElm) => {this.domElmns.submitBtn = domElm}}
                                         // onKeyUp= { (e) => this.handleKeyUp(e, {currElmKey:'submitBtn', isSubmitBtn: true})}
                                         onClick={(e) => this.handleSubmit()}
@@ -2146,7 +2152,7 @@ class BillCreation extends Component {
                                 this.props.loadedInPledgebook &&
                                 <input 
                                     type="button"
-                                    className='gs-button'
+                                    className='gs-button bordered'
                                     ref={(domElm) => {this.domElmns.updateBtn = domElm}}
                                     onClick={(e) => this.handleUpdate()}
                                     disabled={this.props.billCreation.loading}

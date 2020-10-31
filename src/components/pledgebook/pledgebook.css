@@ -144,8 +144,12 @@
     color: #337ab7; 
     /* colod: #2196f3; */
     vertical-align: text-bottom;
-
 }
+.status-popover-trigger-btn:focus,
+.status-popover-trigger-btn:hover {
+    color: #fba200;
+}
+
 .status-popover-content {
     background: white;
     padding: 15px;
@@ -160,9 +164,14 @@
     margin-left: 10px;
 }
 
+.pledgebook-page-content .second-row .action-btn,
+.pledgebook-page-content .second-row .action-btn {
+    color: #337ab7;
+}
 .pledgebook-page-content .second-row .action-btn:hover,
 .pledgebook-page-content .second-row .action-btn:focus {
-    color: #337ab7;
+    /* color: #337ab7; */
+    color: #fba200;
 }
 
 .pledgebook-page-content .second-row .row-count,

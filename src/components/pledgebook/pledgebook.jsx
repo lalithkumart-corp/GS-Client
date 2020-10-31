@@ -174,7 +174,7 @@ class Pledgebook extends Component {
                                                     <Col xs={{span: 12}} md={{span: 12}} style={{textAlign: "center", marginBottom: 20}}>
                                                         <input 
                                                             type="button"
-                                                            className='gs-button'
+                                                            className='gs-button bordered'
                                                             onClick={(e) => this.onStatusPopoverSubmit()}
                                                             value='Apply Filters'
                                                         />
@@ -775,7 +775,7 @@ class Pledgebook extends Component {
             <Container className="pledgebook-page-content">
                 <Row className='first-row'>
                     <Col xs={6}>
-                        <p style={{fontSize: "20px"}}>Pledgebook</p>
+                        <p style={{fontSize: "20px", cursor: "pointer"}} onClick={(e) => this.initiateFetchPledgebookAPI()}>Pledgebook</p>
                     </Col>
                     <Col xs={6} className="text-align-right" style={{color: "grey"}}>
                         No of Bills: {this.state.totalCount}

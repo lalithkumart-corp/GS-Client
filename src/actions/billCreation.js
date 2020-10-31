@@ -21,7 +21,7 @@ export const insertNewBill = (requestParams) => {
                             data: {msg: resp.data.ERROR}
                         });
                     } else {
-                        toast.success('New bill added successfully'); //TODO: Hide this msg automatically after some timeout
+                        toast.success('New bill added successfully', {autoClose: 1000}); //TODO: Hide this msg automatically after some timeout
                         dispatch({
                             type: 'NEW_BILL_INSERTED_SUCCESSFULLY'
                         });
