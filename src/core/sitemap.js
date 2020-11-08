@@ -55,3 +55,5 @@ export const FETCH_ROLES_LIST = `${config.proxy_protocol}://${config.proxy_api_h
 
 export const FETCH_ORN_LIST_JEWELLERY = `${config.proxy_protocol}://${config.proxy_api_host}:${config.proxy_api_port}/${config.restApiRoot}/JewellryOrnaments/fetch-orn-list`;
 export const FETCH_STOCK_LIST = `${config.proxy_protocol}://${config.proxy_api_host}:${config.proxy_api_port}/${config.restApiRoot}/Stocks/fetch-list`;
+export const INSERT_NEW_STOCK_ITEM = `${config.proxy_protocol}://${config.proxy_api_host}:${config.proxy_api_port}/${config.restApiRoot}/Stocks/insert`;
+export const FETCH_TOUCH_LIST = `${config.proxy_protocol}://${config.proxy_api_host}:${config.proxy_api_port}/${config.restApiRoot}/Touches/list`;

@@ -244,6 +244,7 @@
     padding: 6px 12px 6px 0;
     outline: none;
     box-shadow: none;
+    border-radius: 0;
 }
 
 .react-autosuggest__input.orn.gs-input-cell + .react-autosuggest__suggestions-container {

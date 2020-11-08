@@ -7,10 +7,19 @@ import moment from 'moment';
 import { getDateInUTC } from '../../../utilities/utility';
 import _ from 'lodash';
 import { DoublyLinkedList } from '../../../utilities/doublyLinkedList';
+import axios from '../../../core/axios';
+import { getAccessToken } from '../../../core/storage';
+import { FETCH_ORN_LIST_JEWELLERY, INSERT_NEW_STOCK_ITEM, FETCH_TOUCH_LIST } from '../../../core/sitemap';
+import * as ReactAutosuggest from 'react-autosuggest';
+import axiosMiddleware from '../../../core/axios';
+import { constructItemObj, resetFormData } from './helper';
+import { toast } from 'react-toastify';
+
 
 const ENTER_KEY = 13;
 const SPACE_KEY = 32;
 
+const METAL_CATEG = 'metal';
 const METAL_PRICE = 'metalPrice';
 const METAL_PRICE_GM = 'metalPricePerGm';
 const DLR_STORE_NAME = 'dealerStoreName';
@@ -30,19 +39,24 @@ const PROD_ITOUCH = 'productITouch';
 const PROD_LAB_CHARGES = 'productLabourCharges';
 const PROD_LAB_CALC_UNIT = 'productLabourCalcUnit';
 const PROD_CGST_PERCENT = 'productCgstPercent';
+const PROD_CGST_AMT = 'productCgstAmt';
+const PROD_SGST_AMT = 'productSgstAmt';
+const PROD_IGST_AMT = 'productIgstAmt';
 const PROD_SGST_PERCENT = 'productSgstPercent';
 const PROD_IGST_PERCENT = 'productIgstPercent';
 const ADD_ENTRY = 'addEntry';
+const CONFIRM_ADD = 'confirmAdd';
 
 var domList = new DoublyLinkedList();
+domList.add(METAL_CATEG, {type: 'formControl', enabled: true});
 domList.add(METAL_PRICE, {type: 'formControl', enabled: true});
 domList.add(DLR_STORE_NAME, {type: 'formControl', enabled: true});
 domList.add(DLR_PERSON_NAME, {type: 'formControl', enabled: true});
-domList.add(PROD_CODE, {type: 'formControl', enabled: true});
-domList.add(PROD_NAME, {type: 'formControl', enabled: true});
-domList.add(PROD_CATEG, {type: 'formControl', enabled: true});
-domList.add(PROD_SUB_CATEG, {type: 'formControl', enabled: true});
-domList.add(PROD_DIM, {type: 'formControl', enabled: true});
+// domList.add(PROD_CODE, {type: 'formControl', enabled: true});
+domList.add(PROD_NAME, {type: 'rautosuggest', enabled: true});
+domList.add(PROD_CATEG, {type: 'rautosuggest', enabled: true});
+domList.add(PROD_SUB_CATEG, {type: 'rautosuggest', enabled: true});
+domList.add(PROD_DIM, {type: 'rautosuggest', enabled: true});
 domList.add(PROD_QTY, {type: 'formControl', enabled: true});
 domList.add(PROD_GWT, {type: 'formControl', enabled: true});
 domList.add(PROD_NWT, {type: 'formControl', enabled: true});
@@ -54,7 +68,7 @@ domList.add(PROD_CGST_PERCENT, {type: 'formControl', enabled: true});
 domList.add(PROD_SGST_PERCENT, {type: 'formControl', enabled: true});
 domList.add(PROD_IGST_PERCENT, {type: 'formControl', enabled: true});
 domList.add(ADD_ENTRY, {type: 'defaultInput', enabled: true});
-
+domList.add(CONFIRM_ADD, {type: 'defaultInput', enabled: true});
 
 export default class AddStock extends Component {
     constructor(props) {
@@ -97,7 +111,20 @@ export default class AddStock extends Component {
                 calcAmtWithTax: '',
                 productTotalAmt: null,
                 listItems: []
-            }
+            },
+            autoSuggestions: {
+                itemNameList: [],
+                filteredItemNameList: [],
+                itemCategoryList: [],
+                filteredItemCategoryList: [],
+                itemSubCategoryList: [],
+                filteredItemSubCategoryList: [],
+                itemDimentionList: [],
+                filteredItemDimentionList: [],
+            },
+            itemCategoryAutoSugs: [],
+            filteredItemCategoryAutoSugs: [],
+            itemSubCategoryAutoSugs: [],
         }
         this.domElmns = {};
         this.bindMethods();
@@ -109,6 +136,8 @@ export default class AddStock extends Component {
 
     componentDidMount() {
         this.domElmns[METAL_PRICE].focus();
+        this.fetchOrnAutoSuggestionList();
+        this.fetchTouchList();
     }
 
     inputControls = {
@@ -119,117 +148,143 @@ export default class AddStock extends Component {
                     newState.formData[identifier].inputVal = moment(val).format('DD-MM-YYYY');
                     newState.formData[identifier]._inputVal = getDateInUTC(val);
                     break;
-                case 'dealerStoreName':
-                case 'dealerPersonName':
-                case 'productCode':
-                case 'productName':
-                case 'productCategory':
-                case 'productSubCategory':
-                case 'productDimension':
-                case 'productQty':
-                case 'productGWt':
-                case 'productNWt':
-                case 'productPureTouch':
-                case 'productITouch':
-                case 'productIWt':
-                case 'productPWt':
-                //case 'productWst':
-                case 'productLabourCharges':
-                //case 'productFlatAmt':
-                case 'productCgstPercent':
-                case 'productCgstAmt':
-                case 'productSgstPercent':
-                case 'productSgstAmt':
-                case 'productIgstPercent':
-                case 'productIgstAmt':
-                //case 'productTotalAmt':
+                case DLR_STORE_NAME:
+                case DLR_PERSON_NAME:
+                case PROD_CATEG:
+                case PROD_SUB_CATEG:
+                case PROD_DIM:
+                case PROD_QTY:
+                case PROD_GWT:
+                case PROD_NWT:
+                case PROD_PTOUCH:
+                case PROD_ITOUCH:
+                case PROD_IWT:
+                case PROD_PWT:
+                case PROD_LAB_CHARGES:
+                case PROD_CGST_PERCENT:
+                case PROD_CGST_AMT:
+                case PROD_SGST_PERCENT:
+                case PROD_SGST_AMT:
+                case PROD_IGST_PERCENT:
+                case PROD_IGST_AMT:
                     newState.formData[identifier] = val;
                     break;
-                case 'metalPrice':
+                case METAL_PRICE:
                     newState.formData[identifier] = val;
                     newState.formData.metalPricePerGm = val/10;
+                    break;
             }
             this.setState(newState);
         }
     }
 
-    onButtonClicks(e, identifier) {
+    reactAutosuggestControls = {
+        onChange: (event, { newValue, method }, identifier, options) => {
+            let newState = {...this.state};
+            switch(identifier) {
+                case PROD_NAME:
+                case PROD_CATEG:
+                case PROD_SUB_CATEG:
+                case PROD_DIM:
+                    newState.formData[identifier] = newValue;
+                    break;
+            }
+            this.setState(newState);
+        },
+        onKeyUp: (e, options) => {
+            e.persist();
+            if(e.keyCode == ENTER_KEY)
+                this.handleEnterKeyPress(e, options);
+            else if(e.keyCode == SPACE_KEY)
+                this.handleSpaceKeyPress(e, options);
+        },
+        onSuggestionsFetchRequested: ({value}, identifier) => {
+            let newState = {...this.state};
+            let suggestionsList = [];
+            switch(identifier) {
+                case PROD_NAME:
+                    var lowerCaseVal = value.toLowerCase();
+                    suggestionsList = this.state.autoSuggestions.itemNameList.filter(aSuggestion => aSuggestion.toLowerCase().slice(0, lowerCaseVal.length) === lowerCaseVal);
+                    suggestionsList = suggestionsList.filter((value, index, self) => {
+                        return self.indexOf(value) === index;
+                    });
+                    suggestionsList = suggestionsList.slice(0, 35);
+                    newState.autoSuggestions.filteredItemNameList = suggestionsList;
+                    break;
+                case PROD_CATEG:
+                    var lowerCaseVal = value.toLowerCase();
+                    suggestionsList = this.state.autoSuggestions.itemCategoryList.filter(aSuggestion => aSuggestion.toLowerCase().slice(0, lowerCaseVal.length) === lowerCaseVal);
+                    suggestionsList = suggestionsList.filter((value, index, self) => {
+                        return self.indexOf(value) === index;
+                    });
+                    suggestionsList = suggestionsList.slice(0, 35);
+                    newState.autoSuggestions.filteredItemCategoryList = suggestionsList;
+                    break;
+                case PROD_SUB_CATEG:
+                    var lowerCaseVal = value.toLowerCase();
+                    suggestionsList = this.state.autoSuggestions.itemSubCategoryList.filter(aSuggestion => aSuggestion.toLowerCase().slice(0, lowerCaseVal.length) === lowerCaseVal);
+                    suggestionsList = suggestionsList.filter((value, index, self) => {
+                        return self.indexOf(value) === index;
+                    });
+                    suggestionsList = suggestionsList.slice(0, 35);
+                    newState.autoSuggestions.filteredItemSubCategoryList = suggestionsList;
+                    break;
+                case PROD_DIM:
+                    var lowerCaseVal = value.toLowerCase();
+                    suggestionsList = this.state.autoSuggestions.itemDimentionList.filter(aSuggestion => aSuggestion.toLowerCase().slice(0, lowerCaseVal.length) === lowerCaseVal);
+                    suggestionsList = suggestionsList.filter((value, index, self) => {
+                        return self.indexOf(value) === index;
+                    });
+                    suggestionsList = suggestionsList.slice(0, 35);
+                    newState.autoSuggestions.filteredItemDimentionList = suggestionsList;
+                    break;
+            }
+            this.setState(newState);
+        },
+        onSuggestionSelected: (event, { suggestion, suggestionValue, suggestionIndex, sectionIndex, method }, identifier, options) => {
+            let newState = {...this.state};
+            switch(identifier) {
+                case PROD_NAME:
+                case PROD_CATEG:
+                case PROD_SUB_CATEG:
+                case PROD_DIM:
+                    newState.formData[identifier] = suggestionValue;
+                    break;
+            }
+            this.setState(newState);
+        }
+    }
+
+    async onButtonClicks(e, identifier) {
         let newState = {...this.state};
-        let fd = this.state.formData;
         switch(identifier) {
-            case 'addEntry':
-                let itemObj = {
-                    metal: fd.metal,
-                    metalPrice: fd.metalPrice,
-                    dealerStoreName: fd.dealerStoreName,
-                    dealerPersonName: fd.dealerPersonName,
-                    productCode: fd.productCode,
-                    productName: fd.productName,
-                    productCategory: fd.productCategory,
-                    productDimension: fd.productDimension,
-                    productQty: fd.productQty,
-                    productGWt: fd.productGWt,
-                    productNWt: fd.productNWt,
-                    productPWt: fd.productPWt,
-                    productPureTouch: fd.productPureTouch,
-                    productITouch: fd.productITouch,
-                    productIWt: fd.productIWt,
-                    //productWst: fd.productWst,
-                    productLabourCharges: fd.productLabourCharges,
-                    productLabourCalcUnit: fd.productLabourCalcUnit,
-                   // productFlatAmt: fd.productFlatAmt,
-                    productCgstPercent: fd.productCgstPercent,
-                    productCgstAmt: fd.productCgstAmt,
-                    productSgstPercent: fd.productSgstPercent,
-                    productSgstAmt: fd.productSgstAmt,
-                    productIgstPercent: fd.productIgstPercent,
-                    productIgstAmt: fd.productIgstAmt,
-                    productTotalAmt: fd.productTotalAmt,
-                };
-                newState.formData = {
-                    ...this.state.formData,
-                    productCode: "",
-                    productName: '',
-                    productCategory: '',
-                    productSubCategory: "",
-                    productDimension: '',
-                    productQty: "",
-                    productGWt: "",
-                    productNWt: "",
-                    productPWt: "",
-                    productPureTouch: '',
-                    productITouch: '',
-                    productIWt: '',
-                    calcAmtUptoIWt: "",
-                    productLabourCharges: '',
-                    productLabourCalcUnit: 'fixed',
-                    calcAmtWithLabour: "",
-                    productCgstPercent: "",
-                    productCgstAmt: "",
-                    productSgstPercent: "",
-                    productSgstAmt: "",
-                    productIgstPercent: "",
-                    productIgstAmt: "",
-                    productTotalAmt: "",
+            case ADD_ENTRY:
+                if(this.validateEntries()) {
+                    newState.formData.listItems.push(constructItemObj(this.state));
+                    this.setState(newState);
+                    this.transferFocus(e, identifier);
                 }
-                newState.formData.listItems.push(itemObj);
+                break;
+            case CONFIRM_ADD:
+                let flag = await this.insertNewStockItem(newState.formData.listItems[0]);
+                if(flag) {
+                    newState = resetFormData(newState);
+                    newState.formData.listItems = [];
+                    this.setState(newState);
+                }
                 break;
         }
-        this.setState(newState);
-        setTimeout(() => {
-            this.domElmns[PROD_CODE].focus();
-        }, 400);
     }
 
     onDropdownChange(e, identifier) {
         let selectedVal = e.target.value;
         let newState = {...this.state};
         switch(identifier) {
-            case 'metal':
-            case 'productPureTouch':
+            case METAL_CATEG:
+            case PROD_PTOUCH:
                 newState.formData[identifier] = selectedVal;
                 break;
-            case 'productLabourCalcUnit':
+            case PROD_LAB_CALC_UNIT:
                 newState.formData[identifier] = selectedVal;
                 break;
         }
@@ -248,11 +303,6 @@ export default class AddStock extends Component {
 
     handleEnterKeyPress(e, options) {
         let newState = {...this.state};
-        // switch(options.currElmKey) {
-        //     case ADD_ENTRY:
-        //         this.onButtonClicks(e, options.currElmKey);
-        //         break;
-        // }
         newState = this.setAutoFillups(newState);
         this.setState(newState);
         this.transferFocus(e, options.currElmKey);
@@ -260,6 +310,26 @@ export default class AddStock extends Component {
 
     handleSpaceKeyPress(e, options) {
 
+    }
+
+    validateEntries() {
+        let flag = true;
+        let msg = [];
+        if(!this.state.formData.metalPrice) {
+            msg.push('MetalPrice is Empty');
+            flag = false;
+        }
+        if(!this.state.formData.productName) {
+            msg.push('ProductName is Empty');
+            flag = false;
+        }
+        if(!this.state.formData.productQty) {
+            msg.push('ProductQty is Empty');
+            flag = false;
+        }
+        if(!flag)
+            toast.error(msg.join(', '));
+        return flag;
     }
 
     transferFocus(e, currentElmKey, direction='forward') {
@@ -284,7 +354,6 @@ export default class AddStock extends Component {
     }
 
     getNextElm(currElmKey) {
-        debugger;
         let currNode = domList.findNode(currElmKey);
         let nextNode = currNode.next;
         if(nextNode && !nextNode.enabled)
@@ -303,6 +372,8 @@ export default class AddStock extends Component {
     setAutoFillups(newState) {
         let fd = newState.formData;
         // pWt, iwt, calcAmtUptoIWt, calcAmtWithLabour, calcAmtWithTax, productTotalAmt
+        if(fd.productGWt)
+            fd.productNWt = fd.productGWt;
         if(fd.metalPrice && fd.metalPricePerGm && fd.productQty && fd.productNWt) {
             if(fd.productPureTouch)
                 fd.productPWt = ((fd.productNWt * fd.productPureTouch)/100).toFixed(3);
@@ -321,17 +392,74 @@ export default class AddStock extends Component {
             }
 
             if(fd.productCgstPercent && fd.calcAmtWithLabour)
-                fd.productCgstAmt = (fd.calcAmtWithLabour * fd.productCgstPercent)/100;
+                fd.productCgstAmt = parseFloat( ( (fd.calcAmtWithLabour * fd.productCgstPercent)/100 ).toFixed(2) );
             if(fd.productSgstPercent && fd.calcAmtWithLabour)
-                fd.productSgstAmt = (fd.calcAmtWithLabour * fd.productSgstPercent)/100;
+                fd.productSgstAmt = parseFloat( ( (fd.calcAmtWithLabour * fd.productSgstPercent)/100 ).toFixed(2) );
             if(fd.productIgstPercent && fd.calcAmtWithLabour)
-                fd.productIgstAmt = (fd.calcAmtWithLabour * fd.productIgstPercent)/100;
+                fd.productIgstAmt = parseFloat( ( (fd.calcAmtWithLabour * fd.productIgstPercent)/100 ).toFixed(2) );
             fd.productTotalAmt = fd.calcAmtWithLabour + (fd.productSgstAmt || 0) + (fd.productCgstAmt || 0) + (fd.productIgstAmt || 0);
 
             if(fd.productTotalAmt)
                 fd.productTotalAmt = fd.productTotalAmt.toFixed(3);
         }
         return newState;
+    }
+
+    async fetchOrnAutoSuggestionList() {
+        try {
+            let at = getAccessToken();
+            let resp = await axios.get(`${FETCH_ORN_LIST_JEWELLERY}?access_token=${at}`);
+            let list = resp.data.RESPONSE;
+            let itemNameList = [], itemCategoryList = [], itemSubCategoryList = [], itemDimentionList = [];
+            _.each(list, (anObj, index) => {
+                if(anObj.name)
+                    itemNameList.push(anObj.name);
+                if(anObj.category)
+                    itemCategoryList.push(anObj.category);
+                if(anObj.subCategory)
+                    itemSubCategoryList.push(anObj.subCategory);
+                if(anObj.dimension)
+                    itemDimentionList.push(anObj.dimension);
+            });
+            let newState = {...this.state};
+            newState.rawResp = {...newState.rawResp, ornListResp: list}; 
+            newState.autoSuggestions = newState.autoSuggestions || {};
+            newState.autoSuggestions.itemNameList = itemNameList;
+            newState.autoSuggestions.itemCategoryList = itemCategoryList;
+            newState.autoSuggestions.itemSubCategoryList = itemSubCategoryList;
+            newState.autoSuggestions.itemDimentionList = itemDimentionList;
+            this.setState(newState);
+        } catch(e) {
+            alert('Error in fetching the AutoSuggestion list of ItemCategory & SubCategory');
+        }
+    }
+
+    async fetchTouchList() {
+        try {
+            let at = getAccessToken();
+            let resp = await axios.get(`${FETCH_TOUCH_LIST}?access_token=${at}`);
+            let list = resp.data.RESPONSE;
+            let newState = {...this.state};
+            newState.autoSuggestions = newState.autoSuggestions || {};
+            newState.autoSuggestions.touchList = list;
+            newState.rawResp = {...newState.rawResp, touchListResp: list};
+            this.setState(newState);
+        } catch(e) {
+            alert('Error in fetching the touch list');
+            console.log(e);
+        }
+    }
+
+    async insertNewStockItem(requestParams) {
+        try {
+            let accessToken = getAccessToken();
+            await axiosMiddleware.post(INSERT_NEW_STOCK_ITEM, {accessToken, requestParams});
+            toast.success('Inserted new item in stock list!');
+            return true;
+        } catch(e) {
+            toast.error('Error occured while inserting new stock item');
+            return false;
+        }
     }
 
     getMetalListDom() {
@@ -344,12 +472,17 @@ export default class AddStock extends Component {
 
     getTouchDom() {
         let buffer = [];
-        buffer.push(<option key='option-100' value='99'>100</option>);
-        buffer.push(<option key='option-99' value='99'>99</option>);
-        buffer.push(<option key='option-91.6' value='91.6'>91.6</option>);
-        buffer.push(<option key='option-80' value='80'>80</option>);
-        buffer.push(<option key='option-77' value='77'>77</option>);
-        buffer.push(<option key='option-75' value='75'>75</option>);
+        if(this.state.formData.metal == 'G') {
+            _.each(this.state.autoSuggestions.touchList, (anObj, index) => {
+                if(anObj.metal == 'G')
+                    buffer.push(<option key={`option-${anObj.purity}`} value={anObj.purity}>{anObj.name}</option>);
+            });
+        } else if(this.state.formData.metal == 'S') {
+            _.each(this.state.autoSuggestions.touchList, (anObj, index) => {
+                if(anObj.metal == 'S')
+                    buffer.push(<option key={`option-${anObj.purity}`} value={anObj.purity}>{anObj.name}</option>);
+            });
+        }
         return buffer;
     }
 
@@ -358,7 +491,6 @@ export default class AddStock extends Component {
         _.each(this.state.formData.listItems, (anItem, obj) => {
             dom.push(
                 <tr>
-                    <td>{anItem.productCode}</td>
                     <td>{anItem.metal}/{anItem.metalPrice}</td>
                     <td>{anItem.productName} {anItem.productCategory}</td>
                     <td>{anItem.productQty}</td>
@@ -375,6 +507,13 @@ export default class AddStock extends Component {
             );
         });
         return dom;
+    }
+
+    renderSuggestion = (suggestion) => {
+        let theDom = <div className='react-auto-suggest-list-item'>
+                        <span>{suggestion}</span>
+                    </div>;
+        return theDom;
     }
 
     render() {
@@ -411,7 +550,7 @@ export default class AddStock extends Component {
                                     </td>
                                     <td>
                                         <Form.Group className="border-right-none">
-                                            <Form.Control as="select" onChange={(e) => this.onDropdownChange(e)} value={this.state.formData.metal, 'metal'}>
+                                            <Form.Control as="select" onChange={(e) => this.onDropdownChange(e, 'metal')} value={this.state.formData.metal}>
                                                 {this.getMetalListDom()}
                                             </Form.Control>
                                         </Form.Group>
@@ -498,7 +637,7 @@ export default class AddStock extends Component {
                                 <tr>
                                     <td className="product-name">
                                         <Row className="no-margin">
-                                            <Col xs={{span: 2}} className="no-padding">
+                                            {/* <Col xs={{span: 2}} className="no-padding">
                                                 <Form.Group>
                                                     <Form.Control
                                                         type="text"
@@ -510,9 +649,26 @@ export default class AddStock extends Component {
                                                         ref= {(domElm) => {this.domElmns[PROD_CODE] = domElm; }}
                                                     />
                                                 </Form.Group>
-                                            </Col>
-                                            <Col xs={{span: 5}} className="no-padding">
-                                                <Form.Group>
+                                            </Col> */}
+                                            <Col xs={{span: 6}} className="no-padding">
+                                                <ReactAutosuggest
+                                                    suggestions={this.state.autoSuggestions.filteredItemNameList}
+                                                    onSuggestionsFetchRequested={({value}) => this.reactAutosuggestControls.onSuggestionsFetchRequested({value}, PROD_NAME)}
+                                                    // onSuggestionsClearRequested={this.reactAutosuggestControls.onSuggestionsClearRequested}
+                                                    getSuggestionValue={(suggestion, e) => suggestion}
+                                                    renderSuggestion={(suggestion) => this.renderSuggestion(suggestion, PROD_NAME)}
+                                                    onSuggestionSelected={(event, { suggestion, suggestionValue, suggestionIndex, sectionIndex, method}) => this.reactAutosuggestControls.onSuggestionSelected(event, { suggestion, suggestionValue, suggestionIndex, sectionIndex, method }, PROD_NAME)}
+                                                    inputProps={{
+                                                        placeholder: 'Item',
+                                                        value: this.state.formData.productName,
+                                                        onChange: (e, {newValue, method}) => this.reactAutosuggestControls.onChange(e, {newValue, method}, PROD_NAME),
+                                                        onKeyUp: (e) => this.reactAutosuggestControls.onKeyUp(e, {currElmKey: PROD_NAME}),
+                                                        className: "react-autosuggest__input gs-input-cell"
+                                                    }}
+                                                    ref = {(domElm) => { this.domElmns[PROD_NAME] = domElm?domElm.input:domElm; }}
+                                                />
+
+                                                {/* <Form.Group>
                                                     <Form.Control
                                                         type="text"
                                                         placeholder="Item"
@@ -522,10 +678,26 @@ export default class AddStock extends Component {
                                                         value={this.state.formData.productName}
                                                         ref= {(domElm) => {this.domElmns[PROD_NAME] = domElm; }}
                                                     />
-                                                </Form.Group>
+                                                </Form.Group> */}
                                             </Col>
-                                            <Col xs={{span: 5}} className="no-padding">
-                                                <Form.Group>
+                                            <Col xs={{span: 6}} className="no-padding">
+                                                <ReactAutosuggest
+                                                    suggestions={this.state.autoSuggestions.filteredItemCategoryList}
+                                                    onSuggestionsFetchRequested={({value}) => this.reactAutosuggestControls.onSuggestionsFetchRequested({value}, PROD_CATEG)}
+                                                    // onSuggestionsClearRequested={this.reactAutosuggestControls.onSuggestionsClearRequested}
+                                                    getSuggestionValue={(suggestion, e) => suggestion}
+                                                    renderSuggestion={(suggestion) => this.renderSuggestion(suggestion, PROD_CATEG)}
+                                                    onSuggestionSelected={(event, { suggestion, suggestionValue, suggestionIndex, sectionIndex, method}) => this.reactAutosuggestControls.onSuggestionSelected(event, { suggestion, suggestionValue, suggestionIndex, sectionIndex, method }, PROD_CATEG)}
+                                                    inputProps={{
+                                                        placeholder: 'Category',
+                                                        value: this.state.formData.productCategory,
+                                                        onChange: (e, {newValue, method}) => this.reactAutosuggestControls.onChange(e, {newValue, method}, PROD_CATEG),
+                                                        onKeyUp: (e) => this.reactAutosuggestControls.onKeyUp(e, {currElmKey: PROD_CATEG}),
+                                                        className: "react-autosuggest__input gs-input-cell"
+                                                    }}
+                                                    ref = {(domElm) => { this.domElmns[PROD_CATEG] = domElm?domElm.input:domElm; }}
+                                                />
+                                                {/* <Form.Group>
                                                     <Form.Control
                                                         type="text"
                                                         placeholder="Category"
@@ -535,7 +707,7 @@ export default class AddStock extends Component {
                                                         onKeyUp={(e) => this.handleKeyUp(e, {currElmKey: PROD_CATEG})}
                                                         value={this.state.formData.productCategory}
                                                     />
-                                                </Form.Group>
+                                                </Form.Group> */}
                                             </Col>
                                         </Row>
                                     </td>
@@ -762,7 +934,23 @@ export default class AddStock extends Component {
                                     <td>
                                         <Row className="no-margin">
                                             <Col xs={{span:7}} className="no-padding">
-                                                <Form.Group>
+                                                <ReactAutosuggest
+                                                    suggestions={this.state.autoSuggestions.filteredItemSubCategoryList}
+                                                    onSuggestionsFetchRequested={({value}) => this.reactAutosuggestControls.onSuggestionsFetchRequested({value}, PROD_SUB_CATEG)}
+                                                    // onSuggestionsClearRequested={this.reactAutosuggestControls.onSuggestionsClearRequested}
+                                                    getSuggestionValue={(suggestion, e) => suggestion}
+                                                    renderSuggestion={(suggestion) => this.renderSuggestion(suggestion, PROD_SUB_CATEG)}
+                                                    onSuggestionSelected={(event, { suggestion, suggestionValue, suggestionIndex, sectionIndex, method}) => this.reactAutosuggestControls.onSuggestionSelected(event, { suggestion, suggestionValue, suggestionIndex, sectionIndex, method }, PROD_SUB_CATEG)}
+                                                    inputProps={{
+                                                        placeholder: 'Sub Category',
+                                                        value: this.state.formData.productSubCategory,
+                                                        onChange: (e, {newValue, method}) => this.reactAutosuggestControls.onChange(e, {newValue, method}, PROD_SUB_CATEG),
+                                                        onKeyUp: (e) => this.reactAutosuggestControls.onKeyUp(e, {currElmKey: PROD_SUB_CATEG}),
+                                                        className: "react-autosuggest__input gs-input-cell"
+                                                    }}
+                                                    ref = {(domElm) => { this.domElmns[PROD_SUB_CATEG] = domElm?domElm.input:domElm; }}
+                                                />
+                                                {/* <Form.Group>
                                                     <Form.Control
                                                         type="text"
                                                         placeholder="Sub-Categ"
@@ -772,10 +960,26 @@ export default class AddStock extends Component {
                                                         onKeyUp={(e) => this.handleKeyUp(e, {currElmKey: PROD_SUB_CATEG})}
                                                         ref= {(domElm) => {this.domElmns[PROD_SUB_CATEG] = domElm; }}
                                                     />
-                                                </Form.Group>
+                                                </Form.Group> */}
                                             </Col>
                                             <Col xs={{span:5}} className="no-padding">
-                                                <Form.Group>
+                                                <ReactAutosuggest
+                                                    suggestions={this.state.autoSuggestions.filteredItemDimentionList}
+                                                    onSuggestionsFetchRequested={({value}) => this.reactAutosuggestControls.onSuggestionsFetchRequested({value}, PROD_DIM)}
+                                                    // onSuggestionsClearRequested={this.reactAutosuggestControls.onSuggestionsClearRequested}
+                                                    getSuggestionValue={(suggestion, e) => suggestion}
+                                                    renderSuggestion={(suggestion) => this.renderSuggestion(suggestion, PROD_DIM)}
+                                                    onSuggestionSelected={(event, { suggestion, suggestionValue, suggestionIndex, sectionIndex, method}) => this.reactAutosuggestControls.onSuggestionSelected(event, { suggestion, suggestionValue, suggestionIndex, sectionIndex, method }, PROD_DIM)}
+                                                    inputProps={{
+                                                        placeholder: 'Size',
+                                                        value: this.state.formData.productDimension,
+                                                        onChange: (e, {newValue, method}) => this.reactAutosuggestControls.onChange(e, {newValue, method}, PROD_DIM),
+                                                        onKeyUp: (e) => this.reactAutosuggestControls.onKeyUp(e, {currElmKey: PROD_DIM}),
+                                                        className: "react-autosuggest__input gs-input-cell"
+                                                    }}
+                                                    ref = {(domElm) => { this.domElmns[PROD_DIM] = domElm?domElm.input:domElm; }}
+                                                />
+                                                {/* <Form.Group>
                                                     <Form.Control
                                                         type="text"
                                                         placeholder="Size/Length"
@@ -785,7 +989,7 @@ export default class AddStock extends Component {
                                                         value={this.state.formData.productDimension}
                                                         ref= {(domElm) => {this.domElmns[PROD_DIM] = domElm; }}
                                                     />
-                                                </Form.Group>
+                                                </Form.Group> */}
                                             </Col>
                                         </Row>
                                     </td>
@@ -834,7 +1038,7 @@ export default class AddStock extends Component {
                         <input 
                             type="button" 
                             className="gs-button" 
-                            value="Add Entry" 
+                            value="Add" 
                             // onKeyUp={(e) => this.handleKeyUp(e, {currElmKey: ADD_ENTRY})}
                             ref= {(domElm) => {this.domElmns[ADD_ENTRY] = domElm; }}
                             onClick={(e) => this.onButtonClicks(e, ADD_ENTRY)}
@@ -845,7 +1049,6 @@ export default class AddStock extends Component {
                     <Col>
                         <table>
                             <colgroup>
-                                <col style={{width: "10%"}}></col>
                                 <col style={{width: "10%"}}></col>
                                 <col style={{width: "10%"}}></col>
                                 <col style={{width: "3%"}}></col>
@@ -864,7 +1067,6 @@ export default class AddStock extends Component {
                             </colgroup>
                             <thead>
                                 <tr>
-                                    <th>Code</th>
                                     <th>Metal</th>
                                     <th>Item</th>
                                     <th>Qty</th>
@@ -889,7 +1091,13 @@ export default class AddStock extends Component {
                 </Row>
                 <Row className="action-container-2" style={{textAlign: "right"}}>
                     <Col>
-                        <input type="button" className="gs-button" value="Add to Stock" />
+                        <input 
+                            type="button" 
+                            className="gs-button" 
+                            value="Confirm Add" 
+                            ref= {(domElm) => {this.domElmns[CONFIRM_ADD] = domElm; }}
+                            onClick={(e) => this.onButtonClicks(e, CONFIRM_ADD)}
+                        />
                     </Col>
                 </Row>
             </Container>

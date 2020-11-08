@@ -107,3 +107,25 @@
 .add-stock-container .preview-container {
     margin-top: 50px;
 }
+
+.add-stock-container .react-autosuggest__suggestions-container {
+    top: 33px;
+}
+
+/* .add-stock-container input {
+    border: none;
+    width: calc(100% - 15px);
+    padding: 6px 12px 6px 0;
+    outline: none;
+    box-shadow: none;
+    border-radius: 0;
+}
+
+.add-stock-container .react-autosuggest__input {
+    border: none;
+    width: calc(100% - 15px);
+    padding: 6px 12px 6px 0;
+    outline: none;
+    box-shadow: none;
+    border-radius: 0;
+} */
