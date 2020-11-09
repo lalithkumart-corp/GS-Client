@@ -93,7 +93,7 @@ export default class AddStock extends Component {
                 productGWt: null,
                 productNWt: null,
                 productPWt: null,
-                productPureTouch: '',
+                productPureTouch: '91.6',
                 productITouch: '',
                 productIWt: '',
                 calcAmtUptoIWt: '',
@@ -559,7 +559,7 @@ export default class AddStock extends Component {
                                         <Form.Group className="border-right-none">
                                             <Form.Control
                                                 type="text"
-                                                placeholder="MetalPrice"
+                                                placeholder="Enter MetalPrice"
                                                 onChange={(e) => this.inputControls.onChange(null, e.target.value, METAL_PRICE)} 
                                                 onKeyUp = {(e) => this.handleKeyUp(e, {currElmKey: METAL_PRICE}) }
                                                 value={this.state.formData.metalPrice}
@@ -571,7 +571,7 @@ export default class AddStock extends Component {
                                         <Form.Group className="border-right-none">
                                             <Form.Control
                                                 type="text"
-                                                placeholder="Dealer StoreName"
+                                                placeholder="Enter Wholesale StoreName"
                                                 onChange={(e) => this.inputControls.onChange(null, e.target.value, DLR_STORE_NAME)} 
                                                 value={this.state.formData.dealerStoreName}
                                                 onKeyUp = {(e) => this.handleKeyUp(e, {currElmKey: DLR_STORE_NAME}) }
@@ -583,7 +583,7 @@ export default class AddStock extends Component {
                                         <Form.Group>
                                             <Form.Control
                                                 type="text"
-                                                placeholder="Dealer Person"
+                                                placeholder="Enter Person Name"
                                                 onChange={(e) => this.inputControls.onChange(null, e.target.value, DLR_PERSON_NAME)} 
                                                 value={this.state.formData.dealerPersonName}
                                                 onKeyUp = {(e) => this.handleKeyUp(e, {currElmKey: DLR_PERSON_NAME}) }
@@ -659,7 +659,7 @@ export default class AddStock extends Component {
                                                     renderSuggestion={(suggestion) => this.renderSuggestion(suggestion, PROD_NAME)}
                                                     onSuggestionSelected={(event, { suggestion, suggestionValue, suggestionIndex, sectionIndex, method}) => this.reactAutosuggestControls.onSuggestionSelected(event, { suggestion, suggestionValue, suggestionIndex, sectionIndex, method }, PROD_NAME)}
                                                     inputProps={{
-                                                        placeholder: 'Item',
+                                                        placeholder: 'Enter Name',
                                                         value: this.state.formData.productName,
                                                         onChange: (e, {newValue, method}) => this.reactAutosuggestControls.onChange(e, {newValue, method}, PROD_NAME),
                                                         onKeyUp: (e) => this.reactAutosuggestControls.onKeyUp(e, {currElmKey: PROD_NAME}),
@@ -689,7 +689,7 @@ export default class AddStock extends Component {
                                                     renderSuggestion={(suggestion) => this.renderSuggestion(suggestion, PROD_CATEG)}
                                                     onSuggestionSelected={(event, { suggestion, suggestionValue, suggestionIndex, sectionIndex, method}) => this.reactAutosuggestControls.onSuggestionSelected(event, { suggestion, suggestionValue, suggestionIndex, sectionIndex, method }, PROD_CATEG)}
                                                     inputProps={{
-                                                        placeholder: 'Category',
+                                                        placeholder: 'Enter Category 1',
                                                         value: this.state.formData.productCategory,
                                                         onChange: (e, {newValue, method}) => this.reactAutosuggestControls.onChange(e, {newValue, method}, PROD_CATEG),
                                                         onKeyUp: (e) => this.reactAutosuggestControls.onKeyUp(e, {currElmKey: PROD_CATEG}),
@@ -770,7 +770,7 @@ export default class AddStock extends Component {
                                         <Form.Group>
                                             <Form.Control
                                                 type="text"
-                                                placeholder="PureWt"
+                                                placeholder=""
                                                 className="border-right-none"
                                                 //onChange={(e) => this.inputControls.onChange(null, e.target.value, 'productPWt')} 
                                                 value={this.state.formData.productPWt}
@@ -788,7 +788,7 @@ export default class AddStock extends Component {
                                             </Form.Control> */}
                                             <Form.Control
                                                 type="text"
-                                                placeholder="I-Touch"
+                                                placeholder=""
                                                 className="border-right-none"
                                                 onChange={(e) => this.inputControls.onChange(null, e.target.value, PROD_ITOUCH)} 
                                                 onKeyUp={(e) => this.handleKeyUp(e, {currElmKey: PROD_ITOUCH})}
@@ -801,7 +801,7 @@ export default class AddStock extends Component {
                                         <Form.Group>
                                             <Form.Control
                                                 type="text"
-                                                placeholder="I-wt"
+                                                placeholder=""
                                                 className="border-right-none"
                                                 //onChange={(e) => this.inputControls.onChange(null, e.target.value, 'productIWt')} 
                                                 value={this.state.formData.productIWt}
@@ -813,7 +813,7 @@ export default class AddStock extends Component {
                                         <Form.Group>
                                             <Form.Control
                                                 type="text"
-                                                placeholder="Labour"
+                                                placeholder=""
                                                 className="border-right-none product-labour-charges"
                                                 onChange={(e) => this.inputControls.onChange(null, e.target.value, PROD_LAB_CHARGES)}
                                                 onKeyUp={(e) => this.handleKeyUp(e, {currElmKey: PROD_LAB_CHARGES})} 
@@ -942,7 +942,7 @@ export default class AddStock extends Component {
                                                     renderSuggestion={(suggestion) => this.renderSuggestion(suggestion, PROD_SUB_CATEG)}
                                                     onSuggestionSelected={(event, { suggestion, suggestionValue, suggestionIndex, sectionIndex, method}) => this.reactAutosuggestControls.onSuggestionSelected(event, { suggestion, suggestionValue, suggestionIndex, sectionIndex, method }, PROD_SUB_CATEG)}
                                                     inputProps={{
-                                                        placeholder: 'Sub Category',
+                                                        placeholder: 'Enter Category 2',
                                                         value: this.state.formData.productSubCategory,
                                                         onChange: (e, {newValue, method}) => this.reactAutosuggestControls.onChange(e, {newValue, method}, PROD_SUB_CATEG),
                                                         onKeyUp: (e) => this.reactAutosuggestControls.onKeyUp(e, {currElmKey: PROD_SUB_CATEG}),
@@ -971,7 +971,7 @@ export default class AddStock extends Component {
                                                     renderSuggestion={(suggestion) => this.renderSuggestion(suggestion, PROD_DIM)}
                                                     onSuggestionSelected={(event, { suggestion, suggestionValue, suggestionIndex, sectionIndex, method}) => this.reactAutosuggestControls.onSuggestionSelected(event, { suggestion, suggestionValue, suggestionIndex, sectionIndex, method }, PROD_DIM)}
                                                     inputProps={{
-                                                        placeholder: 'Size',
+                                                        placeholder: 'Enter Size',
                                                         value: this.state.formData.productDimension,
                                                         onChange: (e, {newValue, method}) => this.reactAutosuggestControls.onChange(e, {newValue, method}, PROD_DIM),
                                                         onKeyUp: (e) => this.reactAutosuggestControls.onKeyUp(e, {currElmKey: PROD_DIM}),

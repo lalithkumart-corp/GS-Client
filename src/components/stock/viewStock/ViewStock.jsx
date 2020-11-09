@@ -15,64 +15,125 @@ export default class ViewStock extends Component {
             stockList: [],
             columns: [
                 {
-                    id: 'suplierName',
-                    displayText: 'Supplier',
-                    isFilterable: true,
-                    filterCallback: this.filterCallbacks.supplier,
-                    className: 'stock-supplier-col',
-                    formatter: (column, columnIndex, row, rowIndex) => {
-                        return (
-                            <span className='product-supplier-cell'>
-                                <b>{row[column.id]}</b> 
-                            </span>
-                        )
-                    },
-                    width: '10%'
-                },
-                {
-                    id: 'metal',
-                    displayText: 'Metal',
-                    isFilterable: true,
-                    filterCallback: this.filterCallbacks.metal,
-                    className: 'stock-metal-col',
-                    formatter: (column, columnIndex, row, rowIndex) => {
-                        return (
-                            <span className='product-metal-cell'>
-                                <b>{row[column.id]}</b>
-                            </span>
-                        )
-                    },
-                    width: '5%'
-                },
-                {
-                    id: 'productCode',
+                    id: 'itemCode',
                     displayText: 'Code',
                     isFilterable: true,
-                    filterCallback: this.filterCallbacks.productCode,
+                    filterCallback: this.filterCallbacks.itemCode,
                     className: 'stock-product-code-col',
                     formatter: (column, columnIndex, row, rowIndex) => {
                         return (
                             <span className='product-code-cell'>
-                                <b>{row[column.id]}</b>
+                                {row[column.id]}
                             </span>
                         )
                     },
                     width: '5%'
                 },
                 {
-                    id: 'name',
-                    displayText: 'Name',
+                    id: 'itemName',
+                    displayText: 'Item',
                     isFilterable: true,
-                    filterCallback: this.filterCallbacks.name,
+                    filterCallback: this.filterCallbacks.itemName,
                     className: 'stock-product-name-col',
                     formatter: (column, columnIndex, row, rowIndex) => {
                         return (
                             <span className='product-name-cell'>
-                                <b>{row[column.id]}</b>
+                                {row[column.id]}
                             </span>
                         )
                     },
-                    width: '15%'
+                    width: '10%',
+                    tdClassNameGetter: (column, columnIndex, row, rowIndex) => {
+                        let clsName = 'gold-item';
+                        if(row['metal'] == 'S')
+                            clsName = 'silver-item';
+                        return clsName;
+                    }
+                },
+                {
+                    id: 'itemCategory',
+                    displayText: 'Categ',
+                    isFilterable: true,
+                    filterCallback: this.filterCallbacks.itemCategory,
+                    className: 'stock-item-category-col',
+                    formatter: (column, columnIndex, row, rowIndex) => {
+                        return (
+                            <span className='product-name-cell'>
+                                {row[column.id]}
+                            </span>
+                        )
+                    },
+                    width: '7%'
+                },
+                {
+                    id: 'itemSubCategory',
+                    displayText: 'SubCateg',
+                    isFilterable: true,
+                    filterCallback: this.filterCallbacks.itemSubCategory,
+                    className: 'stock-item-subcategory-col',
+                    formatter: (column, columnIndex, row, rowIndex) => {
+                        return (
+                            <span className='product-name-cell'>
+                                {row[column.id]}
+                            </span>
+                        )
+                    },
+                    width: '7%'
+                },
+                {
+                    id: 'dimension',
+                    displayText: 'Size',
+                    isFilterable: true,
+                    filterCallback: this.filterCallbacks.dimension,
+                    className: 'stock-item-dimension-col',
+                    formatter: (column, columnIndex, row, rowIndex) => {
+                        return (
+                            <span className='product-name-cell'>
+                                {row[column.id]}
+                            </span>
+                        )
+                    },
+                    width: '7%'
+                },
+                {
+                    id: 'qty',
+                    displayText: 'Qty',
+                    // filterCallback: this.filterCallbacks.qty,
+                    className: 'stock-product-qty-col',
+                    formatter: (column, columnIndex, row, rowIndex) => {
+                        return (
+                            <span className='product-qty-cell'>
+                                {row[column.id]}
+                            </span>
+                        )
+                    },
+                    width: '3%'
+                },
+                {
+                    id: 'grossWt',
+                    displayText: 'G.Wt',
+                    className: 'stock-product-gross-wt-col',
+                    formatter: (column, columnIndex, row, rowIndex) => {
+                        return (
+                            <span className='product-gross-wt-cell'>
+                                {row[column.id]}
+                            </span>
+                        )
+                    },
+                    width: '5%'
+                },
+                {
+                    id: 'netWt',
+                    displayText: 'N.Wt',
+                    className: 'stock-product-net-wt-col',
+                    formatter: (column, columnIndex, row, rowIndex) => {
+                        return (
+                            <span className='product-net-wt-cell'>
+                                {row[column.id]}
+                            </span>
+                        )
+                    },
+                    width: '5%'
                 },
                 {
                     id: 'touch',
@@ -83,113 +144,65 @@ export default class ViewStock extends Component {
                     formatter: (column, columnIndex, row, rowIndex) => {
                         return (
                             <span className='product-touch-cell'>
-                                <b>{row[column.id]}</b>
+                                {row[column.id]}
                             </span>
                         )
                     },
                     width: '5%'
                 },
                 {
-                    id: 'grossWt',
-                    displayText: 'Gross Wt',
-                    className: 'stock-product-gross-wt-col',
+                    id: 'total',
+                    displayText: 'Total',
+                    className: 'stock-total-col',
                     formatter: (column, columnIndex, row, rowIndex) => {
                         return (
-                            <span className='product-gross-wt-cell'>
-                                <b>{row[column.id]}</b>
+                            <span className='product-total-cell'>
+                                {row[column.id]}
                             </span>
                         )
                     },
-                    width: '5%'
-                },
-                {
-                    id: 'netWt',
-                    displayText: 'Net Wt',
-                    className: 'stock-product-net-wt-col',
-                    formatter: (column, columnIndex, row, rowIndex) => {
-                        return (
-                            <span className='product-net-wt-cell'>
-                                <b>{row[column.id]}</b>
-                            </span>
-                        )
-                    },
-                    width: '5%'
-                },
-                {
-                    id: 'pureWt',
-                    displayText: 'Pure Wt',
-                    className: 'stock-product-fine-wt-col',
-                    formatter: (column, columnIndex, row, rowIndex) => {
-                        return (
-                            <span className='product-fine-wt-cell'>
-                                <b>{row[column.id]}</b>
-                            </span>
-                        )
-                    },
-                    width: '5%'
-                },
-                {
-                    id: 'purchasedQty',
-                    displayText: 'Purchased Qty',
-                    isFilterable: true,
-                    filterCallback: this.filterCallbacks.purchasedQty,
-                    className: 'stock-product-purchasedQty-col',
-                    formatter: (column, columnIndex, row, rowIndex) => {
-                        return (
-                            <span className='product-purchasedQty-cell'>
-                                <b>{row[column.id]}</b>
-                            </span>
-                        )
-                    },
-                    width: '5%'
+                    width: '4%'
                 },
                 {
                     id: 'soldQty',
                     displayText: 'Sold Qty',
-                    isFilterable: true,
-                    filterCallback: this.filterCallbacks.soldQty,
+                    // filterCallback: this.filterCallbacks.soldQty,
                     className: 'stock-product-soldQty-col',
                     formatter: (column, columnIndex, row, rowIndex) => {
                         return (
                             <span className='product-soldQty-cell'>
-                                <b>{row[column.id]}</b>
+                                {row[column.id]}
                             </span>
                         )
                     },
-                    width: '5%'
+                    width: '3%'
                 },
                 {
                     id: 'avlQty',
                     displayText: 'Avl Qty',
-                    isFilterable: true,
-                    filterCallback: this.filterCallbacks.avlQty,
+                    // filterCallback: this.filterCallbacks.avlQty,
                     className: 'stock-product-avlQty-col',
                     formatter: (column, columnIndex, row, rowIndex) => {
                         return (
                             <span className='product-avlQty-cell'>
-                                <b>{row[column.id]}</b>
+                                {row[column.id]}
                             </span>
                         )
                     },
-                    width: '5%'
+                    width: '3%'
                 }
             ],
             filters: {
-                supplier: '',
+                itemName: ''
             }
         }
         this.bindMethods();
     }
     bindMethods() {
         this.handleCheckboxChangeListener = this.handleCheckboxChangeListener.bind(this);
-        this.filterCallbacks.supplier = this.filterCallbacks.supplier.bind(this);
-        this.filterCallbacks.metal = this.filterCallbacks.metal.bind(this);
-        this.filterCallbacks.productCode = this.filterCallbacks.productCode.bind(this);
-        this.filterCallbacks.name = this.filterCallbacks.name.bind(this);
+        this.filterCallbacks.itemCode = this.filterCallbacks.itemCode.bind(this);
+        this.filterCallbacks.itemName = this.filterCallbacks.itemName.bind(this);
         this.filterCallbacks.touch = this.filterCallbacks.touch.bind(this);
-        this.filterCallbacks.purchasedQty = this.filterCallbacks.purchasedQty.bind(this);
-        this.filterCallbacks.avlQty = this.filterCallbacks.avlQty.bind(this);
-        this.filterCallbacks.soldQty = this.filterCallbacks.soldQty.bind(this);
         this.filterCallbacks.supplier = this.filterCallbacks.supplier.bind(this);
         this.filterCallbacks.supplier = this.filterCallbacks.supplier.bind(this);
     }
@@ -204,35 +217,75 @@ export default class ViewStock extends Component {
             await this.setState(newState);
             this.fetchStockList();
         },
-        metal: async () => {
-
+        itemCode: async () => {
+            // let val = e.target.value;
+            // let newState = {...this.state};
+            // newState.filters.supplier = val;
+            // await this.setState(newState);
+            // this.fetchStockList();
         },
-        productCode: async () => {
-
+        itemName: async (e) => {
+            let val = e.target.value;
+            let newState = {...this.state};
+            newState.filters.itemName = val;
+            await this.setState(newState);
+            this.fetchStockList();
         },
-        name: async () => {
-
+        itemCategory: async (e) => {
+            let val = e.target.value;
+            let newState = {...this.state};
+            newState.filters.itemCategory = val;
+            await this.setState(newState);
+            this.fetchStockList();
+        },
+        itemSubCategory: async (e) => {
+            let val = e.target.value;
+            let newState = {...this.state};
+            newState.filters.itemSubCategory = val;
+            await this.setState(newState);
+            this.fetchStockList();
+        },
+        dimension: async (e) => {
+            let val = e.target.value;
+            let newState = {...this.state};
+            newState.filters.dimension = val;
+            await this.setState(newState);
+            this.fetchStockList();
         },
         touch: async () => {
-
-        },
-        purchasedQty: async () => {
-
-        },
-        avlQty: async () => {
-
-        },
-        soldQty: async () => {
 
         }
     }
     expandRow = {
         renderer: (row) => {
+            let supplier = row.suplierName;
+            if(row.supplierPersonName)
+                supplier += ' - ' + row.supplierPersonName;
             return (
-                <Row>
-                    <Col xs={{span:2}}>Supplier: </Col>
-                    <Col xs={{span:2}}>{row.suplierName}</Col>
-                </Row>
+                <Container>
+                    <Row style={{paddingTop: '15px'}}>
+                        <Col xs={{span:2}}><h6>Supplier</h6></Col>
+                        <Col xs={{span:2}}>{supplier}</Col>
+                    </Row>
+                    <Row style={{paddingTop: '15px'}}>
+                        <Col xs={{span:2}}><h6>Amount (Before Tax) </h6></Col>
+                        <Col xs={{span:2}}>{row.amount}</Col>
+                    </Row>
+                    <Row style={{paddingTop: '15px'}}>
+                        <Col xs={{span:2}}><h6>Tax Detail </h6></Col>
+                        <Col xs={{span:2}}>
+                            <Row>
+                                <Col xs={{span:12}}>SGST: {row.sgstPercent}% - {row.sgstAmt} </Col>
+                                <Col xs={{span:12}}>CGST: {row.cgstPercent}% - {row.cgstAmt} </Col>
+                                <Col xs={{span:12}}>IGST: {row.igstPercent}% - {row.igstAmt} </Col>
+                            </Row>
+                        </Col>
+                    </Row>
+                    <Row style={{paddingTop: '15px'}}>
+                        <Col xs={{span:2}}><h6>Amount (After Tax) </h6></Col>
+                        <Col xs={{span:2}}>{row.total}</Col>
+                    </Row>
+                </Container>
             )
         },
         showIndicator: true,
@@ -276,33 +329,49 @@ export default class ViewStock extends Component {
 
     getFilterParams() {
         return {
-            supplier: this.state.filters.supplier
+            metal: this.state.filters.metal,
+            itemName: this.state.filters.itemName,
+            itemCategory: this.state.filters.itemCategory,
+            itemSubCategory: this.state.filters.itemSubCategory,
+            dimension: this.state.filters.dimension
         }
     }
 
     async fetchStockList() {
         try {
             let args = this.getFilterParams();
-            let resp = await axios.get(`${FETCH_STOCK_LIST}?access_token=${getAccessToken()}&params=${JSON.stringify(args)}`);
+            let resp = await axios.get(`${FETCH_STOCK_LIST}?access_token=${getAccessToken()}&filters=${JSON.stringify(args)}`);
             let newState = {...this.state};
             newState.stockList = [];
             if(resp.data.STOCK_LIST) {
                 _.each(resp.data.STOCK_LIST, (aStockItem, index) => {
                     newState.stockList.push({
-                        productCode: aStockItem.ProductCode,
-                        purchaseBillId: aStockItem.PurchaseBillId,
-                        name: aStockItem.Name,
-                        suplierName: aStockItem.SuplierName,
+                        itemCode: aStockItem.ItemCode || '',
+                        itemName: aStockItem.ItemName,
+                        itemCategory: aStockItem.ItemCategory,
+                        itemSubCategory: aStockItem.ItemSubCategory,
+                        dimension: aStockItem.Dimension,
+                        suplierName: aStockItem.Supplier,
+                        supplierPersonName: aStockItem.SupplierPersonName,
                         metal: aStockItem.Metal,
                         metalRate: aStockItem.MetalRate,
-                        grossWt: aStockItem.GrossWt,
-                        netWt: aStockItem.NetWt,
-                        pureWt: aStockItem.PureWt,
-                        purchasedQty: aStockItem.PurchasedQty,
+                        grossWt: aStockItem.GWt,
+                        netWt: aStockItem.NWt,
+                        pureWt: aStockItem.PWt,
+                        qty: aStockItem.Qty,
                         avlQty: aStockItem.AvlQty,
                         soldQty: aStockItem.SoldQty,
-                        touch: aStockItem.Touch,
-                    })
+                        touch: aStockItem.PTouchName,
+                        iTouch: aStockItem.ITouchValue,
+                        amount: aStockItem.Amount,
+                        cgstPercent: aStockItem.CgstPercent,
+                        cgstAmt: aStockItem.CgstAmt,
+                        sgstPercent: aStockItem.SgstPercent,
+                        sgstAmt: aStockItem.SgstAmt,
+                        igstPercent: aStockItem.IgstPercent,
+                        igstAmt: aStockItem.IgstAmt,
+                        total: aStockItem.Total
+                    });
                 });
                 this.setState(newState);
             } else {
@@ -329,7 +398,6 @@ export default class ViewStock extends Component {
                             checkboxOnChangeListener = {this.handleCheckboxChangeListener}
                             globalCheckBoxListener = {this.handleGlobalCheckboxChange}
                             selectedIndexes = {this.state.selectedIndexes}
-                            
                         />
                     </Col>
                 </Row>

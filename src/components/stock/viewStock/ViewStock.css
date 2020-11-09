@@ -15,7 +15,7 @@
 } */
 
 
-.my-stock-view-table.gs-table .expand-icon {
+/* .my-stock-view-table.gs-table .expand-icon {
     padding-right: 10px;
 } 
 .my-stock-view-table .gstable-checkbox-container {
@@ -26,8 +26,15 @@
     border-right: none;
     border-bottom: none;
     background-color: white;
-}
+} */
 
 .my-stock-view-table .inner-header input[type="text"] {
     width: 100%;
+}
+
+.my-stock-view-table .gold-item {
+    border-left: 5px solid gold !important;
+}
+.my-stock-view-table .silver-item {
+    border-left: 5px solid silver !important;
 }
