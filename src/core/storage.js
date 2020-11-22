@@ -143,7 +143,7 @@ export const saveUserPreferences = (data) => {
     setUserPreference(data);
 };
 
-export const getAccessToken = (data) => {
+export const getAccessToken = () => {
     return _read(keys.accessToken);
 };
 

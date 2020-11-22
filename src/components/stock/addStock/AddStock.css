@@ -129,3 +129,7 @@
     box-shadow: none;
     border-radius: 0;
 } */
+
+.product-code-input-col .react-autosuggest__suggestions-container {
+    width: 300px;
+}

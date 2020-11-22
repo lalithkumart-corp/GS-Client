@@ -44,7 +44,22 @@ let axiosMiddleware = {
         });
     },
     delete: (urlPath, configs) => {
-        return axios.delete(urlPath, configs);
+        return new Promise( (resolve, reject) => {
+            try {
+                axios.delete(urlPath, configs)
+                .then(
+                    (successResp) => {
+                        return resolve(successResp);
+                    },
+                    (errResp) => {
+                        return reject(handleError(errResp));
+                    }
+                )
+            } catch(e) {
+                return reject(e);
+            }
+        });
+        //return axios.delete(urlPath, configs);
     },
 }
 
