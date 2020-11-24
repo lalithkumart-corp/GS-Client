@@ -6,7 +6,7 @@ export const constructItemObj = (thatState) => {
         metalPricePerGm: fd.metalPricePerGm,
         dealerStoreName: fd.dealerStoreName,
         dealerPersonName: fd.dealerPersonName,
-        productCode: fd.productCode,
+        productCodeSeries: (fd.productCodeSeries || "A").toUpperCase(),
         productName: fd.productName || "",
         productCategory: fd.productCategory || "",
         productSubCategory: fd.productSubCategory || "",
@@ -40,7 +40,6 @@ const injectOrnamentId = (thatState, itemObj) => {
     let fd = thatState.formData;
     if(thatState.rawResp && thatState.rawResp.ornListResp) {
         let resp = thatState.rawResp.ornListResp;
-        debugger;
         _.each(resp, (row, index) => {
             let name = toLowerCase(row.name || ""), 
                 productCategory = toLowerCase(row.category || ""),
@@ -72,7 +71,7 @@ const injectTouchId = (thatState, itemObj) => {
 export const resetFormData = (thatState) => {
     thatState.formData = {
         ...thatState.formData,
-        productCode: "",
+        productCodeSeries: "",
         productName: '',
         productCategory: '',
         productSubCategory: "",
@@ -81,7 +80,7 @@ export const resetFormData = (thatState) => {
         productGWt: "",
         productNWt: "",
         productPWt: "",
-        productPureTouch: '',
+        productPureTouch: '91.6',
         productITouch: '',
         productIWt: '',
         calcAmtUptoIWt: "",

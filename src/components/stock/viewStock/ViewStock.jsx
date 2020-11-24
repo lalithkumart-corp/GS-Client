@@ -21,9 +21,10 @@ export default class ViewStock extends Component {
                     filterCallback: this.filterCallbacks.itemCode,
                     className: 'stock-product-code-col',
                     formatter: (column, columnIndex, row, rowIndex) => {
+                        debugger;
                         return (
                             <span className='product-code-cell'>
-                                {row[column.id]}
+                                {row[column.id]}-{row['itemCodeNumber']}
                             </span>
                         )
                     },
@@ -347,6 +348,7 @@ export default class ViewStock extends Component {
                 _.each(resp.data.STOCK_LIST, (aStockItem, index) => {
                     newState.stockList.push({
                         itemCode: aStockItem.ItemCode || '',
+                        itemCodeNumber: aStockItem.ItemCodeNumber,
                         itemName: aStockItem.ItemName,
                         itemCategory: aStockItem.ItemCategory,
                         itemSubCategory: aStockItem.ItemSubCategory,
