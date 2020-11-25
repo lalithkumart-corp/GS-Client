@@ -352,7 +352,7 @@ export default class CreateItem extends Component {
                                     </Col>
                                     <Col xs={{span: 12}}>
                                         <Form.Group>
-                                            <Form.Label>Item Category</Form.Label>
+                                            <Form.Label>Item Category 1</Form.Label>
                                             <InputGroup>
                                                 <FormControl
                                                     type="text"
@@ -365,7 +365,7 @@ export default class CreateItem extends Component {
                                     </Col>
                                     <Col xs={{span: 12}}>
                                         <Form.Group>
-                                            <Form.Label>Item Sub-Category</Form.Label>
+                                            <Form.Label>Item Category 2</Form.Label>
                                             <InputGroup>
                                                 <FormControl
                                                     type="text"
@@ -438,7 +438,7 @@ export default class CreateItem extends Component {
                                         </Form.Group>
                                     </Col>
                                     <Col xs={{span: 6}} style={{padding: 0}}>
-                                        Item Category:
+                                        Item Category 1:
                                         <Form.Group>
                                             <InputGroup>
                                                 {/* <Form.Label>Item Category</Form.Label> */}
@@ -452,7 +452,7 @@ export default class CreateItem extends Component {
                                         </Form.Group>
                                     </Col>
                                     <Col xs={{span: 6}} style={{padding: 0}}>
-                                        Item Sub-Category:
+                                        Item Category 2:
                                         <Form.Group>
                                             <InputGroup>
                                                 {/* <Form.Label>Item Sub-Category</Form.Label> */}
@@ -528,7 +528,7 @@ export default class CreateItem extends Component {
                                         </Col>
                                         <Col xs={{span: 12}}>
                                             <Form.Group>
-                                                <Form.Label>Item Category</Form.Label>
+                                                <Form.Label>Item Category 1</Form.Label>
                                                 <InputGroup>
                                                     <FormControl
                                                         type="text"
@@ -542,7 +542,7 @@ export default class CreateItem extends Component {
                                         </Col>
                                         <Col xs={{span: 12}}>
                                             <Form.Group>
-                                                <Form.Label>Item Sub-Category</Form.Label>
+                                                <Form.Label>Item Category 2</Form.Label>
                                                 <InputGroup>
                                                     <FormControl
                                                         type="text"

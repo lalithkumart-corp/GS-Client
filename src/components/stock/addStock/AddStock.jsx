@@ -545,8 +545,18 @@ export default class AddStock extends Component {
         let theDom;
         switch(identifier) {
             case PROD_CODE_SERIES:
-                theDom = <div className='react-auto-suggest-list-item'>
-                            <span>{suggestion.itemCode}:{suggestion.metal}-{suggestion.itemName}-{suggestion.itemCategory}-{suggestion.itemSubCategory}-{suggestion.itemDim}</span>
+                let category1 = '';
+                if(suggestion.itemCategory)
+                    category1 = ' - ' + suggestion.itemCategory;
+                let category2 = '';
+                if(suggestion.itemSubCategory)
+                    category2 = suggestion.itemSubCategory;
+                let size = '';
+                if(suggestion.itemDim)
+                    size = <span><b>Size:</b><span>{suggestion.itemDim}</span></span>;
+                theDom = <div className='react-auto-suggest-list-item' style={{borderBottom: '1px dotted'}}>
+                            <p style={{margin: 0}}><span><b>{suggestion.itemCode}</b> {suggestion.metal} - {suggestion.itemName}{category1}</span></p>
+                            {(category2 || size) && <p style={{margin: 0, paddingTop: "3px"}}><span>{category2} {size}</span></p> }
                         </div>;
                 break;
             default:
@@ -639,7 +649,7 @@ export default class AddStock extends Component {
                 </Row>
                 <Row className="item-input-row">
                     <Col>
-                        <table>
+                        <table className="item-input-table">
                             <colgroup>
                                 <col style={{width: "20%"}}></col>
                                 <col style={{width: "3%"}}></col>
@@ -691,7 +701,7 @@ export default class AddStock extends Component {
                                                     />
                                                 </Form.Group>
                                             </Col> */}
-                                            <Col xs={{span: 3}} className="product-code-input-col no-padding">
+                                            <Col xs={{span: 4}} className="product-code-input-col no-padding">
                                                 <ReactAutosuggest
                                                     suggestions={this.state.autoSuggestions.filteredCodeSeries}
                                                     onSuggestionsFetchRequested={({value}) => this.reactAutosuggestControls.onSuggestionsFetchRequested({value}, PROD_CODE_SERIES)}
@@ -709,7 +719,7 @@ export default class AddStock extends Component {
                                                     ref = {(domElm) => { this.domElmns[PROD_CODE_SERIES] = domElm?domElm.input:domElm; }}
                                                 />
                                             </Col>
-                                            <Col xs={{span: 3}} className="no-padding">
+                                            {/* <Col xs={{span: 3}} className="no-padding">
                                                 <Form.Group>
                                                     <Form.Control
                                                         type="text"
@@ -722,8 +732,8 @@ export default class AddStock extends Component {
                                                         readOnly={true}
                                                     />
                                                 </Form.Group>
-                                            </Col>
-                                            <Col xs={{span: 6}} className="no-padding">
+                                            </Col> */}
+                                            <Col xs={{span: 8}} className="no-padding">
                                                 <ReactAutosuggest
                                                     suggestions={this.state.autoSuggestions.filteredItemNameList}
                                                     onSuggestionsFetchRequested={({value}) => this.reactAutosuggestControls.onSuggestionsFetchRequested({value}, PROD_NAME)}

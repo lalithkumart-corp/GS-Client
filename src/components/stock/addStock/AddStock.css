@@ -133,3 +133,8 @@
 .product-code-input-col .react-autosuggest__suggestions-container {
     width: 300px;
 }
+
+table.item-input-table {
+    table-layout: fixed;
+    width: 100%;
+}
