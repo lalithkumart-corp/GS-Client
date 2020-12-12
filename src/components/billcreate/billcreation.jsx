@@ -23,8 +23,8 @@ import sh from 'shorthash';
 import EditDetailsDialog from './editDetailsDialog';
 import { insertNewBill, updateBill, updateClearEntriesFlag, showEditDetailModal, hideEditDetailModal, getBillNoFromDB, disableReadOnlyMode, updateBillNoInStore } from '../../actions/billCreation';
 import { DoublyLinkedList } from '../../utilities/doublyLinkedList';
-import { getGaurdianNameList, getAddressList, getPlaceList, getCityList, getPincodeList, getMobileList, buildRequestParams, buildRequestParamsForUpdate, updateBillNumber, resetState, defaultPictureState, defaultOrnPictureState, validateFormValues } from './helper';
-import { getAccessToken } from '../../core/storage';
+import { getGaurdianNameList, getAddressList, getPlaceList, getCityList, getPincodeList, getMobileList, buildRequestParams, buildRequestParamsForUpdate, updateBillNumber, resetState, defaultPictureState, defaultOrnPictureState, validateFormValues, fetchCustomerMetaData, fetchOrnList } from './helper';
+// import { getAccessToken } from '../../core/storage';
 import { getDateInUTC, currencyFormatter, getInterestRate } from '../../utilities/utility';
 import { getRateOfInterest } from '../redeem/helper';
 import Picture from '../profilePic/picture';
@@ -169,7 +169,7 @@ class BillCreation extends Component {
                     list: ['Aadhar card', 'Pan Card', 'License Number', 'SBI Bank Account Number', 'Email'],
                     limitedList: []
                 },
-                selectedCustomer: {}                
+                selectedCustomer: {}
             },
             amountPopoverOpen: false,
             userPicture: JSON.parse(JSON.stringify(defaultPictureState)),
@@ -359,50 +359,31 @@ class BillCreation extends Component {
 
     /* START: API accessors */
     fetchMetaData() {
-        let accessToken = getAccessToken();
-        axios.get(PLEDGEBOOK_METADATA + `?access_token=${accessToken}&identifiers=["all", "otherDetails"]&filters=${JSON.stringify({onlyIsActive: true})}`)
-            .then(
-                (successResp) => {
+        fetchCustomerMetaData().then(
+            (resp) => {
+                if(resp) {
                     let newState = {...this.state};
-                    let results = successResp.data;
-                    newState.formData.cname.list = results.customers.list;
-                    newState.formData.gaurdianName.list = getGaurdianNameList(results.customers.list);
-                    newState.formData.address.list = getAddressList(results.customers.list);
-                    newState.formData.place.list = getPlaceList(results.customers.list);
-                    newState.formData.city.list = getCityList(results.customers.list);
-                    newState.formData.pincode.list = getPincodeList(results.customers.list);
-                    newState.formData.mobile.list = getMobileList(results.customers.list);                    
-                    newState.formData.moreDetails.list = results.otherDetails.map((anItem) => {return {key: anItem.key, value: anItem.displayText}});
+                    newState.formData.cname.list = resp.cnameList;
+                    newState.formData.gaurdianName.list = resp.gaurdianNameList;
+                    newState.formData.address.list = resp.addressList;
+                    newState.formData.place.list = resp.placeList;
+                    newState.formData.city.list = resp.cityList;
+                    newState.formData.pincode.list = resp.pincodeList;
+                    newState.formData.mobile.list = resp.mobileList;
+                    newState.formData.moreDetails.list = resp.moreDetailsList;
                     this.setState(newState);
-                },
-                (errResp) => {
-                    console.log(errResp);
                 }
-            )
-            .catch(
-                (exception) => {
-                    console.log(exception);
-                }
-            )
-        axios.get(ORNAMENT_LIST+ `?access_token=${accessToken}`)
-            .then(
-                (successResp) => {
+            }
+        )
+        fetchOrnList().then(
+            (resp) => {
+                if(resp) {
                     let newState = {...this.state};
-                    if(successResp.data.STATUS == 'SUCCESS')
-                        newState.formData.orn.list = successResp.data.RESPONSE.map(anItem => anItem.category + ' ' + anItem.title );
-                    else
-                        newState.formData.orn.list = [];
+                    newState.formData.orn.list = resp.ornList;
                     this.setState(newState);
-                },
-                (errResp) => {
-                    console.log(errResp);
                 }
-            )
-            .catch(
-                (exception) => {
-                    console.log(exception);
-                }
-            )
+            }
+        )
     }
     /* END: API accessors */
 
@@ -1201,15 +1182,15 @@ class BillCreation extends Component {
                 newState.formData.moreDetails.currCustomerInputField = anObj.value;
                 newState.formData.moreDetails.currCustomerInputKey = anObj.key;
             } else if(identifier == "cname"){
-                if(!val || typeof val == 'string') {
-                    newState.formData[identifier].inputVal = val;
-                    // this.updateSelectedCustomer({name: val});
-                    newState.selectedCustomer = {};
-                } else {
-                    newState.formData[identifier].inputVal = val.name || '';
-                    // this.updateSelectedCustomer(val);
-                    newState.selectedCustomer = val;
-                }
+                // if(!val || typeof val == 'string') {
+                //     newState.formData[identifier].inputVal = val;
+                //     // this.updateSelectedCustomer({name: val});
+                //     newState.selectedCustomer = {};
+                // } else {
+                //     newState.formData[identifier].inputVal = val.name || '';
+                //     // this.updateSelectedCustomer(val);
+                //     newState.selectedCustomer = val;
+                // }
             /*} else if(identifier == "gaurdianName") {
                 newState.formData[identifier].inputVal = val;
                 let inputVal = val.toLowerCase();

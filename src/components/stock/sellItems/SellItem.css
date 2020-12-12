@@ -1,0 +1,16 @@
+.sell-item-container .customer-selection-parent-row {
+    height: 50px;
+}
+.sell-item-container .customer-selection-panel {
+    border: 1px solid lightGray;
+}
+.sell-item-container .gold-rate-container {
+    border: 1px solid lightGray;
+}
+.sell-item-container .sell-item-main-panel-row {
+    min-height: 500px;
+    border: 1px solid lightgray;
+}
+.sell-item-container .common-modal-wrapper {
+    z-index: 3;
+}

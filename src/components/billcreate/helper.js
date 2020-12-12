@@ -1,4 +1,7 @@
+import axios from "axios";
 import _ from 'lodash';
+import { PLEDGEBOOK_METADATA, ORNAMENT_LIST } from '../../core/sitemap';
+import { getAccessToken } from '../../core/storage';
 
 export const defaultPictureState = {
     holder: {
@@ -292,4 +295,68 @@ export const validateFormValues = (formValues) => {
     return {
         errors: errors
     };
+}
+
+export const fetchCustomerMetaData = () => {
+    return new Promise( (resolve, reject) => {
+        let accessToken = getAccessToken();
+        axios.get(PLEDGEBOOK_METADATA + `?access_token=${accessToken}&identifiers=["all", "otherDetails"]&filters=${JSON.stringify({onlyIsActive: true})}`)
+            .then(
+                (successResp) => {
+                    //let newState = {...this.state};
+                    let returnObj = {};
+                    let results = successResp.data;
+                    returnObj.cnameList = results.customers.list;
+                    returnObj.gaurdianNameList = getGaurdianNameList(results.customers.list);
+                    returnObj.addressList = getAddressList(results.customers.list);
+                    returnObj.placeList = getPlaceList(results.customers.list);
+                    returnObj.cityList = getCityList(results.customers.list);
+                    returnObj.pincodeList = getPincodeList(results.customers.list);
+                    returnObj.mobileList = getMobileList(results.customers.list);                    
+                    returnObj.moreDetailsList = results.otherDetails.map((anItem) => {return {key: anItem.key, value: anItem.displayText}});
+                    //this.setState(newState);
+                    return resolve(returnObj);
+
+                },
+                (errResp) => {
+                    console.log(errResp);
+                    return resolve(null);
+                }
+            )
+            .catch(
+                (exception) => {
+                    console.log(exception);
+                    return resolve(null);
+                }
+            )
+    });
+}
+
+export const fetchOrnList = () => {
+    return new Promise( (resolve, reject) => {
+        let accessToken = getAccessToken();
+        axios.get(ORNAMENT_LIST+ `?access_token=${accessToken}`)
+            .then(
+                (successResp) => {
+                    //let newState = {...this.state};
+                    let returnObj = {};
+                    if(successResp.data.STATUS == 'SUCCESS')
+                        returnObj.ornList = successResp.data.RESPONSE.map(anItem => anItem.category + ' ' + anItem.title );
+                    else
+                        returnObj.ornList = [];
+                    //this.setState(newState);
+                    return resolve(returnObj);
+                },
+                (errResp) => {
+                    console.log(errResp);
+                    return resolve(null);
+                }
+            )
+            .catch(
+                (exception) => {
+                    console.log(exception);
+                    return resolve(null);
+                }
+            )
+    })
 }

@@ -122,3 +122,18 @@ export const currencyFormatter = (val) => {
     }
     return val;
 }
+
+export const getLowerCase = (str) => {
+    if(str)
+        return str.toLowerCase();
+    else
+        return '';
+}
+export const isNull = (val) => {
+    let isNull = true;
+    if(val) {
+        if(val !== 'null' && val !== 'undefined')
+            isNull = false;
+    }
+    return isNull;
+}

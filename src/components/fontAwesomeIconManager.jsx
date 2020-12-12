@@ -1,6 +1,8 @@
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faStroopwafel, faCamera, faCheck, faTimes, faBroom, faSave, faTrash, faEdit, faAngleRight, faAngleDown, faCalendar, faUpload, faSpinner, faCog, faFileExcel, faFilter, faPlus, faMinus } from '@fortawesome/free-solid-svg-icons';
+import { faStroopwafel, faCamera, faCheck, faTimes, faBroom, faSave, faTrash, faEdit, faAngleRight, 
+    faAngleDown, faCalendar, faUpload, faSpinner, faCog, faFileExcel, faFilter, faPlus, faMinus, faUserAlt,
+     faUserAstronaut, faRecycle, faPowerOff, faUser, faUserEdit } from '@fortawesome/free-solid-svg-icons';
 
 library.add(faStroopwafel);
 library.add(faCamera);
@@ -20,3 +22,9 @@ library.add(faFileExcel);
 library.add(faFilter);
 library.add(faPlus);
 library.add(faMinus);
+library.add(faUser);
+library.add(faUserEdit);
+library.add(faUserAlt);
+library.add(faUserAstronaut);
+library.add(faRecycle);
+library.add(faPowerOff);
