@@ -1,3 +1,7 @@
+const LABOUR_UNIT_MAP = {
+    "fixed": "FX",
+    "percent": "PC"
+}
 export const constructItemObj = (thatState) => {
     let fd = thatState.formData;
     let itemObj = {
@@ -20,7 +24,8 @@ export const constructItemObj = (thatState) => {
         productIWt: fd.productIWt,
         //productWst: fd.productWst,
         productLabourCharges: fd.productLabourCharges,
-        productLabourCalcUnit: fd.productLabourCalcUnit,
+        productLabourCalcUnit: LABOUR_UNIT_MAP[fd.productLabourCalcUnit],
+        productCalcLabourAmt: fd.calcLabourVal,
        // productFlatAmt: fd.productFlatAmt,
         calcAmtWithLabour: fd.calcAmtWithLabour,
         productCgstPercent: fd.productCgstPercent,
