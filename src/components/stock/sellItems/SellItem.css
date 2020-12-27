@@ -33,6 +33,9 @@
     padding: 11px 0;
     line-height: 40px;
 }
+.sell-item-container .exchange-preview-table {
+    margin-top: 25px;
+}
 .sell-item-container .item-detail-row {
     margin-top: 15px;
 }
@@ -85,4 +88,22 @@
 }
 .sell-item-container .metal-dpd-col .form-group {
     margin-bottom: 0;
+}
+.pymnt-mode-input-div .form-group {
+    display: inline-block;
+    margin-left: 0px;
+    margin-bottom: 0;
+}
+.sell-item-container .payment-column .field-name.payment-mode,
+.sell-item-container .payment-column .field-name.amount-paid,
+.sell-item-container .payment-column .field-name.amount-bal {
+    width: 120px;
+    display: inline-block; 
+    margin-bottom: 10px;
+}
+
+.sell-item-container .payment-column .field-val.amount-paid,
+.sell-item-container .payment-column .field-val.amount-bal {
+    border-color: lightgray;
+    width: 100px;
 }

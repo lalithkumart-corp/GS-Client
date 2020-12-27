@@ -88,16 +88,18 @@ export const calculatePaymentFormData = (stateObj) => {
     let paymentFormData = {
         totalPurchasePrice: stateObj.totalPurchasePrice || 0,
         totalExchangePrice: stateObj.totalExchangePrice || 0,
-        sum: stateObj.sum || 0,
-        paymentMode: stateObj.paymentMode || 'CASH',
-        paymentDetails: stateObj.paymentDetails || {},
-        paid: stateObj.paid || 0,
-        balance: stateObj.balance || 0
+        sum: stateObj.paymentFormData.sum || 0,
+        paymentMode: stateObj.paymentFormData.paymentMode || 'CASH',
+        paymentDetails: stateObj.paymentFormData.paymentDetails || {},
+        paid: stateObj.paymentFormData.paid || "",
+        balance: stateObj.paymentFormData.balance || 0
     };
     if(typeof stateObj.purchaseTotals.price !== "undefined")
         paymentFormData.totalPurchasePrice = stateObj.purchaseTotals.price;
     if(typeof stateObj.exchangeItemsTotals.price !== "undefined")
         paymentFormData.totalExchangePrice = stateObj.exchangeItemsTotals.price;
     paymentFormData.sum = paymentFormData.totalPurchasePrice - paymentFormData.totalExchangePrice;
+
+    paymentFormData.balance = paymentFormData.sum - (paymentFormData.paid || 0);
     return paymentFormData;
 }

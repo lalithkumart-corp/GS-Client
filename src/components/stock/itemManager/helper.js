@@ -36,7 +36,7 @@ export const getApiParamsForCreateItem = (thatState) => {
         productCategory: formData.itemCategory.inputVal,
         productSubCategory: formData.itemSubCategory.inputVal,
         productDimension: formData.itemDim.inputVal,
-        productCode: formData.itemCode.inputVal
+        productCode: formData.itemCode.inputVal || 'A'
     };
     return params;
 }

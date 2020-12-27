@@ -26,6 +26,9 @@ const EX_NET_WT = 'exNetWt';
 const EX_WASTAGE = 'exWastage';
 const EX_OLD_RATE = 'exOldRate';
 const EX_PRICE = 'exPrice';
+const PAYMENT_MODE = 'paymentMode';
+const AMT_PAID = 'paid';
+const AMT_BAL = 'balance';
 
 const ENTER_KEY = 13;
 const SPACE_KEY = 32;
@@ -61,7 +64,7 @@ export default class SellItem extends Component {
                 totalPurchasePrice: 0,
                 totalExchangePrice: 0,
                 sum: 0,
-                paymentMode: 'CASH',
+                paymentMode: 'cash',
                 paymentDetails: {},
                 paid: 0,
                 balance: 0
@@ -161,6 +164,13 @@ export default class SellItem extends Component {
                 newState.exchangeItemFormData[identifier] = val;
                 this.calculateExchangePrice();
                 break;
+            case AMT_PAID:
+            case AMT_BAL:
+                let vall = e.target.value;
+                if(vall) vall = parseFloat(vall);
+                newState.paymentFormData[identifier] = vall;
+                newState.paymentFormData = calculatePaymentFormData(newState);
+                break;
         }
         this.setState(newState);
     }
@@ -170,6 +180,9 @@ export default class SellItem extends Component {
         switch(identifier) {
             case EX_METAL:
                 newState.exchangeItemFormData.metal = e.target.value;
+                break;
+            case PAYMENT_MODE:
+                newState.paymentFormData.paymentMode = e.target.value;
                 break;
         }
         this.setState(newState);
@@ -253,6 +266,10 @@ export default class SellItem extends Component {
         newState.exchangeItemsTotals = calculateExchangeTotals(newState.exchangeItems);
         newState.paymentFormData = calculatePaymentFormData(newState);
         this.setState(newState);
+    }
+
+    submit() {
+
     }
 
     handleEnterKeyPress(e, options) {
@@ -406,7 +423,7 @@ export default class SellItem extends Component {
                         <span className="field-value">{item.avl_qty}</span>
                     </td>
                     <td>
-                        MetalRate: <span className="field-value">{item.metal_rate}</span>
+                        MetalRate: <span className="field-value">{item.metal_rate}/(addTodyRt)</span>
                         <br></br>
                         Pure Touch: <span className="field-value">{item.pure_touch}</span>
                         <br></br>
@@ -660,7 +677,7 @@ export default class SellItem extends Component {
     getCheckboxForExchangeItem() {
         if(this.state.selectedCustomer) {
             return (
-                <Col xs={{span: 3, offset: 3}}>
+                <Col xs={{span: 12}}>
                     <GSCheckbox labelText="Have Items For Exchange?" 
                                 checked={this.state.hasExchangeItem} 
                                 onChangeListener = {(e) => {this.exchangeItemCheckboxListener(e)}} />
@@ -811,50 +828,68 @@ export default class SellItem extends Component {
             )
         }
         return (
-            <Col>
-                <Row>  
-                    <Col xs={6}>
-                        <table className="exchange-preview-table">
-                            <colgroup>
-                                <col style={{width: "5%"}}></col>
-                                <col style={{width: "5%"}}></col>
-                                <col style={{width: "5%"}}></col>
-                                <col style={{width: "5%"}}></col>
-                                <col style={{width: "7%"}}></col>
-                                <col style={{width: "10%"}}></col>
-                            </colgroup>
-                            <thead>
-                                <tr>
-                                    <th>Metal</th>
-                                    <th>GrossWt</th>
-                                    <th>NetWt</th>
-                                    <th>Wastage</th>
-                                    <th>OldRate</th>
-                                    <th>Price</th>
-                                </tr>
-                            </thead>
-                            <tbody>{rows}</tbody>
-                            <tfoot>
-                                {footer}
-                            </tfoot>
-                        </table>
-                    </Col>
-                </Row>
-            </Col>
+                <Col xs={6}>
+                    <table className="exchange-preview-table">
+                        <colgroup>
+                            <col style={{width: "5%"}}></col>
+                            <col style={{width: "5%"}}></col>
+                            <col style={{width: "5%"}}></col>
+                            <col style={{width: "5%"}}></col>
+                            <col style={{width: "7%"}}></col>
+                            <col style={{width: "10%"}}></col>
+                        </colgroup>
+                        <thead>
+                            <tr>
+                                <th>Metal</th>
+                                <th>GrossWt</th>
+                                <th>NetWt</th>
+                                <th>Wastage</th>
+                                <th>OldRate</th>
+                                <th>Price</th>
+                            </tr>
+                        </thead>
+                        <tbody>{rows}</tbody>
+                        <tfoot>
+                            {footer}
+                        </tfoot>
+                    </table>
+                </Col>
         )
     }
 
     getPaymentContainer() {
-        if(!this.state.selectedCustomer)
-            return [];
         return (
-            <Row>
-                <Col xs={6}>
-                    <p>New Item Price: {this.state.paymentFormData.totalPurchasePrice}</p>
-                    <p>Old Item Price: {this.state.paymentFormData.totalExchangePrice}</p>
-                    <p>Sum: {this.state.paymentFormData.sum}</p>
-                </Col>
-            </Row>
+            <Col className="payment-column">
+                <p>New Item Price: {this.state.paymentFormData.totalPurchasePrice}</p>
+                <p>Old Item Price: {this.state.paymentFormData.totalExchangePrice}</p>
+                <p>Sum: {this.state.paymentFormData.sum}</p>
+                <div className="pymnt-mode-input-div">
+                    <span className="field-name payment-mode">Payment Mode:</span>
+                    <Form.Group>
+                        <Form.Control as="select"
+                            onChange={(e) => this.onDropdownChange(e, PAYMENT_MODE)} 
+                            value={this.state.paymentFormData.paymentMode}
+                            style={{ height: "26px" }}
+                            // onKeyUp={(e) => this.handleKeyUp(e, {currElmKey: PAYMENT_MODE})}
+                            // ref= {(domElm) => {this.domElmns[PAYMENT_MODE] = domElm; }}
+                            >
+                                <option key="key-cash" value="cash">CASH</option>
+                                <option key="key-cheque" value="cheque">CHEQUE</option>
+                                <option key="key-upi" value="upi">UPI</option>
+                                <option key="key-paytm" value="paytm">Paytm</option>
+                                <option key="key-gpay" value="gpay">GPay</option>
+                        </Form.Control>
+                    </Form.Group>
+                </div>
+                <div>
+                    <span className="field-name amount-paid">Amout Paid:</span>
+                    <input type="number" className="field-val amount-paid" value={this.state.paymentFormData.paid} onChange={(e) => this.onInputValChange(e, AMT_PAID)}/>
+                </div>
+                <div>
+                    <span className="field-name amount-bal">Amount Bal:</span>
+                    <input type="number" className="field-val amount-paid" value={this.state.paymentFormData.balance} onChange={(e) => this.onInputValChange(e, AMT_BAL)}/>
+                </div>
+            </Col>
         );
     }
 
@@ -911,7 +946,12 @@ export default class SellItem extends Component {
                         </Row>
                     </Col>
                     <Col xs={3}>
-                        {this.getPaymentContainer()}
+                        <Row>
+                            {this.getPaymentContainer()}
+                        </Row>
+                        <Row>
+                            <input type="button" className="gs-button" value="Submit" onClick={this.submit}/>
+                        </Row>
                     </Col>
                 </Row>
             </Container>

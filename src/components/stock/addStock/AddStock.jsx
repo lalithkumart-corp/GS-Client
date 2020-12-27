@@ -485,9 +485,15 @@ export default class AddStock extends Component {
     async insertNewStockItem(requestParams) {
         try {
             let accessToken = getAccessToken();
-            await axiosMiddleware.post(INSERT_NEW_STOCK_ITEM, {accessToken, requestParams});
-            toast.success('Inserted new item in stock list!');
-            return true;
+            let resp = await axiosMiddleware.post(INSERT_NEW_STOCK_ITEM, {accessToken, requestParams});
+            if(resp.data && resp.data.STATUS == "SUCCESS") {
+                toast.success('Inserted new item in stock list!');
+                return true;
+            } else {
+                let msg = resp.data.MSG || 'ERROR';
+                toast.error(msg);
+                return false;
+            }
         } catch(e) {
             toast.error('Error occured while inserting new stock item');
             return false;
