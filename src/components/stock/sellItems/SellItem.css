@@ -1,3 +1,6 @@
+.sell-item-container {
+    max-width: calc(100% - 20px);
+}
 .sell-item-container .customer-selection-parent-row {
     height: 50px;
 }
@@ -14,6 +17,22 @@
 .sell-item-container .common-modal-wrapper {
     z-index: 3;
 }
+/* .sell-item-container table.selling-items-preview thead,
+.sell-item-container table.exchange-preview-table thead {
+    font-weight: bold;
+    background-color: #ffeecf;
+} */
+.sell-item-container .sell-item-detail-view-row table.table2 thead,
+.sell-item-container .sell-item-detail-view-row table.table3 thead,
+.sell-item-container table.exchange-item-input-contrl thead {
+    font-weight: bold;
+    background-color: #ffeecf;
+}
+.sell-item-container table.selling-items-preview tfoot tr,
+.sell-item-container table.exchange-preview-table tfoot tr {
+    padding: 11px 0;
+    line-height: 40px;
+}
 .sell-item-container .item-detail-row {
     margin-top: 15px;
 }
@@ -28,10 +47,11 @@
 }
 .sell-item-container table th,
 .sell-item-container table td {
-    border: 1px solid #ddd;
+    border: 1px dashed #ddd;
     padding: 3px;
 }
-.sell-item-container .selling-detail .gs-input {
+.sell-item-container .selling-detail .gs-input,
+.sell-item-container table.exchange-item-input-contrl .gs-input {
     width: calc(100% - 8px);
     border: 0;
     padding: 3px;
@@ -44,4 +64,25 @@
 }
 .sell-item-container .sell-item-selected-preview-row {
     margin-top: 15px;
+}
+
+.sell-item-container .gs-checkbox-container {
+    font-size: 16px;
+}
+.sell-item-container .exchange-panel-col .gs-input {
+    width: 70px;
+    margin-left: 10px;
+    border-color: lightgray;
+    border-style: solid;
+}
+.sell-item-container .exchange-panel-col .form-control {
+    height: 27px;
+    padding: 0;
+}
+.sell-item-container .third-card {
+    border: 1px solid lightGray;
+    padding: 15px 0;
+}
+.sell-item-container .metal-dpd-col .form-group {
+    margin-bottom: 0;
 }
