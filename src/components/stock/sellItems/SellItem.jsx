@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import { connect } from 'react-redux';
 import { Container, Row, Col, Form } from 'react-bootstrap';
 import * as ReactAutosuggest from 'react-autosuggest';
 import { FETCH_PROD_IDS, FETCH_STOCKS_BY_PRODID } from '../../../core/sitemap';
@@ -9,7 +10,7 @@ import CommonModal from '../../common-modal/commonModal';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import GSCheckbox from '../../ui/gs-checkbox/checkbox';
 import './SellItem.css';
-import {calcPurchaseTotals, calculateExchangeTotals, calculatePaymentFormData } from './helper';
+import {calcPurchaseTotals, calculateExchangeTotals, calculatePaymentFormData, validate, constructApiParams } from './helper';
 
 const TAGID = 'tagid';
 const SELL_QTY = 'qty';
@@ -41,11 +42,11 @@ let defaultExchangeItemFormData = {
     exOldRate: "",
     exPrice: ""
 }
-export default class SellItem extends Component {
+class SellItem extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            retailPrice: 4770,
+            retailPrice: this.props.rate.retailRate.gold,
             customerSelectionModalOpen: false,
             selectedCustomer: null,
             prodId: {
@@ -82,6 +83,7 @@ export default class SellItem extends Component {
         this.onInputValChange = this.onInputValChange.bind(this);
         this.addItemToBillPreview = this.addItemToBillPreview.bind(this);
         this.onClickExAddButton = this.onClickExAddButton.bind(this);
+        this.submit = this.submit.bind(this);
     }
     componentDidMount() {
         this.fetchProdIds();
@@ -268,8 +270,19 @@ export default class SellItem extends Component {
         this.setState(newState);
     }
 
-    submit() {
-
+    async submit() {
+        let validation = validate(this.state);
+        if(validation.flag) {
+            try {
+                let apiParams = constructApiParams(this.state);
+                let resp = await axiosMiddleware.post(SALE_ITEM, {apiParams});
+            } catch(e) {
+                console.log(e);
+                toast.error('ERROR');
+            }
+        } else {
+            toast.error(validation.msg.join(' , '));
+        }
     }
 
     handleEnterKeyPress(e, options) {
@@ -423,7 +436,7 @@ export default class SellItem extends Component {
                         <span className="field-value">{item.avl_qty}</span>
                     </td>
                     <td>
-                        MetalRate: <span className="field-value">{item.metal_rate}/(addTodyRt)</span>
+                        MetalRate: <span className="field-value">{item.metal_rate}/{this.props.rate.metalRate.gold}</span>
                         <br></br>
                         Pure Touch: <span className="field-value">{item.pure_touch}</span>
                         <br></br>
@@ -958,3 +971,11 @@ export default class SellItem extends Component {
         )
     }
 }
+
+const mapStateToProps = (state) => { 
+    return {
+        rate: state.rate
+    };
+};
+
+export default connect(mapStateToProps, {})(SellItem);

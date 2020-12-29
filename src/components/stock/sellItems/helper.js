@@ -103,3 +103,54 @@ export const calculatePaymentFormData = (stateObj) => {
     paymentFormData.balance = paymentFormData.sum - (paymentFormData.paid || 0);
     return paymentFormData;
 }
+
+export const validate = (stateObj) => {
+    let flag = true;
+    let msg = [];
+    if(Object.keys(stateObj.purchaseItemPreview).length == 0) {
+        flag = false;
+        msg.push('Select Items for Sale')
+    }
+    return {flag, msg};
+}
+
+export const constructApiParams = (stateObj) => {
+    let newProds = [];
+    _.each(stateObj.purchaseItemPreview, (anItem, index) => {
+        newProds.push({
+            prodId: anItem.prod_id,
+            qty: anItem.formData.qty,
+            grossWt: anItem.formData.wt,
+            netWt: anItem.formData.wt,
+            wastage: anItem.formData.wastage,
+            labour: anItem.formData.labour,
+            cgstPercent: anItem.formData.cgstPercent,
+            sgstPercent: anItem.formData.sgstPercent,
+            discount: anItem.formData.discount
+        });
+    });
+    let exchangeProds = [];
+    _.each(stateObj.exchangeItems, (anItem, index) => {
+        exchangeProds.push({
+            name: anItem.name || 'some item',
+            grossWt: anItem.grossWt,
+            netWt: anItem.netWt,
+            wastage: anItem.wastage,
+            oldRate: anItem.oldRate,
+            price: anItem.price
+        });
+    });
+    let paymentFormData = {
+        newItemPrice: stateObj.paymentFormData.totalPurchasePrice,
+        totalExchangePrice: stateObj.paymentFormData.totalExchangePrice,
+        sum: stateObj.paymentFormData.sum,
+        paymentMode: stateObj.paymentFormData.paymentMode,
+        paid: stateObj.paymentFormData.paid,
+        balance: stateObj.paymentFormData.balance
+    }
+    return {
+        newProds,
+        exchangeProds,
+        paymentFormData
+    }
+}
