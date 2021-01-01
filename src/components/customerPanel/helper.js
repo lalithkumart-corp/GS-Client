@@ -3,6 +3,7 @@ import { isNull } from '../../utilities/utility';
 export const constructCreateCustParams = (thatState) => {
     let state = thatState;
     let params = {
+        customerId: state.selectedCustomer.customerId || null,
         cname: state.selectedCustomer.name || state.formData.cname.inputVal,
         gaurdianName: state.selectedCustomer.gaurdianName || state.formData.gaurdianName.inputVal,
         address: state.selectedCustomer.address || state.formData.address.inputVal,

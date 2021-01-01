@@ -114,7 +114,7 @@ export const validate = (stateObj) => {
     return {flag, msg};
 }
 
-export const constructApiParams = (stateObj) => {
+export const constructApiParams = (stateObj, propObj) => {
     let newProds = [];
     _.each(stateObj.purchaseItemPreview, (anItem, index) => {
         newProds.push({
@@ -126,7 +126,8 @@ export const constructApiParams = (stateObj) => {
             labour: anItem.formData.labour,
             cgstPercent: anItem.formData.cgstPercent,
             sgstPercent: anItem.formData.sgstPercent,
-            discount: anItem.formData.discount
+            discount: anItem.formData.discount,
+            price: anItem.formData.price
         });
     });
     let exchangeProds = [];
@@ -149,6 +150,9 @@ export const constructApiParams = (stateObj) => {
         balance: stateObj.paymentFormData.balance
     }
     return {
+        customerId: stateObj.selectedCustomer.customerId,
+        retailRate: stateObj.retailPrice,
+        metalRate: propObj.rate.metalRate.gold,
         newProds,
         exchangeProds,
         paymentFormData

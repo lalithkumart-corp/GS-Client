@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { Container, Row, Col, Form } from 'react-bootstrap';
 import * as ReactAutosuggest from 'react-autosuggest';
-import { FETCH_PROD_IDS, FETCH_STOCKS_BY_PRODID } from '../../../core/sitemap';
+import { FETCH_PROD_IDS, FETCH_STOCKS_BY_PRODID, SALE_ITEM } from '../../../core/sitemap';
 import axiosMiddleware from '../../../core/axios';
 import { getAccessToken } from '../../../core/storage';
 import Customer from '../../customerPanel/Customer';
@@ -11,6 +11,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import GSCheckbox from '../../ui/gs-checkbox/checkbox';
 import './SellItem.css';
 import {calcPurchaseTotals, calculateExchangeTotals, calculatePaymentFormData, validate, constructApiParams } from './helper';
+import { toast } from 'react-toastify';
 
 const TAGID = 'tagid';
 const SELL_QTY = 'qty';
@@ -274,8 +275,16 @@ class SellItem extends Component {
         let validation = validate(this.state);
         if(validation.flag) {
             try {
-                let apiParams = constructApiParams(this.state);
+                let apiParams = constructApiParams(this.state, this.props);
                 let resp = await axiosMiddleware.post(SALE_ITEM, {apiParams});
+                if(resp.data && resp.data.STATUS == "SUCCESS") {
+                    toast.success('Success!');
+                    //TODO: reset the UI form data
+                } else {
+                    let msg = resp.data.ERROR || 'ERROR';
+                    toast.error(msg);
+                }
+
             } catch(e) {
                 console.log(e);
                 toast.error('ERROR');
