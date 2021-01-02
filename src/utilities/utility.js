@@ -92,6 +92,10 @@ export const convertBufferToBase64 = (imgBuff) => {
 
 export const convertToLocalTime = (theDate, options) => {
     options = options || {};
+
+    if(theDate.length == 24) // Ex: 2021-01-02T12:17:57.000Z
+        theDate = theDate.replace('T', ' ').slice(0,23);
+
     const twoDigitFormat = (val) => {
         val = parseInt(val);
         if(val < 10)

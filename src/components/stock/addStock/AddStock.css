@@ -12,21 +12,21 @@
     display: inline-block;
 }
 .bill-metal-table thead {
-    background-color: #fbbc04;
-    color: white;
+    background-color: #ffeecf;
+    /* color: white; */
     font-weight: bold;
 }
 .bill-metal-table thead th {
     padding: 5px 0;
     text-align: center;
-    border: 1px solid lightyellow;
+    /* border: 1px solid lightyellow; */
 }
 .bill-metal-table .form-control {
     border-radius: 0;
 }
 .bill-metal-table .bill-date-picker {
-    border: 1px solid lightgray;
-    border-right: 0;
+    /* border: 1px solid lightgray;
+    border-right: 0; */
 }
 /* .bill-metal-table .border-right-none input,
 .bill-metal-table .border-right-none select {
@@ -42,14 +42,14 @@
     margin-top: 20px;
 }
 .item-input-row thead{
-    background-color: #fbbc04;
-    color: white;
+    background-color: #ffeecf;
+    /* color: white; */
     font-weight: bold;
 }
 .item-input-row thead th {
     padding: 5px 0;
     text-align: center;
-    border: 1px solid lightyellow;
+    /* border: 1px solid lightyellow; */
 }
 .item-input-row .form-control {
     border-radius: 0;
@@ -79,8 +79,9 @@
 .item-input-row input:focus,
 .bill-metal-table select:focus,
 .item-input-row select:focus {
-    border-color: lightgray;
+    /* border-color: lightgray; */
     box-shadow: none;
+    border-radius: 0;
 }
 
 .add-stock-container .action-container {
@@ -137,4 +138,22 @@
 table.item-input-table {
     table-layout: fixed;
     width: 100%;
+}
+.bill-meta-data-row th,
+.item-input-table th, 
+.bill-meta-data-row td,
+.item-input-table td {
+    border: 1px solid lightgrey;
+}
+.bill-meta-data-row .gs-input-cell,
+.item-input-table .gs-input-cell {
+    border: none;
+}
+.bill-meta-data-row .form-control,
+.item-input-row .form-control {
+    border: none;
+}
+.item-input-row .form-control:disabled,
+.item-input-row .form-control[readonly] {
+    background-color: #e9ecef8a;
 }

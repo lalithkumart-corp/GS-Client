@@ -24,7 +24,8 @@ import BackupRestore from '../backup_restore/backupRestore';
 import TallyPage from '../tally/tallyPage';
 //import Products from '../products/Products';
 import AddStock from '../stock/addStock/AddStock';
-import ViewStock from '../stock/viewStock/ViewStock';
+// import ViewStock from '../stock/viewStock/ViewStock';
+import StockViewTabLayout from '../stock/viewStock/index';
 import SellItem from '../stock/sellItems/SellItem';
 import StockSetup from '../stock/setup/StockSetup';
 import TagDemo from '../stock/tag/TagDemo';
@@ -66,7 +67,7 @@ class SmartComponent extends Component {
                                 <Route path= '/tally' component={TallyPage} />
                                 {/* <Route path= "/products" component={Products} /> */}
                                 <Route path= "/stock-add" component={AddStock} />
-                                <Route path= "/stock-view" component={ViewStock} />
+                                <Route path= "/stock-view" component={StockViewTabLayout} />
                                 <Route path= "/sell-item" component={SellItem} />
                                 <Route path= "/stock-setup" component={StockSetup} />
                                 <Route path= "/tag-demo" component={TagDemo} />

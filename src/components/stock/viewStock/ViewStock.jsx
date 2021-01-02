@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Container, Row, Col } from 'react-bootstrap';
+import { Container, Row, Col, Form } from 'react-bootstrap';
 import axios from '../../../core/axios';
 import GSTable from '../../gs-table/GSTable';
 import './ViewStock.css';
@@ -10,6 +10,8 @@ import { getAccessToken } from '../../../core/storage';
 import ReactPaginate from 'react-paginate';
 import { convertToLocalTime, dateFormatter } from '../../../utilities/utility';
 import DateRangePicker from '../../dateRangePicker/dataRangePicker';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import Popover, {ArrowContainer} from 'react-tiny-popover'
 
 const DEFAULT_SELECTION = {
     rowObj: [],
@@ -25,6 +27,7 @@ export default class ViewStock extends Component {
         let todaysEndDate = new Date();
         todaysEndDate.setHours(23,59,59,999);        
         this.state = {
+            timeOut: 400,
             pageLimit: 10,
             selectedPageIndex: 0,
             stockList: [],
@@ -37,7 +40,7 @@ export default class ViewStock extends Component {
             },
             columns: [
                 {
-                    id: 'createdDate',
+                    id: 'date',
                     displayText: 'Date',
                     isFilterable: false,
                     width: '10%',
@@ -56,7 +59,7 @@ export default class ViewStock extends Component {
                     formatter: (column, columnIndex, row, rowIndex) => {
                         return (
                             <span className='product-code-cell'>
-                                {row[column.id]}-{row['itemCodeNumber']}
+                                {row[column.id]}{row['itemCodeNumber']}
                             </span>
                         )
                     },
@@ -230,13 +233,16 @@ export default class ViewStock extends Component {
                     startDate: past7daysStartDate,
                     endDate: todaysEndDate
                 },
+                metalCategory: {gold: true, silver: true},
+                showOnlyAvlStockItems: true,
                 prodId: '',
                 supplier: '',
                 itemName: '',
                 itemCategory: '',
                 itemSubCategory: '',
                 dimension: ''
-            }
+            },
+            filterPopupVisibility: false,
         }
         this.bindMethods();
     }
@@ -249,6 +255,9 @@ export default class ViewStock extends Component {
         this.filterCallbacks.supplier = this.filterCallbacks.supplier.bind(this);
         this.filterCallbacks.supplier = this.filterCallbacks.supplier.bind(this);
         this.handlePageClick = this.handlePageClick.bind(this);
+        this.onFilterBtnClick = this.onFilterBtnClick.bind(this);
+        this.onMetalCategoryFilterChange = this.onMetalCategoryFilterChange.bind(this);
+        this.refresh = this.refresh.bind(this);
     }
     componentDidMount() {
         this.fetchTotals();
@@ -259,7 +268,7 @@ export default class ViewStock extends Component {
             let newState = {...this.state};
             newState.filters.date.startDate = new Date(startDate);
             newState.filters.date.endDate = new Date(endDate);
-            newSttae.selectedInfo = DEFAULT_SELECTION;
+            newState.selectedInfo = DEFAULT_SELECTION;
             await this.setState(newState);
             this.refresh();
         },
@@ -267,15 +276,15 @@ export default class ViewStock extends Component {
             let val = e.target.value;
             let newState = {...this.state};
             newState.filters.supplier = val;
-            newSttae.selectedInfo = DEFAULT_SELECTION;
+            newState.selectedInfo = DEFAULT_SELECTION;
             await this.setState(newState);
             this.refresh({fetchOnlyRows: true});
         },
-        itemCode: async () => {
+        itemCode: async (e) => {
             let val = e.target.value;
             let newState = {...this.state};
             newState.filters.prodId = val;
-            newSttae.selectedInfo = DEFAULT_SELECTION;
+            newState.selectedInfo = DEFAULT_SELECTION;
             await this.setState(newState);
             this.refresh({fetchOnlyRows: true});
         },
@@ -283,7 +292,7 @@ export default class ViewStock extends Component {
             let val = e.target.value;
             let newState = {...this.state};
             newState.filters.itemName = val;
-            newSttae.selectedInfo = DEFAULT_SELECTION;
+            newState.selectedInfo = DEFAULT_SELECTION;
             await this.setState(newState);
             this.refresh({fetchOnlyRows: true});
         },
@@ -291,7 +300,7 @@ export default class ViewStock extends Component {
             let val = e.target.value;
             let newState = {...this.state};
             newState.filters.itemCategory = val;
-            newSttae.selectedInfo = DEFAULT_SELECTION;
+            newState.selectedInfo = DEFAULT_SELECTION;
             await this.setState(newState);
             this.refresh({fetchOnlyRows: true});
         },
@@ -299,7 +308,7 @@ export default class ViewStock extends Component {
             let val = e.target.value;
             let newState = {...this.state};
             newState.filters.itemSubCategory = val;
-            newSttae.selectedInfo = DEFAULT_SELECTION;
+            newState.selectedInfo = DEFAULT_SELECTION;
             await this.setState(newState);
             this.refresh({fetchOnlyRows: true});
         },
@@ -307,7 +316,7 @@ export default class ViewStock extends Component {
             let val = e.target.value;
             let newState = {...this.state};
             newState.filters.dimension = val;
-            newSttae.selectedInfo = DEFAULT_SELECTION;
+            newState.selectedInfo = DEFAULT_SELECTION;
             await this.setState(newState);
             this.refresh({fetchOnlyRows: true});
         },
@@ -351,9 +360,12 @@ export default class ViewStock extends Component {
         expandByColumnOnly: true
     }
     refresh(options={}) {
-        this.fetchStockListPerPage();
-        if(!options.fetchOnlyRows)
-            this.fetchTotals();
+        clearTimeout(this.timer);
+        this.timer = setTimeout(() => {
+            this.fetchStockListPerPage();
+            if(!options.fetchOnlyRows)
+                this.fetchTotals();
+        }, this.timeOut);
     }
     handleCheckboxChangeListener(params) {
         let newState = {...this.state};
@@ -386,6 +398,20 @@ export default class ViewStock extends Component {
         }
         this.setState(newState);
     }
+
+    onFilterBtnClick() {
+        this.setState({filterPopupVisibility: !this.state.filterPopupVisibility});
+    }
+    onMetalCategoryFilterChange(e, identifier) {
+        let newState = {...this.state};
+        newState.filters.metalCategory[identifier] = e.target.checked;
+        this.setState(newState);
+    }
+    onChangeItemsViewOption(e) {
+        let newState = {...this.state};
+        newState.filters.showOnlyAvlStockItems = e.target.checked;
+        this.setState(newState);
+    }
     
     shouldExpndAll() {
         return false;
@@ -394,17 +420,24 @@ export default class ViewStock extends Component {
     getFilterParams() {
         let endDate = new Date(this.state.filters.date.endDate);
         endDate.setHours(23,59,59,999);
+
+        let metalCategory = [];
+        if(this.state.filters.metalCategory.gold)
+            metalCategory.push('G');
+        if(this.state.filters.metalCategory.silver)
+            metalCategory.push('S');
         return {
             date: {
                 startDate: dateFormatter(this.state.filters.date.startDate),
                 endDate: dateFormatter(endDate)
             },
-            metal: this.state.filters.metal,
+            metalCategory: metalCategory,
             prodId: this.state.filters.prodId,
             itemName: this.state.filters.itemName,
             itemCategory: this.state.filters.itemCategory,
             itemSubCategory: this.state.filters.itemSubCategory,
-            dimension: this.state.filters.dimension
+            dimension: this.state.filters.dimension,
+            showOnlyAvlStockItems: this.state.filters.showOnlyAvlStockItems,
         }
     }
 
@@ -469,7 +502,7 @@ export default class ViewStock extends Component {
                         igstPercent: aStockItem.IgstPercent,
                         igstAmt: aStockItem.IgstAmt,
                         total: aStockItem.Total,
-                        createdDate: aStockItem.CreatedDate.replace('T', ' ').slice(0,23)
+                        date: aStockItem.Date //.replace('T', ' ').slice(0,23)
                     });
                 });
                 this.setState(newState);
@@ -490,7 +523,7 @@ export default class ViewStock extends Component {
     }
     render() {
         return (
-            <Container>
+            <Container className="view-stock-container">
                 <Row>
                     <Col xs={4}>
                         <DateRangePicker 
@@ -500,6 +533,56 @@ export default class ViewStock extends Component {
                             endDate={this.state.filters.date.endDate}
                             showIcon= {false}
                         />
+                        <Popover
+                            className='view-stock-filter-popover'
+                            padding={0}
+                            isOpen={this.state.filterPopupVisibility}
+                            position={'right'} // preferred position
+                            onClickOutside={() => this.setState({ filterPopupVisibility: false })}
+                            content={({ position, targetRect, popoverRect }) => {
+                                return (
+                                    <Container className='gs-card arrow-box left filter-popover-container'>
+                                        <Row className='filter-popover-content' >
+                                            <Col>
+                                                <Row>
+                                                    <Col xs={12} className="metal-view-options">
+                                                        <span className="field-name">Choose Metal</span>
+                                                        <Form>
+                                                            <Form.Group>
+                                                                <Form.Check id='orn-categ-g' type='checkbox' checked={this.state.filters.metalCategory.gold} value='G' label='Gold' onChange={(e)=>this.onMetalCategoryFilterChange(e, 'gold')}/>
+                                                            </Form.Group>
+                                                            <Form.Group>
+                                                                <Form.Check id='orn-categ-s' type='checkbox' checked={this.state.filters.metalCategory.silver} value='S' label='Silver' onChange={(e)=>this.onMetalCategoryFilterChange(e, 'silver')}/>
+                                                            </Form.Group>
+                                                        </Form>
+                                                    </Col>
+                                                </Row>
+                                                <Row>
+                                                    <Col xs={12} className="show-avl-stock-items">
+                                                        <span className="field-name">Show Only Avl Items</span>
+                                                        <Form>
+                                                            <Form.Group>
+                                                                <Form.Check id='only-avl' type='checkbox' checked={this.state.filters.showOnlyAvlStockItems} value='' label="Available Items" onChange={(e)=>this.onChangeItemsViewOption(e)}/>
+                                                            </Form.Group>
+                                                        </Form>
+                                                    </Col>
+                                                </Row>
+                                                <Row>
+                                                    <Col style={{textAlign: 'center'}}>
+                                                        <input type="button" className="gs-button" value="APPLY" onClick={this.refresh}/>
+                                                    </Col>
+                                                </Row>
+                                            </Col>
+                                        </Row>
+                                    </Container>
+                                )
+                            }
+                        }
+                        >
+                            <span className='filter-popover-trigger-btn' onClick={this.onFilterBtnClick}>
+                                <FontAwesomeIcon icon='filter'/>
+                            </span>                                    
+                        </Popover>
                     </Col>
                     <Col xs={4}>
                         <ReactPaginate previousLabel={"<"}
@@ -516,7 +599,7 @@ export default class ViewStock extends Component {
                             forcePage={this.state.selectedPageIndex} />
                     </Col>
                     <Col xs={4} style={{textAlign: 'right'}}>
-                        <span>No. Of StockItems: {this.state.totals.stockItems}</span>
+                        <span className="no-of-items">No. Of StockItems: {this.state.totals.stockItems}</span>
                     </Col>
                 </Row>
                 <Row>

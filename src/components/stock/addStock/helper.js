@@ -5,7 +5,7 @@ const LABOUR_UNIT_MAP = {
 export const constructItemObj = (thatState) => {
     let fd = thatState.formData;
     let itemObj = {
-        date: fd.date._inputVal,
+        date: fd.date._inputVal.replace('T', ' ').slice(0,23),
         metal: fd.metal,
         metalPrice: fd.metalPrice,
         metalPricePerGm: fd.metalPricePerGm,

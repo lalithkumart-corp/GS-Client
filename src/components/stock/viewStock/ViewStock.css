@@ -1,3 +1,6 @@
+.view-stock-container {
+    max-width: 100%;
+}
 .my-stock-view-table {
     overflow-x: auto;
     display: inline-block;
@@ -37,4 +40,44 @@
 }
 .my-stock-view-table .silver-item {
     border-left: 5px solid silver !important;
+}
+
+.filter-popover-container {
+    width:500px;
+    padding: 15px;
+}
+.filter-popover-container .metal-view-options .field-name,
+.filter-popover-container .show-avl-stock-items .field-name {
+    font-size: 17px;
+    width: 200px;
+    display: inline-block;
+}
+.filter-popover-container .metal-view-options form,
+.filter-popover-container .metal-view-options .form-group,
+.filter-popover-container .show-avl-stock-items form,
+.filter-popover-container .show-avl-stock-items .form-group {
+    display: inline-block;
+}
+.filter-popover-container .metal-view-options .form-group {
+    padding: 0 25px 0 0;
+}
+.filter-popover-container .metal-view-options .form-group .form-check-label,
+.filter-popover-container .show-avl-stock-items .form-group .form-check-label {
+    font-weight: normal;
+}
+.stock-view-date-filter {
+    border: 1px solid !important;
+    margin-bottom: 10px;
+}
+.stock-view-date-filter .arrow-down-icon {
+    padding-left: 7px;
+}
+.filter-popover-trigger-btn {
+    margin-left: 10px;
+    color: #337ab7;
+    vertical-align: super;
+}
+.no-of-items {
+    margin-top: 14px;
+    display: inline-block;
 }
