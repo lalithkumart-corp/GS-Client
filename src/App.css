@@ -359,3 +359,20 @@ input[type=checkbox], input[type=radio] {
     size: auto;
   }
 }
+
+/* START: Custom React Pagination styles */
+.gs-pagination.pagination {
+  margin: 0;
+  float: right;
+}
+.gs-pagination.pagination li>a {
+  border: none;
+  border-radius: 50%;
+  outline: none;
+  color: black;
+  font-weight: bold;
+}
+.gs-pagination.pagination>.active>a {
+  color: white;
+}
+/* END: Custom React Pagination styles */

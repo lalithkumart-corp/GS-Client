@@ -3,17 +3,50 @@ import { Container, Row, Col } from 'react-bootstrap';
 import axios from '../../../core/axios';
 import GSTable from '../../gs-table/GSTable';
 import './ViewStock.css';
-import { FETCH_STOCK_LIST } from '../../../core/sitemap';
+import { FETCH_STOCK_LIST, FETCH_STOCK_TOTALS } from '../../../core/sitemap';
 import _ from 'lodash';
 import { toast } from 'react-toastify';
 import { getAccessToken } from '../../../core/storage';
+import ReactPaginate from 'react-paginate';
+import { convertToLocalTime, dateFormatter } from '../../../utilities/utility';
+import DateRangePicker from '../../dateRangePicker/dataRangePicker';
 
+const DEFAULT_SELECTION = {
+    rowObj: [],
+    indexes: []
+}
 export default class ViewStock extends Component {
     constructor(props) {
         super(props);
+        let todaysDate = new Date();
+        let past7daysStartDate = new Date();
+        past7daysStartDate.setDate(past7daysStartDate.getDate()-730);
+        todaysDate.setHours(0,0,0,0);
+        let todaysEndDate = new Date();
+        todaysEndDate.setHours(23,59,59,999);        
         this.state = {
+            pageLimit: 10,
+            selectedPageIndex: 0,
             stockList: [],
+            selectedInfo: {
+                rowObj: [],
+                indexes: [],
+            },
+            totals: {
+                stockItems: 0,
+            },
             columns: [
+                {
+                    id: 'createdDate',
+                    displayText: 'Date',
+                    isFilterable: false,
+                    width: '10%',
+                    formatter: (column, columnIndex, row, rowIndex) => {
+                        return (
+                            <span>{convertToLocalTime(row[column.id], {excludeTime: true})}</span>
+                        )
+                    }
+                },
                 {
                     id: 'itemCode',
                     displayText: 'Code',
@@ -21,7 +54,6 @@ export default class ViewStock extends Component {
                     filterCallback: this.filterCallbacks.itemCode,
                     className: 'stock-product-code-col',
                     formatter: (column, columnIndex, row, rowIndex) => {
-                        debugger;
                         return (
                             <span className='product-code-cell'>
                                 {row[column.id]}-{row['itemCodeNumber']}
@@ -194,64 +226,90 @@ export default class ViewStock extends Component {
                 }
             ],
             filters: {
-                itemName: ''
+                date: {
+                    startDate: past7daysStartDate,
+                    endDate: todaysEndDate
+                },
+                prodId: '',
+                supplier: '',
+                itemName: '',
+                itemCategory: '',
+                itemSubCategory: '',
+                dimension: ''
             }
         }
         this.bindMethods();
     }
     bindMethods() {
         this.handleCheckboxChangeListener = this.handleCheckboxChangeListener.bind(this);
+        this.handleGlobalCheckboxChange = this.handleGlobalCheckboxChange.bind(this);
         this.filterCallbacks.itemCode = this.filterCallbacks.itemCode.bind(this);
         this.filterCallbacks.itemName = this.filterCallbacks.itemName.bind(this);
         this.filterCallbacks.touch = this.filterCallbacks.touch.bind(this);
         this.filterCallbacks.supplier = this.filterCallbacks.supplier.bind(this);
         this.filterCallbacks.supplier = this.filterCallbacks.supplier.bind(this);
+        this.handlePageClick = this.handlePageClick.bind(this);
     }
     componentDidMount() {
-        this.fetchStockList();
+        this.fetchTotals();
+        this.fetchStockListPerPage();
     }
     filterCallbacks = {
+        date: async (startDate, endDate) => {
+            let newState = {...this.state};
+            newState.filters.date.startDate = new Date(startDate);
+            newState.filters.date.endDate = new Date(endDate);
+            newSttae.selectedInfo = DEFAULT_SELECTION;
+            await this.setState(newState);
+            this.refresh();
+        },
         supplier: async (e, col, colIndex) => {
             let val = e.target.value;
             let newState = {...this.state};
             newState.filters.supplier = val;
+            newSttae.selectedInfo = DEFAULT_SELECTION;
             await this.setState(newState);
-            this.fetchStockList();
+            this.refresh({fetchOnlyRows: true});
         },
         itemCode: async () => {
-            // let val = e.target.value;
-            // let newState = {...this.state};
-            // newState.filters.supplier = val;
-            // await this.setState(newState);
-            // this.fetchStockList();
+            let val = e.target.value;
+            let newState = {...this.state};
+            newState.filters.prodId = val;
+            newSttae.selectedInfo = DEFAULT_SELECTION;
+            await this.setState(newState);
+            this.refresh({fetchOnlyRows: true});
         },
         itemName: async (e) => {
             let val = e.target.value;
             let newState = {...this.state};
             newState.filters.itemName = val;
+            newSttae.selectedInfo = DEFAULT_SELECTION;
             await this.setState(newState);
-            this.fetchStockList();
+            this.refresh({fetchOnlyRows: true});
         },
         itemCategory: async (e) => {
             let val = e.target.value;
             let newState = {...this.state};
             newState.filters.itemCategory = val;
+            newSttae.selectedInfo = DEFAULT_SELECTION;
             await this.setState(newState);
-            this.fetchStockList();
+            this.refresh({fetchOnlyRows: true});
         },
         itemSubCategory: async (e) => {
             let val = e.target.value;
             let newState = {...this.state};
             newState.filters.itemSubCategory = val;
+            newSttae.selectedInfo = DEFAULT_SELECTION;
             await this.setState(newState);
-            this.fetchStockList();
+            this.refresh({fetchOnlyRows: true});
         },
         dimension: async (e) => {
             let val = e.target.value;
             let newState = {...this.state};
             newState.filters.dimension = val;
+            newSttae.selectedInfo = DEFAULT_SELECTION;
             await this.setState(newState);
-            this.fetchStockList();
+            this.refresh({fetchOnlyRows: true});
         },
         touch: async () => {
 
@@ -292,17 +350,22 @@ export default class ViewStock extends Component {
         showIndicator: true,
         expandByColumnOnly: true
     }
+    refresh(options={}) {
+        this.fetchStockListPerPage();
+        if(!options.fetchOnlyRows)
+            this.fetchTotals();
+    }
     handleCheckboxChangeListener(params) {
         let newState = {...this.state};
         if(params.isChecked) {
-            newState.selectedIndexes.push(params.rowIndex);        
-            newState.selectedRowJson.push(params.row);
+            newState.selectedInfo.indexes.push(params.rowIndex);        
+            newState.selectedInfo.rowObj.push(params.row);
         } else {
-            let rowIndex = newState.selectedIndexes.indexOf(params.rowIndex);
-            newState.selectedIndexes.splice(rowIndex, 1);            
-            newState.selectedRowJson= newState.selectedRowJson.filter(
+            let rowIndex = newState.selectedInfo.indexes.indexOf(params.rowIndex);
+            newState.selectedInfo.indexes.splice(rowIndex, 1);            
+            newState.selectedInfo.rowObj= newState.selectedInfo.rowObj.filter(
                 (anItem) => {
-                    if(newState.selectedIndexes.indexOf(anItem.rowNumber) == -1)
+                    if(newState.selectedInfo.indexes.indexOf(anItem.rowNumber) == -1)
                         return true;                                                  
                 }
             );
@@ -314,12 +377,12 @@ export default class ViewStock extends Component {
         let newState = {...this.state};
         if(params.isChecked) {
             _.each(params.rows, (aRow, index) => {
-                newState.selectedIndexes.push(index);
-                newState.selectedRowJson.push(aRow);
+                newState.selectedInfo.indexes.push(index);
+                newState.selectedInfo.rowObj.push(aRow);
             });
         } else {
-            newState.selectedIndexes = [];
-            newState.selectedRowJson = [];
+            newState.selectedInfo.indexes = [];
+            newState.selectedInfo.rowObj = [];
         }
         this.setState(newState);
     }
@@ -329,8 +392,15 @@ export default class ViewStock extends Component {
     }
 
     getFilterParams() {
+        let endDate = new Date(this.state.filters.date.endDate);
+        endDate.setHours(23,59,59,999);
         return {
+            date: {
+                startDate: dateFormatter(this.state.filters.date.startDate),
+                endDate: dateFormatter(endDate)
+            },
             metal: this.state.filters.metal,
+            prodId: this.state.filters.prodId,
             itemName: this.state.filters.itemName,
             itemCategory: this.state.filters.itemCategory,
             itemSubCategory: this.state.filters.itemSubCategory,
@@ -338,9 +408,35 @@ export default class ViewStock extends Component {
         }
     }
 
-    async fetchStockList() {
+    getOffsets() {        
+        let pageNumber = parseInt(this.state.selectedPageIndex);
+        let offsetStart = pageNumber * parseInt(this.state.pageLimit);
+        let offsetEnd = offsetStart + parseInt(this.state.pageLimit);
+        return [offsetStart, offsetEnd];
+    }
+
+    async fetchTotals() {
         try {
             let args = this.getFilterParams();
+            let resp = await axios.get(`${FETCH_STOCK_TOTALS}?access_token=${getAccessToken()}&filters=${JSON.stringify(args)}`);
+            if(resp.data && resp.data.TOTALS) {
+                let newState = {...this.state};
+                newState.totals.stockItems = resp.data.TOTALS.count;
+                this.setState(newState);
+            }
+        } catch(e) {
+            toast.error(e);
+            console.log(e);
+        }
+    }
+
+    async fetchStockListPerPage() {
+        try {
+            let offsets = this.getOffsets();
+            let args = this.getFilterParams();
+            args.offsetStart = offsets[0] || 0;
+            args.offsetEnd = offsets[1] || 20;
+
             let resp = await axios.get(`${FETCH_STOCK_LIST}?access_token=${getAccessToken()}&filters=${JSON.stringify(args)}`);
             let newState = {...this.state};
             newState.stockList = [];
@@ -372,7 +468,8 @@ export default class ViewStock extends Component {
                         sgstAmt: aStockItem.SgstAmt,
                         igstPercent: aStockItem.IgstPercent,
                         igstAmt: aStockItem.IgstAmt,
-                        total: aStockItem.Total
+                        total: aStockItem.Total,
+                        createdDate: aStockItem.CreatedDate.replace('T', ' ').slice(0,23)
                     });
                 });
                 this.setState(newState);
@@ -384,9 +481,44 @@ export default class ViewStock extends Component {
             console.log(e);
         }
     }
+    async handlePageClick(selectedPage) {
+        await this.setState({selectedPageIndex: selectedPage.selected, rowObj: [], indexes: []});        
+        this.refresh({fetchOnlyRows: true});
+    }
+    getPageCount() {
+        return this.state.totals.stockItems/this.state.pageLimit;
+    }
     render() {
         return (
             <Container>
+                <Row>
+                    <Col xs={4}>
+                        <DateRangePicker 
+                            className = 'stock-view-date-filter'
+                            selectDateRange={this.filterCallbacks.date}
+                            startDate={this.state.filters.date.startDate}
+                            endDate={this.state.filters.date.endDate}
+                            showIcon= {false}
+                        />
+                    </Col>
+                    <Col xs={4}>
+                        <ReactPaginate previousLabel={"<"}
+                            nextLabel={">"}
+                            breakLabel={"..."}
+                            breakClassName={"break-me"}
+                            pageCount={this.getPageCount()}
+                            marginPagesDisplayed={2}
+                            pageRangeDisplayed={5}
+                            onPageChange={this.handlePageClick}
+                            containerClassName={"gs-pagination pagination"}
+                            subContainerClassName={"pages pagination"}
+                            activeClassName={"active"}
+                            forcePage={this.state.selectedPageIndex} />
+                    </Col>
+                    <Col xs={4} style={{textAlign: 'right'}}>
+                        <span>No. Of StockItems: {this.state.totals.stockItems}</span>
+                    </Col>
+                </Row>
                 <Row>
                     <Col>
                         <GSTable 
@@ -399,7 +531,7 @@ export default class ViewStock extends Component {
                             IsGlobalCheckboxSelected = {false} //optional
                             checkboxOnChangeListener = {this.handleCheckboxChangeListener}
                             globalCheckBoxListener = {this.handleGlobalCheckboxChange}
-                            selectedIndexes = {this.state.selectedIndexes}
+                            selectedIndexes = {this.state.selectedInfo.indexes}
                         />
                     </Col>
                 </Row>
