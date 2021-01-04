@@ -58,10 +58,15 @@ export default class PledgebookExportPopup extends Component {
             },
             include: this.state.billStatusFlag
         }
+        let sortOrder = {
+            sortBy: "desc",
+            sortByColumn: "pledgedDate"
+        }
         return {            
             offsetStart: 0,
             offsetEnd: 10000,
-            filters: filters
+            filters: filters,
+            sortOrder : sortOrder
         }
     }
     render () {
