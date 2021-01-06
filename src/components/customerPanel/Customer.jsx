@@ -19,6 +19,8 @@ domList.add('place', {type: 'rautosuggest', enabled: true});
 domList.add('city', {type: 'rautosuggest', enabled: true});
 domList.add('pincode', {type: 'rautosuggest', enabled: true});
 domList.add('mobile', {type: 'rautosuggest', enabled: true});
+domList.add('selectBtn', {type: 'defaultInput', enabled: false});
+domList.add('createBtn', {type: 'defaultInput', enabled: true});
 
 export default class Customer extends Component {
     constructor(props) {
@@ -77,7 +79,8 @@ export default class Customer extends Component {
     }
 
     componentDidMount() {
-        this.fetchMetaData()
+        this.fetchMetaData();
+        this.setAutoFocusOnFirstInput();
     }
 
     bindMethods() {
@@ -138,6 +141,59 @@ export default class Customer extends Component {
     async handleEnterKeyPress(evt, options) {
         if(options && (options.currElmKey == 'gaurdianName' || options.currElmKey == 'address' || options.currElmKey == 'place' || options.currElmKey == 'city' || options.currElmKey == 'pincode'))
             await this.verifySelectedCustomerBy(options.currElmKey);
+        if(this.canTransferFocus(evt, options.currElmKey, options))
+            this.transferFocus(evt, options.currElmKey, options.traverseDirection);
+    }
+
+    canTransferFocus() {
+        
+        // Update if necessary based on business logic
+
+        return true;
+    }
+
+    transferFocus(e, currentElmKey, direction='forward') {
+        let nextElm;
+        if(direction == 'forward')
+            nextElm = this.getNextElm(currentElmKey);
+        else
+            nextElm = this.getPrevElm(currentElmKey);
+        try{
+            if(nextElm) {
+                if(nextElm.type == 'autosuggest')
+                    this.domElmns[nextElm.key].refs.input.focus();
+                else if(nextElm.type == 'datePicker')
+                    this.domElmns[nextElm.key].input.focus();
+                else if (nextElm.type == 'rautosuggest' || nextElm.type == 'defaultInput' || nextElm.type == 'formControl')
+                    this.domElmns[nextElm.key].focus();
+            }
+        } catch(e) {
+            //TODO: Remove this alert after completing development
+            alert(`ERROR Occured (${currentElmKey} - ${nextElm.key}) . Let me refresh.`);
+            window.location.reload(false);
+            console.log(e);
+            console.log(currentElmKey, nextElm.key, direction);
+        }
+    }
+
+    getNextElm(currElmKey) {    
+        let currNode = domList.findNode(currElmKey);
+        let nextNode = currNode.next;
+        if(nextNode && !nextNode.enabled)
+            nextNode = this.getNextElm(nextNode.key);        
+        return nextNode;
+    }
+
+    getPrevElm(currElmKey) {        
+        let currNode = domList.findNode(currElmKey);
+        let prevNode = currNode.prev;
+        if(prevNode && !prevNode.enabled)
+            prevNode = this.getPrevElm(prevNode.key);        
+        return prevNode;
+    }
+
+    setAutoFocusOnFirstInput() {
+        this.domElmns.cname.focus();
     }
 
     reactAutosuggestControls = {
@@ -202,6 +258,7 @@ export default class Customer extends Component {
                     newState.formData.city.hasTextUpdated = false;
                     newState.formData.pincode.hasTextUpdated = false;
                     newState.formData.mobile.hasTextUpdated = false;
+                    this.updateDomStates('enableSelectBtn');
                     break;
                 case 'gaurdianName':
                 case 'address':
@@ -269,11 +326,23 @@ export default class Customer extends Component {
         if((valInState != valInSelectedCustomer)) {
             console.log('RESETTING', valInState, valInSelectedCustomer);
             newState.selectedCustomer = {};
+            this.updateDomStates('enableCreateBtn');
         }
         await this.setState(newState);
     }
 
-    
+    updateDomStates(action) {
+        switch(action) {
+            case 'enableSelectBtn':
+                domList.enable('selectBtn');
+                domList.disable('createBtn');
+                break;
+            case 'enableCreateBtn':
+                domList.disable('selectBtn');
+                domList.enable('createBtn');
+                break;
+        }
+    }
 
     // createNewCustomer() {
     //     return new Promise( (resolve, reject) => {
@@ -460,8 +529,14 @@ export default class Customer extends Component {
                         </Form.Group>
                     </Col>
                     <Col xs={3}>
-                            {this.doesSelectedCustomerExist() && <input type="button" value="Select" className="gs-button" style={{marginTop: '23px'}} onClick={this.onClickSelectBtn}/> }
-                            {!this.doesSelectedCustomerExist() && <input type="button" value="Create" className="gs-button" style={{marginTop: '23px'}} onClick={this.onClickCreateBtn}/> }
+                            {this.doesSelectedCustomerExist() && <input 
+                                            type="button" value="Select" className="gs-button" style={{marginTop: '23px'}} onClick={this.onClickSelectBtn}
+                                            ref={(domElm) => {this.domElmns.selectBtn = domElm}}
+                                            /> }
+                            {!this.doesSelectedCustomerExist() && <input 
+                                            type="button" value="Create" className="gs-button" style={{marginTop: '23px'}} onClick={this.onClickCreateBtn}
+                                            ref={(domElm) => {this.domElmns.createBtn = domElm}}
+                                            /> }
                     </Col>
                 </Row>
             </Container>

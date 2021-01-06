@@ -12,7 +12,7 @@ export default class AddStock extends Component {
     render() {
         return (
             <Container>
-                <Tabs defaultActiveKey="itemManager" className="gs-tabs">
+                <Tabs defaultActiveKey="rate" className="gs-tabs">
                     <Tab eventKey="metalManager" title="Metal Manager">
                         <MetalManager />
                     </Tab>

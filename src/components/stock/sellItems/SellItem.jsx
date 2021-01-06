@@ -12,6 +12,7 @@ import GSCheckbox from '../../ui/gs-checkbox/checkbox';
 import './SellItem.css';
 import {calcPurchaseTotals, calculateExchangeTotals, calculatePaymentFormData, validate, constructApiParams } from './helper';
 import { toast } from 'react-toastify';
+import { DoublyLinkedList } from '../../../utilities/doublyLinkedList';
 
 const TAGID = 'tagid';
 const SELL_QTY = 'qty';
@@ -32,8 +33,27 @@ const PAYMENT_MODE = 'paymentMode';
 const AMT_PAID = 'paid';
 const AMT_BAL = 'balance';
 
+const TAB_KEY = 9;
 const ENTER_KEY = 13;
 const SPACE_KEY = 32;
+
+var domList = new DoublyLinkedList();
+domList.add('retailPrice', {type: 'defaultInput', enabled: true});
+domList.add('tagid', {type: 'rautosuggest', enabled: true});
+domList.add('qty1', {type: 'defaultInput', enabled: true});
+domList.add('wt1', {type: 'defaultInput', enabled: false});
+domList.add('wastage1', {type: 'defaultInput', enabled: true});
+domList.add('labour1', {type: 'defaultInput', enabled: true});
+domList.add('cgstPercent1', {type: 'defaultInput', enabled: true});
+domList.add('sgstPercent1', {type: 'defaultInput', enabled: true});
+domList.add('discount1', {type: 'defaultInput', enabled: true});
+domList.add('addItemToBillPreviewBtn', {type: 'defaultInput', enabled: true});
+domList.add(EX_GROSS_WT, {type: 'defaultInput', enabled: true});
+domList.add(EX_NET_WT, {type: 'defaultInput', enabled: true});
+domList.add(EX_WASTAGE, {type: 'defaultInput', enabled: true});
+domList.add(EX_OLD_RATE, {type: 'defaultInput', enabled: true});
+domList.add(EX_PRICE, {type: 'defaultInput', enabled: true});
+domList.add('exchangeAddBtn', {type: 'defaultInput', enabled: true});
 
 let defaultExchangeItemFormData = {
     exMetal: 'G',
@@ -46,6 +66,8 @@ let defaultExchangeItemFormData = {
 class SellItem extends Component {
     constructor(props) {
         super(props);
+        this.domElmns = {};
+        this.domOrders = domList;
         this.state = {
             retailPrice: this.props.rate.retailRate.gold,
             customerSelectionModalOpen: false,
@@ -85,6 +107,8 @@ class SellItem extends Component {
         this.addItemToBillPreview = this.addItemToBillPreview.bind(this);
         this.onClickExAddButton = this.onClickExAddButton.bind(this);
         this.submit = this.submit.bind(this);
+        this.focusTagIdInput = this.focusTagIdInput.bind(this);
+        this.deleteItemFromPurchaseItemPreview = this.deleteItemFromPurchaseItemPreview.bind(this);
     }
     componentDidMount() {
         this.fetchProdIds();
@@ -134,17 +158,28 @@ class SellItem extends Component {
     closeCustomerModal() {
         this.setState({customerSelectionModalOpen: false});
     }
-    onSelectCustomer(selectedCustomer) {
+    async onSelectCustomer(selectedCustomer) {
         let newState = {...this.state};
         newState.selectedCustomer = selectedCustomer;
         newState.customerSelectionModalOpen = false;
-        this.setState(newState);
+        await this.setState(newState);
+        setTimeout(()=>{
+            this.focusTagIdInput();
+        },300);
     }
 
     onInputValChange(e, identifier) {
         let newState = {...this.state};
         switch(identifier) {
             case SELL_QTY:
+                newState.currSelectedItem.formData[identifier] = parseFloat(e.target.value);
+                this.calculateSellingPrice();
+                let readOnly = this.preventWeighttModification(newState);
+                if(readOnly)
+                    this.updateDomState('readOnlyWt');
+                else
+                    this.updateDomState('editableWt');
+                break;
             case SELL_WT:
             case SELL_WASTAGE:
             case SELL_LABOUR:
@@ -176,6 +211,7 @@ class SellItem extends Component {
                 break;
         }
         this.setState(newState);
+        // this.transferFocus(e, identifier);
     }
 
     onDropdownChange(e, identifier) {
@@ -189,6 +225,16 @@ class SellItem extends Component {
                 break;
         }
         this.setState(newState);
+    }
+
+    onKeyUp(e, options) {
+        e.persist();
+        if(e.keyCode == ENTER_KEY)
+            this.handleEnterKeyPress(e, options);
+        else if(e.keyCode == SPACE_KEY)
+            this.handleSpaceKeyPress(e, options);
+        else if(e.keyCode == TAB_KEY)
+            this.handleTabKeyPress(e, options);
     }
 
     reactAutosuggestControls = {
@@ -239,18 +285,31 @@ class SellItem extends Component {
         }
     }
 
-    addItemToBillPreview() {
+    async addItemToBillPreview(e) {
         let newState = {...this.state};
         newState.purchaseItemPreview = newState.purchaseItemPreview || {};
         newState.purchaseItemPreview[this.state.currSelectedItem.prod_id] = JSON.parse(JSON.stringify(this.state.currSelectedItem));
+        newState.prodId.inputVal = "";
         newState.purchaseTotals = calcPurchaseTotals(newState.purchaseItemPreview);
         newState.currSelectedItem = {};
         newState.paymentFormData = calculatePaymentFormData(newState);
+        await this.setState(newState);
+        //setTimeout(()=>{
+            this.focusTagIdInput();
+        //},100);
+    }
+
+    deleteItemFromPurchaseItemPreview(prodId) {
+        let newState = {...this.state};
+        if(newState.purchaseItemPreview[prodId])
+            delete newState.purchaseItemPreview[prodId]
         this.setState(newState);
     }
 
-    exchangeItemCheckboxListener(e) {
-        this.setState({hasExchangeItem: e.target.checked});
+    async exchangeItemCheckboxListener(e) {
+        await this.setState({hasExchangeItem: e.target.checked});
+        if(this.state.hasExchangeItem)
+            this.focusExGrossWtInput();
     }
 
     onClickExAddButton() {
@@ -269,6 +328,7 @@ class SellItem extends Component {
         newState.exchangeItemsTotals = calculateExchangeTotals(newState.exchangeItems);
         newState.paymentFormData = calculatePaymentFormData(newState);
         this.setState(newState);
+        this.focusExGrossWtInput();
     }
 
     async submit() {
@@ -303,9 +363,14 @@ class SellItem extends Component {
                     let prodId = e.target.value;
                     newState.prodId.inputVal = prodId;
                     this.setState(newState);
-                    canTransferFocus = false;
                     if(prodId)
                         this.fetchItemByProdId(prodId);
+                    else
+                        canTransferFocus = false;
+                    break;
+                case EX_GROSS_WT:
+                    if(!e.target.value)
+                        canTransferFocus = false;
                     break;
             }
         }
@@ -317,9 +382,69 @@ class SellItem extends Component {
 
     }
 
-    transferFocus(e, currElmKey) {
+    handleTabKeyPress(e, options) {
 
     }
+
+    transferFocus(e, currentElmKey, direction='forward') {
+        let nextElm;
+        if(direction == 'forward')
+            nextElm = this.getNextElm(currentElmKey);
+        else
+            nextElm = this.getPrevElm(currentElmKey);
+        try{
+            if(nextElm) {
+                if(nextElm.type == 'autosuggest')
+                    this.domElmns[nextElm.key].refs.input.focus();
+                else if(nextElm.type == 'datePicker')
+                    this.domElmns[nextElm.key].input.focus();
+                else if (nextElm.type == 'rautosuggest' || nextElm.type == 'defaultInput' || nextElm.type == 'formControl')
+                    this.domElmns[nextElm.key].focus();
+            }
+        } catch(e) {
+            //TODO: Remove this alert after completing development
+            alert(`ERROR Occured (${currentElmKey} - ${nextElm.key}) . Let me refresh.`);
+            window.location.reload(false);
+            console.log(e);
+            console.log(currentElmKey, nextElm.key, direction);
+        }
+    }
+
+    getNextElm(currElmKey) {    
+        let currNode = domList.findNode(currElmKey);
+        let nextNode = currNode.next;
+        if(nextNode && !nextNode.enabled)
+            nextNode = this.getNextElm(nextNode.key);        
+        return nextNode;
+    }
+
+    getPrevElm(currElmKey) {        
+        let currNode = domList.findNode(currElmKey);
+        let prevNode = currNode.prev;
+        if(prevNode && !prevNode.enabled)
+            prevNode = this.getPrevElm(prevNode.key);        
+        return prevNode;
+    }
+
+    focusTagIdInput() {
+        this.domElmns['tagid'].focus();
+    }
+
+    focusExGrossWtInput() {
+        this.domElmns[EX_GROSS_WT].focus();
+    }
+
+    updateDomState(action) {
+        switch(action) {
+            case 'readOnlyWt':
+                domList.disable('wt1');
+                break;
+            case 'editableWt':
+                domList.enable('wt1');
+                break;
+        }
+    }
+
 
     changeCustomer() {
         this.setState({customerSelectionModalOpen: true});
@@ -332,10 +457,11 @@ class SellItem extends Component {
         return flag;
     }
 
-    preventWeighttModification() {
+    preventWeighttModification(stateObj) {
         let flag = true;
-        if(this.state.currSelectedItem && Object.keys(this.state.currSelectedItem).length > 0) {
-            if(this.state.currSelectedItem.quantity > 1 || this.state.currSelectedItem.formData.qty != this.state.currSelectedItem.quantity)
+        stateObj = stateObj || this.state;
+        if(stateObj.currSelectedItem && Object.keys(stateObj.currSelectedItem).length > 0) {
+            if(stateObj.currSelectedItem.quantity > 1 || stateObj.currSelectedItem.formData.qty != stateObj.currSelectedItem.quantity)
                 flag = false;
         }
         return flag;
@@ -410,7 +536,7 @@ class SellItem extends Component {
                                 className: "react-autosuggest__input tagid",
                                 autoComplete:"no"
                             }}
-                            //ref = {(domElm) => { this.domElmns.city = domElm?domElm.input:domElm; }}
+                            ref = {(domElm) => { this.domElmns.tagid = domElm?domElm.input:domElm; }}
                         />
                     </Form.Group>
                 </Col>
@@ -531,12 +657,36 @@ class SellItem extends Component {
                             </thead>
                             <tbody>
                                 <tr className="selling-detail">
-                                    <td><input type="number" className="gs-input" value={formData.qty} onChange={(e)=>this.onInputValChange(e, 'qty')} readOnly={isReadOnly}/></td>
-                                    <td><input type="number" className="gs-input" value={formData.wt} onChange={(e)=>this.onInputValChange(e, 'wt')} readOnly={this.preventWeighttModification()}/></td>
-                                    <td><input type="number" className="gs-input" value={formData.wastage} onChange={(e)=>this.onInputValChange(e, 'wastage')} readOnly={isReadOnly}/></td>
-                                    <td><input type="number" className="gs-input" value={formData.labour} onChange={(e)=>this.onInputValChange(e, 'labour')} readOnly={isReadOnly}/></td>
-                                    <td><input type="number" className="gs-input" value={formData.cgstPercent} onChange={(e)=>this.onInputValChange(e, 'cgstPercent')} readOnly={isReadOnly}/></td>
-                                    <td><input type="number" className="gs-input" value={formData.sgstPercent} onChange={(e)=>this.onInputValChange(e, 'sgstPercent')} readOnly={isReadOnly}/></td>
+                                    <td>
+                                        <input type="number" className="gs-input" value={formData.qty} onChange={(e)=>this.onInputValChange(e, 'qty')} readOnly={isReadOnly}
+                                                                onKeyUp = {(e) => this.onKeyUp(e, {currElmKey: 'qty1'})}
+                                                                ref= {(domElm) => {this.domElmns.qty1 = domElm; }}/>
+                                    </td>
+                                    <td>
+                                        <input type="number" className="gs-input" value={formData.wt} onChange={(e)=>this.onInputValChange(e, 'wt')} readOnly={this.preventWeighttModification()}
+                                                                onKeyUp = {(e) => this.onKeyUp(e, {currElmKey: 'wt1'})}
+                                                                ref= {(domElm) => {this.domElmns.wt1 = domElm; }} />
+                                    </td>
+                                    <td>
+                                        <input type="number" className="gs-input" value={formData.wastage} onChange={(e)=>this.onInputValChange(e, 'wastage')} readOnly={isReadOnly}
+                                                                onKeyUp = {(e) => this.onKeyUp(e, {currElmKey: 'wastage1'})}
+                                                                ref= {(domElm) => {this.domElmns.wastage1 = domElm;}} />
+                                    </td>
+                                    <td>
+                                        <input type="number" className="gs-input" value={formData.labour} onChange={(e)=>this.onInputValChange(e, 'labour')} readOnly={isReadOnly}
+                                                                onKeyUp = {(e) => this.onKeyUp(e, {currElmKey: 'labour1'})}
+                                                                ref= {(domElm) => {this.domElmns.labour1 = domElm;}} />
+                                    </td>
+                                    <td>
+                                        <input type="number" className="gs-input" value={formData.cgstPercent} onChange={(e)=>this.onInputValChange(e, 'cgstPercent')} readOnly={isReadOnly}
+                                                                onKeyUp = {(e) => this.onKeyUp(e, {currElmKey: 'cgstPercent1'})}
+                                                                ref= {(domElm) => {this.domElmns.cgstPercent1 = domElm;}} />
+                                    </td>
+                                    <td>
+                                        <input type="number" className="gs-input" value={formData.sgstPercent} onChange={(e)=>this.onInputValChange(e, 'sgstPercent')} readOnly={isReadOnly}
+                                                                onKeyUp = {(e) => this.onKeyUp(e, {currElmKey: 'sgstPercent1'})}
+                                                                ref= {(domElm) => {this.domElmns.sgstPercent1 = domElm;}} />
+                                    </td>
                                 </tr>
                             </tbody>
                         </table>
@@ -558,7 +708,9 @@ class SellItem extends Component {
                             <tbody>
                                 <tr className="selling-detail">
                                     <td>
-                                        <input type="number" className="gs-input" value={formData.discount} onChange={(e) => this.onInputValChange(e, 'discount')} readOnly={isReadOnly}/>
+                                        <input type="number" className="gs-input" value={formData.discount} onChange={(e) => this.onInputValChange(e, 'discount')} readOnly={isReadOnly}
+                                            onKeyUp = {(e) => this.onKeyUp(e, {currElmKey: 'discount1'})}
+                                            ref= {(domElm) => {this.domElmns.discount1 = domElm;}} />
                                     </td>
                                     <td>
                                         <span className="selling-price-val">{formData.price}</span>
@@ -569,8 +721,11 @@ class SellItem extends Component {
                     </Col>
                     <Col xs={6} style={{textAlign: 'right'}}>
                         <input type="button" className="gs-button" value="ADD TO LIST"
-                         onClick={this.addItemToBillPreview} disabled={isReadOnly}
+                         onClick={(e) => this.addItemToBillPreview(e)} 
+                        //  onKeyUp = {(e) => this.onKeyUp(e, {currElmKey: 'addItemToBillPreviewBtn'})}
+                         disabled={isReadOnly}
                          style={{lineHeight: "47px"}}
+                         ref={(domElm) => {this.domElmns.addItemToBillPreviewBtn = domElm}}
                          />
                     </Col>
                 </Row>
@@ -619,7 +774,7 @@ class SellItem extends Component {
                         <td>{anItem.formData.sgstPercent}</td>
                         <td>{anItem.formData.discount}</td>
                         <td>{anItem.formData.price}</td>
-                        <td>ACTIONS</td>
+                        <td><span onClick={(e) => this.deleteItemFromPurchaseItemPreview(anItem.prod_id)}><FontAwesomeIcon icon="backspace"/></span></td>
                     </tr> 
                 );
             });
@@ -707,8 +862,8 @@ class SellItem extends Component {
             )
         } else {
             return (
-                <Col xs={{span: 3, offset: 3}}>
-                    Select Customer...
+                <Col xs={{span: 12}}>
+                    
                 </Col>
             )
         }
@@ -754,11 +909,31 @@ class SellItem extends Component {
                                         </Form.Control>
                                     </Form.Group>
                                 </td>
-                                <td><input type="number" className="gs-input" value={this.state.exchangeItemFormData[EX_GROSS_WT]} onChange={(e)=>this.onInputValChange(e, EX_GROSS_WT)} /></td>
-                                <td><input type="number" className="gs-input" value={this.state.exchangeItemFormData[EX_NET_WT]} onChange={(e)=>this.onInputValChange(e, EX_NET_WT)} /></td>
-                                <td><input type="number" className="gs-input" value={this.state.exchangeItemFormData[EX_WASTAGE]} onChange={(e)=>this.onInputValChange(e, EX_WASTAGE)} /></td>
-                                <td><input type="number" className="gs-input" value={this.state.exchangeItemFormData[EX_OLD_RATE]} onChange={(e)=>this.onInputValChange(e, EX_OLD_RATE)} /></td>
-                                <td><input type="number" className="gs-input" value={this.state.exchangeItemFormData[EX_PRICE]} onChange={(e)=>this.onInputValChange(e, EX_PRICE)} /></td>
+                                <td>
+                                    <input type="number" className="gs-input" value={this.state.exchangeItemFormData[EX_GROSS_WT]} onChange={(e)=>this.onInputValChange(e, EX_GROSS_WT)} 
+                                            onKeyUp = {(e) => this.onKeyUp(e, {currElmKey: EX_GROSS_WT})}
+                                            ref= {(domElm) => {this.domElmns[EX_GROSS_WT] = domElm; }}/>
+                                </td>
+                                <td>
+                                    <input type="number" className="gs-input" value={this.state.exchangeItemFormData[EX_NET_WT]} onChange={(e)=>this.onInputValChange(e, EX_NET_WT)} 
+                                            onKeyUp = {(e) => this.onKeyUp(e, {currElmKey: EX_NET_WT})}
+                                            ref= {(domElm) => {this.domElmns[EX_NET_WT] = domElm; }}/>
+                                </td>
+                                <td>
+                                    <input type="number" className="gs-input" value={this.state.exchangeItemFormData[EX_WASTAGE]} onChange={(e)=>this.onInputValChange(e, EX_WASTAGE)} 
+                                            onKeyUp = {(e) => this.onKeyUp(e, {currElmKey: EX_WASTAGE})}
+                                            ref= {(domElm) => {this.domElmns[EX_WASTAGE] = domElm; }}/>
+                                </td>
+                                <td>
+                                    <input type="number" className="gs-input" value={this.state.exchangeItemFormData[EX_OLD_RATE]} onChange={(e)=>this.onInputValChange(e, EX_OLD_RATE)} 
+                                            onKeyUp = {(e) => this.onKeyUp(e, {currElmKey: EX_OLD_RATE})}
+                                            ref= {(domElm) => {this.domElmns[EX_OLD_RATE] = domElm; }}/>
+                                </td>
+                                <td>
+                                    <input type="number" className="gs-input" value={this.state.exchangeItemFormData[EX_PRICE]} onChange={(e)=>this.onInputValChange(e, EX_PRICE)} 
+                                            onKeyUp = {(e) => this.onKeyUp(e, {currElmKey: EX_PRICE})}
+                                            ref= {(domElm) => {this.domElmns[EX_PRICE] = domElm; }}/>
+                                </td>
                             </tr>
                         </tbody>
                     </table>
@@ -802,7 +977,8 @@ class SellItem extends Component {
                     {/* </Col> */}
                 </Col>
                 <Col xs={2}>
-                    <input type="button" className="gs-button" value="ADD" onClick={this.onClickExAddButton}/>
+                    <input type="button" className="gs-button" value="ADD" onClick={this.onClickExAddButton}
+                                                 ref={(domElm) => {this.domElmns.exchangeAddBtn = domElm}} />
                 </Col>
             </>
         );
@@ -926,18 +1102,30 @@ class SellItem extends Component {
                         <Row className="customer-selection-parent-row">
                             <Col xs={3} className="customer-selection-panel">
                                 { this.doesSelectedCustomerExist() ?
-                                    <Row style={{marginTop: '6px'}}>
+                                    <Row style={{marginTop: '14px'}}>
                                         <Col xs={2}><span onClick={this.changeCustomer}><FontAwesomeIcon icon="user-edit"/></span></Col>
                                         <Col xs={9}>{this.state.selectedCustomer.cname}</Col>
                                     </Row>
                                     :
                                     <Row style={{marginTop: '6px'}}>
-                                        <Col><input type="button" className="gs-button"value="Select Customer" onClick={this.openCustomerModal}/></Col>
+                                        <Col>
+                                            <input type="button" 
+                                                className="gs-button" 
+                                                value="Select Customer" 
+                                                onClick={this.openCustomerModal}
+                                                />
+                                        </Col>
                                     </Row>
                                 }
                             </Col>
                             <Col xs={9} className="gold-rate-container">
-                                <div style={{marginTop: '8px'}}>Retail Rate: <input type="number" value={this.state.retailPrice} onChange={(e) => this.onInputValChange(e, 'retailPrice')}/></div>
+                                <div style={{marginTop: '8px'}}>Retail Rate: 
+                                    <input type="number" 
+                                        value={this.state.retailPrice} 
+                                        onChange={(e) => this.onInputValChange(e, 'retailPrice')}
+                                        ref = {(domElm) => { this.domElmns.retailPrice = domElm?domElm.input:domElm; }}
+                                        />
+                                </div>
                             </Col>
                         </Row>
                         <Row className="second-card">

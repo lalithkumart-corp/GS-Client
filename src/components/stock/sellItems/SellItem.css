@@ -107,3 +107,7 @@
     border-color: lightgray;
     width: 100px;
 }
+
+.sell-item-container .common-modal-content .body {
+    padding-bottom: 70px;
+}

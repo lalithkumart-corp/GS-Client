@@ -17,9 +17,13 @@
     border-radius: 3px;
     overflow: hidden;
 }
+.common-modal-content .header {
+    background-color: white;
+    text-align: right;
+}
 .common-modal-content .close-icon{
     right: 5px;
-    position: absolute;    
+    /* position: absolute;     */
     top: 6px;
     cursor: pointer;    
     padding-right: 15px !important;

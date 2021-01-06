@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import { connect } from 'react-redux';
 import { Container, Row, Col, Form, InputGroup } from 'react-bootstrap';
 import './AddStock.css';
 import DatePicker from 'react-datepicker';
@@ -74,7 +75,7 @@ domList.add(PROD_IGST_PERCENT, {type: 'formControl', enabled: true});
 domList.add(ADD_ENTRY, {type: 'defaultInput', enabled: true});
 domList.add(CONFIRM_ADD, {type: 'defaultInput', enabled: true});
 
-export default class AddStock extends Component {
+class AddStock extends Component {
     constructor(props) {
         super(props);
         this.state = {
@@ -84,8 +85,8 @@ export default class AddStock extends Component {
                     _inputVal: new Date().toISOString()
                 },
                 metal: 'G',
-                metalPrice: '',
-                metalPricePerGm: '',
+                metalPrice: this.props.rate.metalRate.gold,
+                metalPricePerGm: this.getMetalPricePerGm('G', this.props.rate.metalRate.gold),
                 dealerStoreName: '',
                 dealerPersonName: '',
                 productCode: '',
@@ -148,6 +149,16 @@ export default class AddStock extends Component {
         this.fetchTouchList();
     }
 
+    getMetalPricePerGm(categ, val) {
+        let perGm = '';
+        if(val) {
+            if(categ == 'G')
+                perGm = val/10;
+            else
+                perGm = val/1000;
+        }
+        return perGm;
+    }
     inputControls = {
         onChange: (e, val, identifier, options) => {
             let newState = {...this.state};
@@ -1094,3 +1105,11 @@ export default class AddStock extends Component {
         )
     }
 }
+
+const mapStateToProps = (state) => { 
+    return {
+        rate: state.rate
+    };
+};
+
+export default connect(mapStateToProps, {})(AddStock);
