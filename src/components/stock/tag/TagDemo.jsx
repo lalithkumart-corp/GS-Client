@@ -82,19 +82,19 @@ class Tag extends Component {
     render() {
         return (
             <div>
-                <div style={{width: "200px", height: "50px", backgroundColor: "#ecebeb", display: "inline-block", verticalAlign: "middle"}}>
+                <div style={{width: "280px", height: "50px", backgroundColor: "#ecebeb", display: "inline-block", verticalAlign: "middle", fontSize: '17px'}}>
                     <Row>
-                        <Col xs={6} className="left-side" style={{ display: "inline-block", verticalAlign: "middle", whiteSpace: "pre-wrap", paddingRight: 0, paddingTop: '5px'}}>
+                        <Col xs={6} className="left-side" style={{ display: "inline-block", verticalAlign: "middle", whiteSpace: "pre-wrap", paddingRight: 0, paddingTop: '0', paddingLeft: '32px'}}>
                             <div style={{textAlign: "center"}}>MJK</div>
-                            <div style={{textAlign: "center"}}>{this.props.leftContent}</div>
+                            <div style={{textAlign: "center", fontSize: '20px'}}>{this.props.leftContent}</div>
                         </Col>
                         <Col xs={6} className="right-side" style={{ display: "inline-block", verticalAlign: "middle", whiteSpace: "pre-wrap"}}>
-                            <div style={{textAlign: "center"}}>{this.props.rightContent}</div>
-                            <div style={{fontSize: '10px', textAlign: 'right', paddingTop: '14px'}}>{this.props.meltingTouch}</div>
+                            <div style={{textAlign: "center", paddingTop: '6px', fontSize: '22px'}}>{this.props.rightContent}</div>
+                            <div style={{fontSize: '14px', textAlign: 'right', paddingTop: '0', position: 'absolute', right: '21px', top: '34px'}}>{this.props.meltingTouch}</div>
                         </Col>
                     </Row>
                 </div>
-                <div style={{width: "100px", height: "50px", display: "inline-block", verticalAlign: "middle"}}>
+                <div style={{width: "280px", height: "50px", display: "inline-block", verticalAlign: "middle"}}>
                     <span></span>
                 </div>
             </div>
