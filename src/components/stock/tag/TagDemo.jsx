@@ -7,9 +7,10 @@ export default class TagDemo extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            storeName: "Mahalakshmi Jewellers",
+            leftContent: "wt: 0.00gm",
             storeSuffix: "",
-            weight: "wt: 0.00gm "
+            rightContent: "wt: 0.00",
+            meltingTouch: 75
         }
         this.inputControls.onChange = this.inputControls.onChange.bind(this);
     }
@@ -17,11 +18,14 @@ export default class TagDemo extends Component {
         onChange: (e, val, identifier) => {
             let newState = {...this.state};
             switch(identifier) {
-                case 'storeName':
-                    newState.storeName = val;
+                case 'leftContent':
+                    newState.leftContent = val;
                     break;
-                case 'weight':
-                    newState.weight = val;
+                case 'rightContent':
+                    newState.rightContent = val;
+                    break;
+                case 'meltingTouch':
+                    newState.meltingTouch = val;
                     break;
             }
             this.setState(newState);
@@ -32,16 +36,25 @@ export default class TagDemo extends Component {
             <Container>
                 <Row className="gs-card">
                     <Col className="gs-card-content">
-                        <input 
-                            type="text" 
-                            value={this.state.storeName}
-                            onChange={ (e) => this.inputControls.onChange(null, e.target.value, 'storeName') }
+                        <textarea 
+                            value={this.state.leftContent}
+                            onChange={ (e) => this.inputControls.onChange(null, e.target.value, 'leftContent') }
                             />
-                        <input 
+                        {/* <input 
+                            type="text" 
+                            value={this.state.leftContent}
+                            onChange={ (e) => this.inputControls.onChange(null, e.target.value, 'leftContent') }
+                            /> */}
+                        <textarea 
+                            value={this.state.rightContent}
+                            onChange={ (e) => this.inputControls.onChange(null, e.target.value, 'rightContent') }
+                            />
+                        {/* <input 
                             type="text" 
                             value={this.state.weight}
                             onChange={ (e) => this.inputControls.onChange(null, e.target.value, 'weight') }
-                            />
+                            /> */}
+                        <input type="text" value={this.state.meltingTouch} onChange={ (e) => this.inputControls.onChange(null, e.target.value, 'meltingTouch')} />
                         <ReactToPrint
                             trigger={() => {
                                 // NOTE: could just as easily return <SomeComponent />. Do NOT pass an `onClick` prop
@@ -54,7 +67,7 @@ export default class TagDemo extends Component {
                 </Row>
                 <Row className="gs-card">
                     <Col className="gs-card-content">
-                        <Tag ref={el => (this.componentRef = el)} storeName={this.state.storeName} weight={this.state.weight} />
+                        <Tag ref={el => (this.componentRef = el)} leftContent={this.state.leftContent} rightContent={this.state.rightContent} meltingTouch={this.state.meltingTouch} />
                     </Col>
                 </Row>
             </Container>
@@ -70,8 +83,16 @@ class Tag extends Component {
         return (
             <div>
                 <div style={{width: "200px", height: "50px", backgroundColor: "#ecebeb", display: "inline-block", verticalAlign: "middle"}}>
-                    <Col style={{width: "100px", display: "inline-block", padding: 0, verticalAlign: "middle"}}>{this.props.storeName}</Col>
-                    <Col style={{width: "100px", display: "inline-block", padding: 0, verticalAlign: "middle"}}>{this.props.weight}</Col>
+                    <Row>
+                        <Col xs={6} className="left-side" style={{ display: "inline-block", verticalAlign: "middle", whiteSpace: "pre-wrap", paddingRight: 0, paddingTop: '5px'}}>
+                            <div style={{textAlign: "center"}}>MJK</div>
+                            <div style={{textAlign: "center"}}>{this.props.leftContent}</div>
+                        </Col>
+                        <Col xs={6} className="right-side" style={{ display: "inline-block", verticalAlign: "middle", whiteSpace: "pre-wrap"}}>
+                            <div style={{textAlign: "center"}}>{this.props.rightContent}</div>
+                            <div style={{fontSize: '10px', textAlign: 'right', paddingTop: '14px'}}>{this.props.meltingTouch}</div>
+                        </Col>
+                    </Row>
                 </div>
                 <div style={{width: "100px", height: "50px", display: "inline-block", verticalAlign: "middle"}}>
                     <span></span>
