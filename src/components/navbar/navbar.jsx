@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import { connect } from 'react-redux';
 import { Nav, Navbar, NavDropdown, NavItem, DropdownItem } from 'react-bootstrap';
 import { getSession } from '../../core/storage';
 import { Link } from 'react-router-dom'
@@ -14,7 +15,21 @@ class NavbarComp extends Component {
             title += ` ${session.username}`;
         return title;
     }
-    render() {
+    getUnactivatedHeader() {
+        return (
+            <Navbar bg="light" expand="lg">
+                <Navbar.Collapse id="basic-navbar-nav">
+                    <Nav className="mr-auto" style={{borderLeft: "1px solid lightgray"}}></Nav>
+                    <Nav>
+                        <NavDropdown title={this.getTitie()}>
+                            <NavDropdown.Item as={Link} to="/logout">Logout</NavDropdown.Item>
+                        </NavDropdown>
+                    </Nav>
+                </Navbar.Collapse>
+            </Navbar>
+        )
+    }
+    getRegularNavBar() {
         return (
             <Navbar bg="light" expand="lg">
                 <Navbar.Collapse id="basic-navbar-nav">
@@ -58,6 +73,24 @@ class NavbarComp extends Component {
             </Navbar>
         )
     }
+    render() {
+        let navbar;
+        if(this.props.auth.isActivated)
+            navbar = this.getRegularNavBar();
+        else
+            navbar = this.getUnactivatedHeader();
+        return (
+            <>
+                {navbar}
+            </>
+        )
+    }
 }
 
-export default NavbarComp;
+const mapStateToProps = (state) => {     
+    return {        
+        auth: state.auth
+    };
+};
+
+export default connect(mapStateToProps)(NavbarComp);

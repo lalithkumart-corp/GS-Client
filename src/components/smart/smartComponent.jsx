@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { Router, Route } from 'react-router-dom';
 import { connect } from 'react-redux';
+import { isAccountActive } from '../../actions/login.js';
 import Header from '../header/header';
 import Home from '../home/home';
 import LoginPage from '../login/login';
@@ -29,6 +30,7 @@ import StockViewTabLayout from '../stock/viewStock/index';
 import SellItem from '../stock/sellItems/SellItem';
 import StockSetup from '../stock/setup/StockSetup';
 import TagDemo from '../stock/tag/TagDemo';
+import ActivationPage from '../activation/ActivationPage';
 import FontViewerPage from '../fontViewer/FontView';
 import 'bootstrap/dist/css/bootstrap.min.css';
 
@@ -37,10 +39,29 @@ class SmartComponent extends Component {
         super(props);
     }
     componentWillMount() {
-
+        this.props.isAccountActive();
     }
     render() {        
         if(this.props.auth.isAuthenticated) {
+            if(!this.props.auth.isActivated) 
+                return (
+                    <Router history={history}>
+                        <div>
+                            <header>
+                                {/* <Header /> */}
+                            </header>
+                            <div className='navbar-container'>
+                                <Navbar />
+                            </div>
+                            <div className='page-content'>
+                                <ToastContainer position={'top-center'} hideProgressBar={false}/>
+                                <Route exact path= '/' component={ActivationPage} />
+                                <Route path= '/logout' component={Logout} />
+                            </div>
+                        </div>
+                    </Router>
+                )
+
             return (
                 <Router history={history}>
                         <div>
@@ -97,4 +118,4 @@ const mapStateToProps = (state) => {
     };
 };
 
-export default connect(mapStateToProps)(SmartComponent);
+export default connect(mapStateToProps, {isAccountActive})(SmartComponent);

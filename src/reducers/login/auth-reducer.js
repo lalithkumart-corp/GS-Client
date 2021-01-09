@@ -1,9 +1,10 @@
-import { isAuthenticated } from '../../utilities/authUtils';
+import { isAuthenticated, isActivated } from '../../utilities/authUtils';
 import { getUserPreference } from '../../core/storage';
 
 let defaultState = {
     isAuthenticated: false,
-    loading: false
+    loading: false,
+    isActivated: false
 };
 export default function authReducer(state=defaultState, action){
     let newState = { ...state };
@@ -14,6 +15,12 @@ export default function authReducer(state=defaultState, action){
         newState = {...newState, isAuthenticated: true, userPreferences};
 
     switch(action.type){
+        case 'APPLICATION_FLAG':
+            newState = {
+                ...newState,
+                isActivated: action.data
+            };
+            break;
         case 'ENABLE_LOADER':
             newState = {
                 ...newState,
@@ -26,7 +33,8 @@ export default function authReducer(state=defaultState, action){
                 loading: false,
                 isAuthenticated: true,
                 session: action.data.session,
-                userPreferences: action.data.userPreferences
+                userPreferences: action.data.userPreferences,
+                isActivated: action.data.applicationStatus
             };
             break;
         case 'AUTH_ERROR':

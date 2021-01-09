@@ -8,7 +8,7 @@ import { ClipLoader } from 'react-spinners';
 
 import { toast } from 'react-toastify';
 
-import { doAuthentication, enableLoader } from '../../actions/login';
+import { doAuthentication, enableLoader, isAccountActive } from '../../actions/login';
 import './login.css';
 
 const ENTER_KEY = 13;
@@ -83,6 +83,7 @@ class LoginPage extends Component {
             password: this.state.formData.password.val,
         }
         this.props.doAuthentication(params);
+        this.props.isAccountActive();
     }
 
     validationEngine(formData) {
@@ -177,4 +178,4 @@ const mapStateToProps = (state) => {
     };
 };
 
-export default connect(mapStateToProps, {doAuthentication, enableLoader})(LoginPage);
+export default connect(mapStateToProps, {doAuthentication, enableLoader, isAccountActive})(LoginPage);

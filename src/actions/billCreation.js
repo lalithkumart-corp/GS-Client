@@ -183,6 +183,8 @@ const getErrorText = (resp) => {
             if(resp.data.ERROR.length > 0) {
                 if(Array.isArray(resp.data.ERROR)) {
                     errorText = resp.data.ERROR.join(', ');
+                } else if(typeof resp.data.ERROR == 'string') {
+                    errorText = resp.data.ERROR;
                 }
             }
         }

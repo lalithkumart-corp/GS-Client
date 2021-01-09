@@ -5,6 +5,7 @@ import './signup.css';
 import { toast } from 'react-toastify';
 import { ADD_CUSTOMER } from '../../core/sitemap';
 import axios from 'axios';
+import history from '../../history';
 
 const ENTER_KEY = 13;
 const SPACE_KEY = 32;
@@ -17,6 +18,7 @@ domList.add('name', {type: 'formControl', enabled: true});
 domList.add('guardianName', {type: 'formControl', enabled: true});
 domList.add('storeName', {type: 'formControl', enabled: true});
 domList.add('phone', {type: 'formControl', enabled: true});
+domList.add('submitBtn', {type: 'defaultInput', enabled: true});
 
 export default class SignUpPage extends Component {
     constructor(props) {
@@ -78,9 +80,10 @@ export default class SignUpPage extends Component {
             newState.formData[key].hasError = hasError;
             this.setState(newState);
             this.transferFocus(e, options.currElmKey, options.traverseDirection);
-        } else if(key == 'register'){
-            this.handleSubmit();
-        }
+        } 
+        // else if(key == 'register'){
+        //     this.handleSubmit();
+        // }
     }
     
     handleSpaceKeyPress(e, options) {
@@ -141,7 +144,7 @@ export default class SignUpPage extends Component {
     }
 
     redirectToLoginPage() {
-
+        history.push('/');
     }
 
     getSignupArgs() {
@@ -163,17 +166,10 @@ export default class SignUpPage extends Component {
             nextElm = this.getPrevElm(currentElmKey);        
         try{
             if(nextElm) {
-                if(nextElm.value.indexOf('orn') !== 0) { //If not Orn Input field                
-                    if(nextElm.type == 'autosuggest'){
-                        this.domElmns[nextElm.key].refs.input.focus();
-                    }else if (nextElm.type == 'defaultInput' || nextElm.type == 'formControl'){                    
-                        this.domElmns[nextElm.key].focus();
-                    }
-                } else { //Hanlding Orn Input fields                
-                    if(nextElm.type == 'autosuggest')
-                        this.domElmns.orn[nextElm.key].refs.input.focus();
-                    else if (nextElm.type == 'defaultInput' || nextElm.type == 'formControl')
-                        this.domElmns.orn[nextElm.key].focus();
+                if(nextElm.type == 'autosuggest'){
+                    this.domElmns[nextElm.key].refs.input.focus();
+                }else if (nextElm.type == 'defaultInput' || nextElm.type == 'formControl'){    
+                    this.domElmns[nextElm.key].focus();
                 }
             }
         } catch(e) {
@@ -243,7 +239,7 @@ export default class SignUpPage extends Component {
                                             placeholder=""
                                             className="bill-number-field"
                                             onChange={(e) => this.inputControls.onChange(null, e.target.value, "email")}
-                                            inputRef = {(domElm) => { this.domElmns.email = domElm; }}
+                                            ref = {(domElm) => { this.domElmns.email = domElm; }}
                                             onKeyUp = {(e) => this.handleKeyUp(e, {currElmKey: 'email'}) }
                                             readOnly={this.state.loading}
                                         />
@@ -266,7 +262,7 @@ export default class SignUpPage extends Component {
                                             placeholder=""
                                             className="bill-number-field"
                                             onChange={(e) => this.inputControls.onChange(null, e.target.value, "password")}
-                                            inputRef = {(domElm) => { this.domElmns.password = domElm; }}
+                                            ref = {(domElm) => { this.domElmns.password = domElm; }}
                                             onKeyUp = {(e) => this.handleKeyUp(e, {currElmKey: 'password'}) }
                                             readOnly={this.state.loading}
                                         />
@@ -287,7 +283,7 @@ export default class SignUpPage extends Component {
                                             placeholder=""
                                             className="bill-number-field"
                                             onChange={(e) => this.inputControls.onChange(null, e.target.value, "confirmPassword")}
-                                            inputRef = {(domElm) => { this.domElmns.confirmPassword = domElm; }}
+                                            ref = {(domElm) => { this.domElmns.confirmPassword = domElm; }}
                                             onKeyUp = {(e) => this.handleKeyUp(e, {currElmKey: 'confirmPassword'}) }
                                             readOnly={this.state.loading}
                                         />
@@ -310,7 +306,7 @@ export default class SignUpPage extends Component {
                                             placeholder=""
                                             className="bill-number-field"
                                             onChange={(e) => this.inputControls.onChange(null, e.target.value, "name")}
-                                            inputRef = {(domElm) => { this.domElmns.name = domElm; }}
+                                            ref = {(domElm) => { this.domElmns.name = domElm; }}
                                             onKeyUp = {(e) => this.handleKeyUp(e, {currElmKey: 'name'}) }
                                             readOnly={this.state.loading}
                                         />
@@ -331,7 +327,7 @@ export default class SignUpPage extends Component {
                                             placeholder=""
                                             className="bill-number-field"
                                             onChange={(e) => this.inputControls.onChange(null, e.target.value, "guardianName")}
-                                            inputRef = {(domElm) => { this.domElmns.guardianName = domElm; }}
+                                            ref = {(domElm) => { this.domElmns.guardianName = domElm; }}
                                             onKeyUp = {(e) => this.handleKeyUp(e, {currElmKey: 'guardianName'}) }
                                             readOnly={this.state.loading}
                                         />
@@ -354,7 +350,7 @@ export default class SignUpPage extends Component {
                                             placeholder=""
                                             className="bill-number-field"
                                             onChange={(e) => this.inputControls.onChange(null, e.target.value, "storeName")}
-                                            inputRef = {(domElm) => { this.domElmns.storeName = domElm; }}
+                                            ref = {(domElm) => { this.domElmns.storeName = domElm; }}
                                             onKeyUp = {(e) => this.handleKeyUp(e, {currElmKey: 'storeName'}) }
                                             readOnly={this.state.loading}
                                         />
@@ -375,7 +371,7 @@ export default class SignUpPage extends Component {
                                             placeholder=""
                                             className="bill-number-field"
                                             onChange={(e) => this.inputControls.onChange(null, e.target.value, "phone")}
-                                            inputRef = {(domElm) => { this.domElmns.phone = domElm; }}
+                                            ref = {(domElm) => { this.domElmns.phone = domElm; }}
                                             onKeyUp = {(e) => this.handleKeyUp(e, {currElmKey: 'phone'}) }
                                             readOnly={this.state.loading}
                                         />
@@ -390,7 +386,14 @@ export default class SignUpPage extends Component {
                     </Col>
                 </Row>
                 <Row className='footer-container'>
-                    <input type='button' className='gs-button' value='Register' onKeyUp={(e) => this.handleKeyUp(e, {currElmKey: 'register'})} />
+                    <input 
+                        type='button' 
+                        className='gs-button' 
+                        value='Register' 
+                        ref={(domElm) => {this.domElmns.submitBtn = domElm}}
+                        onClick={(e) => this.handleSubmit()}
+                        // onKeyUp={(e) => this.handleKeyUp(e, {currElmKey: 'register'})} 
+                    />
                 </Row>
             </Container>
         )

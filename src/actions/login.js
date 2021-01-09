@@ -1,6 +1,6 @@
 import axios from 'axios';
 import { getAccessToken, saveSession, clearSession, saveUserPreferences } from '../core/storage';
-import { LOGIN, LOGOUT } from '../core/sitemap';
+import { LOGIN, LOGOUT, GET_APP_STATUS } from '../core/sitemap';
 import { toast } from 'react-toastify';
 import history from '../history';
 import axiosMiddleware from '../core/axios';
@@ -76,6 +76,7 @@ export const logout = (accessToken) => {
                         type: 'LOGGED_OUT',
                         data: {}
                     });
+                    history.push('/');
                 },
                 (errorResponse) => {
                     clearSession(theAccessToken);
@@ -96,5 +97,39 @@ export const logout = (accessToken) => {
                 data: {}
             });
         }
+    }
+}
+
+export const isAccountActive = () => {
+    return async (dispatch) => {
+        let isActive = false;
+        try {
+            let accessToken = getAccessToken();
+            if(!accessToken)
+                return;
+            let resp = await axiosMiddleware.get(`${GET_APP_STATUS}?access_token=${accessToken}`);
+            if(resp && resp.data && resp.data.isActive)
+                isActive = true;
+            dispatch({
+                type: 'APPLICATION_FLAG',
+                data: isActive
+            });
+        } catch (e) {
+            console.log(e);
+           // alert('ERROR Code: 768373648');
+            dispatch({
+                type: 'APPLICATION_FLAG',
+                data: isActive
+            });
+        }
+    }
+}
+
+export const updateAccountStatus = (flag) => {
+    return (dispatch) => {
+        dispatch({
+            type: 'APPLICATION_FLAG',
+            data: flag
+        });
     }
 }
