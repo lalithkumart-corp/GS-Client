@@ -6,6 +6,7 @@ import { UPDATE_BILL_NO_SETTINGS } from '../../../../core/sitemap';
 import { getAccessToken } from '../../../../core/storage';
 import axios from 'axios';
 import { toast } from 'react-toastify';
+import './nextBillNoSetting.css';
 
 class NextBillNumber extends Component {
     constructor(props) {
@@ -76,24 +77,24 @@ class NextBillNumber extends Component {
 
     render() {
         return (
-            <Row xs={12}>
+            <Row xs={12} className="bill-serial-no-setting-row">
                 <Col xs={12} className='gs-card'>
                     <Row xs={12} className='gs-card-content'>
                         <Col xs={12}>
                             <h3 style={{marginBottom: '30px'}}>Bill number Setting</h3>
                             <Row>
                                 <Col xs={4} md={4}>
-                                    Serial:
+                                    <p style={{marginBottom: '0', lineHeight: '30px'}}>Serial:</p>
                                 </Col>
-                                <Col xs={8} md={8}>
+                                <Col xs={2} md={2}>
                                     <input className='gs-input-cell' type='text' value={this.state.billSeries} onChange={(e) => this.onChange(e, 'series')}/>
                                 </Col>
                             </Row>
                             <Row>
                                 <Col xs={4} md={4}>
-                                    Next Bill Number:
+                                    <p style={{marginBottom: '0', lineHeight: '30px'}}>Next Bill Number:</p>
                                 </Col>
-                                <Col xs={8} md={8}>
+                                <Col xs={2} md={2}>
                                     <input className='gs-input-cell' type='number' value={this.state.billNumber} onChange={(e) => this.onChange(e, 'billNumber')}/>
                                 </Col>
                             </Row>

@@ -6,6 +6,7 @@ import { toast } from 'react-toastify';
 import { ADD_CUSTOMER } from '../../core/sitemap';
 import axios from 'axios';
 import history from '../../history';
+import axiosMiddleware from '../../core/axios';
 
 const ENTER_KEY = 13;
 const SPACE_KEY = 32;
@@ -111,7 +112,7 @@ export default class SignUpPage extends Component {
             && !this.state.formData.guardianName.hasError
             && !this.state.formData.storeName.hasError
             && !this.state.formData.phone.hasError) {
-                axios.post(ADD_CUSTOMER, this.getSignupArgs())
+                axiosMiddleware.post(ADD_CUSTOMER, this.getSignupArgs())
                     .then(
                         (successResp) => {
                             if(successResp.data.STATUS == 'ERROR') {
@@ -129,7 +130,8 @@ export default class SignUpPage extends Component {
                             }                            
                         },
                         (errResp) => {
-                            toast.error('Something error occured. Check console...');
+                            if(!errResp._IsDeterminedError)
+                                toast.error('Something error occured. Check console...');
                             console.log(errResp);
                         }
                     )

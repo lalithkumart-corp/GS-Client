@@ -56,10 +56,10 @@ export const dateFormatterV2 = (theDate, options) => {
 
 export const getInterestRate = () => {
     return new Promise( (resolve, reject) => {
-        let intRatesFromCookie = getInterestRates();
-        if(intRatesFromCookie) {
-            return resolve(intRatesFromCookie);
-        } else {
+        // let intRatesFromCookie = getInterestRates();
+        // if(intRatesFromCookie) {
+        //     return resolve(intRatesFromCookie);
+        // } else {
             axios.get(GET_INTEREST_RATES+'?access_token='+getAccessToken())
                 .then(
                     (successResp) => {
@@ -77,7 +77,7 @@ export const getInterestRate = () => {
                         return resolve([]);
                     }
                 )
-        }
+        // }
     });
 }
 
