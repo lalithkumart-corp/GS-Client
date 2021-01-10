@@ -9,7 +9,7 @@ export default class TagDemo extends Component {
         this.state = {
             wtContent: "0.000",
             storeSuffix: "",
-            touch: 75,
+            touch: "916KDM",
             makingCharge: 0,
             manufacturer: '',
             wastage: 0,
