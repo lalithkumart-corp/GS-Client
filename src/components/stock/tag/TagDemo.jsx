@@ -12,7 +12,8 @@ export default class TagDemo extends Component {
             touch: 75,
             makingCharge: 0,
             manufacturer: '',
-            wastage: 0
+            wastage: 0,
+            size: ''
         }
         this.inputControls.onChange = this.inputControls.onChange.bind(this);
     }
@@ -31,6 +32,9 @@ export default class TagDemo extends Component {
                     break;
                 case 'wastage':
                     newState.wastage = val;
+                    break;
+                case 'size':
+                    newState.size = val;
                     break;
             }
             this.setState(newState);
@@ -51,10 +55,11 @@ export default class TagDemo extends Component {
                     <Col className="gs-card-content">
                         <input type='checkbox' checked={this.state.showHallmark} onChange={(e) => this.onHallmarkClick(e)}/>Show Hallmark
                         <br></br>
-                        TOUCH: <input type="text" value={this.state.touch} onChange={ (e) => this.inputControls.onChange(null, e.target.value, 'touch')} />
-                        MC: <input type="text" value={this.state.makingCharge} onChange={ (e) => this.inputControls.onChange(null, e.target.value, 'makingCharge')} />
-                        Wastage: <input type="text" value={this.state.wastage} onChange={ (e) => this.inputControls.onChange(null, e.target.value, 'wastage')} />                        
-                        WT: :<input type="text" value={this.state.wtContent} onChange={ (e) => this.inputControls.onChange(null, e.target.value, 'wtContent')} onKeyUp={(e) => this.keyUp(e)}/>
+                        Size: <input type="text" className="tag-input-field" value={this.state.size} onChange={(e) => this.inputControls.onChange(null, e.target.value, 'size')} />
+                        TOUCH: <input type="text" className="tag-input-field" value={this.state.touch} onChange={ (e) => this.inputControls.onChange(null, e.target.value, 'touch')} />
+                        MC: <input type="text" className="tag-input-field" value={this.state.makingCharge} onChange={ (e) => this.inputControls.onChange(null, e.target.value, 'makingCharge')} />
+                        Wastage: <input type="text" className="tag-input-field" value={this.state.wastage} onChange={ (e) => this.inputControls.onChange(null, e.target.value, 'wastage')} />
+                        WT: :<input type="text" className="tag-input-field" value={this.state.wtContent} onChange={ (e) => this.inputControls.onChange(null, e.target.value, 'wtContent')} onKeyUp={(e) => this.keyUp(e)}/>
                         <ReactToPrint
                             ref={(domElm) => {this.printBtn = domElm}}
                             trigger={() => {
@@ -74,6 +79,7 @@ export default class TagDemo extends Component {
                             touch={this.state.touch} 
                             wastage={this.state.wastage}
                             showHallmark={this.state.showHallmark}
+                            size={this.state.size}
                         />
                     </Col>
                 </Row>
@@ -141,8 +147,9 @@ class Tag extends Component {
                     </div>
                     <div style={{width: '135px', display: "inline-block", height: '50px'}}>
                         <div style={{height: '20px'}}>
-                            <span style={{width: '55px', display: 'inline-block', paddingLeft: '3px'}}>MC: {this.props.makingCharge}</span>
-                            <span style={{width: '75px', textAlign: 'right', display: 'inline-block'}}>{this.props.wastage}</span>
+                            <span style={{width: '66px', display: 'inline-block', paddingLeft: '3px'}}>MC: {this.props.makingCharge}</span>
+                            <span style={{width: '34px', textAlign: 'center', display: 'inline-block'}}>{this.props.size}</span>
+                            <span style={{width: '35px', textAlign: 'right', display: 'inline-block'}}>{this.props.wastage}</span>
                         </div>
                         <div style={{height: '30px'}}>
                             <span style={{fontWeight: 'bold', paddingLeft: '3px'}}>

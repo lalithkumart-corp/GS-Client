@@ -1181,9 +1181,8 @@ class AddStock extends Component {
                 </Row> */}
                 <Row className="preview-container">
                     {this.getNewPreviewContainer()}
-                </Row>
-                {this.state.formData.listItems.length > 0 && 
-                <Row className="action-container-2" style={{textAlign: "right"}}>
+                </Row> 
+                <Row className="action-container-2" style={{textAlign: "right", marginTop: '40px'}}>
                     <Col>
                         <input 
                             type="button" 
@@ -1191,9 +1190,10 @@ class AddStock extends Component {
                             value="Confirm Add" 
                             ref= {(domElm) => {this.domElmns[CONFIRM_ADD] = domElm; }}
                             onClick={(e) => this.onButtonClicks(e, CONFIRM_ADD)}
+                            disabled={this.state.formData.listItems.length>0?false:true}
                         />
                     </Col>
-                </Row>}
+                </Row>
             </Container>
         )
     }

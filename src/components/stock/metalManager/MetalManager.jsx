@@ -9,7 +9,7 @@ export default class CreateMetal extends Component {
     render() {
         return (
             <Container>
-                
+                <p>Module is IN-PROGRESS ... Please visit after sometime!</p>
             </Container>
         )
     }
