@@ -121,6 +121,7 @@ class AddStock extends Component {
             },
             autoSuggestions: {
                 codeSeries: [],
+                itemCodeList: [],
                 filteredCodeSeries: [],
                 itemNameList: [],
                 filteredItemNameList: [],
@@ -201,6 +202,13 @@ class AddStock extends Component {
         }
     }
 
+    getLowerCase(str) {
+        if(str)
+            return str.toLowerCase();
+        else
+            return '';
+    }
+
     reactAutosuggestControls = {
         onChange: (event, { newValue, method }, identifier, options) => {
             let newState = {...this.state};
@@ -228,13 +236,45 @@ class AddStock extends Component {
             switch(identifier) {
                 case PROD_NAME:
                     var lowerCaseVal = value.toLowerCase();
-                    suggestionsList = this.state.autoSuggestions.itemNameList.filter(aSuggestion => aSuggestion.toLowerCase().slice(0, lowerCaseVal.length) === lowerCaseVal);
-                    suggestionsList = suggestionsList.filter((value, index, self) => { //TO Remove duplicates
-                        return self.indexOf(value) === index;
-                    });
-                    suggestionsList = suggestionsList.slice(0, 35);
-                    newState.autoSuggestions.filteredItemNameList = suggestionsList;
-                    break;
+                    const inputLength = lowerCaseVal.length;
+
+                    // suggestionsList = this.state.autoSuggestions.ornList.filter(
+                    //     (anObj) => {
+                    //         let itemName = anObj.itemName || '';
+                    //         return itemName.toLowerCase().slice(0, lowerCaseVal.length) === lowerCaseVal;
+                    //     }
+                    // );
+                    // suggestionsList = suggestionsList.slice(0, 35);
+                    // newState.autoSuggestions.filteredItemNameList = suggestionsList;
+
+
+                    if(inputLength === 0) {
+                        return [];
+                    } else {
+                        let splits = lowerCaseVal.split('/');
+                        if(splits.length > 1 && splits[1].length > 0) {
+                            newState.autoSuggestions.filteredItemNameList = this.state.autoSuggestions.ornList.filter(anObj => {
+                                let itemName = this.getLowerCase(anObj.itemName || "");
+                                let itemCategory = this.getLowerCase(anObj.itemCategory || "");
+                                if(itemName.slice(0, splits[0].length) === splits[0] && itemCategory.slice(0, splits[1].length) === splits[1]){
+                                    return true;
+                                } else {
+                                    return false;
+                                }
+                            });
+                        } else {
+                            newState.autoSuggestions.filteredItemNameList = this.state.autoSuggestions.ornList.filter(anObj => this.getLowerCase(anObj.itemName || "").slice(0, splits[0].length) === splits[0]);
+                        }
+                    }
+                    break;    
+                    // var lowerCaseVal = value.toLowerCase();
+                    // suggestionsList = this.state.autoSuggestions.itemNameList.filter(aSuggestion => aSuggestion.toLowerCase().slice(0, lowerCaseVal.length) === lowerCaseVal);
+                    // suggestionsList = suggestionsList.filter((value, index, self) => { //TO Remove duplicates
+                    //     return self.indexOf(value) === index;
+                    // });
+                    // suggestionsList = suggestionsList.slice(0, 35);
+                    // newState.autoSuggestions.filteredItemNameList = suggestionsList;
+                    // break;
                 case PROD_CATEG:
                     var lowerCaseVal = value.toLowerCase();
                     suggestionsList = this.state.autoSuggestions.itemCategoryList.filter(aSuggestion => aSuggestion.toLowerCase().slice(0, lowerCaseVal.length) === lowerCaseVal);
@@ -264,15 +304,10 @@ class AddStock extends Component {
                     break;
                 case PROD_CODE_SERIES:
                     var lowerCaseVal = value.toLowerCase();
-                    suggestionsList = this.state.autoSuggestions.ornList.filter(
-                        (anObj) => {
-                            let codeSeries = anObj.itemCode || '';
-                            return codeSeries.toLowerCase().slice(0, lowerCaseVal.length) === lowerCaseVal;
-                        }
-                    );
-                    // suggestionsList = suggestionsList.filter((value, index, self) => {
-                    //     return self.indexOf(value) === index;
-                    // });
+                    suggestionsList = this.state.autoSuggestions.itemCodeList.filter(aSuggestion => aSuggestion.toLowerCase().slice(0, lowerCaseVal.length) === lowerCaseVal);
+                    suggestionsList = suggestionsList.filter((value, index, self) => {
+                        return self.indexOf(value) === index;
+                    });
                     suggestionsList = suggestionsList.slice(0, 35);
                     newState.autoSuggestions.filteredCodeSeries = suggestionsList;
                     break;
@@ -282,13 +317,13 @@ class AddStock extends Component {
         onSuggestionSelected: (event, { suggestion, suggestionValue, suggestionIndex, sectionIndex, method }, identifier, options) => {
             let newState = {...this.state};
             switch(identifier) {
-                case PROD_NAME:
                 case PROD_CATEG:
                 case PROD_SUB_CATEG:
                 case PROD_DIM:
+                case PROD_CODE_SERIES:
                     newState.formData[identifier] = suggestionValue;
                     break;
-                case PROD_CODE_SERIES:
+                case PROD_NAME:
                     newState.formData[PROD_CODE_SERIES] = suggestion.itemCode || '';
                     newState.formData[PROD_NAME] = suggestion.itemName || '';
                     newState.formData[PROD_CATEG] = suggestion.itemCategory || '';
@@ -305,7 +340,7 @@ class AddStock extends Component {
         switch(identifier) {
             case ADD_ENTRY:
                 if(this.validateEntries()) {
-                    newState.formData.listItems.push(constructItemObj(this.state));
+                    newState.formData.listItems[0] = constructItemObj(this.state);
                     this.setState(newState);
                     this.transferFocus(e, identifier);
                 }
@@ -458,8 +493,10 @@ class AddStock extends Component {
             let at = getAccessToken();
             let resp = await axios.get(`${FETCH_ORN_LIST_JEWELLERY}?access_token=${at}`);
             let list = resp.data.RESPONSE;
-            let itemNameList = [], itemCategoryList = [], itemSubCategoryList = [], itemDimentionList = [];
+            let itemCodeList = [], itemNameList = [], itemCategoryList = [], itemSubCategoryList = [], itemDimentionList = [];
             _.each(list, (anObj, index) => {
+                if(anObj.itemCode && itemCodeList.indexOf(anObj.itemCode) == -1)
+                    itemCodeList.push(anObj.itemCode);
                 if(anObj.itemName)
                     itemNameList.push(anObj.itemName);
                 if(anObj.itemCategory)
@@ -473,6 +510,7 @@ class AddStock extends Component {
             newState.rawResp = {...newState.rawResp, ornListResp: list};
             newState.autoSuggestions = newState.autoSuggestions || {};
             newState.autoSuggestions.ornList = list;
+            newState.autoSuggestions.itemCodeList = itemCodeList;
             newState.autoSuggestions.itemNameList = itemNameList;
             newState.autoSuggestions.itemCategoryList = itemCategoryList;
             newState.autoSuggestions.itemSubCategoryList = itemSubCategoryList;
@@ -570,10 +608,61 @@ class AddStock extends Component {
         return dom;
     }
 
+    getNewPreviewContainer() {
+        let anItem = null;
+        if(this.state.formData.listItems && this.state.formData.listItems.length > 0) {
+            anItem = this.state.formData.listItems[0];
+
+            let buffer = [];
+
+            buffer.push(
+                <Col>
+                    <Row className="preview-container-row">
+                        <Col xs={2} className="a-section">
+                            <div className="section-header">Product</div>
+                            <div className="section-body">
+                                <p>{anItem.metal}/{anItem.metalPrice}</p>
+                                <p>{anItem.productCode} {anItem.productName} {anItem.productCategory} </p>
+                                <p>{anItem.productSubCategory} {anItem.productDimension} </p>
+                            </div>
+                        </Col>
+                        <Col xs={1} className="a-section">
+                            <div className="section-header">Qty</div>
+                            <div className="section-body" style={{textAlign: 'center'}}>{anItem.productQty}</div>
+                        </Col>
+                        <Col xs={2} className="a-section">
+                            <div className="section-header">Weight</div>
+                            <div className="section-body">
+                                <div>GrossWt: {anItem.productGWt}</div>
+                                <div>NetWt: {anItem.productNWt}</div>
+                                <div>Pure Wt: {anItem.productPWt} ({anItem.productPureTouch}) </div>
+                                <div>Calc Wt: <b>{anItem.productIWt}</b> ({anItem.productITouch}) </div>
+                            </div>
+                        </Col>
+                        <Col xs={1} className="a-section">
+                            <div className="section-header">Charges</div>
+                            <div className="section-body">{anItem.productCalcLabourAmt}</div>
+                        </Col>
+                        <Col xs={1} className="a-section">
+                            <div className="section-header">Taxes</div>
+                            <div className="section-body" style={{textAlign: 'center'}}>{anItem.productCgstAmt+anItem.productSgstAmt+anItem.productIgstAmt}</div>
+                        </Col>
+                        <Col xs={1} className="a-section">
+                            <div className="section-header">TOTAL</div>
+                            <div className="section-body" style={{textAlign: 'center'}}>{anItem.productTotalAmt}</div>
+                        </Col>
+                    </Row>
+                </Col>
+            )
+            return buffer;
+        }
+        return [];
+    }
+
     renderSuggestion = (suggestion, identifier) => {
         let theDom;
         switch(identifier) {
-            case PROD_CODE_SERIES:
+            case PROD_NAME:
                 let category1 = '';
                 if(suggestion.itemCategory)
                     category1 = ' - ' + suggestion.itemCategory;
@@ -718,7 +807,7 @@ class AddStock extends Component {
                                                 <ReactAutosuggest
                                                     suggestions={this.state.autoSuggestions.filteredCodeSeries}
                                                     onSuggestionsFetchRequested={({value}) => this.reactAutosuggestControls.onSuggestionsFetchRequested({value}, PROD_CODE_SERIES)}
-                                                    getSuggestionValue={(suggestion, e) => suggestion.itemCode}
+                                                    getSuggestionValue={(suggestion, e) => suggestion}
                                                     renderSuggestion={(suggestion) => this.renderSuggestion(suggestion, PROD_CODE_SERIES)}
                                                     onSuggestionSelected={(event, { suggestion, suggestionValue, suggestionIndex, sectionIndex, method}) => this.reactAutosuggestControls.onSuggestionSelected(event, { suggestion, suggestionValue, suggestionIndex, sectionIndex, method }, PROD_CODE_SERIES)}
                                                     inputProps={{
@@ -735,7 +824,7 @@ class AddStock extends Component {
                                                 <ReactAutosuggest
                                                     suggestions={this.state.autoSuggestions.filteredItemNameList}
                                                     onSuggestionsFetchRequested={({value}) => this.reactAutosuggestControls.onSuggestionsFetchRequested({value}, PROD_NAME)}
-                                                    getSuggestionValue={(suggestion, e) => suggestion}
+                                                    getSuggestionValue={(suggestion, e) => suggestion.itemName}
                                                     renderSuggestion={(suggestion) => this.renderSuggestion(suggestion, PROD_NAME)}
                                                     onSuggestionSelected={(event, { suggestion, suggestionValue, suggestionIndex, sectionIndex, method}) => this.reactAutosuggestControls.onSuggestionSelected(event, { suggestion, suggestionValue, suggestionIndex, sectionIndex, method }, PROD_NAME)}
                                                     inputProps={{
@@ -1038,7 +1127,7 @@ class AddStock extends Component {
                     <Col>
                         <input 
                             type="button" 
-                            className="gs-button" 
+                            className="gs-button bordered" 
                             value="Add" 
                             // onKeyUp={(e) => this.handleKeyUp(e, {currElmKey: ADD_ENTRY})}
                             ref= {(domElm) => {this.domElmns[ADD_ENTRY] = domElm; }}
@@ -1046,7 +1135,7 @@ class AddStock extends Component {
                         />
                     </Col>
                 </Row>
-                <Row className="preview-container">
+                {/* <Row className="preview-container">
                     <Col>
                         <table>
                             <colgroup>
@@ -1089,18 +1178,22 @@ class AddStock extends Component {
                             </tbody>
                         </table>
                     </Col>
+                </Row> */}
+                <Row className="preview-container">
+                    {this.getNewPreviewContainer()}
                 </Row>
+                {this.state.formData.listItems.length > 0 && 
                 <Row className="action-container-2" style={{textAlign: "right"}}>
                     <Col>
                         <input 
                             type="button" 
-                            className="gs-button" 
+                            className="gs-button bordered" 
                             value="Confirm Add" 
                             ref= {(domElm) => {this.domElmns[CONFIRM_ADD] = domElm; }}
                             onClick={(e) => this.onButtonClicks(e, CONFIRM_ADD)}
                         />
                     </Col>
-                </Row>
+                </Row>}
             </Container>
         )
     }

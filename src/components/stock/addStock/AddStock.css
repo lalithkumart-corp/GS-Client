@@ -105,9 +105,9 @@
     color: blue;
 }
 
-.add-stock-container .preview-container {
+/* .add-stock-container .preview-container {
     margin-top: 50px;
-}
+} */
 
 .add-stock-container .react-autosuggest__suggestions-container {
     top: 33px;
@@ -156,4 +156,19 @@ table.item-input-table {
 .item-input-row .form-control:disabled,
 .item-input-row .form-control[readonly] {
     background-color: #e9ecef8a;
+}
+
+.add-stock-container .preview-container-row .a-section {
+    border: 1px solid lightgray;
+    padding: 0;
+    margin: 15px;
+}
+
+.add-stock-container .preview-container-row .a-section .section-header {
+    line-height:30px;
+    background-color: lightgray;
+}
+
+.add-stock-container .preview-container-row .a-section .section-body {
+    padding: 15px;
 }

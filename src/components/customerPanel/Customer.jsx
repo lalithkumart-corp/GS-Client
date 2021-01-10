@@ -145,6 +145,10 @@ export default class Customer extends Component {
             this.transferFocus(evt, options.currElmKey, options.traverseDirection);
     }
 
+    handleSpaceKeyPress() {
+
+    }
+    
     canTransferFocus() {
         
         // Update if necessary based on business logic
