@@ -86,7 +86,7 @@ export default class PledgebookExportPopup extends Component {
             <div>                
                 <Row className='gs-card'>
                     <Col className='gs-card-content'>
-                        <h4>Please select the Date Range:</h4>
+                        <h5 style={{marginBottom: '15px'}}>Select your Date Range:</h5>
                         <DateRangePicker 
                             className = 'pledgebook-date-filter popup'
                             selectDateRange={this.dateSubmitCallback}
@@ -95,10 +95,11 @@ export default class PledgebookExportPopup extends Component {
                         />
                     </Col>                    
                 </Row>
-                <Row className="margin-top-30">
+                <Row>
                     <Col xs={6}>
                         <Row className='gs-card'>
                             <Col className='gs-card-content'>
+                                <h5 style={{marginBottom: '20px'}}>Bill Status</h5>
                                 <Form>
                                     <Form.Group>
                                         <Form.Check id='billstatus-1' type='radio' name='billstatus' checked={this.state.billStatusFlag=='all'} value='all' onChange={(e) => this.onChangeBillStatusFlag(e, 'all')} label='All'/>
@@ -116,7 +117,7 @@ export default class PledgebookExportPopup extends Component {
                     <Col xs={6}>
                         <Row className='gs-card'>
                             <Col className='gs-card-content'>
-                                <h5>Order By</h5>
+                                <h5 style={{marginBottom: '20px'}}>Order By</h5>
                                 <Form onChange={this.onSortByColumnChange}>
                                     <Form.Group>
                                         <Form.Check id='sort-by-pledgedDate' type='radio' name='sortordercol' checked={this.state.sortByColumn=='pledgedDate'} value='pledgedDate' label='Pledged Date'/>
@@ -139,7 +140,9 @@ export default class PledgebookExportPopup extends Component {
                     </Col>
                 </Row>
                 <Row>
-                    <input type='button' className='gs-button' value='START EXPORT' onClick={this.triggerExportAPI} />
+                    <Col style={{textAlign: 'center', marginTop: '20px'}}>
+                        <input type='button' className='gs-button bordered' value='START EXPORT' onClick={this.triggerExportAPI} />
+                    </Col>
                 </Row>
             </div>
         )
