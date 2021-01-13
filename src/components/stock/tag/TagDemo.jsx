@@ -118,15 +118,17 @@ class Tag extends Component {
     // }
     render() {
         const imgStyles= {
-            height: '12px',
-            display: this.props.showHallmark?'inline':'none'
+            height: '20px',
+            display: this.props.showHallmark?'inline':'none',
+            position: 'absolute',
+            marginTop: '4px'
         }
         const touchStyles = {
             width: this.props.showHallmark?'65px':'80px',
-            textAlign: 'right',
+            textAlign: 'center',
             display: 'inline-block',
             position: 'absolute',
-            paddingRight: '3px',
+            paddingRight: this.props.showHallmark?'12px':'3px',
             paddingTop: '2px'
         }
         return (
@@ -136,7 +138,7 @@ class Tag extends Component {
                         <div style={{height: '20px', paddingLeft: '4px'}}>
                             <span style={{width: '49px', display: 'inline-block', fontSize: '18px'}}>MJK</span>
                             <span style={touchStyles}>{this.props.touch}</span>
-                            <span style={{height: '12px'}}><img style={imgStyles} src='/images/bis.jpg' /></span>
+                            <span style={{marginLeft: '54px', height: '12px'}}><img style={imgStyles} src='/images/bis.jpg' /></span>
                         </div>
                         <div style={{height: '30px', paddingLeft: '4px'}}>
                             <span style={{fontWeight: 'bold'}}>
@@ -149,7 +151,7 @@ class Tag extends Component {
                         <div style={{height: '20px'}}>
                             <span style={{width: '66px', display: 'inline-block', paddingLeft: '3px'}}>MC: {this.props.makingCharge}</span>
                             <span style={{width: '34px', textAlign: 'center', display: 'inline-block'}}>{this.props.size}</span>
-                            <span style={{width: '35px', textAlign: 'right', display: 'inline-block'}}>{this.props.wastage}</span>
+                            <span style={{width: '35px', textAlign: 'center', display: 'inline-block'}}>{this.props.wastage}</span>
                         </div>
                         <div style={{height: '30px'}}>
                             <span style={{fontWeight: 'bold', paddingLeft: '3px'}}>
