@@ -1,0 +1,162 @@
+.billreceipt-print {
+    display: none;
+    /* display: block;
+    max-width: 830px !important;
+    min-width: 500px !important;
+    border: 1px solid black;
+    margin: 15px; */
+}
+
+@media print {
+    .billreceipt-print {
+        display: block;
+        max-width: 830px !important;
+        min-width: 500px !important;
+        border: none;
+        margin: 15px;
+        /* visibility: hidden; */
+    }
+    .billreceipt-print .in-build-print {
+        /* visibility: hidden; */
+    }
+    .billreceipt-print .no-border-in-build-print {
+        /* border: none !important; */
+    }
+    .billreceipt-print .bill-receipt-content {
+        padding: 15px 25px;
+        border: none;
+        /* border: 1px solid lightgray; */
+    }
+    .billreceipt-print .god-logo {
+        width: 100%;
+    }
+    .billreceipt-print .storename {
+        font-size: 42px;
+        text-align: center;
+        margin-top: 10px;
+        letter-spacing: 15px;
+        font-weight: 900;
+    }
+    .billreceipt-print .static-store-suffix,
+    .billreceipt-print .storeaddr,
+    .billreceipt-print .storeaddr2 {
+        font-size: 20px;
+        text-align: center;
+    }
+    .billreceipt-print .bill-no-date {
+        margin-bottom: 20px;
+    }
+    .billreceipt-print .bill-no {
+        font-weight: bold;   
+    }
+    .billreceipt-print .cust-info-col {
+        padding-right: 0;
+        margin-right: 15px;
+        border: 1px solid lightgray;
+        border-radius: 10px;
+        padding-top: 10px;
+        min-height: 220px;
+        max-height: 220px;
+    }
+    .billreceipt-print .cust-name-field {
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        overflow: hidden;
+        margin-bottom: 0;
+    }
+    .billreceipt-print .row-name-3 {
+        margin-top: 20px;
+    }
+    .billreceipt-print .orn-info-col {
+        /* background-color: orange !important; */
+        border: 1px solid lightgray;
+        margin-right: 15px;
+        padding-left: 5px;
+    }
+  
+    .billreceipt-print .orn-info-col .image-col {
+        margin-top: 15px;
+    }
+    .billreceipt-print .orn-table-header {
+        margin-left: -5px;
+        border-bottom: 1px solid lightgray;
+    }
+    .billreceipt-print .orn-list-container {
+        min-height: 250px;
+        max-height: 250px;
+        overflow-x: hidden;
+    }
+    .billreceipt-print .orn-table-body-cell.nos {
+        text-align: center;
+        padding-right: 0;
+    }
+    .billreceipt-print .orn-list-footer {
+        border-top: 1px solid lightgray;
+        margin-left: -5px;
+    }
+    .billreceipt-print .amount-row {
+        margin-top: 20px;
+        padding-left: 0;
+    }
+    .bill-receipt-content {
+        /* background-color: yellow !important; */
+    }
+    .signature1-space,
+    .signature2-space {
+        height: 50px;
+    }
+    .amount1 {
+        display: inline-block;
+        text-overflow: ellipsis;
+        overflow: hidden;
+        white-space: nowrap;
+        width: 100%;
+    }
+    .image-col {
+        padding-right: 15px;
+    }
+    .image-col.orn{
+        margin-top: 10px;
+    }
+    .signature-row {
+        padding-top: 30px;
+        min-height: 60px;
+    }
+    .font12 {
+        font-size: 12px;
+    }
+    .font16 {
+        font-size: 16px;
+    }
+    .font17 {
+        font-size: 17px;
+    }
+    .font18 {
+        font-size: 18px;
+    }
+    .font19 {
+        font-size: 19px;
+    }
+    .font20 {
+        font-size: 20px;
+    }
+    .font22 {
+        font-size: 22px;
+    }
+    .font23 {
+        font-size: 23px;
+    }
+    .font30 {
+        font-size: 30px;
+    }
+
+    .orn-chit {
+        /* border: 1px solid lightgray; */
+        padding: 2px 2px;
+        margin: 0;
+        font-size: 45px;
+        letter-spacing: 10px;
+        font-weight: 900;
+        font-family: auto;
+    }
+}

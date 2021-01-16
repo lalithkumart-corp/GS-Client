@@ -110,13 +110,16 @@ export const isAccountActive = () => {
             let resp = await axiosMiddleware.get(`${GET_APP_STATUS}?access_token=${accessToken}`);
             if(resp && resp.data && resp.data.isActive)
                 isActive = true;
+            else if(resp && resp.data && resp.data.STATUS == 'ERROR') {
+                let msg = resp.data.MSG || 'SESSION EXPIRED / Login Again';
+                toast.error(msg);
+            }
             dispatch({
                 type: 'APPLICATION_FLAG',
                 data: isActive
             });
         } catch (e) {
             console.log(e);
-           // alert('ERROR Code: 768373648');
             dispatch({
                 type: 'APPLICATION_FLAG',
                 data: isActive

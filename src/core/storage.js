@@ -183,3 +183,16 @@ export const getRates = () => {
         return ratesStr;
     }
 }
+
+export const getStoreInfo = (data) => {
+    _save(keys.store, data);
+}
+
+export const setStoreInfo = () => {
+    let storeStr = _read(keys.store);
+    try {
+        return JSON.parse(storeStr);
+    } catch(e) {
+        return storeStr;
+    }
+}

@@ -32,6 +32,7 @@ import StockSetup from '../stock/setup/StockSetup';
 import TagDemo from '../stock/tag/TagDemo';
 import ActivationPage from '../activation/ActivationPage';
 import FontViewerPage from '../fontViewer/FontView';
+import { getStoreDetails } from '../../actions/storeDetails';
 import 'bootstrap/dist/css/bootstrap.min.css';
 
 class SmartComponent extends Component {
@@ -40,6 +41,13 @@ class SmartComponent extends Component {
     }
     componentWillMount() {
         this.props.isAccountActive();
+    }
+    componentDidMount() {
+        if(this.props.auth.isAuthenticated) {
+            if(!this.props.auth.isActivated) {
+                this.props.getStoreDetails();
+            }
+        }
     }
     render() {        
         if(this.props.auth.isAuthenticated) {
@@ -118,4 +126,4 @@ const mapStateToProps = (state) => {
     };
 };
 
-export default connect(mapStateToProps, {isAccountActive})(SmartComponent);
+export default connect(mapStateToProps, {isAccountActive, getStoreDetails})(SmartComponent);

@@ -7,6 +7,8 @@ import authReducer from './reducers/login/auth-reducer';
 import pledgeBookReducer from './reducers/pledgebook/reducer';
 import pledgeBookModalReducer from './reducers/pledgebookModal/pdm-reducer';
 import rateReducer from './reducers/rate/reducer';
+import storeReducer from './reducers/storeDetail/reducer';
+
 export const getStore = () => {
 
     const theReducers = combineReducers({
@@ -15,6 +17,7 @@ export const getStore = () => {
         pledgeBook: pledgeBookReducer,
         pledgeBookModal: pledgeBookModalReducer,
         rate: rateReducer,
+        storeDetail: storeReducer,
     });
 
     const middleware = applyMiddleware(reduxThunk, logger);

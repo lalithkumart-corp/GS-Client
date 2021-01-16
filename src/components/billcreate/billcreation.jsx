@@ -308,7 +308,7 @@ class BillCreation extends Component {
             currState.userPicture.loading = false;
             currState.userPicture.id = null;
             currState.userPicture.url = null;
-            currState.userPicture.holder = JSON.parse(JSON.stringify(defaultPictureState.holder));            
+            currState.userPicture.holder = JSON.parse(JSON.stringify(defaultPictureState.holder));
             this.setState(currState);
         }     
     }
@@ -417,8 +417,7 @@ class BillCreation extends Component {
         newState.formData.orn.rowCount = Object.keys(ornObj).length;
         newState.formData.moreDetails.customerInfo = JSON.parse(data.OtherDetails) || [];  
         newState.formData.moreDetails.billRemarks = data.Remarks || '';  
-        newState.userPicture = JSON.parse(JSON.stringify(defaultPictureState));
-        newState.ornPicture = JSON.parse(JSON.stringify(defaultOrnPictureState));
+        
         newState.formData.orn.totalWeight = data.TotalWeight || 0.00;
         newState.formData.orn.category = data.OrnCategory || 0.00;
         newState.formData.interest.percent = data.IntPercent || 0;
@@ -438,6 +437,8 @@ class BillCreation extends Component {
             newState.userPicture.holder.confirmedImgSrc = '';
             newState.userPicture.holder.imgSrc = '';
             newState.userPicture.status = 'SAVED';
+        } else {
+            newState.userPicture = JSON.parse(JSON.stringify(defaultPictureState));
         }
 
         if(data.OrnImageBlob && data.OrnImageBlob.data) {
@@ -454,6 +455,8 @@ class BillCreation extends Component {
             newState.ornPicture.holder.confirmedImgSrc = '';
             newState.ornPicture.holder.imgSrc = '';
             newState.ornPicture.status = 'SAVED';
+        } else {
+            newState.ornPicture = JSON.parse(JSON.stringify(defaultOrnPictureState));
         }
 
         newState.uniqueIdentifier = data.UniqueIdentifier;        

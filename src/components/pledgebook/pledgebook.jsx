@@ -19,7 +19,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import PledgebookExportPopup from './pledgebookExportPopup';
 import { toast } from 'react-toastify';
 import GSCheckbox from '../ui/gs-checkbox/checkbox';
-
+import BillTemplate from '../billcreate/billTemplate2';
 class Pledgebook extends Component {
     constructor(props) {
         super(props);        
@@ -864,6 +864,7 @@ class Pledgebook extends Component {
                 <CommonModal modalOpen={this.state.displayExportPopup} secClass="export-pledgebook-popup" handleClose={this.handleExportPopupClose}>
                     <PledgebookExportPopup handleClose={this.handleExportPopupClose}/>
                 </CommonModal>
+                <BillTemplate data={this.state.printContent} />
             </Container>
         )
     }
