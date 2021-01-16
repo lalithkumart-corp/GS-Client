@@ -110,6 +110,17 @@ export const validate = (stateObj) => {
     if(Object.keys(stateObj.purchaseItemPreview).length == 0) {
         flag = false;
         msg.push('Select Items for Sale')
+    } else {
+        _.each(stateObj.purchaseItemPreview, (anItem, index) => {
+            if(anItem.avl_qty < anItem.formData.qty) {
+                flag = false;
+                msg.push(`Check the Qty of item: ${index}.`);
+            }
+        });
+        if(stateObj.paymentFormData.paid > stateObj.paymentFormData.sum) {
+            flag = false;
+            msg.push('Paid amount is greater than the actual Total amount.');
+        }
     }
     return {flag, msg};
 }
