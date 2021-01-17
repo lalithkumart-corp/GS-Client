@@ -330,7 +330,7 @@ export default class BillTemplate extends Component {
     render() {
         return (
             <div style={{width: '810px', fontSize: '20px'}}>
-            <Container className="billreceipt-print">
+            <div className="billreceipt-print">
                 <Row>
                     <Col className="bill-receipt-content" xs={12}>
                         {this.getHeader()}
@@ -353,7 +353,7 @@ export default class BillTemplate extends Component {
                         </Row>
                     </Col>
                 </Row> */}
-            </Container>
+            </div>
             </div>
         )
     }
