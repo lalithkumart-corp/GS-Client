@@ -31,7 +31,7 @@ import Picture from '../profilePic/picture';
 import { toast } from 'react-toastify';
 import BillHistoryView from './billHistoryView';
 import Popover from 'react-tiny-popover';
-import BillTemplate from './billTemplate';
+import BillTemplate from './billTemplate2';
 import ReactToPrint from 'react-to-print';
 
 const ENTER_KEY = 13;
@@ -1113,7 +1113,13 @@ class BillCreation extends Component {
         } else {
             if(window.confirm('Are you Sure to create new Bill?')) {
                 if(this.isAutoPrintEnabled()) {
-                    await this.setState({printContent: JSON.parse(JSON.stringify(requestParams))});
+                    let printParams = {...requestParams};
+                    printParams.storeName = this.props.storeDetail.loanLicenseName;
+                    printParams.addressLine1 = this.props.storeDetail.loanBillAddressLine1;
+                    printParams.addressLine2 = this.props.storeDetail.loanBillAddressLine2;
+                    printParams.userPicture = {url: this.state.userPicture.url};
+                    printParams.ornPicture = {url: this.state.ornPicture.url};
+                    await this.setState({printContent: JSON.parse(JSON.stringify(printParams))});
                     this.printReceipt();
                 }
                 this.props.insertNewBill(requestParams);
@@ -2164,7 +2170,8 @@ class BillCreation extends Component {
 const mapStateToProps = (state) => {
     return {
         auth: state.auth,
-        billCreation: state.billCreation
+        billCreation: state.billCreation,
+        storeDetail: state.storeDetail
     };
 };
 
