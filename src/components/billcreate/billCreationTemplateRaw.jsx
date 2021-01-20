@@ -138,21 +138,23 @@ export default class BillTemplate extends Component {
                     </Row>
                 );
             });
-            dom.push(
-                <Row className="orn-list-container">
-                    <Col xs={{span: 12}} md={{span: 12}}>
-                        {list}
-                    </Col>
-                </Row>
-            )
-            dom.push(
-                <Row className={`orn-list-footer ${this.state.printModelBorderClsName}`}>
-                    <Col xs={1}>{footer.qty}</Col>
-                    <Col xs={9}></Col>
-                    <Col xs={1}>{footer.wt}</Col>
-                </Row>
-            )
+            
         }
+
+        dom.push(
+            <Row className="orn-list-container">
+                <Col xs={{span: 12}} md={{span: 12}}>
+                    
+                </Col>
+            </Row>
+        )
+        dom.push(
+            <Row className={`orn-list-footer ${this.state.printModelBorderClsName}`} style={{minHeight: '31px'}}>
+                <Col xs={1}></Col>
+                <Col xs={9}></Col>
+                <Col xs={1}></Col>
+            </Row>
+        )
         // dom.push(
         //     <Row>
         //         <Col xs={{span: 1}} md={{span: 1}}>{footer.qty}</Col>
@@ -196,10 +198,10 @@ export default class BillTemplate extends Component {
         return (
             <Row className="bill-no-date font16">
                 <Col className="bill-no" xs={{span: 5}} md={{span: 5}}>
-                    <span>{this.getBillNo()}</span>
+                    {/* <span>{this.getBillNo()}</span>
                     <span style={{width: '200px'}}>
                         <Barcode value={this.getBillNo()} fontSize={20} height={25} displayValue={false}/>
-                    </span>
+                    </span> */}
                 </Col>
                 <Col xs={3}>
 
@@ -207,7 +209,8 @@ export default class BillTemplate extends Component {
                 <Col xs={{span: 4}} md={{span: 4}}>
                     <span style={{lineHeight: '45px', paddingRight: '15px'}}>
                         <span style={{verticalAlign: 'top', paddingRight: '5px'}} className={this.state.printModelClsName}>Date:</span>
-                        <span className="font23">{this.getDate()}</span></span>
+                        {/* <span className="font23">{this.getDate()}</span> */}
+                    </span>
                 </Col>
             </Row>
         )
@@ -224,9 +227,8 @@ export default class BillTemplate extends Component {
     getAmountValWithWords() {
         return (
             <span className="amount1">
-                {format(this.state.data.amount, {code: "INR"})}
+                
                 &nbsp; &nbsp;
-                {this.getRupeesInWords(this.state.data.amount)}
             </span>
         );
     }
@@ -242,11 +244,11 @@ export default class BillTemplate extends Component {
                             </Col>
                             <Col xs={10} md={10}>
                                 <p className="cust-name-field font19">
-                                    <span style={{textTransform: "uppercase"}}>{this.state.data.cname}</span>
+                                    <span style={{textTransform: "uppercase"}}></span>
                                     &nbsp; 
-                                    <span className="font12">c/o</span> 
+                                    <span className="font12"></span> 
                                     &nbsp; 
-                                    <span style={{textTransform: "uppercase"}}>{this.state.data.gaurdianName}</span>
+                                    <span style={{textTransform: "uppercase"}}></span>
                                 </p>
                             </Col>
                         </Row>
@@ -255,34 +257,32 @@ export default class BillTemplate extends Component {
                                 <span className={`font17 ${this.state.printModelClsName}`}><b>Address:</b></span>
                             </Col>
                             <Col xs={10} md={10} style={{maxHeight: "110px", minHeight: "110px"}}>
-                                <div>{this.state.data.address}</div>
-                                {this.state.data.place}, 
-                                {this.state.data.city}-{this.state.data.pinCode}
+                                
                             </Col>
                         </Row>
                     </div>
-                    <Row>
+                    <Row style={{minHeight: "30px"}}>
                         <Col xs={2}>
                             <span className={`font17 ${this.state.printModelClsName}`}><b>Amount:</b></span>
                         </Col>
                         <Col xs={4}>
-                            {format(this.state.data.amount, {code: "INR"})}
+                            
                         </Col>
                         <Col xs={2}>
                             <span className={`font17 ${this.state.printModelClsName}`}><b>Mobile:</b></span>
                         </Col>
                         <Col xs={4}>
-                            {this.state.data.mobile}
+                           
                         </Col>
                     </Row>
-                    <Row>
+                    <Row style={{minHeight: "30px"}}>
                         <Col xs={12} md={12}>
-                            <span className={`font17 ${this.state.printModelClsName}`}><b>₹ in words:</b></span> {this.getRupeesInWords(this.state.data.amount)}
+                            <span className={`font17 ${this.state.printModelClsName}`}><b>₹ in words:</b></span> 
                         </Col>
                     </Row>
                 </Col>
                 <Col xs={{span: 3}} md={{span: 3}} className="image-col user">
-                    {this.getImageSection('user')}
+                    
                 </Col>
             </Row>
         )
@@ -295,7 +295,7 @@ export default class BillTemplate extends Component {
                     {this.getOrnSecction()}
                 </Col>
                 <Col xs={{span: 3}} md={{span: 3}} className="image-col orn">
-                    {this.getImageSection('orn')}
+                    
                 </Col>
             </Row>
         )
@@ -305,8 +305,7 @@ export default class BillTemplate extends Component {
         return (
             <Row className="amount-row">
                 <Col>
-                    <span className={`font30 ${this.state.printModelClsName}`}><b>₹:</b></span> &nbsp;
-                    <span className="font30">{format(this.state.data.amount, {code: "INR", symbol: ""})}</span>
+                    <span className="font30"><b>₹:</b></span> &nbsp;<span className="font30"></span>
                 </Col>
             </Row>
         )
@@ -318,7 +317,7 @@ export default class BillTemplate extends Component {
                 <Col xs={{span: 4}} md={{span: 4}}>
                     <div className="signature1-space"></div>
                     <div className="signature1-text">
-                        
+
                     </div>
                 </Col>
                 <Col xs={4}>
@@ -327,7 +326,7 @@ export default class BillTemplate extends Component {
                 <Col xs={{span: 4}} md={{span: 4}}>
                     <div className="signature2-space"></div>
                     <div className="signature2-text">
-                        
+
                     </div>
                 </Col>
             </Row>  
