@@ -295,7 +295,8 @@ export default class BillTemplate extends Component {
         return (
             <Row className="amount-row">
                 <Col>
-                    <span className="font30"><b>₹:</b></span> &nbsp;<span className="font30">{format(this.state.data.amount, {code: "INR", symbol: ""})}</span>
+                    <span className={`font30 ${this.state.printModelClsName}`}><b>₹:</b></span> &nbsp;
+                    <span className="font30">{format(this.state.data.amount, {code: "INR", symbol: ""})}</span>
                 </Col>
             </Row>
         )
@@ -307,7 +308,7 @@ export default class BillTemplate extends Component {
                 <Col xs={{span: 4}} md={{span: 4}}>
                     <div className="signature1-space"></div>
                     <div className="signature1-text">
-                        Signature 1
+                        
                     </div>
                 </Col>
                 <Col xs={4}>
@@ -316,7 +317,7 @@ export default class BillTemplate extends Component {
                 <Col xs={{span: 4}} md={{span: 4}}>
                     <div className="signature2-space"></div>
                     <div className="signature2-text">
-                        Signature 2
+                        
                     </div>
                 </Col>
             </Row>  
