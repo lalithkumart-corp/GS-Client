@@ -33,6 +33,14 @@ class PledgebookModal extends Component {
         
     }
 
+    getPrintModel() {
+        let flag = 'full';
+        if(this.props.auth && this.props.auth.userPreferences 
+            && (this.props.auth.userPreferences.loanBillPrintmodel == "partial"))
+            flag = 'partial';
+        return flag;
+    }
+
     onReopenClick() {
         let options = {...this.props.currentBillData};
         let requestParams = getReopenRequestParams(options);
@@ -130,6 +138,7 @@ class PledgebookModal extends Component {
             storeName: this.props.storeDetail.loanLicenseName,
             addressLine1: this.props.storeDetail.loanBillAddressLine1,
             addressLine2: this.props.storeDetail.loanBillAddressLine2,
+            printModel: this.getPrintModel()
         }
         await this.setState({printContent: templateData});
         this.printBtn.handlePrint();
@@ -252,6 +261,7 @@ class PledgebookModal extends Component {
 
 const mapStateToProps = (state) => { 
     return {
+        auth: state.auth,
         pledgebookModal: state.pledgebookModal,
         storeDetail: state.storeDetail
     };

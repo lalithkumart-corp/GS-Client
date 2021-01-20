@@ -14,13 +14,12 @@
         min-width: 500px !important;
         border: none;
         margin: 15px 30px;
-        /* visibility: hidden; */
     }
-    .billreceipt-print .in-build-print {
-        /* visibility: hidden; */
+    .partial-print-view {
+        visibility: hidden;
     }
-    .billreceipt-print .no-border-in-build-print {
-        /* border: none !important; */
+    .border-in-partial-print-view {
+        border-color: transparent !important;
     }
     .billreceipt-print .bill-receipt-content {
         padding: 15px 25px;

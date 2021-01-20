@@ -44,13 +44,19 @@ export default class BillTemplate extends Component {
                 //         11: {ornItem: "G Ring", ornNWt: "1.8", ornNos: "1", ornSpec: ""},
                 //         12: {ornItem: "G Ring", ornNWt: "1.8", ornNos: "1", ornSpec: ""},
                 //     // }
-                // }
+                // },
+                printModel: 'full'
             }
         }
+        this.state.printModelClsName = (this.state.data.printModel=='partial')?'partial-print-view':'';
+        this.state.printModelBorderClsName = (this.state.data.printModel=='partial')?'border-in-partial-print-view':'';
     }
     componentWillReceiveProps(nextProps) {
-        if(nextProps.data)
+        if(nextProps.data) {
             this.state.data = nextProps.data;
+            this.state.printModelClsName = (nextProps.data.printModel=='partial')?'partial-print-view':'';
+            this.state.printModelBorderClsName = (nextProps.data.printModel=='partial')?'border-in-partial-print-view':'';
+        }
     }
 
     getDate() {
@@ -112,7 +118,7 @@ export default class BillTemplate extends Component {
             qty: 0
         }
         dom.push(
-            <Row className="orn-table-header in-build-print">
+            <Row className={`orn-table-header ${this.state.printModelClsName}`}>
                 <Col className="orn-table-th-cell font17" xs={{span: 1}} md={{span: 1}}><b>Nos</b></Col>
                 <Col className="orn-table-th-cell font17" xs={{span: 9}} md={{span: 9}} style={{paddingLeft: "20px"}}><b>ITEM</b></Col>
                 <Col className="orn-table-th-cell font17" xs={{span: 1}} md={{span: 1}}>WT</Col>
@@ -140,7 +146,7 @@ export default class BillTemplate extends Component {
                 </Row>
             )
             dom.push(
-                <Row className="orn-list-footer no-border-in-build-print">
+                <Row className={`orn-list-footer ${this.state.printModelBorderClsName}`}>
                     <Col xs={1}>{footer.qty}</Col>
                     <Col xs={9}></Col>
                     <Col xs={1}>{footer.wt}</Col>
@@ -159,7 +165,7 @@ export default class BillTemplate extends Component {
 
     getHeader() {
         return (
-            <Row className="in-build-print" style={{minHeight: '200px', maxHeight: '200px', marginTop: '50px'}}>
+            <Row className={this.state.printModelClsName} style={{minHeight: '200px', maxHeight: '200px', marginTop: '50px'}}>
                 <Col xs={2}>
                     <img className="god-logo" src="/images/god_lakshmiji.jpg"/>
                 </Col>
@@ -190,7 +196,7 @@ export default class BillTemplate extends Component {
                 </Col>
                 <Col xs={{span: 4}} md={{span: 4}}>
                     <span style={{lineHeight: '45px', paddingRight: '15px'}}>
-                        <span style={{verticalAlign: 'top', paddingRight: '5px'}} className="in-build-print">Date:</span>
+                        <span style={{verticalAlign: 'top', paddingRight: '5px'}} className={this.state.printModelClsName}>Date:</span>
                         <span className="font23">{this.getDate()}</span></span>
                 </Col>
             </Row>
@@ -218,11 +224,11 @@ export default class BillTemplate extends Component {
     getCustInfo() {
         return (
             <Row>
-                <Col xs={{span: 8}} md={{span: 8}} className="cust-info-col no-border-in-build-print">
+                <Col xs={{span: 8}} md={{span: 8}} className={`cust-info-col ${this.state.printModelBorderClsName}`}>
                     <div>
                         <Row>
                             <Col xs={2} md={2}>
-                                <span className="font17 in-build-print"><b>Name:</b></span>
+                                <span className={`font17 ${this.state.printModelClsName}`}><b>Name:</b></span>
                             </Col>
                             <Col xs={10} md={10}>
                                 <p className="cust-name-field font19">
@@ -236,7 +242,7 @@ export default class BillTemplate extends Component {
                         </Row>
                         <Row style={{paddingTop: '5px'}}>
                             <Col xs={2} md={2}>
-                                <span className="font17 in-build-print"><b>Address:</b></span>
+                                <span className={`font17 ${this.state.printModelClsName}`}><b>Address:</b></span>
                             </Col>
                             <Col xs={10} md={10} style={{maxHeight: "110px", minHeight: "110px"}}>
                                 <div>{this.state.data.address}</div>
@@ -247,13 +253,13 @@ export default class BillTemplate extends Component {
                     </div>
                     <Row>
                         <Col xs={2}>
-                            <span className="font17 in-build-print"><b>Amount:</b></span>
+                            <span className={`font17 ${this.state.printModelClsName}`}><b>Amount:</b></span>
                         </Col>
                         <Col xs={4}>
                             {format(this.state.data.amount, {code: "INR"})}
                         </Col>
                         <Col xs={2}>
-                            <span className="font17 in-build-print"><b>Mobile:</b></span>
+                            <span className={`font17 ${this.state.printModelClsName}`}><b>Mobile:</b></span>
                         </Col>
                         <Col xs={4}>
                             {this.state.data.mobile}
@@ -261,7 +267,7 @@ export default class BillTemplate extends Component {
                     </Row>
                     <Row>
                         <Col xs={12} md={12}>
-                            <span className="font17 in-build-print"><b>₹ in words:</b></span> {this.getRupeesInWords(this.state.data.amount)}
+                            <span className={`font17 ${this.state.printModelClsName}`}><b>₹ in words:</b></span> {this.getRupeesInWords(this.state.data.amount)}
                         </Col>
                     </Row>
                 </Col>
@@ -275,7 +281,7 @@ export default class BillTemplate extends Component {
     getOrnaments() {
         return (
             <Row className="row-name-3">
-                <Col xs={{span: 8}} md={{span: 8}} className="orn-info-col no-border-in-build-print">
+                <Col xs={{span: 8}} md={{span: 8}} className={`orn-info-col ${this.state.printModelBorderClsName}`}>
                     {this.getOrnSecction()}
                 </Col>
                 <Col xs={{span: 3}} md={{span: 3}} className="image-col orn">

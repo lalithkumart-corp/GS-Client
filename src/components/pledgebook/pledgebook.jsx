@@ -864,7 +864,7 @@ class Pledgebook extends Component {
                 <CommonModal modalOpen={this.state.displayExportPopup} secClass="export-pledgebook-popup" handleClose={this.handleExportPopupClose}>
                     <PledgebookExportPopup handleClose={this.handleExportPopupClose}/>
                 </CommonModal>
-                <BillTemplate data={this.state.printContent} />
+                {/* <BillTemplate data={this.state.printContent} /> */}
             </Container>
         )
     }
