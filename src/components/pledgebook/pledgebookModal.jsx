@@ -36,7 +36,7 @@ class PledgebookModal extends Component {
     getPrintModel() {
         let flag = 'full';
         if(this.props.auth && this.props.auth.userPreferences 
-            && (this.props.auth.userPreferences.loanBillPrintmodel == "partial"))
+            && (this.props.auth.userPreferences.loan_bill_print_model == "partial"))
             flag = 'partial';
         return flag;
     }

@@ -238,7 +238,7 @@ export default class BillTemplate extends Component {
                     <div>
                         <Row>
                             <Col xs={2} md={2}>
-                                <span className={`font17 ${this.state.printModelClsName}`}><b>Name:</b></span>
+                                <span className={`field-name font17 ${this.state.printModelClsName}`}><b>Name:</b></span>
                             </Col>
                             <Col xs={10} md={10}>
                                 <p className="cust-name-field font19">
@@ -252,7 +252,7 @@ export default class BillTemplate extends Component {
                         </Row>
                         <Row style={{paddingTop: '5px'}}>
                             <Col xs={2} md={2}>
-                                <span className={`font17 ${this.state.printModelClsName}`}><b>Address:</b></span>
+                                <span className={`field-name font17 ${this.state.printModelClsName}`}><b>Address:</b></span>
                             </Col>
                             <Col xs={10} md={10} style={{maxHeight: "110px", minHeight: "110px"}}>
                                 <div>{this.state.data.address}</div>
@@ -263,13 +263,13 @@ export default class BillTemplate extends Component {
                     </div>
                     <Row>
                         <Col xs={2}>
-                            <span className={`font17 ${this.state.printModelClsName}`}><b>Amount:</b></span>
+                            <span className={`field-name font17 ${this.state.printModelClsName}`}><b>Amount:</b></span>
                         </Col>
                         <Col xs={4}>
                             {format(this.state.data.amount, {code: "INR"})}
                         </Col>
                         <Col xs={2}>
-                            <span className={`font17 ${this.state.printModelClsName}`}><b>Mobile:</b></span>
+                            <span className={`field-name font17 ${this.state.printModelClsName}`}><b>Mobile:</b></span>
                         </Col>
                         <Col xs={4}>
                             {this.state.data.mobile}
@@ -277,7 +277,7 @@ export default class BillTemplate extends Component {
                     </Row>
                     <Row>
                         <Col xs={12} md={12}>
-                            <span className={`font17 ${this.state.printModelClsName}`}><b>₹ in words:</b></span> {this.getRupeesInWords(this.state.data.amount)}
+                            <span className={`field-name font17 ${this.state.printModelClsName}`}><b>₹ in words:</b></span> {this.getRupeesInWords(this.state.data.amount)}
                         </Col>
                     </Row>
                 </Col>

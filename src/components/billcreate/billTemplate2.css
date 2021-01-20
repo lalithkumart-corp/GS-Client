@@ -61,6 +61,7 @@
     }
     .billreceipt-print .bill-no-date {
         margin-bottom: 20px;
+        height: 48px;
     }
     .billreceipt-print .bill-no {
         font-weight: bold;   
@@ -73,6 +74,9 @@
         padding-top: 10px;
         min-height: 220px;
         max-height: 220px;
+    }
+    .billreceipt-print .cust-info-col .field-name {
+        line-height: 32px;
     }
     .billreceipt-print .cust-name-field {
         text-overflow: ellipsis;
