@@ -1,6 +1,7 @@
 import { GET_STORE_INFO, UPDATE_STORE_INFO} from '../core/sitemap';
 import { getAccessToken } from '../core/storage';
 import axiosMiddleware from '../core/axios';
+import { toast } from 'react-toastify';
 
 export const getStoreDetails = () => {
     return async (dispatch) => {
@@ -41,6 +42,7 @@ export const updateStoreDetails = (apiParams) => {
                     type: 'STORE_DETAILS',
                     data: resp.data.UPDATED_DETAILS
                 });
+                toast.success("Success!");
             }
         } catch (e) {
             console.log(e);
@@ -48,6 +50,7 @@ export const updateStoreDetails = (apiParams) => {
                 type: 'STORE_DETAILS',
                 data: {}
             });
+            toast.error('Error!');
         }
     }
 }

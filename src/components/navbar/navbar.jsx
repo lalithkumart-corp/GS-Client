@@ -61,7 +61,7 @@ class NavbarComp extends Component {
                             <NavDropdown.Divider />
                             <NavDropdown.Item as={Link} to="/stock-setup">Setup</NavDropdown.Item>
                             <NavDropdown.Divider />
-                            <NavDropdown.Item as={Link} to="/tag-demo">Tagging</NavDropdown.Item>
+                            <NavDropdown.Item as={Link} to="/tag-demo">Tag-Custom</NavDropdown.Item>
                         </NavDropdown>
                     </Nav>
                     <Nav>
