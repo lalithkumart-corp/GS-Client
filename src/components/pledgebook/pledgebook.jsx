@@ -825,6 +825,8 @@ class Pledgebook extends Component {
                             <option selected={this.state.pageLimit=="50" && "selected"}>50</option>
                             <option selected={this.state.pageLimit=="100" && "selected"}>100</option>
                             <option selected={this.state.pageLimit=="200" && "selected"}>200</option>
+                            <option selected={this.state.pageLimit=="1000" && "selected"}>1000</option>
+                            <option selected={this.state.pageLimit=="2000" && "selected"}>2000</option>
                         </select>
                     </Col>
                     <Col xs={{span: 7}} className='pagination-container'>

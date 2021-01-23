@@ -67,7 +67,7 @@ export default class BillTemplate extends Component {
     }
 
     getBillNo() {
-        let billNo = '';
+        let billNo = 'null';
         if(this.state.data.billSeries)
             billNo += this.state.data.billSeries + ':';
         if(this.state.data.billNo)

@@ -352,13 +352,22 @@ class BillCreation extends Component {
             currState.ornPicture.holder = JSON.parse(JSON.stringify(defaultOrnPictureState.holder));
             this.setState(currState);
         }
-        
-    }    
+    }
 
     /* END: "this" Binders */
 
     /* START: API accessors */
     fetchMetaData() {
+        fetchOrnList()
+        .then(
+            (resp) => {
+                if(resp) {
+                    let newState = {...this.state};
+                    newState.formData.orn.list = resp.ornList;
+                    this.setState(newState);
+                }
+            }
+        )
         fetchCustomerMetaData().then(
             (resp) => {
                 if(resp) {
@@ -371,15 +380,6 @@ class BillCreation extends Component {
                     newState.formData.pincode.list = resp.pincodeList;
                     newState.formData.mobile.list = resp.mobileList;
                     newState.formData.moreDetails.list = resp.moreDetailsList;
-                    this.setState(newState);
-                }
-            }
-        )
-        fetchOrnList().then(
-            (resp) => {
-                if(resp) {
-                    let newState = {...this.state};
-                    newState.formData.orn.list = resp.ornList;
                     this.setState(newState);
                 }
             }
