@@ -12,7 +12,8 @@ import { convertToLocalTime, dateFormatter } from '../../../utilities/utility';
 import DateRangePicker from '../../dateRangePicker/dataRangePicker';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import Popover, {ArrowContainer} from 'react-tiny-popover'
-
+import {Tooltip} from 'react-tippy';
+   
 const DEFAULT_SELECTION = {
     rowObj: [],
     indexes: []
@@ -132,6 +133,35 @@ export default class ViewStock extends Component {
                     width: '7%'
                 },
                 {
+                    id: 'pTouch',
+                    displayText: 'PTouch',
+                    // isFilterable: true,
+                    // filterCallback: this.filterCallbacks.touch,
+                    className: 'stock-product-touch-col',
+                    formatter: (column, columnIndex, row, rowIndex) => {
+                        return (
+                            <span className='product-touch-cell'>
+                                {row[column.id]}
+                            </span>
+                        )
+                    },
+                    width: '5%'
+                },
+                {
+                    id: 'iTouch',
+                    displayText: 'ITouch',
+                    // filterCallback: this.filterCallbacks.iTouch,
+                    className: 'stock-i-touch-col',
+                    formatter: (column, columnIndex, row, rowIndex) => {
+                        return (
+                            <span className='i-touch-cell'>
+                                {row[column.id]}
+                            </span>
+                        )
+                    },
+                    width: '5%'
+                },
+                {
                     id: 'qty',
                     displayText: 'Qty',
                     // filterCallback: this.filterCallbacks.qty,
@@ -172,32 +202,19 @@ export default class ViewStock extends Component {
                     width: '5%'
                 },
                 {
-                    id: 'touch',
-                    displayText: 'Touch',
-                    isFilterable: true,
-                    filterCallback: this.filterCallbacks.touch,
-                    className: 'stock-product-touch-col',
+                    id: 'pureWt',
+                    displayText: 'P-Wt',
+                    // isFilterable: true,
+                    // filterCallback: this.filterCallbacks.touch,
+                    className: 'stock-product-pure-wt-col',
                     formatter: (column, columnIndex, row, rowIndex) => {
                         return (
-                            <span className='product-touch-cell'>
+                            <span className='product-pure-wt-cell'>
                                 {row[column.id]}
                             </span>
                         )
                     },
                     width: '5%'
-                },
-                {
-                    id: 'total',
-                    displayText: 'Total',
-                    className: 'stock-total-col',
-                    formatter: (column, columnIndex, row, rowIndex) => {
-                        return (
-                            <span className='product-total-cell'>
-                                {row[column.id]}
-                            </span>
-                        )
-                    },
-                    width: '4%'
                 },
                 {
                     id: 'soldQty',
@@ -213,15 +230,125 @@ export default class ViewStock extends Component {
                     },
                     width: '3%'
                 },
+                // {
+                //     id: 'soldGWt',
+                //     displayText: 'S-G.Wt',
+                //     className: 'stock-product-sold-gross-wt-col',
+                //     formatter: (column, columnIndex, row, rowIndex) => {
+                //         return (
+                //             <span className='product-sold-gross-wt-cell'>
+                //                 {row[column.id]}
+                //             </span>
+                //         )
+                //     },
+                //     width: '5%'
+                // },
+                {
+                    id: 'soldNWt',
+                    displayText: 'S-N.Wt',
+                    className: 'stock-product-sold-net-wt-col',
+                    formatter: (column, columnIndex, row, rowIndex) => {
+                        return (
+                            <span className='product-sold-net-wt-cell'>
+                                {row[column.id]}
+                            </span>
+                        )
+                    },
+                    width: '5%'
+                },
+                // {
+                //     id: 'soldPWt',
+                //     displayText: 'S-P.Wt',
+                //     className: 'stock-product-sold-pure-wt-col',
+                //     formatter: (column, columnIndex, row, rowIndex) => {
+                //         return (
+                //             <span className='product-sold-pure-wt-cell'>
+                //                 {row[column.id]}
+                //             </span>
+                //         )
+                //     },
+                //     width: '5%'
+                // },
+                
                 {
                     id: 'avlQty',
                     displayText: 'Avl Qty',
-                    // filterCallback: this.filterCallbacks.avlQty,
                     className: 'stock-product-avlQty-col',
                     formatter: (column, columnIndex, row, rowIndex) => {
                         return (
                             <span className='product-avlQty-cell'>
                                 {row[column.id]}
+                            </span>
+                        )
+                    },
+                    width: '3%'
+                },
+
+                // {
+                //     id: 'avlGWt',
+                //     displayText: 'A-G.Wt',
+                //     className: 'stock-product-avl-gross-wt-col',
+                //     formatter: (column, columnIndex, row, rowIndex) => {
+                //         return (
+                //             <span className='product-avl-gross-wt-cell'>
+                //                 {row[column.id]}
+                //             </span>
+                //         )
+                //     },
+                //     width: '5%'
+                // },
+                {
+                    id: 'avlNWt',
+                    displayText: 'A-N.Wt',
+                    className: 'stock-product-avl-net-wt-col',
+                    formatter: (column, columnIndex, row, rowIndex) => {
+                        return (
+                            <span className='product-avl-net-wt-cell'>
+                                {row[column.id]}
+                            </span>
+                        )
+                    },
+                    width: '5%'
+                },
+                // {
+                //     id: 'avlPWt',
+                //     displayText: 'A-P.Wt',
+                //     className: 'stock-product-avl-pure-wt-col',
+                //     formatter: (column, columnIndex, row, rowIndex) => {
+                //         return (
+                //             <span className='product-avl-pure-wt-cell'>
+                //                 {row[column.id]}
+                //             </span>
+                //         )
+                //     },
+                //     width: '5%'
+                // },
+
+                {
+                    id: 'total',
+                    displayText: 'Total',
+                    className: 'stock-total-col',
+                    formatter: (column, columnIndex, row, rowIndex) => {
+                        return (
+                            <span className='product-total-cell'>
+                                {row[column.id]}
+                            </span>
+                        )
+                    },
+                    width: '4%'
+                },
+                {
+                    id: '',
+                    displayText: '',
+                    className: 'actions-col',
+                    formatter: (column, columnIndex, row, rowIndex) => {
+                        return (
+                            <span className='actions-cell'>
+                                <Tooltip title="Print Tag"
+                                        position="top"
+                                        trigger="mouseenter">
+                                    <span className="tag-print-btn gs-icon"><FontAwesomeIcon icon='print' onClick={(e) => this.printClickListener(row)}/></span>
+                                </Tooltip>
                             </span>
                         )
                     },
@@ -320,9 +447,13 @@ export default class ViewStock extends Component {
             await this.setState(newState);
             this.refresh({fetchOnlyRows: true});
         },
+        iTouch: () => {},
         touch: async () => {
 
         }
+    }
+    printClickListener(row) {
+
     }
     expandRow = {
         renderer: (row) => {
@@ -331,27 +462,77 @@ export default class ViewStock extends Component {
                 supplier += ' - ' + row.supplierPersonName;
             return (
                 <Container>
-                    <Row style={{paddingTop: '15px'}}>
-                        <Col xs={{span:2}}><h6>Supplier</h6></Col>
-                        <Col xs={{span:2}}>{supplier}</Col>
-                    </Row>
-                    <Row style={{paddingTop: '15px'}}>
-                        <Col xs={{span:2}}><h6>Amount (Before Tax) </h6></Col>
-                        <Col xs={{span:2}}>{row.amount}</Col>
-                    </Row>
-                    <Row style={{paddingTop: '15px'}}>
-                        <Col xs={{span:2}}><h6>Tax Detail </h6></Col>
-                        <Col xs={{span:2}}>
-                            <Row>
-                                <Col xs={{span:12}}>SGST: {row.sgstPercent}% - {row.sgstAmt} </Col>
-                                <Col xs={{span:12}}>CGST: {row.cgstPercent}% - {row.cgstAmt} </Col>
-                                <Col xs={{span:12}}>IGST: {row.igstPercent}% - {row.igstAmt} </Col>
+                    <Row>
+                        <Col xs={{span: 6}}>
+                            <Row style={{paddingTop: '15px'}}>
+                                <Col xs={{span:4}}><h6>Supplier</h6></Col>
+                                <Col xs={{span:4}}>{supplier}</Col>
+                            </Row>
+                            <Row style={{paddingTop: '15px'}}>
+                                <Col xs={{span: 4}}> <h6>Touch: </h6></Col>
+                                <Col xs={{span: 8}}>
+                                    <Row>
+                                        <Col xs={4}>Pure Touch</Col>
+                                        <Col xs={4}>{row.pTouch}</Col>
+                                    </Row>
+                                    <Row>
+                                        <Col xs={4}>I-Touch</Col>
+                                        <Col xs={4}>{row.iTouch}</Col>
+                                    </Row>
+                                </Col>
+                            </Row>
+                            <Row style={{paddingTop: '15px'}}>
+                                <Col xs={{span:4}}><h6>Amount (Before Tax) </h6></Col>
+                                <Col xs={{span:4}}>₹ {row.amount}</Col>
+                            </Row>
+                            <Row style={{paddingTop: '15px'}}>
+                                <Col xs={{span:4}}><h6>Tax Detail </h6></Col>
+                                <Col xs={{span:4}}>
+                                    <Row>
+                                        <Col xs={{span:12}}>SGST: {row.sgstPercent}% - ₹ {row.sgstAmt} </Col>
+                                        <Col xs={{span:12}}>CGST: {row.cgstPercent}% - ₹ {row.cgstAmt} </Col>
+                                        <Col xs={{span:12}}>IGST: {row.igstPercent}% - ₹ {row.igstAmt} </Col>
+                                    </Row>
+                                </Col>
+                            </Row>
+                            <Row style={{paddingTop: '15px'}}>
+                                <Col xs={{span:4}}><h6>Amount (After Tax) </h6></Col>
+                                <Col xs={{span:4}}>₹ {row.total}</Col>
                             </Row>
                         </Col>
-                    </Row>
-                    <Row style={{paddingTop: '15px'}}>
-                        <Col xs={{span:2}}><h6>Amount (After Tax) </h6></Col>
-                        <Col xs={{span:2}}>{row.total}</Col>
+                        <Col xs={{span: 6}} className="view-stock-table-expand-row-right-pane">
+                            <Row>
+                                <Col>
+                                    <h4>Stock Details:</h4>
+                                    <div class="a-row row-1">
+                                        <span class='a-cell'>QTY</span>
+                                        <span class='a-cell'>G.WT</span>
+                                        <span class='a-cell'>N.WT</span>
+                                        <span class='a-cell'>P.WT</span>
+                                    </div>
+                                    <div></div>
+                                    <div class="a-row row-2">
+                                        <span class='a-cell'>{row.qty}</span>
+                                        <span class='a-cell'>{row.grossWt}</span>
+                                        <span class='a-cell'>{row.netWt}</span>
+                                        <span class='a-cell'>{row.pureWt}</span>
+                                    </div>
+                                    <div class="a-row row-3" style={{color: 'red'}}>
+                                        <span class='a-cell'>{row.soldQty}</span>
+                                        <span class='a-cell'>{row.soldGWt}</span>
+                                        <span class='a-cell'>{row.soldNWt}</span>
+                                        <span class='a-cell'>{row.soldPWt}</span>
+                                    </div>
+                                    <div></div>
+                                    <div class="a-row row-4" style={{color: "green"}}>
+                                        <span class='a-cell'>{row.avlQty}</span>
+                                        <span class='a-cell'>{row.avlGWt}</span>
+                                        <span class='a-cell'>{row.avlNWt}</span>
+                                        <span class='a-cell'>{row.avlPWt}</span>
+                                    </div>
+                                </Col>
+                            </Row>
+                        </Col>
                     </Row>
                 </Container>
             )
@@ -492,7 +673,14 @@ export default class ViewStock extends Component {
                         qty: aStockItem.Qty,
                         avlQty: aStockItem.AvlQty,
                         soldQty: aStockItem.SoldQty,
+                        avlGWt: aStockItem.AvlGWt,
+                        avlNWt: aStockItem.AvlNWt,
+                        avlPWt: aStockItem.AvlPWt,
+                        soldGWt: aStockItem.SoldGWt,
+                        soldNWt: aStockItem.SoldNWt,
+                        soldPWt: aStockItem.SoldPWt,
                         touch: aStockItem.PTouchName,
+                        pTouch: aStockItem.PTouchValue,
                         iTouch: aStockItem.ITouchValue,
                         amount: aStockItem.Amount,
                         cgstPercent: aStockItem.CgstPercent,

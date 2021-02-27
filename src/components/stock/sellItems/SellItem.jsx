@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { Container, Row, Col, Form } from 'react-bootstrap';
 import * as ReactAutosuggest from 'react-autosuggest';
+// import Popover, {ArrowContainer} from 'react-tiny-popover'
 import { FETCH_PROD_IDS, FETCH_STOCKS_BY_PRODID, SALE_ITEM } from '../../../core/sitemap';
 import axiosMiddleware from '../../../core/axios';
 import { getAccessToken } from '../../../core/storage';
@@ -10,13 +11,15 @@ import CommonModal from '../../common-modal/commonModal';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import GSCheckbox from '../../ui/gs-checkbox/checkbox';
 import './SellItem.css';
-import {calcPurchaseTotals, calculateExchangeTotals, calculatePaymentFormData, validate, constructApiParams } from './helper';
+import {calcPurchaseTotals, calculateExchangeTotals, calculatePaymentFormData, validate, constructApiParams, resetPageState, defaultExchangeItemFormData } from './helper';
 import { toast } from 'react-toastify';
 import { DoublyLinkedList } from '../../../utilities/doublyLinkedList';
 
 const TAGID = 'tagid';
 const SELL_QTY = 'qty';
 const SELL_WT = 'wt';
+const SELL_GWT = 'grossWt';
+const SELL_NWT = 'netWt';
 const SELL_WASTAGE = 'wastage';
 const SELL_LABOUR = 'labour';
 const SELL_CGST = 'cgstPercent';
@@ -42,6 +45,7 @@ domList.add('retailPrice', {type: 'defaultInput', enabled: true});
 domList.add('tagid', {type: 'rautosuggest', enabled: true});
 domList.add('qty1', {type: 'defaultInput', enabled: true});
 domList.add('wt1', {type: 'defaultInput', enabled: false});
+domList.add('wt2', {type: 'defaultInput', enabled: false});
 domList.add('wastage1', {type: 'defaultInput', enabled: true});
 domList.add('labour1', {type: 'defaultInput', enabled: true});
 domList.add('cgstPercent1', {type: 'defaultInput', enabled: true});
@@ -55,14 +59,7 @@ domList.add(EX_OLD_RATE, {type: 'defaultInput', enabled: true});
 domList.add(EX_PRICE, {type: 'defaultInput', enabled: true});
 domList.add('exchangeAddBtn', {type: 'defaultInput', enabled: true});
 
-let defaultExchangeItemFormData = {
-    exMetal: 'G',
-    exGrossWt: "",
-    exNetWt: "",
-    exWastage: "",
-    exOldRate: "",
-    exPrice: ""
-}
+
 class SellItem extends Component {
     constructor(props) {
         super(props);
@@ -132,8 +129,9 @@ class SellItem extends Component {
             let newState = {...this.state};
             newState.currSelectedItem = resp.data.ITEM;
             newState.currSelectedItem.formData = {
-                qty: 1,
-                wt: newState.currSelectedItem.gross_wt,
+                qty: newState.currSelectedItem.avl_qty || 1,
+                grossWt: newState.currSelectedItem.avl_g_wt,
+                netWt: newState.currSelectedItem.avl_n_wt,
                 wastage: "",
                 labour: "",
                 cgstPercent: "",
@@ -180,7 +178,8 @@ class SellItem extends Component {
                 else
                     this.updateDomState('editableWt');
                 break;
-            case SELL_WT:
+            case SELL_GWT:
+            case SELL_NWT:
             case SELL_WASTAGE:
             case SELL_LABOUR:
             case SELL_CGST:
@@ -289,10 +288,12 @@ class SellItem extends Component {
         let newState = {...this.state};
         newState.purchaseItemPreview = newState.purchaseItemPreview || {};
         newState.purchaseItemPreview[this.state.currSelectedItem.prod_id] = JSON.parse(JSON.stringify(this.state.currSelectedItem));
+        newState.purchaseItemPreview[this.state.currSelectedItem.prod_id].tempFormData = {...newState.purchaseItemPreview[this.state.currSelectedItem.prod_id].formData};
         newState.prodId.inputVal = "";
         newState.purchaseTotals = calcPurchaseTotals(newState.purchaseItemPreview);
         newState.currSelectedItem = {};
         newState.paymentFormData = calculatePaymentFormData(newState);
+        newState.editView = false;
         await this.setState(newState);
         //setTimeout(()=>{
             this.focusTagIdInput();
@@ -306,11 +307,58 @@ class SellItem extends Component {
         this.setState(newState);
     }
 
+    enableEditView(prodId) {
+        let newState = {...this.state}
+        let editItem;
+        _.each(newState.purchaseItemPreview, (anItem, prod_Id) => {
+            if(prod_Id == prodId)
+                editItem = anItem;
+        });
+        newState.currSelectedItem = editItem;
+        newState.editView = true;
+        this.setState(newState);
+    }
+
+    // showPopover(stateKey) {
+    //     let newState = {...this.state};
+    //     newState[stateKey] = true;
+    //     this.setState(newState); 
+    // }
+
+    // closePopover(stateKey) {
+    //     let newState = {...this.state};
+    //     newState[stateKey] = false;
+    //     this.setState(newState);
+    // }
+
     async exchangeItemCheckboxListener(e) {
         await this.setState({hasExchangeItem: e.target.checked});
         if(this.state.hasExchangeItem)
             this.focusExGrossWtInput();
     }
+
+    // onChangeInPurchasePreview(key, prodId, value) {
+    //     let newState = {...this.state};
+    //     _.each(newState.purchaseItemPreview, (anItem, index) => {
+    //         if(anItem.prod_id == prodId) {
+    //             anItem['tempFormData'] = anItem['tempFormData'] || {};
+    //             anItem['tempFormData'][key] = value;
+    //         }
+    //     });
+    //     this.setState(newState);
+    // }
+
+    // onSaveBtn1Click(prodId) {
+    //     let newState = {...this.state};
+    //     _.each(newState.purchaseItemPreview, (anItem, index) => {
+    //         if(anItem.prod_id == prodId) {
+    //             _.each(anItem.tempFormData, (inputVal, key) => {
+    //                 anItem.formData[key] = inputVal;
+    //             });
+    //         }
+    //     })
+    //     this.setState(newState);
+    // }
 
     onClickExAddButton() {
         let metal = this.state.exchangeItemFormData[EX_METAL];
@@ -332,13 +380,16 @@ class SellItem extends Component {
     }
 
     async submit() {
-        let validation = validate(this.state);
+        let validation = validate(this.state, this.props);
         if(validation.flag) {
             try {
                 let apiParams = constructApiParams(this.state, this.props);
                 let resp = await axiosMiddleware.post(SALE_ITEM, {apiParams});
                 if(resp.data && resp.data.STATUS == "SUCCESS") {
                     toast.success('Success!');
+                    let newState = {...this.state};
+                    newState = resetPageState(newState);
+                    this.setState(newState);
                     //TODO: reset the UI form data
                 } else {
                     let msg = resp.data.ERROR || 'ERROR';
@@ -438,9 +489,11 @@ class SellItem extends Component {
         switch(action) {
             case 'readOnlyWt':
                 domList.disable('wt1');
+                domList.disable('wt2');
                 break;
             case 'editableWt':
                 domList.enable('wt1');
+                domList.enable('wt2');
                 break;
         }
     }
@@ -476,7 +529,7 @@ class SellItem extends Component {
             let qty = this.state.currSelectedItem.formData.qty || 0;
             if(qty) {
 
-                let wt = this.state.currSelectedItem.formData.wt || this.state.currSelectedItem.gross_wt; //wtPerQty*qty;
+                let wt = this.state.currSelectedItem.formData.netWt || this.state.currSelectedItem.net_wt; //wtPerQty*qty;
                 
                 let wastage = this.state.currSelectedItem.formData.wastage || 0;
                 let labour = this.state.currSelectedItem.formData.labour || 0;
@@ -620,10 +673,11 @@ class SellItem extends Component {
         )
     }
     getSellingInputControls() {
-        let formData = {qty: "", wt: "", wastage: "", labour: "", cgstPercent: "", sgstPercent: "", discount: "", price: ""};
+        let formData = {qty: "", grossWt: "", netWt:"", wastage: "", labour: "", cgstPercent: "", sgstPercent: "", discount: "", price: ""};
         if(this.state.currSelectedItem && Object.keys(this.state.currSelectedItem) !== 0 && this.state.currSelectedItem.formData) {
             formData.qty = this.state.currSelectedItem.formData.qty || null;
-            formData.wt = this.state.currSelectedItem.formData.wt || null;
+            formData.grossWt = this.state.currSelectedItem.formData.grossWt || null;
+            formData.netWt = this.state.currSelectedItem.formData.netWt || null;
             formData.wastage = this.state.currSelectedItem.formData.wastage || null;
             formData.labour = this.state.currSelectedItem.formData.labour || null;
             formData.cgstPercent = this.state.currSelectedItem.formData.cgstPercent || null;
@@ -639,16 +693,18 @@ class SellItem extends Component {
                         <table className="table2">
                             <colgroup>
                                 <col style={{width: "10%"}}></col>
-                                <col style={{width: "10%"}}></col>
-                                <col style={{width: "15%"}}></col>
-                                <col style={{width: "15%"}}></col>
-                                <col style={{width: "15%"}}></col>
-                                <col style={{width: "15%"}}></col>
+                                <col style={{width: "13%"}}></col>
+                                <col style={{width: "13%"}}></col>
+                                <col style={{width: "12%"}}></col>
+                                <col style={{width: "12%"}}></col>
+                                <col style={{width: "12%"}}></col>
+                                <col style={{width: "12%"}}></col>
                             </colgroup>
                             <thead>
                                 <tr>
                                     <th>Qty</th>
-                                    <th>Weight</th>
+                                    <th>G-Wt</th>
+                                    <th>N-Wt</th>
                                     <th>Wst</th>
                                     <th>Labour</th>
                                     <th>CGST%</th>
@@ -663,9 +719,14 @@ class SellItem extends Component {
                                                                 ref= {(domElm) => {this.domElmns.qty1 = domElm; }}/>
                                     </td>
                                     <td>
-                                        <input type="number" className="gs-input" value={formData.wt} onChange={(e)=>this.onInputValChange(e, 'wt')} readOnly={this.preventWeighttModification()}
+                                        <input type="number" className="gs-input" value={formData.grossWt} onChange={(e)=>this.onInputValChange(e, 'grossWt')} readOnly={this.preventWeighttModification()}
                                                                 onKeyUp = {(e) => this.onKeyUp(e, {currElmKey: 'wt1'})}
                                                                 ref= {(domElm) => {this.domElmns.wt1 = domElm; }} />
+                                    </td>
+                                    <td>
+                                        <input type="number" className="gs-input" value={formData.netWt} onChange={(e)=>this.onInputValChange(e, 'netWt')} readOnly={this.preventWeighttModification()}
+                                                                onKeyUp = {(e) => this.onKeyUp(e, {currElmKey: 'wt2'})}
+                                                                ref= {(domElm) => {this.domElmns.wt2 = domElm; }} />
                                     </td>
                                     <td>
                                         <input type="number" className="gs-input" value={formData.wastage} onChange={(e)=>this.onInputValChange(e, 'wastage')} readOnly={isReadOnly}
@@ -720,7 +781,7 @@ class SellItem extends Component {
                         </table>
                     </Col>
                     <Col xs={6} style={{textAlign: 'right'}}>
-                        <input type="button" className="gs-button" value="ADD TO LIST"
+                        <input type="button" className="gs-button" value={this.state.editView?'Update':'ADD TO LIST'}
                          onClick={(e) => this.addItemToBillPreview(e)} 
                         //  onKeyUp = {(e) => this.onKeyUp(e, {currElmKey: 'addItemToBillPreviewBtn'})}
                          disabled={isReadOnly}
@@ -762,19 +823,83 @@ class SellItem extends Component {
             let iteration = 0;
             let totals = calcPurchaseTotals(this.state.purchaseItemPreview);
             _.each(this.state.purchaseItemPreview, (anItem, index) => {
+                // let stateKey = `editIteInPurchasePanelmPopover${index}`;
                 rows.push(
                     <tr>
                         <td>{++iteration}</td>
                         <td>{anItem.prod_id}</td>
                         <td>{anItem.formData.qty}</td>
-                        <td>{anItem.formData.wt}</td>
+                        <td>{anItem.formData.grossWt}</td>
+                        <td>{anItem.formData.netWt}</td>
                         <td>{anItem.formData.wastage}</td>
                         <td>{anItem.formData.labour}</td>
                         <td>{anItem.formData.cgstPercent}</td>
                         <td>{anItem.formData.sgstPercent}</td>
                         <td>{anItem.formData.discount}</td>
                         <td>{anItem.formData.price}</td>
-                        <td><span onClick={(e) => this.deleteItemFromPurchaseItemPreview(anItem.prod_id)}><FontAwesomeIcon icon="backspace"/></span></td>
+                        <td>
+                            <span onClick={(e) => this.deleteItemFromPurchaseItemPreview(anItem.prod_id)}><FontAwesomeIcon icon="backspace"/></span>
+                            <span onClick={(e) => this.enableEditView(index)} style={{paddingLeft: '10px'}}><FontAwesomeIcon icon="edit"/></span>                             
+
+                            {/* <Popover
+                                    className='status-popover'
+                                    padding={0}
+                                    isOpen={this.state[stateKey]}
+                                    position={'right'} // preferred position
+                                    onClickOutside={() => this.closePopover(stateKey)}
+                                    content={({ position, targetRect, popoverRect }) => {
+                                        let tempFormData = anItem.tempFormData;
+                                        return (
+                                            <Container className="edit-item-in-purchase-panel-container" style={{width: '200px', backgroundColor: 'navajowhite', padding: '10px'}}>
+                                                <Row>
+                                                    Avl Qty: {anItem.avl_qty}
+                                                    Wt: {anItem.gross_wt}
+                                                </Row>
+                                                <Row>
+                                                    <Col xs={6}>
+                                                        Quantity:
+                                                        <input type="text" value={tempFormData.qty} onChange={(e) => {this.onChangeInPurchasePreview('qty', anItem.prod_id, e.target.value)}} />
+                                                    </Col>
+                                                    <Col xs={6}>
+                                                        Wt:
+                                                        <input type="text" value={tempFormData.wt} onChange={(e) => {this.onChangeInPurchasePreview('wt', anItem.prod_id, e.target.value)}} />
+                                                    </Col>
+                                                    <Col xs={6}>
+                                                        Labour:
+                                                        <input type="text" value={tempFormData.wastage} onChange={(e) => {this.onChangeInPurchasePreview('wastage', anItem.prod_id, e.target.value)}} />
+                                                    </Col>
+                                                    <Col xs={6}>
+                                                        wastage:
+                                                        <input type="text" value={tempFormData.labour} onChange={(e) => {this.onChangeInPurchasePreview('labour', anItem.prod_id, e.target.value)}} />
+                                                    </Col>
+                                                    <Col xs={6}>
+                                                        CGST:
+                                                        <input type="text" value={tempFormData.cgstPercent} onChange={(e) => {this.onChangeInPurchasePreview('cgstPercent', anItem.prod_id, e.target.value)}} />
+                                                    </Col>
+                                                    <Col xs={6}>
+                                                        SGST:
+                                                        <input type="text" value={tempFormData.sgstPercent} onChange={(e) => {this.onChangeInPurchasePreview('sgstPercent', anItem.prod_id, e.target.value)}} />
+                                                    </Col>
+                                                    <Col xs={6}>
+                                                        Discount:
+                                                        <input type="text" value={tempFormData.dicsount} onChange={(e) => {this.onChangeInPurchasePreview('dicsount', anItem.prod_id, e.target.value)}} />
+                                                    </Col>
+                                                    <Col xs={6}>
+                                                        Price:
+                                                        <input type="text" readOnly value={tempFormData.dicsount} />
+                                                    </Col>
+                                                </Row>
+                                                <Row>
+                                                    <input type="button" className="gs-button" value="SAVE" onClick={(e) => this.onSaveBtn1Click(index)}/>
+                                                </Row>
+                                            </Container>
+                                            )
+                                    }
+                                }                                                                 
+                                >
+                                    <span onClick={(e) => this.showPopover(stateKey)} style={{paddingLeft: '10px'}}><FontAwesomeIcon icon="edit"/></span>                             
+                                </Popover> */}
+                        </td>
                     </tr> 
                 );
             });
@@ -783,6 +908,7 @@ class SellItem extends Component {
                     <colgroup>
                         <col style={{width: "5%"}}></col>
                         <col style={{width: "10%"}}></col>
+                        <col style={{width: "5%"}}></col>
                         <col style={{width: "5%"}}></col>
                         <col style={{width: "5%"}}></col>
                         <col style={{width: "5%"}}></col>
@@ -798,7 +924,8 @@ class SellItem extends Component {
                             <td></td>
                             <td>Tag No</td>
                             <td>Qty</td>
-                            <td>Wt</td>
+                            <td>G-Wt</td>
+                            <td>N-Wt</td>
                             <td>Wastage</td>
                             <td>Labour</td>
                             <td>CGST</td>
@@ -814,7 +941,8 @@ class SellItem extends Component {
                             <td>Total</td>
                             <td></td>
                             <td>{this.state.purchaseTotals.qty}</td>
-                            <td>{this.state.purchaseTotals.wt}</td>
+                            <td>{this.state.purchaseTotals.grossWt}</td>
+                            <td>{this.state.purchaseTotals.netWt}</td>
                             <td>{this.state.purchaseTotals.wastage}</td>
                             <td>{this.state.purchaseTotals.labour}</td>
                             <td></td>

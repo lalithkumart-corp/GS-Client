@@ -36,6 +36,7 @@
     "react-scripts": "^4.0.0",
     "react-spinners": "^0.4.4",
     "react-tiny-popover": "^3.4.2",
+    "react-tippy": "^1.4.0",
     "react-to-print": "^2.9.0",
     "react-toastify": "^4.2.0",
     "react-webcam": "^1.0.1",

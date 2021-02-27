@@ -351,6 +351,10 @@ class AddStock extends Component {
                     newState = resetFormData(newState);
                     newState.formData.listItems = [];
                     this.setState(newState);
+                    this.fetchOrnAutoSuggestionList();
+                    setTimeout(()=>{
+                        this.domElmns[PROD_NAME].focus();
+                    },300);
                 }
                 break;
         }

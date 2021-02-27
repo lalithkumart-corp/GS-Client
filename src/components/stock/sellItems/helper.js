@@ -1,3 +1,12 @@
+export let defaultExchangeItemFormData = {
+    exMetal: 'G',
+    exGrossWt: "",
+    exNetWt: "",
+    exWastage: "",
+    exOldRate: "",
+    exPrice: ""
+}
+
 export const calcualteAvgWastagePercent = (billPreviewList) => {
     let itemsCount = Object.keys(billPreviewList).length;
     let totalAddedWastage = 0;
@@ -28,7 +37,8 @@ export const calculateAvgSgstPercent = (billPreviewList) => {
 export const calcPurchaseTotals = (billPreviewList) => {
     let totals = {
         qty: 0,
-        wt: 0,
+        grossWt: 0,
+        netWt: 0,
         wastage: 0,
         labour: 0,
         cgstPercent: 0,
@@ -38,7 +48,8 @@ export const calcPurchaseTotals = (billPreviewList) => {
     };
     _.each(billPreviewList, (anItem, index) => {
         totals.qty += anItem.formData.qty;
-        totals.wt += anItem.formData.wt;
+        totals.grossWt += anItem.formData.grossWt;
+        totals.netWt += anItem.formData.netWt;
         totals.wastage = calcualteAvgWastagePercent(billPreviewList);
         totals.cgstPercent = calculateAvgCgstPercent(billPreviewList);
         totals.sgstPercent = calculateAvgSgstPercent(billPreviewList);
@@ -104,7 +115,7 @@ export const calculatePaymentFormData = (stateObj) => {
     return paymentFormData;
 }
 
-export const validate = (stateObj) => {
+export const validate = (stateObj, propObj) => {
     let flag = true;
     let msg = [];
     if(Object.keys(stateObj.purchaseItemPreview).length == 0) {
@@ -121,18 +132,29 @@ export const validate = (stateObj) => {
             flag = false;
             msg.push('Paid amount is greater than the actual Total amount.');
         }
+        if(!stateObj.retailPrice) {
+            flag = false;
+            msg.push('Give retail price.');
+        }
+        if(!propObj.rate.metalRate.gold) {
+            flag = false;
+            msg.push('Set the MetalRate in Stock-Setup page.');
+        }
     }
     return {flag, msg};
 }
 
 export const constructApiParams = (stateObj, propObj) => {
     let newProds = [];
+    debugger;
     _.each(stateObj.purchaseItemPreview, (anItem, index) => {
         newProds.push({
-            prodId: anItem.prod_id,
+            prodId: anItem.prod_id, //TAGID
+            ornamentId: anItem.ornament,
             qty: anItem.formData.qty,
-            grossWt: anItem.formData.wt,
-            netWt: anItem.formData.wt,
+            grossWt: anItem.formData.grossWt,
+            netWt: anItem.formData.netWt,
+            pureWt: anItem.formData.netWt * (anItem.pure_touch/100),
             wastage: anItem.formData.wastage,
             labour: anItem.formData.labour,
             cgstPercent: anItem.formData.cgstPercent,
@@ -147,6 +169,7 @@ export const constructApiParams = (stateObj, propObj) => {
             name: anItem.name || 'some item',
             grossWt: anItem.grossWt,
             netWt: anItem.netWt,
+            pureWt: anItem.pureWt,
             wastage: anItem.wastage,
             oldRate: anItem.oldRate,
             price: anItem.price
@@ -162,10 +185,33 @@ export const constructApiParams = (stateObj, propObj) => {
     }
     return {
         customerId: stateObj.selectedCustomer.customerId,
-        retailRate: stateObj.retailPrice,
-        metalRate: propObj.rate.metalRate.gold,
+        retailRate: stateObj.retailPrice || 0,
+        metalRate: propObj.rate.metalRate.gold || 0,
         newProds,
         exchangeProds,
         paymentFormData
     }
+}
+
+export const resetPageState = (stateObj) => {
+    stateObj = {
+        ...stateObj,
+        currSelectedItem: {},
+        purchaseItemPreview: {},
+        purchaseTotals: {},
+        hasExchangeItem: false,
+        exchangeItemFormData: JSON.parse(JSON.stringify(defaultExchangeItemFormData)),
+        exchangeItems: {},
+        exchangeItemsTotals: {},
+        paymentFormData: {
+            totalPurchasePrice: 0,
+            totalExchangePrice: 0,
+            sum: 0,
+            paymentMode: 'cash',
+            paymentDetails: {},
+            paid: 0,
+            balance: 0
+        }
+    }
+    return stateObj;
 }

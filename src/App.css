@@ -378,6 +378,10 @@ input[type=checkbox], input[type=radio] {
 /* END: Custom React Pagination styles */
 
 
+.gs-icon {
+  color: #2296f3;
+  cursor: pointer;
+}
 
 .react-datepicker-popper {
   z-index: 3;

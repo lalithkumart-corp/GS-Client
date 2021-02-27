@@ -81,3 +81,38 @@
     margin-top: 14px;
     display: inline-block;
 }
+
+.stock-product-qty-col,
+.stock-product-gross-wt-col,
+.stock-product-net-wt-col,
+.stock-product-pure-wt-col {
+    color: grey;
+}
+.stock-product-soldQty-col {
+/* .stock-product-sold-gross-wt-col, */
+/* .stock-product-sold-net-wt-col { */
+    color: red;
+}
+.stock-product-avlQty-col
+/* .stock-product-avl-gross-wt-col, */
+/* .stock-product-avl-net-wt-col */
+{
+    color: green;
+}
+
+.view-stock-table-expand-row-right-pane h4 {
+    margin-bottom: 20px;
+    margin-top: 10px;
+}
+.view-stock-table-expand-row-right-pane .a-cell {
+    width: 100px;
+    display: inline-block;
+    line-height: 23px;
+    padding-left: 10px;
+}
+
+.view-stock-table-expand-row-right-pane .row-1 .a-cell,
+.view-stock-table-expand-row-right-pane .row-3 .a-cell {
+    border-bottom: 1px solid;
+    border-color: lightgray;
+}

@@ -80,13 +80,15 @@ export const logout = (accessToken) => {
                 },
                 (errorResponse) => {
                     clearSession(theAccessToken);
-                    toast.error('Error occured while performing Logout!');
+                    //toast.error('Error occured while performing Logout!');
+                    history.push('/');
                     console.log(errorResponse);
                 }
             )
             .catch(
                 (exception) => {
-                    toast.error('Exception occured while performing Logout!');
+                    //toast.error('Exception occured while performing Logout!');
+                    history.push('/');
                     console.log(exception);
                 }
             )

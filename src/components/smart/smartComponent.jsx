@@ -15,6 +15,8 @@ import UploadPicDemo from '../profilePic/uploadPic';
 import Logout from '../logout/logout';
 import Navbar from '../navbar/navbar';
 import { ToastContainer } from 'react-toastify';
+// import ReactTooltip from 'react-tooltip';
+// import tooltip from 'tooltip';
 import 'react-toastify/dist/ReactToastify.css';
 import history from '../../history';
 import Users from '../users/users.jsx';
@@ -34,7 +36,14 @@ import ActivationPage from '../activation/ActivationPage';
 import FontViewerPage from '../fontViewer/FontView';
 import { getStoreDetails } from '../../actions/storeDetails';
 import 'bootstrap/dist/css/bootstrap.min.css';
-
+import 'react-tippy/dist/tippy.css'
+// var config  = {
+//     showDelay: 0,
+//     style: {
+//       padding: 5
+//     }
+// }
+// tooltip(config);
 class SmartComponent extends Component {
     constructor(props) {
         super(props);
@@ -81,7 +90,8 @@ class SmartComponent extends Component {
                             </div>
                             <div className='page-content'>
                                 <ToastContainer position={'top-center'} hideProgressBar={false}/>
-                                <Route exact path='/' component={Home} />                                
+                                {/* <ReactTooltip /> */}
+                                <Route exact path='/' component={Home} />
                                 <Route path= '/billcreate' component={BillCreation} />
                                 <Route path= '/redeem' component={Redeem} />
                                 <Route path= '/pledgebook' component={Pledgebook} />

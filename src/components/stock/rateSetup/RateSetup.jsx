@@ -61,7 +61,7 @@ class RateSetup extends Component {
                 <Row>
                     <Col className="gs-card">
                         <Row className="gs-card-content">
-                            <Col xs={6}>
+                            <Col xs={3}>
                                 <Form.Group>
                                     <Form.Label>GOLD Metal Rate (10 gms)</Form.Label>
                                     <InputGroup>
@@ -74,7 +74,7 @@ class RateSetup extends Component {
                                     </InputGroup>
                                 </Form.Group>
                             </Col>
-                            <Col xs={6}>
+                            <Col xs={3}>
                                 <Form.Group>
                                     <Form.Label>Silver Metal Rate</Form.Label>
                                     <InputGroup>
@@ -87,7 +87,7 @@ class RateSetup extends Component {
                                     </InputGroup>
                                 </Form.Group>
                             </Col>
-                            <Col xs={6}>
+                            <Col xs={3}>
                                 <Form.Group>
                                     <Form.Label>GOLD Retail Rate (1 gm)</Form.Label>
                                     <InputGroup>
@@ -100,7 +100,7 @@ class RateSetup extends Component {
                                     </InputGroup>
                                 </Form.Group>
                             </Col>
-                            <Col xs={6}>
+                            <Col xs={3}>
                                 <Form.Group>
                                     <Form.Label>Silver Retail Rate (1 gm)</Form.Label>
                                     <InputGroup>

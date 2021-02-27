@@ -1,0 +1,13 @@
+.sold-out-list-container {
+    max-width: 100%;
+}
+.stock-sold-out-itens-date-filter {
+    border: 1px solid !important;
+    margin-bottom: 10px;
+}
+.stock-sold-out-itens-date-filter .arrow-down-icon {
+    padding-left: 7px;
+}
+table.my-stock-sold-items-view-table.gs-table .inner-header input[type="text"] {
+    width: 100%;
+}
