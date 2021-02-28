@@ -394,18 +394,20 @@ class AddStock extends Component {
         switch(identifier) {
             case ADD_ENTRY:
                 if(this.validateEntries()) {
-                    newState.formData.listItems[0] = constructItemObj(this.state);
-                    // this.setState(newState);
-                    // this.transferFocus(e, identifier);
-                    let flag = await this.insertNewStockItem(newState.formData.listItems[0]);
-                    if(flag) {
-                        newState = resetFormData(newState);
-                        newState.formData.listItems = [];
-                        this.setState(newState);
-                        this.fetchOrnAutoSuggestionList();
-                        setTimeout(()=>{
-                            this.domElmns[PROD_NAME].focus();
-                        },300);
+                    if(window.confirm('Sure to add new item in stock?')) {
+                        newState.formData.listItems[0] = constructItemObj(this.state);
+                        // this.setState(newState);
+                        // this.transferFocus(e, identifier);
+                        let flag = await this.insertNewStockItem(newState.formData.listItems[0]);
+                        if(flag) {
+                            newState = resetFormData(newState);
+                            newState.formData.listItems = [];
+                            this.setState(newState);
+                            this.fetchOrnAutoSuggestionList();
+                            setTimeout(()=>{
+                                this.domElmns[PROD_NAME].focus();
+                            },300);
+                        }
                     }
                 }
                 break;
@@ -423,8 +425,10 @@ class AddStock extends Component {
                 break;
             case UPDATE_ENTRY:
                 if(this.validateEntries()) {
-                    newState.formData.listItems[0] = constructItemObj(this.state, {updateMode: true});
-                    let flag = await this.updateStockItem(newState.formData.listItems[0]);
+                    if(window.confirm('Sure to update?')) {
+                        newState.formData.listItems[0] = constructItemObj(this.state, {propObj: this.props, updateMode: true} );
+                        let flag = await this.updateStockItem(newState.formData.listItems[0]);
+                    }
                 }
                 break;
         }
@@ -540,6 +544,8 @@ class AddStock extends Component {
         // pWt, iwt, calcAmtUptoIWt, calcAmtWithLabour, calcAmtWithTax, productTotalAmt
         if(fd.productGWt)
             fd.productNWt = fd.productGWt;
+        if(fd.productPureTouch && !fd.productITouch)
+            fd.productITouch = fd.productPureTouch;
         if(fd.metalPrice && fd.metalPricePerGm && fd.productQty && fd.productNWt) {
             if(fd.productPureTouch)
                 fd.productPWt = ((fd.productNWt * fd.productPureTouch)/100).toFixed(3);
@@ -565,6 +571,11 @@ class AddStock extends Component {
                 fd.productIgstAmt = parseFloat( ( (fd.calcAmtWithLabour * fd.productIgstPercent)/100 ).toFixed(2) );
             fd.productTotalAmt = fd.calcAmtWithLabour + (fd.productSgstAmt || 0) + (fd.productCgstAmt || 0) + (fd.productIgstAmt || 0);
 
+            // BEAUTIFY OR TRIMMING
+            if(fd.calcAmtUptoIWt)
+                fd.calcAmtUptoIWt = parseFloat(fd.calcAmtUptoIWt.toFixed(3));
+            if(fd.calcAmtWithLabour)
+                fd.calcAmtWithLabour = parseFloat(fd.calcAmtWithLabour.toFixed(3));
             if(fd.productTotalAmt)
                 fd.productTotalAmt = fd.productTotalAmt.toFixed(3);
         }
@@ -1011,6 +1022,7 @@ class AddStock extends Component {
                                                 onKeyUp={(e) => this.handleKeyUp(e, {currElmKey: PROD_ITOUCH})}
                                                 ref= {(domElm) => {this.domElmns[PROD_ITOUCH] = domElm; }}
                                                 value={this.state.formData.productITouch}
+                                                onFocus={(e)=> {e.target.select()}}
                                             />
                                         </Form.Group>
                                     </td>
@@ -1150,7 +1162,8 @@ class AddStock extends Component {
                                                         value: this.state.formData.productCategory,
                                                         onChange: (e, {newValue, method}) => this.reactAutosuggestControls.onChange(e, {newValue, method}, PROD_CATEG),
                                                         onKeyUp: (e) => this.reactAutosuggestControls.onKeyUp(e, {currElmKey: PROD_CATEG}),
-                                                        className: "react-autosuggest__input gs-input-cell"
+                                                        className: "react-autosuggest__input gs-input-cell",
+                                                        onFocus: (e)=> {e.target.select()}
                                                     }}
                                                     ref = {(domElm) => { this.domElmns[PROD_CATEG] = domElm?domElm.input:domElm; }}
                                                 />
@@ -1167,7 +1180,8 @@ class AddStock extends Component {
                                                         value: this.state.formData.productSubCategory,
                                                         onChange: (e, {newValue, method}) => this.reactAutosuggestControls.onChange(e, {newValue, method}, PROD_SUB_CATEG),
                                                         onKeyUp: (e) => this.reactAutosuggestControls.onKeyUp(e, {currElmKey: PROD_SUB_CATEG}),
-                                                        className: "react-autosuggest__input gs-input-cell"
+                                                        className: "react-autosuggest__input gs-input-cell",
+                                                        onFocus: (e)=> {e.target.select()}
                                                     }}
                                                     ref = {(domElm) => { this.domElmns[PROD_SUB_CATEG] = domElm?domElm.input:domElm; }}
                                                 />
@@ -1184,7 +1198,8 @@ class AddStock extends Component {
                                                         value: this.state.formData.productDimension,
                                                         onChange: (e, {newValue, method}) => this.reactAutosuggestControls.onChange(e, {newValue, method}, PROD_DIM),
                                                         onKeyUp: (e) => this.reactAutosuggestControls.onKeyUp(e, {currElmKey: PROD_DIM}),
-                                                        className: "react-autosuggest__input gs-input-cell"
+                                                        className: "react-autosuggest__input gs-input-cell",
+                                                        onFocus: (e)=> {e.target.select()}
                                                     }}
                                                     ref = {(domElm) => { this.domElmns[PROD_DIM] = domElm?domElm.input:domElm; }}
                                                 />

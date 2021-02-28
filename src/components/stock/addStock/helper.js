@@ -41,7 +41,11 @@ export const constructItemObj = (thatState, options) => {
     itemObj = injectTouchId(thatState, itemObj);
 
     if(options && options.updateMode) {
-        if(fd.productCodeNo)
+        let oldProdCodeSeries = '';
+        if(options.propObj && options.propObj.rowData){
+            oldProdCodeSeries = options.propObj.rowData.itemCode;
+        }
+        if(fd.productCodeNo && oldProdCodeSeries==fd.productCodeSeries)
             itemObj.productCodeNo = fd.productCodeNo;
         itemObj._id = fd.id;
         itemObj._uid = fd.uid;
