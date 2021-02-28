@@ -10,7 +10,7 @@ import _ from 'lodash';
 import { DoublyLinkedList } from '../../../utilities/doublyLinkedList';
 import axios from '../../../core/axios';
 import { getAccessToken } from '../../../core/storage';
-import { FETCH_ORN_LIST_JEWELLERY, INSERT_NEW_STOCK_ITEM, FETCH_TOUCH_LIST } from '../../../core/sitemap';
+import { FETCH_ORN_LIST_JEWELLERY, INSERT_NEW_STOCK_ITEM, FETCH_TOUCH_LIST, UPDATE_STOCK_ITEM } from '../../../core/sitemap';
 import * as ReactAutosuggest from 'react-autosuggest';
 import axiosMiddleware from '../../../core/axios';
 import { constructItemObj, resetFormData } from './helper';
@@ -49,6 +49,7 @@ const PROD_SGST_PERCENT = 'productSgstPercent';
 const PROD_IGST_PERCENT = 'productIgstPercent';
 const ADD_ENTRY = 'addEntry';
 const CONFIRM_ADD = 'confirmAdd';
+const UPDATE_ENTRY = 'updateEntry';
 
 var domList = new DoublyLinkedList();
 domList.add(METAL_CATEG, {type: 'formControl', enabled: true});
@@ -73,7 +74,8 @@ domList.add(PROD_CGST_PERCENT, {type: 'formControl', enabled: true});
 domList.add(PROD_SGST_PERCENT, {type: 'formControl', enabled: true});
 domList.add(PROD_IGST_PERCENT, {type: 'formControl', enabled: true});
 domList.add(ADD_ENTRY, {type: 'defaultInput', enabled: true});
-domList.add(CONFIRM_ADD, {type: 'defaultInput', enabled: true});
+domList.add(CONFIRM_ADD, {type: 'defaultInput', enabled: false});
+domList.add(UPDATE_ENTRY, {type: 'defaultInput', enabled: false});
 
 class AddStock extends Component {
     constructor(props) {
@@ -108,7 +110,6 @@ class AddStock extends Component {
                 productLabourCalcUnit: 'fixed',
                 calcLabourVal: '',
                 calcAmtWithLabour: '',
-                //productFlatAmt: null,
                 productCgstPercent: null,
                 productCgstAmt: null,
                 productSgstPercent: null,
@@ -148,6 +149,58 @@ class AddStock extends Component {
         this.domElmns[METAL_PRICE].focus();
         this.fetchOrnAutoSuggestionList();
         this.fetchTouchList();
+        if(this.props.mode == "update" && this.props.rowData) {
+            console.log('=======================AA', this.props);
+            this.populateDataFromProps(this.props);
+            this.updateDomList('enableUpdateBtn');
+        }
+    }
+
+    componentWillReceiveProps(nextProps) {
+        console.log('=======================', nextProps);
+        if(nextProps.mode == "update" && nextProps.rowData) {
+            // this.populateDataFromProps(nextProps);
+        }
+    }
+
+    populateDataFromProps(propObj) {
+        let rowData = propObj.rowData;
+        let newState = {...this.state};
+        newState.formData.id = rowData.id;
+        newState.formData.uid = rowData.uid;
+        newState.formData.metal = rowData.metal;
+        newState.formData.metalPrice = rowData.metalRate;
+        newState.formData.metalPricePerGm = this.getMetalPricePerGm('G', rowData.metalRate),
+            
+        newState.formData.dealerStoreName = rowData.suplierName;
+        newState.formData.dealerPersonName = rowData.supplierPersonName;
+        newState.formData.productCodeSeries = rowData.itemCode;
+        newState.formData.productCodeNo = rowData.itemCodeNumber;
+        newState.formData.productName = rowData.itemName;
+        newState.formData.productCategory = rowData.itemCategory;
+        newState.formData.productSubCategory = rowData.itemSubCategory;
+        newState.formData.productDimension = rowData.dimension;
+        newState.formData.productQty = rowData.qty;
+        newState.formData.productGWt = rowData.grossWt;
+        newState.formData.productNWt = rowData.netWt;
+        newState.formData.productPWt = rowData.pureWt;
+        newState.formData.productPureTouch = rowData.pTouch;
+        newState.formData.productITouch = rowData.iTouch;
+        newState.formData.productIWt = null; //rowData.dealerStoreName;
+        newState.formData.calcAmtUptoIWt = null;//rowData.dealerStoreName;
+        newState.formData.productLabourCharges = rowData.labourCharge;
+        newState.formData.productLabourCalcUnit = rowData.labourChargeUnit;
+        newState.formData.calcLabourVal = rowData.labourChargeCalc;
+        newState.formData.calcAmtWithLabour = null;//rowData.dealerStoreName;
+        newState.formData.productCgstPercent = rowData.CgstPercent;
+        newState.formData.productCgstAmt = rowData.CgstAmt;
+        newState.formData.productSgstPercent = rowData.SgstPercent;
+        newState.formData.productSgstAmt = rowData.SgstAmt;
+        newState.formData.productIgstAmt = rowData.IgstPercent;
+        newState.formData.calcAmtWithLabour = rowData.IgstAmt;
+        newState.formData.productTotalAmt = rowData.total;
+        this.setState(newState);
+        this.setAutoFillups(newState);
     }
 
     getMetalPricePerGm(categ, val) {
@@ -325,6 +378,7 @@ class AddStock extends Component {
                     break;
                 case PROD_NAME:
                     newState.formData[PROD_CODE_SERIES] = suggestion.itemCode || '';
+                    newState.formData[PROD_CODE_NO] = null;
                     newState.formData[PROD_NAME] = suggestion.itemName || '';
                     newState.formData[PROD_CATEG] = suggestion.itemCategory || '';
                     newState.formData[PROD_SUB_CATEG] = suggestion.itemSubCategory || '';
@@ -341,8 +395,18 @@ class AddStock extends Component {
             case ADD_ENTRY:
                 if(this.validateEntries()) {
                     newState.formData.listItems[0] = constructItemObj(this.state);
-                    this.setState(newState);
-                    this.transferFocus(e, identifier);
+                    // this.setState(newState);
+                    // this.transferFocus(e, identifier);
+                    let flag = await this.insertNewStockItem(newState.formData.listItems[0]);
+                    if(flag) {
+                        newState = resetFormData(newState);
+                        newState.formData.listItems = [];
+                        this.setState(newState);
+                        this.fetchOrnAutoSuggestionList();
+                        setTimeout(()=>{
+                            this.domElmns[PROD_NAME].focus();
+                        },300);
+                    }
                 }
                 break;
             case CONFIRM_ADD:
@@ -355,6 +419,12 @@ class AddStock extends Component {
                     setTimeout(()=>{
                         this.domElmns[PROD_NAME].focus();
                     },300);
+                }
+                break;
+            case UPDATE_ENTRY:
+                if(this.validateEntries()) {
+                    newState.formData.listItems[0] = constructItemObj(this.state, {updateMode: true});
+                    let flag = await this.updateStockItem(newState.formData.listItems[0]);
                 }
                 break;
         }
@@ -456,6 +526,15 @@ class AddStock extends Component {
         return prevNode;
     }
 
+    updateDomList(identifier) {
+        switch(identifier) {
+            case 'enableUpdateBtn':
+                domList.enable(UPDATE_ENTRY);
+                domList.disable(ADD_ENTRY);
+                break;
+        }
+    }
+
     setAutoFillups(newState) {
         let fd = newState.formData;
         // pWt, iwt, calcAmtUptoIWt, calcAmtWithLabour, calcAmtWithTax, productTotalAmt
@@ -555,6 +634,24 @@ class AddStock extends Component {
             }
         } catch(e) {
             toast.error('Error occured while inserting new stock item');
+            return false;
+        }
+    }
+
+    async updateStockItem(requestParams) {
+        try {
+            let accessToken = getAccessToken();
+            let resp = await axiosMiddleware.post(UPDATE_STOCK_ITEM, {accessToken, requestParams});
+            if(resp.data && resp.data.STATUS == "SUCCESS") {
+                toast.success('Updated the item in stock list!');
+                return true;
+            } else {
+                let msg = resp.data.MSG || 'ERROR';
+                toast.error(msg);
+                return false;
+            }
+        } catch(e) {
+            toast.error('Error occured while updating a stock item');
             return false;
         }
     }
@@ -1129,14 +1226,27 @@ class AddStock extends Component {
                 </Row>
                 <Row className="action-container">
                     <Col>
-                        <input 
-                            type="button" 
-                            className="gs-button bordered" 
-                            value="Add" 
-                            // onKeyUp={(e) => this.handleKeyUp(e, {currElmKey: ADD_ENTRY})}
-                            ref= {(domElm) => {this.domElmns[ADD_ENTRY] = domElm; }}
-                            onClick={(e) => this.onButtonClicks(e, ADD_ENTRY)}
-                        />
+                        {this.props.mode == "update" &&
+                            <input 
+                                type="button" 
+                                className="gs-button bordered" 
+                                value="Update" 
+                                // onKeyUp={(e) => this.handleKeyUp(e, {currElmKey: ADD_ENTRY})}
+                                ref= {(domElm) => {this.domElmns[UPDATE_ENTRY] = domElm; }}
+                                onClick={(e) => this.onButtonClicks(e, UPDATE_ENTRY)}
+                            />
+                        }
+
+                        {this.props.mode !== "update" && 
+                            <input 
+                                type="button" 
+                                className="gs-button bordered" 
+                                value="Add" 
+                                // onKeyUp={(e) => this.handleKeyUp(e, {currElmKey: ADD_ENTRY})}
+                                ref= {(domElm) => {this.domElmns[ADD_ENTRY] = domElm; }}
+                                onClick={(e) => this.onButtonClicks(e, ADD_ENTRY)}
+                            />
+                        }
                     </Col>
                 </Row>
                 {/* <Row className="preview-container">
@@ -1186,7 +1296,7 @@ class AddStock extends Component {
                 <Row className="preview-container">
                     {this.getNewPreviewContainer()}
                 </Row> 
-                <Row className="action-container-2" style={{textAlign: "right", marginTop: '40px'}}>
+                {/* <Row className="action-container-2" style={{textAlign: "right", marginTop: '40px'}}>
                     <Col>
                         <input 
                             type="button" 
@@ -1197,7 +1307,7 @@ class AddStock extends Component {
                             disabled={this.state.formData.listItems.length>0?false:true}
                         />
                     </Col>
-                </Row>
+                </Row> */}
             </Container>
         )
     }

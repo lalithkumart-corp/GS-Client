@@ -2,7 +2,7 @@ const LABOUR_UNIT_MAP = {
     "fixed": "FX",
     "percent": "PC"
 }
-export const constructItemObj = (thatState) => {
+export const constructItemObj = (thatState, options) => {
     let fd = thatState.formData;
     let itemObj = {
         date: fd.date._inputVal.replace('T', ' ').slice(0,23),
@@ -39,6 +39,13 @@ export const constructItemObj = (thatState) => {
     };
     itemObj = injectOrnamentId(thatState, itemObj);
     itemObj = injectTouchId(thatState, itemObj);
+
+    if(options && options.updateMode) {
+        if(fd.productCodeNo)
+            itemObj.productCodeNo = fd.productCodeNo;
+        itemObj._id = fd.id;
+        itemObj._uid = fd.uid;
+    }
     return itemObj;
 }
 

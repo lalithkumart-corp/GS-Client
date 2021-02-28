@@ -1,3 +1,7 @@
+.add-stock-container {
+    margin-bottom: 50px;
+}
+
 .bill-meta-data-row .form-group {
     margin: 0;
 }
@@ -86,6 +90,7 @@
 
 .add-stock-container .action-container {
     text-align: right;
+    margin-top: 20px;
 }
 
 .add-stock-container .item-input-row .form-group {

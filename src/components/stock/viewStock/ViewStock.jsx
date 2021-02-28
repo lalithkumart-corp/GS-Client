@@ -13,7 +13,9 @@ import DateRangePicker from '../../dateRangePicker/dataRangePicker';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import Popover, {ArrowContainer} from 'react-tiny-popover'
 import {Tooltip} from 'react-tippy';
-   
+import CommonModal from '../../common-modal/commonModal';
+import StockItemEdit from './StockItemEdit';
+
 const DEFAULT_SELECTION = {
     rowObj: [],
     indexes: []
@@ -39,6 +41,8 @@ export default class ViewStock extends Component {
             totals: {
                 stockItems: 0,
             },
+            isItemEditModalOpen: false,
+            itemEditData: null,
             columns: [
                 {
                     id: 'date',
@@ -59,7 +63,7 @@ export default class ViewStock extends Component {
                     className: 'stock-product-code-col',
                     formatter: (column, columnIndex, row, rowIndex) => {
                         return (
-                            <span className='product-code-cell'>
+                            <span className='product-code-cell' onClick={(e)=>this.onClickItem(e, row)}>
                                 {row[column.id]}{row['itemCodeNumber']}
                             </span>
                         )
@@ -598,6 +602,14 @@ export default class ViewStock extends Component {
         return false;
     }
 
+    onClickItem(e, row) {
+        if(row.soldQty){
+            alert('You cannot edit item which has sold (partial/Full)');
+        } else {
+            this.setState({isItemEditModalOpen: true, itemEditData: row});
+        }
+    }
+
     getFilterParams() {
         let endDate = new Date(this.state.filters.date.endDate);
         endDate.setHours(23,59,59,999);
@@ -657,6 +669,7 @@ export default class ViewStock extends Component {
             if(resp.data.STOCK_LIST) {
                 _.each(resp.data.STOCK_LIST, (aStockItem, index) => {
                     newState.stockList.push({
+                        uid: aStockItem.UID,
                         itemCode: aStockItem.ItemCode || '',
                         itemCodeNumber: aStockItem.ItemCodeNumber,
                         itemName: aStockItem.ItemName,
@@ -682,6 +695,9 @@ export default class ViewStock extends Component {
                         touch: aStockItem.PTouchName,
                         pTouch: aStockItem.PTouchValue,
                         iTouch: aStockItem.ITouchValue,
+                        labourCharge: aStockItem.LabourCharge,
+                        labourChargeUnit: aStockItem.LabourChargeUnit,
+                        labourChargeCalc: aStockItem.LabourAmtCalc,
                         amount: aStockItem.Amount,
                         cgstPercent: aStockItem.CgstPercent,
                         cgstAmt: aStockItem.CgstAmt,
@@ -806,6 +822,9 @@ export default class ViewStock extends Component {
                         />
                     </Col>
                 </Row>
+                <CommonModal modalOpen={this.state.isItemEditModalOpen} handleClose={(e)=> {this.setState({isItemEditModalOpen: false, itemEditData: null})}}>
+                    <StockItemEdit itemEditData={this.state.itemEditData}/>
+                </CommonModal>
             </Container>
         )
     }

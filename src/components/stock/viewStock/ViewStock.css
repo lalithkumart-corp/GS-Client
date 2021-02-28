@@ -116,3 +116,12 @@
     border-bottom: 1px solid;
     border-color: lightgray;
 }
+
+.product-code-cell {
+    cursor: pointer;
+}
+
+.view-stock-container .pagination>li {
+    padding-right: 1px;
+    z-index: 1;
+}
