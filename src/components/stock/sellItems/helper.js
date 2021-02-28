@@ -146,7 +146,6 @@ export const validate = (stateObj, propObj) => {
 
 export const constructApiParams = (stateObj, propObj) => {
     let newProds = [];
-    debugger;
     _.each(stateObj.purchaseItemPreview, (anItem, index) => {
         newProds.push({
             prodId: anItem.prod_id, //TAGID
@@ -154,7 +153,7 @@ export const constructApiParams = (stateObj, propObj) => {
             qty: anItem.formData.qty,
             grossWt: anItem.formData.grossWt,
             netWt: anItem.formData.netWt,
-            pureWt: anItem.formData.netWt * (anItem.pure_touch/100),
+            pureWt: (anItem.formData.netWt * (anItem.pure_touch/100)).toFixed(3),
             wastage: anItem.formData.wastage,
             labour: anItem.formData.labour,
             cgstPercent: anItem.formData.cgstPercent,

@@ -34,6 +34,7 @@ class GSTable extends Component {
         newState.isGlobalExpandIconExpanded = parsed.isGlobalExpandIconExpanded || false;
         this.checkboxOnChangeListener = parsed.checkboxOnChangeListener;
         newState.selectedIndexes = parsed.selectedIndexes || [];
+        newState.showFooter = parsed.showFooter;
         this.setState(newState);
     }
     parseInputCollection(props) {
@@ -74,6 +75,11 @@ class GSTable extends Component {
                 buffer.filterDataType = aCol.filterDataType || "text";
                 buffer.width = aCol.width || '0%';
                 buffer.tdClassNameGetter = aCol.tdClassNameGetter || this.defaults.tdClassNameGetter;
+                if(props.showFooter && aCol.footerFormatter) {
+                    buffer.footer = true;
+                    buffer.footerFormatter = aCol.footerFormatter;
+                    buffer.footerClassName = aCol.footerClassName || '';
+                }
                 parsedData.columns.push(buffer);
             });
         }
@@ -90,7 +96,8 @@ class GSTable extends Component {
         parsedData.className = props.className || '';
         parsedData.checkbox = props.checkbox || false;
         parsedData.checkboxOnChangeListener = props.checkboxOnChangeListener;
-        parsedData.selectedIndexes = props.selectedIndexes || [];        
+        parsedData.selectedIndexes = props.selectedIndexes || [];
+        parsedData.showFooter = props.showFooter || false;
         return parsedData;
     }
     defaults = {
@@ -191,6 +198,9 @@ class GSTable extends Component {
             return (                
                 <input type={dataType} value={undefined} onChange={(e) => column.filterCallback(e, column, colIndex)}/>
             );
+        },
+        footerFormatter: (column) => {
+            return <span></span>;
         }
     }
     callbackMiddleware = {
@@ -283,7 +293,8 @@ class GSTable extends Component {
             <table className={this.state.className + ' gs-table table table-hover table-bordered table-sm'}>
                 {this.createColGroup()}
                 {this.createHeader()}
-                {this.createBody()}                
+                {this.createBody()}
+                {this.state.showFooter && this.createfooter()}
             </table>
         )
     }
@@ -416,7 +427,27 @@ class GSTable extends Component {
         )
     }
     createfooter() {
-
+        return (
+            <tfoot>
+                <tr>
+                    {
+                        ( ()=> {
+                            let footerCells = [];
+                            let columns = this.state.columns;
+                            for(let i = 0; i< columns.length; i++) {
+                                let formatter = columns[i].footerFormatter || this.defaultFormatters.footerFormatter;
+                                footerCells.push(
+                                    <td key={i+"-header"} className={columns[i].footerClassName + " footer a-cell"}>
+                                        {formatter()}
+                                    </td>
+                                );
+                            }
+                            return footerCells;
+                        } )()
+                    }
+                </tr>
+            </tfoot>
+        )
     }
     render() {
         return (

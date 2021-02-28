@@ -125,3 +125,9 @@
     padding-right: 1px;
     z-index: 1;
 }
+
+.stock-net-wt-footer-cell,
+.stock-sold-net-wt-footer-cell,
+.stock-avl-net-wt-footer-cell {
+    line-height: 30px;
+}

@@ -203,7 +203,9 @@ export default class ViewStock extends Component {
                             </span>
                         )
                     },
-                    width: '5%'
+                    width: '5%',
+                    footerClassName: 'stock-net-wt-footer-cell',
+                    footerFormatter: () => <span>{this.state?this.state.totals.netWt:''}</span>
                 },
                 {
                     id: 'pureWt',
@@ -258,7 +260,9 @@ export default class ViewStock extends Component {
                             </span>
                         )
                     },
-                    width: '5%'
+                    width: '5%',
+                    footerClassName: 'stock-sold-net-wt-footer-cell',
+                    footerFormatter: () => <span>{this.state?this.state.totals.soldNetWt:''}</span>
                 },
                 // {
                 //     id: 'soldPWt',
@@ -312,7 +316,9 @@ export default class ViewStock extends Component {
                             </span>
                         )
                     },
-                    width: '5%'
+                    width: '5%',
+                    footerClassName: 'stock-avl-net-wt-footer-cell',
+                    footerFormatter: () => <span>{this.state?this.state.totals.avlNetWt:''}</span>
                 },
                 // {
                 //     id: 'avlPWt',
@@ -648,6 +654,16 @@ export default class ViewStock extends Component {
             if(resp.data && resp.data.TOTALS) {
                 let newState = {...this.state};
                 newState.totals.stockItems = resp.data.TOTALS.count;
+                newState.totals.netWt = resp.data.TOTALS.netWt;
+                newState.totals.soldNetWt = resp.data.TOTALS.soldNetWt;
+                newState.totals.avlNetWt = resp.data.TOTALS.avlNetWt;
+
+                if(newState.totals.netWt)
+                    newState.totals.netWt = newState.totals.netWt.toFixed(3);
+                if(newState.totals.soldNetWt)
+                    newState.totals.soldNetWt = newState.totals.soldNetWt.toFixed(3);
+                if(newState.totals.avlNetWt)
+                    newState.totals.avlNetWt = newState.totals.avlNetWt.toFixed(3);
                 this.setState(newState);
             }
         } catch(e) {
@@ -819,6 +835,7 @@ export default class ViewStock extends Component {
                             checkboxOnChangeListener = {this.handleCheckboxChangeListener}
                             globalCheckBoxListener = {this.handleGlobalCheckboxChange}
                             selectedIndexes = {this.state.selectedInfo.indexes}
+                            showFooter = {true}
                         />
                     </Col>
                 </Row>
