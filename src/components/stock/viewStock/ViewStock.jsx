@@ -30,6 +30,7 @@ export default class ViewStock extends Component {
         let todaysEndDate = new Date();
         todaysEndDate.setHours(23,59,59,999);        
         this.state = {
+            lang: ['php', 'nodejs'],
             timeOut: 400,
             pageLimit: 10,
             selectedPageIndex: 0,
@@ -839,7 +840,7 @@ export default class ViewStock extends Component {
                         />
                     </Col>
                 </Row>
-                <CommonModal modalOpen={this.state.isItemEditModalOpen} handleClose={(e)=> {this.setState({isItemEditModalOpen: false, itemEditData: null})}}>
+                <CommonModal secClass="edit-stock-common-modal" modalOpen={this.state.isItemEditModalOpen} handleClose={(e)=> {this.setState({isItemEditModalOpen: false, itemEditData: null})}}>
                     <StockItemEdit itemEditData={this.state.itemEditData}/>
                 </CommonModal>
             </Container>

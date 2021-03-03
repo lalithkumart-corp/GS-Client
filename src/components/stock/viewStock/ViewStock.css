@@ -131,3 +131,9 @@
 .stock-avl-net-wt-footer-cell {
     line-height: 30px;
 }
+.edit-stock-common-modal {
+    width: 90%;
+}
+.edit-stock-common-modal .container {
+    max-width: 100%;
+}

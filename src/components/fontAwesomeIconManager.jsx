@@ -2,7 +2,7 @@ import { library } from '@fortawesome/fontawesome-svg-core';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faStroopwafel, faCamera, faCheck, faTimes, faBroom, faSave, faTrash, faEdit, faAngleRight, 
     faAngleDown, faCalendar, faUpload, faSpinner, faCog, faFileExcel, faFilter, faPlus, faMinus, faUserAlt,
-     faUserAstronaut, faRecycle, faPowerOff, faUser, faUserEdit, faBackspace, faPrint } from '@fortawesome/free-solid-svg-icons';
+     faUserAstronaut, faRecycle, faPowerOff, faUser, faUserEdit, faBackspace, faPrint, faBell, faListUl } from '@fortawesome/free-solid-svg-icons';
 
 library.add(faStroopwafel);
 library.add(faCamera);
@@ -30,3 +30,5 @@ library.add(faRecycle);
 library.add(faPowerOff);
 library.add(faBackspace);
 library.add(faPrint);
+library.add(faBell);
+library.add(faListUl);

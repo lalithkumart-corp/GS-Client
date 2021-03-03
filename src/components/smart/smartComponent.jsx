@@ -14,6 +14,7 @@ import Picture from '../profilePic/ProfilePic';
 import UploadPicDemo from '../profilePic/uploadPic';
 import Logout from '../logout/logout';
 import Navbar from '../navbar/navbar';
+import RightSideBar from '../rightSideBar/RightSideBar';
 import { ToastContainer } from 'react-toastify';
 // import ReactTooltip from 'react-tooltip';
 // import tooltip from 'tooltip';
@@ -112,6 +113,10 @@ class SmartComponent extends Component {
                                 <Route path= "/tag-demo" component={TagDemo} />
                                 <Route path= "/font-view" component={FontViewerPage} />
                             </div>
+                            {/* <div className="floating-right-side-bar"> */}
+                            <div className={`floating-right-side-bar ${this.props.rightSideBar.visibility?'show':'hide'} `}>
+                                <RightSideBar />
+                            </div>
                         </div>
                 </Router>
             )
@@ -132,7 +137,8 @@ class SmartComponent extends Component {
 
 const mapStateToProps = (state) => {     
     return {        
-        auth: state.auth
+        auth: state.auth,
+        rightSideBar: state.rightSideBar
     };
 };
 

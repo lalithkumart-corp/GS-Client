@@ -2,11 +2,14 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { Nav, Navbar, NavDropdown, NavItem, DropdownItem } from 'react-bootstrap';
 import { getSession } from '../../core/storage';
-import { Link } from 'react-router-dom'
+import { Link } from 'react-router-dom';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { toggleSideBar } from '../../actions/rightSidebar';
 
 class NavbarComp extends Component {
     constructor(props) {
         super(props);
+        this.onClickSideTrigger = this.onClickSideTrigger.bind(this);
     }
     getTitie() {
         let title = 'Welcome';
@@ -14,6 +17,9 @@ class NavbarComp extends Component {
         if(session && session.username)
             title += ` ${session.username}`;
         return title;
+    }
+    onClickSideTrigger() {
+        this.props.toggleSideBar();
     }
     getUnactivatedHeader() {
         return (
@@ -68,6 +74,7 @@ class NavbarComp extends Component {
                         <NavDropdown title={this.getTitie()}>
                             <NavDropdown.Item as={Link} to="/logout">Logout</NavDropdown.Item>
                         </NavDropdown>
+                        <span className="right-side-trigger-icon"><FontAwesomeIcon icon="list-ul" onClick={this.onClickSideTrigger}/></span>
                     </Nav>
                 </Navbar.Collapse>
             </Navbar>
@@ -93,4 +100,4 @@ const mapStateToProps = (state) => {
     };
 };
 
-export default connect(mapStateToProps)(NavbarComp);
+export default connect(mapStateToProps, {toggleSideBar})(NavbarComp);
