@@ -206,3 +206,11 @@
     color: #337ab7 !important;
     background-color: transparent;
 }
+.pledgebook-header {
+    font-size: 20px;
+    cursor: pointer;
+    width: 100px;
+}
+.pledgebook-header:hover {
+    
+}

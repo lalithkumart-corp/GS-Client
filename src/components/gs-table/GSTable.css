@@ -41,3 +41,16 @@ span.gstable-checkbox-container{
     vertical-align: middle !important;
     font-size: 20px;
 }
+.secondary-row-first-col.inner-header.a-cell{
+    vertical-align: top;
+    padding: 0;
+}
+.global-checkbox-only-col {
+    vertical-align: top !important;
+    margin: 0;
+    padding: 0 !important;
+}
+
+.gs-table tr.expandable-row:hover {
+    cursor: pointer;
+}

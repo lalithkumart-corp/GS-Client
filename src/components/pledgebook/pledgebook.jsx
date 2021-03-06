@@ -215,7 +215,7 @@ class Pledgebook extends Component {
                     className: 'pb-billno-col',
                     formatter: (column, columnIndex, row, rowIndex) => {
                         return (
-                            <span className='bill-no-cell' onClick={(e) => this.cellClickCallbacks.onBillNoClick({column, columnIndex, row, rowIndex})}>
+                            <span className='bill-no-cell' onClick={(e) => this.cellClickCallbacks.onBillNoClick({column, columnIndex, row, rowIndex}, e)}>
                                 <b>{row[column.id]}</b>
                             </span>
                         )
@@ -411,7 +411,8 @@ class Pledgebook extends Component {
     }
 
     cellClickCallbacks = {
-        onBillNoClick(params) {            
+        onBillNoClick(params, e) {
+            e.stopPropagation();
             this.setState({PBmodalIsOpen: true, currentBillData: params.row, currRowIndex: params.rowIndex});
         }
     }        
@@ -713,7 +714,7 @@ class Pledgebook extends Component {
                 </div>
             )
         },
-        showIndicator: true,
+        // showIndicator: true,
         expandByColumnOnly: true
     }
 
@@ -775,7 +776,7 @@ class Pledgebook extends Component {
             <Container className="pledgebook-page-content">
                 <Row className='first-row'>
                     <Col xs={6}>
-                        <p style={{fontSize: "20px", cursor: "pointer"}} onClick={(e) => this.initiateFetchPledgebookAPI()}>Pledgebook</p>
+                        <p className="pledgebook-header" onClick={(e) => this.initiateFetchPledgebookAPI()}>Pledgebook</p>
                     </Col>
                     <Col xs={6} className="text-align-right" style={{color: "grey"}}>
                         No of Bills: {this.state.totalCount}
