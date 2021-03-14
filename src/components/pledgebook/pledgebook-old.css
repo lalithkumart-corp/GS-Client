@@ -212,5 +212,8 @@
     width: 100px;
 }
 .pledgebook-header:hover {
-    
+
+}
+.pb-mobile-col .mobile-cell {
+    font-size: 13px;
 }

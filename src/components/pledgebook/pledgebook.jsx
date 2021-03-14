@@ -5,7 +5,7 @@ import { connect } from 'react-redux';
 import _ from 'lodash';
 import { Container, Form, Row, Col, FormGroup, FormLabel, FormControl, HelpBlock, InputGroup, Button, Glyphicon, FormCheck } from 'react-bootstrap';
 import moment from 'moment';
-import './pledgebook.css';
+import './pledgebook.scss';
 import CommonModal from '../common-modal/commonModal.jsx';
 import PledgebookModal from './pledgebookModal';
 import GSTable from '../gs-table/GSTable';
@@ -20,6 +20,9 @@ import PledgebookExportPopup from './pledgebookExportPopup';
 import { toast } from 'react-toastify';
 import GSCheckbox from '../ui/gs-checkbox/checkbox';
 import BillTemplate from '../billcreate/billTemplate2';
+import { FaBell, FaPencilAlt } from 'react-icons/fa';
+import { MdNotifications, MdNotificationsActive, MdNotificationsNone, MdNotificationsOff, MdNotificationsPaused, MdBorderColor } from 'react-icons/md';
+
 class Pledgebook extends Component {
     constructor(props) {
         super(props);        
@@ -36,6 +39,7 @@ class Pledgebook extends Component {
             billDisplayFlag: 'pending',
             offsetStart: 0,
             offsetEnd: 10,
+            alertPopups: {},
             filters: {
                 date: {
                     startDate: past7daysStartDate,
@@ -279,6 +283,18 @@ class Pledgebook extends Component {
                         )
                     },
                     filterDataType: 'number'
+                // }, {
+                //     id: '',
+                //     displayText: '',
+                //     width: '3%',
+                //     className: 'pb-actions-col',
+                //     formatter: (column, columnIndex, row, rowIndex) => {
+                //         return (
+                //             <span className='actions-cell'>
+                //                 {this.actionsColFormater()}
+                //             </span>
+                //         )
+                    // }
                 }
             ]
         }
@@ -531,6 +547,19 @@ class Pledgebook extends Component {
         this.setState({displayExportPopup: false});
     }
 
+    onClickAlertIcon(e, row) {
+        let newState = {...this.state};
+        console.log(row.UniqueIdentifier);
+        let id = row.UniqueIdentifier;
+        if(newState.alertPopups[id]) {
+            newState.alertPopups[id].isOpen = !newState.alertPopups[id].isOpen;
+        } else {
+            newState.alertPopups[id] = {};
+            newState.alertPopups[id].isOpen = true;
+        }
+        this.setState(newState);
+    }
+
     // START: Helper's
     // dateFormatter(theDate, options) {        
     //     let formattedDate = theDate.toISOString().replace('T', ' ').slice(0,19);        
@@ -658,8 +687,8 @@ class Pledgebook extends Component {
         renderer: (row) => {
             let ornData = JSON.parse(row.Orn) || {};
             return (
-                <div>
-                    <div className="orn-display-dom">
+                <Row>
+                    <Col xs={{span: 6}} className="orn-display-dom">
                         <table>
                             <colgroup>
                                 <col style={{width: "40%"}}></col>
@@ -700,22 +729,74 @@ class Pledgebook extends Component {
                                 }
                             </tbody>
                         </table>                   
-                    </div>
-                    {row.OrnImagePath &&
-                        <ImageZoom
-                            image={{
-                            src: row.OrnImagePath,
-                            alt: 'Ornament Imamge',
-                            className: 'pledgebook-orn-display-in-row',
-                            // style: { width: '50em' }
-                            }}
-                        />
-                    }
-                </div>
+                    </Col>
+                    <Col xs={{span: 2}}>
+                        {row.OrnImagePath &&
+                            <ImageZoom
+                                image={{
+                                src: row.OrnImagePath,
+                                alt: 'Ornament Imamge',
+                                className: 'pledgebook-orn-display-in-row',
+                                // style: { width: '50em' }
+                                }}
+                            />
+                        }
+                    </Col>
+                    <Col xs={{span: 1, offset: 2}}>
+                        <span onClick={(e) => this.onClickAlertIcon(e, row)}>
+                            <Popover
+                                className='alert-popover'
+                                padding={0}
+                                isOpen={this.getAlertPopoverVisibility(row.UniqueIdentifier)}
+                                position={'right'} // preferred position
+                                onClickOutside={() => this.closePopover(row.UniqueIdentifier)}
+                                content={({ position, targetRect, popoverRect }) => {
+                                    return (
+                                        <div>
+                                            {this.getAlertPopoverDOM()}
+                                        </div>
+                                    )
+                                }}
+                                >
+                                {row.alertId && <MdNotifications/>}
+                                {!row.alertId && <MdNotificationsNone/>}
+                            </Popover>
+                            <FaPencilAlt />
+                            {/* <MdBorderColor /> */}
+                        </span>
+                        {/* <MdNotifications/> */}
+                        {/* <MdNotificationsPaused/> */}
+                    </Col>
+                </Row>
             )
         },
         // showIndicator: true,
         expandByColumnOnly: true
+    }
+
+    getAlertPopoverVisibility(id) {
+        let flag = false;
+        if(this.state.alertPopups && this.state.alertPopups[id] && this.state.alertPopups[id].isOpen)
+            flag = true;
+        console.log('CAN SHOW:', flag);
+        return flag;
+    }
+    
+    closePopover(id) {
+        let newState = {...this.state};
+        if(newState.alertPopups && newState.alertPopups[id] && newState.alertPopups[id])
+            newState.alertPopups[id].isOpen = false;
+        this.setState(newState);
+    }
+
+    getAlertPopoverDOM() {
+        return (
+            <Row>
+                <Col>
+                    {row.UniqueIdentifier}
+                </Col>
+            </Row>
+        )
     }
 
     getCustomFilterOptions() {
@@ -770,6 +851,14 @@ class Pledgebook extends Component {
         )
     }
     // END: Helper's
+
+    actionsColFormater() {
+        return (
+            <div>
+                <span><FontAwesomeIcon icon="bell"/></span>
+            </div>
+        )
+    }
 
     render() {                    
         return (
