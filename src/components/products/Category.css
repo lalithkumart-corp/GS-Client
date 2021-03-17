@@ -1,0 +1,33 @@
+.category-panel ul {
+    list-style: none;
+}
+
+.category-panel .a-row {
+    padding-left: 10px;
+    padding-top: 3px;
+    padding-bottom: 3px;
+}
+
+.category-panel .a-row:hover,
+.category-panel .a-row:focus {
+    background-color: #2396f340;
+}
+
+.category-panel .gs-checkbox-container.categ-tree {
+    margin-left: 5px;
+    display: inline-block;
+    margin-bottom: 0;
+}
+
+.category-panel .action.add-sub-categ.gs-button {
+    padding: 4px 16px;
+}
+
+.category-panel .action.add-sub-categ {
+    float: right;
+    /* border: 1px solid #0C7EAF;
+    border-radius: 4px;
+    padding: 2px 10px;
+    cursor: pointer;
+    color: #0C7EAF; */
+}

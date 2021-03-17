@@ -30,7 +30,7 @@
 span.gstable-checkbox-container{
     position: absolute;
     margin-top: 4px;
-    margin-left: 5px;
+    margin-left: 3px;
 }
 .gs-table .a-row.selected {
     background-color: #f5f5f5;
@@ -40,4 +40,17 @@ span.gstable-checkbox-container{
     text-align: center;
     vertical-align: middle !important;
     font-size: 20px;
+}
+.secondary-row-first-col.inner-header.a-cell{
+    vertical-align: top;
+    padding: 0;
+}
+.global-checkbox-only-col {
+    vertical-align: top !important;
+    margin: 0;
+    padding: 0 !important;
+}
+
+.gs-table tr.expandable-row:hover {
+    cursor: pointer;
 }

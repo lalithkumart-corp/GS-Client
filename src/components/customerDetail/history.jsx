@@ -21,7 +21,7 @@ class History extends Component {
                 width: '22%',
                 formatter: (column, columnIndex, row, rowIndex) => {
                     return (
-                        <span>{convertToLocalTime(row[column.id])}</span>
+                        <span>{convertToLocalTime(row[column.id], {excludeTime: true})}</span>
                     )
                 },
                 tdClassNameGetter: (column, columnIndex, row, rowIndex) => {

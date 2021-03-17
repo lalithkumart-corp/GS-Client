@@ -29,6 +29,10 @@
     background-color: rgba(73, 171, 249, 0.88);
     color: white;
 }
+.customer-detail-container .right-pane {
+    padding: 15px;
+    border: 1px solid lightgrey;
+}
 .right-pane .tab-content .container {
     width: 100%;
 }

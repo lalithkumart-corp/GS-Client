@@ -1,0 +1,179 @@
+.add-stock-container {
+    margin-bottom: 50px;
+}
+
+.bill-meta-data-row .form-group {
+    margin: 0;
+}
+/* .bill-meta-data-row .react-datepicker-wrapper {
+    width: calc(100% - 43px);
+} */
+.bill-meta-data-row .react-datepicker__input-container input {
+    width: 100%;
+    padding: 5px 12px 6px 10px;
+}
+.bill-meta-data-row .bill-metal-table .input-group-prepend {
+    display: inline-block;
+}
+.bill-metal-table thead {
+    background-color: #ffeecf;
+    /* color: white; */
+    font-weight: bold;
+}
+.bill-metal-table thead th {
+    padding: 5px 0;
+    text-align: center;
+    /* border: 1px solid lightyellow; */
+}
+.bill-metal-table .form-control {
+    border-radius: 0;
+}
+.bill-metal-table .bill-date-picker {
+    /* border: 1px solid lightgray;
+    border-right: 0; */
+}
+/* .bill-metal-table .border-right-none input,
+.bill-metal-table .border-right-none select {
+    border-right: none;
+} */
+/* .bill-meta-data-row .bill-metal-table th,
+.bill-meta-data-row .bill-metal-table td {
+    border: 1px solid lightgray;
+    border-collapse: collapse;
+    padding: 5px;
+} */
+.item-input-row {
+    margin-top: 20px;
+}
+.item-input-row thead{
+    background-color: #ffeecf;
+    /* color: white; */
+    font-weight: bold;
+}
+.item-input-row thead th {
+    padding: 5px 0;
+    text-align: center;
+    /* border: 1px solid lightyellow; */
+}
+.item-input-row .form-control {
+    border-radius: 0;
+}
+/* .item-input-row tbody td {
+    padding-left: 2px;
+    padding-right: 2px;
+} */
+.item-input-row .border-right-none {
+    border-right: none;
+}
+.item-input-row .form-control {
+    padding: 0 0 0 2px;
+}
+.item-input-row .product-name {
+    padding-left: 0;
+}
+.item-input-row .product-amt-total {
+    padding-right: 0;
+}
+.border-left-dashed {
+    border-left-style: dashed;
+    border-left-color: lightgray !important;
+}
+
+.bill-metal-table input:focus,
+.item-input-row input:focus,
+.bill-metal-table select:focus,
+.item-input-row select:focus {
+    /* border-color: lightgray; */
+    box-shadow: none;
+    border-radius: 0;
+}
+
+.add-stock-container .action-container {
+    text-align: right;
+    margin-top: 20px;
+}
+
+.add-stock-container .item-input-row .form-group {
+    margin-bottom: 0;
+}
+
+.add-stock-container .product-labour-charges,
+.add-stock-container .product-labour-charge-unit {
+    display: inline-block;
+    width: 60%;
+}
+.add-stock-container .product-labour-charge-unit {
+    width: 40%;
+}
+
+.add-stock-container select:focus {
+    color: blue;
+}
+
+/* .add-stock-container .preview-container {
+    margin-top: 50px;
+} */
+
+.add-stock-container .react-autosuggest__suggestions-container {
+    top: 33px;
+}
+
+/* .add-stock-container input {
+    border: none;
+    width: calc(100% - 15px);
+    padding: 6px 12px 6px 0;
+    outline: none;
+    box-shadow: none;
+    border-radius: 0;
+}
+
+.add-stock-container .react-autosuggest__input {
+    border: none;
+    width: calc(100% - 15px);
+    padding: 6px 12px 6px 0;
+    outline: none;
+    box-shadow: none;
+    border-radius: 0;
+} */
+
+.product-code-input-col .react-autosuggest__suggestions-container {
+    width: 300px;
+}
+
+table.item-input-table {
+    table-layout: fixed;
+    width: 100%;
+}
+.bill-meta-data-row th,
+.item-input-table th, 
+.bill-meta-data-row td,
+.item-input-table td {
+    border: 1px solid lightgrey;
+}
+.bill-meta-data-row .gs-input-cell,
+.item-input-table .gs-input-cell {
+    border: none;
+}
+.bill-meta-data-row .form-control,
+.item-input-row .form-control {
+    border: none;
+}
+.item-input-row .form-control:disabled,
+.item-input-row .form-control[readonly] {
+    background-color: #e9ecef8a;
+}
+
+.add-stock-container .preview-container-row .a-section {
+    border: 1px solid lightgray;
+    padding: 0;
+    margin: 15px;
+}
+
+.add-stock-container .preview-container-row .a-section .section-header {
+    line-height:30px;
+    background-color: lightgray;
+}
+
+.add-stock-container .preview-container-row .a-section .section-body {
+    padding: 15px;
+}

@@ -102,7 +102,7 @@ class Picture extends Component {
                     this.setState(newState);
                 };
                 if(!file)
-                    alert('hoi');
+                    alert('No File');
                 
                 if(file) {
                     reader.readAsDataURL(file);

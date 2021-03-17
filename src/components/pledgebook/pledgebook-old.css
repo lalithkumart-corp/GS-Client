@@ -1,5 +1,6 @@
 .pledgebook-page-content {
     width: 100%;
+    max-width: calc(100% - 100px);
 }
 .pledgebook-page-content .first-row,
 .pledgebook-page-content .second-row {
@@ -20,7 +21,7 @@
     border: 1px solid;
     padding: 0 10px;
     vertical-align: top;
-    height: 22px;
+    height: 31px;
     text-align: center;
     /* position: absolute;
     right: 15%;
@@ -82,6 +83,7 @@
     /* margin: 20px 0 0 20px; */
     /* margin: 13px 0 0 0; */
     margin: 0;
+    float: right;
 }
 .pledgebook.pagination li>a {
     border: none;
@@ -142,8 +144,12 @@
     color: #337ab7; 
     /* colod: #2196f3; */
     vertical-align: text-bottom;
-
 }
+.status-popover-trigger-btn:focus,
+.status-popover-trigger-btn:hover {
+    color: #fba200;
+}
+
 .status-popover-content {
     background: white;
     padding: 15px;
@@ -158,9 +164,14 @@
     margin-left: 10px;
 }
 
+.pledgebook-page-content .second-row .action-btn,
+.pledgebook-page-content .second-row .action-btn {
+    color: #337ab7;
+}
 .pledgebook-page-content .second-row .action-btn:hover,
 .pledgebook-page-content .second-row .action-btn:focus {
-    color: #337ab7;
+    /* color: #337ab7; */
+    color: #fba200;
 }
 
 .pledgebook-page-content .second-row .row-count,
@@ -189,4 +200,20 @@
 
 .orn-categ-card label, .bill-status-card label, .bill-sort-order label {
     font-weight: normal;
+}
+.gs-button.selected-date-range-btn.pledgebook-date-filter:hover,
+.gs-button.selected-date-range-btn.pledgebook-date-filter:focus {
+    color: #337ab7 !important;
+    background-color: transparent;
+}
+.pledgebook-header {
+    font-size: 20px;
+    cursor: pointer;
+    width: 100px;
+}
+.pledgebook-header:hover {
+
+}
+.pb-mobile-col .mobile-cell {
+    font-size: 13px;
 }

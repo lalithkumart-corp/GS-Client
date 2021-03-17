@@ -110,6 +110,7 @@
 .react-autosuggest__input.city:focus,
 .react-autosuggest__input.pincode:focus,
 .react-autosuggest__input.mobile:focus,
+.react-autosuggest__input.morecustdetail:focus,
 .ornament-dom-container .form-control:focus {
     border-color: rgb(204, 204, 204);
     border-bottom: 2px solid #0acfee;
@@ -130,20 +131,20 @@
     margin-bottom: 10px;
 }
 .add-more-header .show-more {
-    color: #4db8e3;
+    color: #219af5;
     cursor: pointer;
     border: none;
-    width: 70px;
+    width: 75px;
 }
 .add-more-header .show-more:hover,
 .add-more-header .show-more:focus {
-    color: #216ba5;
+    color: #fba200;
 }
 .horizontal-dashed-line:after{
     content:"";
     position: absolute;
     /* bottom: 0; */
-    left: 75px;
+    left: 100px;
     right: 0;
     height: 0.5em;
     border-top: 1px solid #2196f3;
@@ -243,6 +244,7 @@
     padding: 6px 12px 6px 0;
     outline: none;
     box-shadow: none;
+    border-radius: 0;
 }
 
 .react-autosuggest__input.orn.gs-input-cell + .react-autosuggest__suggestions-container {
@@ -276,4 +278,10 @@
 
 .print-hidden-btn {
     visibility: hidden;
+}
+
+#bill-no-addon.readOnly,
+#rupee-addon.readOnly{
+    background-color: transparent;
+    border-color: white;
 }

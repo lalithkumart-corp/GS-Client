@@ -10,6 +10,10 @@
     -ms-user-select: none;
     user-select: none;
   }
+  .gs-checkbox-container.small {
+    font-size: 16px;
+    padding-left: 25px;
+  }
   
   /* Hide the browser's default checkbox */
   .gs-checkbox-container input {

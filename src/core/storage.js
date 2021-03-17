@@ -5,7 +5,8 @@ const keys = {
     session: 'session',
     userPreferences: 'userPreferences',
     accessToken: 'accessToken',
-    interestRates: 'interestRates'
+    interestRates: 'interestRates',
+    rates: 'rates'
 };
 
 const keyMaps = {
@@ -13,7 +14,8 @@ const keyMaps = {
         keys.userId,
         keys.userPreferences,
         keys.interestRates,
-        keys.session
+        keys.session,
+        keys.rates
     ],
     session: [
 
@@ -143,7 +145,7 @@ export const saveUserPreferences = (data) => {
     setUserPreference(data);
 };
 
-export const getAccessToken = (data) => {
+export const getAccessToken = () => {
     return _read(keys.accessToken);
 };
 
@@ -167,4 +169,30 @@ export const getInterestRates = () => {
 
 export const clearInterestRates = () => {
     _clear(keys.interestRates);
+}
+
+export const setRates = (data) => {
+    _save(keys.rates, data);
+}
+
+export const getRates = () => {
+    let ratesStr = _read(keys.rates);
+    try {
+        return JSON.parse(ratesStr);
+    } catch(e) {
+        return ratesStr;
+    }
+}
+
+export const getStoreInfo = (data) => {
+    _save(keys.store, data);
+}
+
+export const setStoreInfo = () => {
+    let storeStr = _read(keys.store);
+    try {
+        return JSON.parse(storeStr);
+    } catch(e) {
+        return storeStr;
+    }
 }

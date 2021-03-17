@@ -23,15 +23,15 @@ import sh from 'shorthash';
 import EditDetailsDialog from './editDetailsDialog';
 import { insertNewBill, updateBill, updateClearEntriesFlag, showEditDetailModal, hideEditDetailModal, getBillNoFromDB, disableReadOnlyMode, updateBillNoInStore } from '../../actions/billCreation';
 import { DoublyLinkedList } from '../../utilities/doublyLinkedList';
-import { getGaurdianNameList, getAddressList, getPlaceList, getCityList, getPincodeList, getMobileList, buildRequestParams, buildRequestParamsForUpdate, updateBillNumber, resetState, defaultPictureState, defaultOrnPictureState, validateFormValues } from './helper';
-import { getAccessToken } from '../../core/storage';
+import { getGaurdianNameList, getAddressList, getPlaceList, getCityList, getPincodeList, getMobileList, buildRequestParams, buildRequestParamsForUpdate, updateBillNumber, resetState, defaultPictureState, defaultOrnPictureState, validateFormValues, fetchCustomerMetaData, fetchOrnList } from './helper';
+// import { getAccessToken } from '../../core/storage';
 import { getDateInUTC, currencyFormatter, getInterestRate } from '../../utilities/utility';
 import { getRateOfInterest } from '../redeem/helper';
 import Picture from '../profilePic/picture';
 import { toast } from 'react-toastify';
 import BillHistoryView from './billHistoryView';
 import Popover from 'react-tiny-popover';
-import BillTemplate from './billTemplate';
+import BillTemplate from './billTemplate2';
 import ReactToPrint from 'react-to-print';
 
 const ENTER_KEY = 13;
@@ -169,7 +169,7 @@ class BillCreation extends Component {
                     list: ['Aadhar card', 'Pan Card', 'License Number', 'SBI Bank Account Number', 'Email'],
                     limitedList: []
                 },
-                selectedCustomer: {}                
+                selectedCustomer: {}
             },
             amountPopoverOpen: false,
             userPicture: JSON.parse(JSON.stringify(defaultPictureState)),
@@ -181,9 +181,13 @@ class BillCreation extends Component {
     /* START: Lifecycle methods */
     componentDidMount() {
         this.fetchMetaData(); //TODO: Refactor it to store in cache and not make api call eact time
-        if(!this.props.loadedInPledgebook) {            
+        
+        if(!this.props.loadedInPledgebook) { // Check: Is BillCreation Page
             this.props.getBillNoFromDB();
             this.props.disableReadOnlyMode();
+            this.updateDomList('enableSubmitBtn');
+            this.updateDomList('disableMoreDetailsInputElmns');
+            this.domElmns["amount"].focus();
         } else {
             this.updateFieldValuesInState(this.props.billData);
             this.updateDomList('enableUpdateBtn');
@@ -191,7 +195,6 @@ class BillCreation extends Component {
             this.updateDomList('ornInputFields');
         }
         this.setInterestRates();
-        this.domElmns["amount"].focus();
     }
 
     componentWillReceiveProps(nextProps) {
@@ -200,6 +203,10 @@ class BillCreation extends Component {
             newState = updateBillNumber(nextProps, newState);
         }
         if(nextProps.billCreation.clearEntries) {
+            
+            if(this.isNewCustomerInserted()) //IF NEW CUSTOMER BILL INSERTED, THE REFRESH THE AUTOSUGGESTION LIST
+                this.fetchMetaData();
+            
             this.updateDomList('resetOrnTableRows', newState);
             newState = resetState(nextProps, newState);
             this.injectDefaults(newState);
@@ -301,7 +308,7 @@ class BillCreation extends Component {
             currState.userPicture.loading = false;
             currState.userPicture.id = null;
             currState.userPicture.url = null;
-            currState.userPicture.holder = JSON.parse(JSON.stringify(defaultPictureState.holder));            
+            currState.userPicture.holder = JSON.parse(JSON.stringify(defaultPictureState.holder));
             this.setState(currState);
         }     
     }
@@ -345,57 +352,38 @@ class BillCreation extends Component {
             currState.ornPicture.holder = JSON.parse(JSON.stringify(defaultOrnPictureState.holder));
             this.setState(currState);
         }
-        
-    }    
+    }
 
     /* END: "this" Binders */
 
     /* START: API accessors */
     fetchMetaData() {
-        let accessToken = getAccessToken();
-        axios.get(PLEDGEBOOK_METADATA + `?access_token=${accessToken}&identifiers=["all", "otherDetails"]&filters=${JSON.stringify({onlyIsActive: true})}`)
-            .then(
-                (successResp) => {
+        fetchOrnList()
+        .then(
+            (resp) => {
+                if(resp) {
                     let newState = {...this.state};
-                    let results = successResp.data;
-                    newState.formData.cname.list = results.customers.list;
-                    newState.formData.gaurdianName.list = getGaurdianNameList(results.customers.list);
-                    newState.formData.address.list = getAddressList(results.customers.list);
-                    newState.formData.place.list = getPlaceList(results.customers.list);
-                    newState.formData.city.list = getCityList(results.customers.list);
-                    newState.formData.pincode.list = getPincodeList(results.customers.list);
-                    newState.formData.mobile.list = getMobileList(results.customers.list);                    
-                    newState.formData.moreDetails.list = results.otherDetails.map((anItem) => {return {key: anItem.key, value: anItem.displayText}});
+                    newState.formData.orn.list = resp.ornList;
                     this.setState(newState);
-                },
-                (errResp) => {
-                    console.log(errResp);
                 }
-            )
-            .catch(
-                (exception) => {
-                    console.log(exception);
-                }
-            )
-        axios.get(ORNAMENT_LIST+ `?access_token=${accessToken}`)
-            .then(
-                (successResp) => {
+            }
+        )
+        fetchCustomerMetaData().then(
+            (resp) => {
+                if(resp) {
                     let newState = {...this.state};
-                    if(successResp.data.STATUS == 'SUCCESS')
-                        newState.formData.orn.list = successResp.data.RESPONSE.map(anItem => anItem.category + ' ' + anItem.title );
-                    else
-                        newState.formData.orn.list = [];
+                    newState.formData.cname.list = resp.cnameList;
+                    newState.formData.gaurdianName.list = resp.gaurdianNameList;
+                    newState.formData.address.list = resp.addressList;
+                    newState.formData.place.list = resp.placeList;
+                    newState.formData.city.list = resp.cityList;
+                    newState.formData.pincode.list = resp.pincodeList;
+                    newState.formData.mobile.list = resp.mobileList;
+                    newState.formData.moreDetails.list = resp.moreDetailsList;
                     this.setState(newState);
-                },
-                (errResp) => {
-                    console.log(errResp);
                 }
-            )
-            .catch(
-                (exception) => {
-                    console.log(exception);
-                }
-            )
+            }
+        )
     }
     /* END: API accessors */
 
@@ -429,8 +417,7 @@ class BillCreation extends Component {
         newState.formData.orn.rowCount = Object.keys(ornObj).length;
         newState.formData.moreDetails.customerInfo = JSON.parse(data.OtherDetails) || [];  
         newState.formData.moreDetails.billRemarks = data.Remarks || '';  
-        newState.userPicture = JSON.parse(JSON.stringify(defaultPictureState));
-        newState.ornPicture = JSON.parse(JSON.stringify(defaultOrnPictureState));
+        
         newState.formData.orn.totalWeight = data.TotalWeight || 0.00;
         newState.formData.orn.category = data.OrnCategory || 0.00;
         newState.formData.interest.percent = data.IntPercent || 0;
@@ -450,6 +437,8 @@ class BillCreation extends Component {
             newState.userPicture.holder.confirmedImgSrc = '';
             newState.userPicture.holder.imgSrc = '';
             newState.userPicture.status = 'SAVED';
+        } else {
+            newState.userPicture = JSON.parse(JSON.stringify(defaultPictureState));
         }
 
         if(data.OrnImageBlob && data.OrnImageBlob.data) {
@@ -466,6 +455,8 @@ class BillCreation extends Component {
             newState.ornPicture.holder.confirmedImgSrc = '';
             newState.ornPicture.holder.imgSrc = '';
             newState.ornPicture.status = 'SAVED';
+        } else {
+            newState.ornPicture = JSON.parse(JSON.stringify(defaultOrnPictureState));
         }
 
         newState.uniqueIdentifier = data.UniqueIdentifier;        
@@ -516,8 +507,8 @@ class BillCreation extends Component {
 
     /* START: GETTERS */
     getOrnFilteredList(value) {
-        if(value && value.trim().length < 2)
-            return [];
+        // if(value && value.trim().length < 2)
+        //     return [];
         var lowerCaseInput = value.toLowerCase();
         let originalList = JSON.parse(JSON.stringify(this.state.formData.orn.list));
         /* let structuredList = originalList.map( (aSuggestion) => {
@@ -549,12 +540,32 @@ class BillCreation extends Component {
             return anObj.text;
         });
         */
-       let filteredList = originalList.filter( aSuggestion => {
-           aSuggestion = aSuggestion.toLowerCase();
-            if(aSuggestion.indexOf(' '+ value.toLowerCase()) != -1)
-                return aSuggestion;
-       } );
-        return filteredList.slice(0, 20);
+        let filteredList = originalList.filter( aSuggestion => {
+            aSuggestion = aSuggestion.toLowerCase();
+                if(aSuggestion.indexOf(' '+ lowerCaseInput) == 1)
+                    return aSuggestion;
+        });
+
+        let secondaryFilteredList = originalList.filter( aSuggestion => {
+            aSuggestion = aSuggestion.toLowerCase();
+                if(aSuggestion.indexOf(lowerCaseInput) != -1)
+                    return aSuggestion;
+        });
+
+        let finalList = [];
+        let totalList = [...filteredList, ...secondaryFilteredList];
+        totalList = totalList.filter((c, index) => {
+            if(!finalList.includes(c))
+                finalList.push(c);
+        });
+
+        finalList = finalList.sort(function(a, b){
+            // ASC  -> a.length - b.length
+            // DESC -> b.length - a.length
+            return a.length - b.length;
+        });
+        
+        return finalList.slice(0, 10);
     }
     getDefaultFromStore(identifier) {
         let val = '';
@@ -642,27 +653,31 @@ class BillCreation extends Component {
         if(inputLength === 0) {
             return [];
         } else {
-            
             let splits = inputValue.split('/');
             if(splits.length > 1 && splits[1].length > 0) {
                 return this.state.formData.cname.list.filter(anObj => {
-                    if(anObj.name.toLowerCase().indexOf(splits[0]) === 0) {
-                        
-                    }
-
-                    if(anObj.name.toLowerCase().slice(0, splits[0].length) === splits[0] && anObj.gaurdianName.toLowerCase().slice(0, splits[1].length) === splits[1]){
+                    let cnameLowercase = this.getLowerCase(anObj.name);
+                    let gaurdianNameLowerCase = this.getLowerCase(anObj.gaurdianName);
+                    if(cnameLowercase.slice(0, splits[0].length) === splits[0] && gaurdianNameLowerCase.slice(0, splits[1].length) === splits[1]){
                         return true;
                     } else {
                         return false;
                     }
                 });
             } else {
-                return this.state.formData.cname.list.filter(anObj => anObj.name.toLowerCase().slice(0, splits[0].length) === splits[0]);
+                return this.state.formData.cname.list.filter(anObj => this.getLowerCase(anObj.name).slice(0, splits[0].length) === splits[0]);
             }
         }
         return inputLength === 0 ? [] : this.state.formData.cname.list.filter(lang =>
             lang.name.toLowerCase().slice(0, inputLength) === inputValue
         );
+    }
+
+    getLowerCase(str) {
+        if(str)
+            return str.toLowerCase();
+        else
+            return '';
     }
     
     getSuggestionValue = (suggestion, identifier) => {
@@ -732,6 +747,10 @@ class BillCreation extends Component {
                 domList.disable('submitBtn');
                 domList.enable('updateBtn');
                 break;
+            case 'enableSubmitBtn':
+                domList.enable('submitBtn');
+                domList.disable('updateBtn');
+                break;
             case 'resetOrnTableRows':
                 _.each(options.formData.orn.inputs, (anInput, index) => {
                     if(index !== "1") {
@@ -799,7 +818,8 @@ class BillCreation extends Component {
             }
         } catch(e) {
             //TODO: Remove this alert after completing development
-            alert("Exception occured in transferring focus...check console immediately");
+            alert(`ERROR Occured (${currentElmKey} - ${nextElm.key}) . Let me refresh.`);
+            window.location.reload(false);
             console.log(e);
             console.log(currentElmKey, nextElm.key, direction);
         }
@@ -1034,8 +1054,8 @@ class BillCreation extends Component {
             this.handleEnterKeyPress(e, options);        
         else if(e.keyCode == SPACE_KEY)
             this.handleSpaceKeyPress(e, options);
-
     }
+    
     async handleEnterKeyPress(evt, options) {
         await this.updateInputVal(evt, options);
         if(options && options.isOrnSpecsInput && (this.canAppendNewRow(options))) {
@@ -1093,12 +1113,25 @@ class BillCreation extends Component {
         } else {
             if(window.confirm('Are you Sure to create new Bill?')) {
                 if(this.isAutoPrintEnabled()) {
-                    await this.setState({printContent: JSON.parse(JSON.stringify(requestParams))});
+                    let printParams = {...requestParams};
+                    printParams.storeName = this.props.storeDetail.loanLicenseName;
+                    printParams.addressLine1 = this.props.storeDetail.loanBillAddressLine1;
+                    printParams.addressLine2 = this.props.storeDetail.loanBillAddressLine2;
+                    printParams.userPicture = {url: this.state.userPicture.url};
+                    printParams.ornPicture = {url: this.state.ornPicture.url};
+                    await this.setState({printContent: JSON.parse(JSON.stringify(printParams))});
                     this.printReceipt();
                 }
                 this.props.insertNewBill(requestParams);
             }
         }
+    }
+
+    isNewCustomerInserted() {
+        let newCustomer = false;
+        if(this.state.selectedCustomer && Object.keys(this.state.selectedCustomer).length == 0)
+            newCustomer = true;
+        return newCustomer;
     }
 
     isAutoPrintEnabled() {
@@ -1158,15 +1191,15 @@ class BillCreation extends Component {
                 newState.formData.moreDetails.currCustomerInputField = anObj.value;
                 newState.formData.moreDetails.currCustomerInputKey = anObj.key;
             } else if(identifier == "cname"){
-                if(!val || typeof val == 'string') {
-                    newState.formData[identifier].inputVal = val;
-                    // this.updateSelectedCustomer({name: val});
-                    newState.selectedCustomer = {};
-                } else {
-                    newState.formData[identifier].inputVal = val.name || '';
-                    // this.updateSelectedCustomer(val);
-                    newState.selectedCustomer = val;
-                }
+                // if(!val || typeof val == 'string') {
+                //     newState.formData[identifier].inputVal = val;
+                //     // this.updateSelectedCustomer({name: val});
+                //     newState.selectedCustomer = {};
+                // } else {
+                //     newState.formData[identifier].inputVal = val.name || '';
+                //     // this.updateSelectedCustomer(val);
+                //     newState.selectedCustomer = val;
+                // }
             /*} else if(identifier == "gaurdianName") {
                 newState.formData[identifier].inputVal = val;
                 let inputVal = val.toLowerCase();
@@ -1588,7 +1621,7 @@ class BillCreation extends Component {
                                 onChange={(e) => this.inputControls.onChange(null, e.target.value, 'moreCustomerDetailsValue')} 
                                 onKeyUp={(e) => this.handleKeyUp(e, {currElmKey: 'moreCustomerDetailValue', isToAddMoreDetail: true, traverseDirection: 'backward'})} 
                                 value={this.state.formData.moreDetails.currCustomerInputVal}
-                                inputRef = {(domElm) => { this.domElmns.moreCustomerDetailValue = domElm; }}
+                                ref = {(domElm) => { this.domElmns.moreCustomerDetailValue = domElm; }}
                                 readOnly={this.props.billCreation.loading}
                             />
                             <FormControl.Feedback />
@@ -1686,7 +1719,7 @@ class BillCreation extends Component {
                                 <InputGroup>
                                     {/* <InputGroup.Addon readOnly={this.props.billCreation.loading}>{this.state.formData.billseries.inputVal}</InputGroup.Addon> */}
                                     <InputGroup.Prepend>
-                                        <InputGroup.Text id="basic-addon1">{this.state.formData.billseries.inputVal}</InputGroup.Text>
+                                        <InputGroup.Text id="bill-no-addon" className={this.props.billCreation.loading?"readOnly": ""}>{this.state.formData.billseries.inputVal}</InputGroup.Text>
                                     </InputGroup.Prepend>
                                     <FormControl
                                         type="text"
@@ -1713,7 +1746,7 @@ class BillCreation extends Component {
                                 <InputGroup>
                                     {/* <InputGroup.Addon readOnly={this.props.billCreation.loading}>Rs:</InputGroup.Addon> */}
                                     <InputGroup.Prepend>
-                                        <InputGroup.Text id="rupee-addon1">Rs:</InputGroup.Text>
+                                        <InputGroup.Text id="rupee-addon" className={this.props.billCreation.loading?"readOnly": ""}>Rs:</InputGroup.Text>
                                     </InputGroup.Prepend>
                                     <FormControl
                                         type="number"
@@ -1790,7 +1823,8 @@ class BillCreation extends Component {
                                         onChange: (e, {newValue, method}) => this.reactAutosuggestControls.onChange(e, {newValue, method}, 'cname'),
                                         onKeyUp: (e) => this.reactAutosuggestControls.onKeyUp(e, {currElmKey: 'cname'}),
                                         className: ((this.state.selectedCustomer && this.state.selectedCustomer.name)?'existing-customer':'new-customer') + " react-autosuggest__input cust-name",
-                                        readOnly: this.props.billCreation.loading
+                                        readOnly: this.props.billCreation.loading,
+                                        autocomplete:"no"
                                     }}
                                     ref = {(domElm) => { this.domElmns.cname = domElm?domElm.input:domElm; }}
                                 />
@@ -1822,7 +1856,8 @@ class BillCreation extends Component {
                                         onChange: (e, {newValue, method}) => this.reactAutosuggestControls.onChange(e, {newValue, method}, 'gaurdianName'),
                                         onKeyUp: (e) => this.reactAutosuggestControls.onKeyUp(e, {currElmKey: 'gaurdianName', isGuardianNameInput: true}),
                                         className: "react-autosuggest__input guardian-name",
-                                        readOnly: this.props.billCreation.loading
+                                        readOnly: this.props.billCreation.loading,
+                                        autocomplete:"no"
                                     }}
                                     ref = {(domElm) => { this.domElmns.gaurdianName = domElm?domElm.input:domElm; }}
                                 />
@@ -1856,7 +1891,8 @@ class BillCreation extends Component {
                                         onChange: (e, {newValue, method}) => this.reactAutosuggestControls.onChange(e, {newValue, method}, 'address'),
                                         onKeyUp: (e) => this.reactAutosuggestControls.onKeyUp(e, {currElmKey: 'address'}),
                                         className: "react-autosuggest__input address",
-                                        readOnly: this.props.billCreation.loading
+                                        readOnly: this.props.billCreation.loading,
+                                        autocomplete:"no"
                                     }}
                                     ref = {(domElm) => { this.domElmns.address = domElm?domElm.input:domElm; }}
                                 />
@@ -1890,7 +1926,8 @@ class BillCreation extends Component {
                                         onChange: (e, {newValue, method}) => this.reactAutosuggestControls.onChange(e, {newValue, method}, 'place'),
                                         onKeyUp: (e) => this.reactAutosuggestControls.onKeyUp(e, {currElmKey: 'place'}),
                                         className: "react-autosuggest__input place",
-                                        readOnly: this.props.billCreation.loading
+                                        readOnly: this.props.billCreation.loading,
+                                        autocomplete:"no"
                                     }}
                                     ref = {(domElm) => { this.domElmns.place = domElm?domElm.input:domElm; }}
                                 />
@@ -1922,7 +1959,8 @@ class BillCreation extends Component {
                                         onChange: (e, {newValue, method}) => this.reactAutosuggestControls.onChange(e, {newValue, method}, 'city'),
                                         onKeyUp: (e) => this.reactAutosuggestControls.onKeyUp(e, {currElmKey: 'city'}),
                                         className: "react-autosuggest__input city",
-                                        readOnly: this.props.billCreation.loading
+                                        readOnly: this.props.billCreation.loading,
+                                        autocomplete:"no"
                                     }}
                                     ref = {(domElm) => { this.domElmns.city = domElm?domElm.input:domElm; }}
                                 />
@@ -1956,7 +1994,8 @@ class BillCreation extends Component {
                                         onChange: (e, {newValue, method}) => this.reactAutosuggestControls.onChange(e, {newValue, method}, 'pincode'),
                                         onKeyUp: (e) => this.reactAutosuggestControls.onKeyUp(e, {currElmKey: 'pincode'}),
                                         className: "react-autosuggest__input pincode",
-                                        readOnly: this.props.billCreation.loading
+                                        readOnly: this.props.billCreation.loading,
+                                        autocomplete:"no"
                                     }}
                                     ref = {(domElm) => { this.domElmns.pincode = domElm?domElm.input:domElm; }}
                                 />
@@ -2091,7 +2130,7 @@ class BillCreation extends Component {
                                     />
                                     <input 
                                         type="button"
-                                        className='gs-button'
+                                        className='gs-button bordered'
                                         ref={(domElm) => {this.domElmns.submitBtn = domElm}}
                                         // onKeyUp= { (e) => this.handleKeyUp(e, {currElmKey:'submitBtn', isSubmitBtn: true})}
                                         onClick={(e) => this.handleSubmit()}
@@ -2103,9 +2142,10 @@ class BillCreation extends Component {
                                 this.props.loadedInPledgebook &&
                                 <input 
                                     type="button"
-                                    className='gs-button'
+                                    className='gs-button bordered'
                                     ref={(domElm) => {this.domElmns.updateBtn = domElm}}
                                     onClick={(e) => this.handleUpdate()}
+                                    disabled={this.props.billCreation.loading}
                                     value='Update Bill'
                                     />
                             }
@@ -2130,7 +2170,8 @@ class BillCreation extends Component {
 const mapStateToProps = (state) => {
     return {
         auth: state.auth,
-        billCreation: state.billCreation
+        billCreation: state.billCreation,
+        storeDetail: state.storeDetail
     };
 };
 

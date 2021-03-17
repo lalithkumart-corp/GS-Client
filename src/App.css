@@ -61,8 +61,15 @@ html {
 }
 .gs-button:hover,
 .gs-button:focus {
-  background-color: rgba(33, 150, 243, 0.08);
+  /* background-color: rgba(33, 150, 243, 0.08); */
   outline: none;
+  color: #fba200;
+  background-color: #ffa5002e;
+}
+.gs-button[disabled]:hover,
+.gs-button[disabled]:focus {
+  color: grey;
+  background-color: transparent;
 }
 .gs-button.red:hover,
 .gs-button.red:focus {
@@ -107,6 +114,11 @@ html {
 .no-padding {
   padding: 0;
 }
+
+.no-margin {
+  margin: 0;
+}
+
 .lightgrey {
   color: lightgrey;
 }
@@ -235,7 +247,7 @@ input[type=checkbox], input[type=radio] {
 /* END: ootstrap issue (due to different versions exist among diff npm */
 
 .react-tiny-popover-container {
-  z-index: 2;
+  z-index: 3;
   padding-right: 20px;
 }
 
@@ -346,4 +358,31 @@ input[type=checkbox], input[type=radio] {
   @page {
     size: auto;
   }
+}
+
+/* START: Custom React Pagination styles */
+.gs-pagination.pagination {
+  margin: 0;
+  float: right;
+}
+.gs-pagination.pagination li>a {
+  border: none;
+  border-radius: 50%;
+  outline: none;
+  color: black;
+  font-weight: bold;
+}
+.gs-pagination.pagination>.active>a {
+  color: white;
+}
+/* END: Custom React Pagination styles */
+
+
+.gs-icon {
+  color: #2296f3;
+  cursor: pointer;
+}
+
+.react-datepicker-popper {
+  z-index: 3;
 }

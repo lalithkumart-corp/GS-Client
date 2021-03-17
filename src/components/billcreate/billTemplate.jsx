@@ -44,7 +44,7 @@ export default class BillTemplate extends Component {
     }
 
     getBillNo() {
-        let billNo = '';
+        let billNo = 'null';
         if(this.state.data.billSeries)
             billNo += this.state.data.billSeries + ':';
         if(this.state.data.billNo)
@@ -133,70 +133,69 @@ export default class BillTemplate extends Component {
         return dom;
     }
 
+    getReceipt() {
+        return (
+            <>
+                <Row>
+                    <Col xs={{span: 12}} md={{span: 12}} className="storename">Tejaram Pawn Broker</Col>
+                    <Col xs={{span: 12}} md={{span: 12}} className="storeaddr">2/34 Mount Poonamallee Road, Kattupakkam</Col>
+                    <Col xs={{span: 12}} md={{span: 12}} className="storeaddr2">Ch-600056, Mob: 9841458015</Col>
+                </Row>
+                <Row className="bill-no-date font16">
+                    <Col className="bill-no" xs={{span: 8}} md={{span: 8}}>{this.getBillNo()} <Barcode value={this.getBillNo()} fontSize={20}  height={25} width={100} displayValue={false} style={{display: "inline-block"}}/></Col>
+                    <Col xs={{offset: 1, span: 3}} md={{offset: 1, span: 3}}>{this.getDate()}</Col>
+                </Row>
+
+                <Row>
+                    <Col xs={{span: 8}} md={{span: 8}} className="cust-info-col">
+                        <Row>
+                            <Col xs={{span: 12}} md={{span: 12}}><b>Name:</b>&nbsp;&nbsp; <span className="font16" style={{textTransform: "uppercase"}}>{this.state.data.cname}</span>  &nbsp; <span className="font12">c/o</span>  &nbsp; <span className="font16" style={{textTransform: "uppercase"}}>{this.state.data.gaurdianName}</span></Col>
+                        </Row>
+
+                        <Row>
+                            <Col xs={{span: 3}} md={{span: 3}}><b>Address: &nbsp;</b></Col>
+                            <Col xs={{span: 9}} md={{span: 9}} style={{paddingLeft: 0, paddingRight: 0}}>
+                                {this.state.data.address}, {this.state.data.place}, {this.state.data.city}-{this.state.data.pinCode}
+                            </Col>
+                        </Row>
+                    </Col>
+                    <Col xs={{span: 3}} md={{span: 3}} className="image-col user">
+                        {this.getImageSection('user')}
+                    </Col>
+                </Row>
+
+                <Row className="row-name-3">
+                    <Col xs={{span: 8}} md={{span: 8}} className="orn-info-col">
+                        {this.getOrnSecction()}
+                    </Col>
+                    <Col xs={{span: 3}} md={{span: 3}} className="image-col orn">
+                        {this.getImageSection('orn')}
+                    </Col>
+                </Row>
+
+                <Row className="amount-row font16">
+                    <Col>
+                        <b>Amount: &nbsp; &nbsp;</b> {format(this.state.data.amount, {code: "INR"})}
+                    </Col>
+                </Row>
+
+                <Row className="signature-row">
+                    <Col xs={{span: 6}} md={{span: 6}}></Col>
+                    <Col xs={{span: 6}} md={{span: 6}}></Col>
+                </Row>
+            </>
+        )
+    }
+
     render() {
         return (
             <Container className="billreceipt-print">
                 <Row>
                     <Col className="bill-receipt-content"  xs={{span: 6}} md={{span: 6}}>
-                        <Row>
-                            <Col xs={{span: 12}} md={{span: 12}} className="storename">Tejaram Pawn Broker</Col>
-                            <Col xs={{span: 12}} md={{span: 12}} className="storeaddr">2/34 Mount Poonamallee Road, Kattupakkam</Col>
-                            <Col xs={{span: 12}} md={{span: 12}} className="storeaddr2">Ch-600056, Mob: 9841458015</Col>
-                        </Row>
-                        <Row className="bill-no-date font16">
-                            <Col className="bill-no" xs={{span: 8}} md={{span: 8}}>{this.getBillNo()} <Barcode value={this.getBillNo()} fontSize={20}  height={25} displayValue={false} style={{display: "inline-block"}}/></Col>
-                            <Col xs={{offset: 1, span: 3}} md={{offset: 1, span: 3}}>{this.getDate()}</Col>
-                        </Row>
-
-                        <Row>
-                            <Col xs={{span: 8}} md={{span: 8}} className="cust-info-col">
-                                <Row>
-                                    <Col xs={{span: 12}} md={{span: 12}}><b>Name:</b>&nbsp;&nbsp; <span className="font16" style={{textTransform: "uppercase"}}>{this.state.data.cname}</span>  &nbsp; <span className="font12">c/o</span>  &nbsp; <span className="font16" style={{textTransform: "uppercase"}}>{this.state.data.gaurdianName}</span></Col>
-                                </Row>
-
-                                <Row>
-                                    <Col xs={{span: 3}} md={{span: 3}}><b>Address: &nbsp;</b></Col>
-                                    <Col xs={{span: 9}} md={{span: 9}} style={{paddingLeft: 0, paddingRight: 0}}>
-                                        {this.state.data.address}, {this.state.data.place}, {this.state.data.city}-{this.state.data.pinCode}
-                                    </Col>
-                                </Row>
-                                {/* <Row>
-                                    <Col xs={{span: 1}} md={{span: 1}}></Col>
-                                    <Col xs={{span: 10}} md={{span: 10}}>
-                                        {this.state.data.place},
-                                    </Col>
-                                </Row>
-                                <Row>
-                                    <Col xs={{span: 1}} md={{span: 1}}></Col>
-                                    <Col xs={{span: 9}} md={{span: 9}}>
-                                        {this.state.data.city}-{this.state.data.pinCode}
-                                    </Col>
-                                </Row> */}
-                            </Col>
-                            <Col xs={{span: 3}} md={{span: 3}} className="image-col user">
-                                {this.getImageSection('user')}
-                            </Col>
-                        </Row>
-
-                        <Row className="row-name-3">
-                            <Col xs={{span: 8}} md={{span: 8}} className="orn-info-col">
-                                {this.getOrnSecction()}
-                            </Col>
-                            <Col xs={{span: 3}} md={{span: 3}} className="image-col orn">
-                                {this.getImageSection('orn')}
-                            </Col>
-                        </Row>
-
-                        <Row className="amount-row font16">
-                            <Col>
-                                <b>Amount: &nbsp; &nbsp;</b> {format(this.state.data.amount, {code: "INR"})}
-                            </Col>
-                        </Row>
-
-                        <Row className="signature-row">
-                            <Col xs={{span: 6}} md={{span: 6}}></Col>
-                            <Col xs={{span: 6}} md={{span: 6}}></Col>
-                        </Row>
+                        {this.getReceipt()}
+                    </Col>
+                    <Col className="bill-receipt-content"  xs={{span: 6}} md={{span: 6}}>
+                        {this.getReceipt()}
                     </Col>
                 </Row>
                 <Row>

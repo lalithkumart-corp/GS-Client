@@ -4,6 +4,7 @@ import { getAccessToken } from '../../core/storage';
 import axios from 'axios';
 import { FETCH_NOTES }  from '../../core/sitemap';
 import _ from 'lodash';
+import { convertToLocalTime } from '../../utilities/utility';
 import './notes.css';
 
 class Notes extends Component {
@@ -53,7 +54,7 @@ class Notes extends Component {
             if(aRec.Remarks) {
                 theDOM .push(
                     <Row xs={12} md={12} className='bill-remark-display'>
-                        <Col xs={12} md={12}><p><span>{aRec.BillNo}</span> <span className='float-right'>{aRec.Date}</span></p></Col>
+                        <Col xs={12} md={12}><p><span>{aRec.BillNo}</span> <span className='float-right'>{convertToLocalTime(aRec.Date, {excludeTime: true})}</span></p></Col>
                         <Col xs={12} md={12}><p>{aRec.Remarks}</p></Col>
                     </Row>
                 );

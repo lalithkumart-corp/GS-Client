@@ -1,0 +1,139 @@
+.view-stock-container {
+    max-width: 100%;
+}
+.my-stock-view-table {
+    overflow-x: auto;
+    display: inline-block;
+}
+
+/* .my-stock-view-table .gs-checkbox-container {
+    padding-top: 22px;
+    margin-bottom: 0;
+}
+.my-stock-view-table .gstable-checkbox-container {
+    position: relative;
+}
+.my-stock-view-table.gs-table .expand-icon {
+    padding-left: 5px;
+} */
+
+
+/* .my-stock-view-table.gs-table .expand-icon {
+    padding-right: 10px;
+} 
+.my-stock-view-table .gstable-checkbox-container {
+    margin-left: -8px;
+}
+.my-stock-view-table.gs-table .column-0 {
+    position: absolute;
+    border-right: none;
+    border-bottom: none;
+    background-color: white;
+} */
+
+.my-stock-view-table .inner-header input[type="text"] {
+    width: 100%;
+}
+
+.my-stock-view-table .gold-item {
+    border-left: 5px solid gold !important;
+}
+.my-stock-view-table .silver-item {
+    border-left: 5px solid silver !important;
+}
+
+.filter-popover-container {
+    width:500px;
+    padding: 15px;
+}
+.filter-popover-container .metal-view-options .field-name,
+.filter-popover-container .show-avl-stock-items .field-name {
+    font-size: 17px;
+    width: 200px;
+    display: inline-block;
+}
+.filter-popover-container .metal-view-options form,
+.filter-popover-container .metal-view-options .form-group,
+.filter-popover-container .show-avl-stock-items form,
+.filter-popover-container .show-avl-stock-items .form-group {
+    display: inline-block;
+}
+.filter-popover-container .metal-view-options .form-group {
+    padding: 0 25px 0 0;
+}
+.filter-popover-container .metal-view-options .form-group .form-check-label,
+.filter-popover-container .show-avl-stock-items .form-group .form-check-label {
+    font-weight: normal;
+}
+.stock-view-date-filter {
+    border: 1px solid !important;
+    margin-bottom: 10px;
+}
+.stock-view-date-filter .arrow-down-icon {
+    padding-left: 7px;
+}
+.filter-popover-trigger-btn {
+    margin-left: 10px;
+    color: #337ab7;
+    vertical-align: super;
+}
+.no-of-items {
+    margin-top: 14px;
+    display: inline-block;
+}
+
+.stock-product-qty-col,
+.stock-product-gross-wt-col,
+.stock-product-net-wt-col,
+.stock-product-pure-wt-col {
+    color: grey;
+}
+.stock-product-soldQty-col {
+/* .stock-product-sold-gross-wt-col, */
+/* .stock-product-sold-net-wt-col { */
+    color: red;
+}
+.stock-product-avlQty-col
+/* .stock-product-avl-gross-wt-col, */
+/* .stock-product-avl-net-wt-col */
+{
+    color: green;
+}
+
+.view-stock-table-expand-row-right-pane h4 {
+    margin-bottom: 20px;
+    margin-top: 10px;
+}
+.view-stock-table-expand-row-right-pane .a-cell {
+    width: 100px;
+    display: inline-block;
+    line-height: 23px;
+    padding-left: 10px;
+}
+
+.view-stock-table-expand-row-right-pane .row-1 .a-cell,
+.view-stock-table-expand-row-right-pane .row-3 .a-cell {
+    border-bottom: 1px solid;
+    border-color: lightgray;
+}
+
+.product-code-cell {
+    cursor: pointer;
+}
+
+.view-stock-container .pagination>li {
+    padding-right: 1px;
+    z-index: 1;
+}
+
+.stock-net-wt-footer-cell,
+.stock-sold-net-wt-footer-cell,
+.stock-avl-net-wt-footer-cell {
+    line-height: 30px;
+}
+.edit-stock-common-modal {
+    width: 90%;
+}
+.edit-stock-common-modal .container {
+    max-width: 100%;
+}

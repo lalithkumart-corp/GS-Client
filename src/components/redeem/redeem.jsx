@@ -347,37 +347,43 @@ class Redeem extends Component {
                             </Row>
                         </Col>
                         <Col xs={4}>
-                            <Col xs={4} className='no-padding'>
-                                <input className='interest-value-input' type = 'text' value={selectedBillData._interestPerMonth} onChange={(e) => this.inputControls.onChange(e, e.target.value, 'interestPerMonth')}/>
-                            </Col>
-                            <Col xs={4} className='no-padding'>
-                                &nbsp;<span style={{fontSize: "10px"}}>X</span> &nbsp;
-                                {selectedBillData._monthDiff}
-                                &nbsp;&nbsp;&nbsp;<span style={{fontSize: "10px"}}>=</span> &nbsp;
-                            </Col>
-                            <Col xs={4}>
-                                <p>{selectedBillData._totalInterestValue}</p>
-                            </Col>
+                            <Row>
+                                <Col xs={4} className='no-padding'>
+                                    <input className='interest-value-input' type = 'text' value={selectedBillData._interestPerMonth} onChange={(e) => this.inputControls.onChange(e, e.target.value, 'interestPerMonth')}/>
+                                </Col>
+                                <Col xs={4} className='no-padding'>
+                                    &nbsp;<span style={{fontSize: "10px"}}>X</span> &nbsp;
+                                    {selectedBillData._monthDiff}
+                                    &nbsp;&nbsp;&nbsp;<span style={{fontSize: "10px"}}>=</span> &nbsp;
+                                </Col>
+                                <Col xs={4}>
+                                    <p>{selectedBillData._totalInterestValue}</p>
+                                </Col>
+                            </Row>
                         </Col> 
                     </Row>
                     <Row>
                         <Col xs={{span: 4, offset: 8}} xs={{span: 4, offset: 8}}>
-                            <Col xs={8}>
-                                <p className='text-align-right lightgrey'>Discount</p>
-                            </Col>
-                            <Col xs={4}>
-                                <input className='discount-value-input' type='text' value={selectedBillData._discountValue} onChange={(e) => this.inputControls.onChange(e, e.target.value, 'discount')}/>
-                            </Col>
+                            <Row>
+                                <Col xs={8}>
+                                    <p className='text-align-right lightgrey'>Discount</p>
+                                </Col>
+                                <Col xs={4}>
+                                    <input className='discount-value-input' type='text' value={selectedBillData._discountValue} onChange={(e) => this.inputControls.onChange(e, e.target.value, 'discount')}/>
+                                </Col>
+                            </Row>
                         </Col>
                     </Row>
                     <Row>
                         <Col xs={{span: 4, offset: 8}} xs={{span: 4, offset: 8}}>
-                            <Col xs={8}>
-                                <p className='text-align-right lightgrey'>Total</p>
-                            </Col>
-                            <Col xs={4}>
-                                <p className='total-value-field'>{selectedBillData._totalValue}</p>
-                            </Col>
+                            <Row>
+                                <Col xs={8}>
+                                    <p className='text-align-right lightgrey'>Total</p>
+                                </Col>
+                                <Col xs={4}>
+                                    <p className='total-value-field'>{selectedBillData._totalValue}</p>
+                                </Col>
+                            </Row>
                         </Col>                        
                     </Row>
                 </Col>
@@ -522,7 +528,7 @@ class Redeem extends Component {
                             renderSuggestion={(suggestion) => this.reactAutosuggestControls.renderSuggestion(suggestion, 'billno')}
                             onSuggestionSelected={(event, { suggestion, suggestionValue, suggestionIndex, sectionIndex, method}) => this.reactAutosuggestControls.onSuggestionSelected(event, { suggestion, suggestionValue, suggestionIndex, sectionIndex, method }, 'billno')}
                             inputProps={{
-                                placeholder: 'Type ...',
+                                placeholder: 'Bill No',
                                 value: this.state.formData.billNo.inputVal || '',
                                 onChange: (e, {newValue, method}) => this.reactAutosuggestControls.onChange(e, {newValue, method}, 'billno'),//this.setState({billno: e.target.value}),
                                 onKeyUp: (e) => this.reactAutosuggestControls.handleKeyUp(e, {currElmKey: 'billno'}),

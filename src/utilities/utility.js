@@ -56,10 +56,10 @@ export const dateFormatterV2 = (theDate, options) => {
 
 export const getInterestRate = () => {
     return new Promise( (resolve, reject) => {
-        let intRatesFromCookie = getInterestRates();
-        if(intRatesFromCookie) {
-            return resolve(intRatesFromCookie);
-        } else {
+        // let intRatesFromCookie = getInterestRates();
+        // if(intRatesFromCookie) {
+        //     return resolve(intRatesFromCookie);
+        // } else {
             axios.get(GET_INTEREST_RATES+'?access_token='+getAccessToken())
                 .then(
                     (successResp) => {
@@ -77,7 +77,7 @@ export const getInterestRate = () => {
                         return resolve([]);
                     }
                 )
-        }
+        // }
     });
 }
 
@@ -92,6 +92,10 @@ export const convertBufferToBase64 = (imgBuff) => {
 
 export const convertToLocalTime = (theDate, options) => {
     options = options || {};
+
+    if(theDate.length == 24) // Ex: 2021-01-02T12:17:57.000Z
+        theDate = theDate.replace('T', ' ').slice(0,23);
+
     const twoDigitFormat = (val) => {
         val = parseInt(val);
         if(val < 10)
@@ -121,4 +125,19 @@ export const currencyFormatter = (val) => {
       val = val.toString().replace(/(\d+)(\d{3})/, '$1'+','+'$2');
     }
     return val;
+}
+
+export const getLowerCase = (str) => {
+    if(str)
+        return str.toLowerCase();
+    else
+        return '';
+}
+export const isNull = (val) => {
+    let isNull = true;
+    if(val) {
+        if(val !== 'null' && val !== 'undefined')
+            isNull = false;
+    }
+    return isNull;
 }

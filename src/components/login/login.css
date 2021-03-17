@@ -12,3 +12,13 @@
     position: absolute;
     left: 35px;
 }
+
+.login-container .btn.loading {
+    background-color: #007bff61;
+    border-color: #007bff1f;
+}
+
+.login-container .css-57hdvq {
+    position: absolute;
+    left: 28%;
+}

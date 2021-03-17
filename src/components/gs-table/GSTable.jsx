@@ -34,6 +34,7 @@ class GSTable extends Component {
         newState.isGlobalExpandIconExpanded = parsed.isGlobalExpandIconExpanded || false;
         this.checkboxOnChangeListener = parsed.checkboxOnChangeListener;
         newState.selectedIndexes = parsed.selectedIndexes || [];
+        newState.showFooter = parsed.showFooter;
         this.setState(newState);
     }
     parseInputCollection(props) {
@@ -44,22 +45,39 @@ class GSTable extends Component {
         if(props && props.columns) {
             if(props.expandRow && props.expandRow.renderer !== undefined) {
                 parsedData.expandRow = props.expandRow;
-                if(props.expandRow.showIndicator && !this.indicatorExistsAlready(props.columns)) {
-                    let id = "_expandIndicator";
-                    let formatter = this.defaultFormatters.expandIconFormatter;
-                    if(props.checkbox){
-                        id = "_expandIndicatorWithCheckbox";
-                        formatter = this.defaultFormatters.expandIconWithCheckboxFormatter;
-                    }                    
-                    props.columns.unshift({
-                        id: id,
-                        displayText: '',
-                        formatter: formatter,
-                        width: '6%'
-                    });
+                if(!this.indicatorExistsAlready(props.columns)) {
+                    if(props.expandRow.showIndicator) {
+                        let id = "_expandIndicator";
+                        let formatter = this.defaultFormatters.expandIconFormatter;
+                        if(props.checkbox){
+                            id = "_expandIndicatorWithCheckbox";
+                            formatter = this.defaultFormatters.expandIconWithCheckboxFormatter;
+                        }                    
+                        props.columns.unshift({
+                            id: id,
+                            displayText: '',
+                            formatter: formatter,
+                            width: '6%'
+                        });
+                    } else {
+                        let id = null;
+                        let formatter = null;
+                        if(props.checkbox) {
+                            id = "_onlyCheckBox";
+                            formatter = this.defaultFormatters.checkBoxFormatter1;
+                        } else {
+                            id = "_onlySerialNo";
+                            formatter = this.defaultFormatters.serialNo;
+                        }
+
+                        props.columns.unshift({
+                            id: id,
+                            displayText: '',
+                            formatter: formatter,
+                            width: '3%'
+                        });
+                    }
                 }
-
-
             }
             _.each(props.columns, (aCol, index) => {                
                 let buffer = {};
@@ -71,8 +89,14 @@ class GSTable extends Component {
                 buffer.filterVal = aCol.filterVal || null;
                 buffer.filterCallback = aCol.filterCallback || this.defaults.filterCallback;
                 buffer.filterFormatter = aCol.filterFormatter || this.defaultFormatters.filter;
+                buffer.filterDataType = aCol.filterDataType || "text";
                 buffer.width = aCol.width || '0%';
                 buffer.tdClassNameGetter = aCol.tdClassNameGetter || this.defaults.tdClassNameGetter;
+                if(props.showFooter && aCol.footerFormatter) {
+                    buffer.footer = true;
+                    buffer.footerFormatter = aCol.footerFormatter;
+                    buffer.footerClassName = aCol.footerClassName || '';
+                }
                 parsedData.columns.push(buffer);
             });
         }
@@ -89,7 +113,8 @@ class GSTable extends Component {
         parsedData.className = props.className || '';
         parsedData.checkbox = props.checkbox || false;
         parsedData.checkboxOnChangeListener = props.checkboxOnChangeListener;
-        parsedData.selectedIndexes = props.selectedIndexes || [];        
+        parsedData.selectedIndexes = props.selectedIndexes || [];
+        parsedData.showFooter = props.showFooter || false;
         return parsedData;
     }
     defaults = {
@@ -104,6 +129,25 @@ class GSTable extends Component {
             return (
                 <span>{row[column.id]}</span>
             )
+        },
+        serialNo: (column, colIndex, row, rowIndex) => {
+            return (
+                <span>{rowIndex}</span>
+            )
+        },
+        checkBoxFormatter1: (column, colIndex, row, rowIndex) => {
+            let theDom = [];
+            theDom.push(
+                <span key={colIndex+'-checkbox'}>
+                    <span className="gstable-checkbox-container">
+                        <GSCheckbox labelText="" 
+                            checked={this.checkIsSelected(rowIndex)} 
+                            onChangeListener = {(e) => {this.callbackMiddleware.checkboxOnChange(e, column, colIndex, row, rowIndex)}} 
+                            className={"gstable-selector-checkbox"}/>
+                    </span>
+                </span>);
+
+            return theDom;
         },
         expandIconFormatter: (column, colIndex, row, rowIndex) => {
             let theDom = [];
@@ -183,14 +227,31 @@ class GSTable extends Component {
 
             return theDom;
         },
-        filter: (column, colIndex) => {            
+        getGlobalCheckBoxDOMFormatter: () => {
+            return (
+                <span className="global-checkbox-only gstable-checkbox-container">
+                    <GSCheckbox labelText="" 
+                        checked={this.IsGlobalCheckboxSelected()} 
+                        onChangeListener = {(e) => {this.onGlobalCheckcboxChange(e)}} 
+                        className={"gstable-selector-checkbox"}/>
+                </span>
+            )
+        },
+        filter: (column, colIndex) => {   
+            let dataType = 'text';
+            if(column.filterDataType)
+                dataType = column.filterDataType;                        
             return (                
-                <input type='text' value={undefined} onChange={(e) => column.filterCallback(e, column, colIndex)}/>                
+                <input type={dataType} value={undefined} onChange={(e) => column.filterCallback(e, column, colIndex)}/>
             );
+        },
+        footerFormatter: (column) => {
+            return <span></span>;
         }
     }
     callbackMiddleware = {
         checkboxOnChange: (e, column, colIndex, row, rowIndex) => {
+            e.stopPropagation();
             let isChecked = e.target.checked;
             this.checkboxOnChangeListener({isChecked, column, colIndex, row, rowIndex});
         }
@@ -206,7 +267,7 @@ class GSTable extends Component {
     indicatorExistsAlready(columns) {
         let exits = false;
         _.each(columns, (aCol, index) => {
-            if(aCol.id == "_expandIndicator" || aCol.id == "_expandIndicatorWithCheckbox")
+            if(aCol.id == "_expandIndicator" || aCol.id == "_expandIndicatorWithCheckbox" || aCol.id == "_onlyCheckBox" || aCol.id =="_onlySerialNo")
                 exits = true;
         });
         return exits;
@@ -236,7 +297,7 @@ class GSTable extends Component {
 
     getSelectAllwithExpandAllDOM(column, colIndex) {        
         return (
-            <th key={colIndex+"-inner-hedaer"} className={column.className + " inner-header a-cell"}>
+            <th key={colIndex+"-inner-hedaer"} className={column.className + "secondary-row-first-col inner-header a-cell"}>
                 {this.defaultFormatters.expndAllWithSelectAllCboxFormatter(column, colIndex)}
             </th>
         )
@@ -246,6 +307,14 @@ class GSTable extends Component {
         return (
             <th key={colIndex+"-inner-header"} className={column.className + " inner-header a-cell"}>
                 {this.defaultFormatters.expndAllFormatter(column, colIndex)}
+            </th>
+        )
+    }
+
+    getGlobalCheckBoxDOM(column, colIndex) {
+        return (
+            <th key={colIndex+"-inner-header"} className={column.className + "global-checkbox-only-col inner-header a-cell"}>
+                {this.defaultFormatters.getGlobalCheckBoxDOMFormatter(column, colIndex)}
             </th>
         )
     }
@@ -260,6 +329,13 @@ class GSTable extends Component {
     }
 
     onExpandIconClick(e, column, colIndex, row, rowIndex) {
+        e.stopPropagation();
+        let newState = {...this.state};
+        newState.rowData[rowIndex]._expanded = !newState.rowData[rowIndex]._expanded;
+        this.setState(newState);
+    }
+
+    rowClickHandler(row, rowIndex) {
         let newState = {...this.state};
         newState.rowData[rowIndex]._expanded = !newState.rowData[rowIndex]._expanded;
         this.setState(newState);
@@ -279,7 +355,8 @@ class GSTable extends Component {
             <table className={this.state.className + ' gs-table table table-hover table-bordered table-sm'}>
                 {this.createColGroup()}
                 {this.createHeader()}
-                {this.createBody()}                
+                {this.createBody()}
+                {this.state.showFooter && this.createfooter()}
             </table>
         )
     }
@@ -317,6 +394,8 @@ class GSTable extends Component {
                                     innerHeaderCells.push(this.getSelectAllwithExpandAllDOM(columns[h], h));
                                 else if(columns[h].id == "_expandIndicator")
                                     innerHeaderCells.push(this.getExpandAll(columns[h], h));
+                                else if(columns[h].id == "_onlyCheckBox")
+                                    innerHeaderCells.push(this.getGlobalCheckBoxDOM(columns[h], h));
                                 else
                                     innerHeaderCells.push(<th key={h+"-inner-header"}></th>)
                             }
@@ -361,14 +440,16 @@ class GSTable extends Component {
         let makeARow = (aRowData, rowIndex) => {
             let columns = this.state.columns;
             let theClassName = (this.checkIsSelected(rowIndex))?"selected":"";
+            if(this.state.expandRow)
+                theClassName += ' expandable-row';
             return (
-                <tr key={rowIndex+"-row"} className={theClassName +" a-row"}>
+                <tr key={rowIndex+"-row"} className={theClassName +" a-row"} onClick={(e) => this.rowClickHandler(aRowData, rowIndex)}>
                     {
                         ( () => {                            
                             let rowCells = [];
                             for(let i=0; i<columns.length; i++) {                                
                                 let  tdClassName = columns[i].tdClassNameGetter(columns[i], i, aRowData, rowIndex);
-                                let formatter = columns[i].formatter;                                
+                                let formatter = columns[i].formatter;
                                 rowCells.push(
                                     <td className={"column-in-row column-"+ i + ' ' + tdClassName} key={i+"-body"}>
                                         {formatter(columns[i], i, aRowData, rowIndex)}                                        
@@ -381,7 +462,7 @@ class GSTable extends Component {
                 </tr>
             )
         }
-        let makeExpandedRow = (aRowData, rowIndex) => {            
+        let makeExpandedRow = (aRowData, rowIndex) => {
             return (
                 <tr key={rowIndex+"-expanded-row"} className="expanded-row">
                     <td colSpan={this.state.columns.length}>
@@ -412,7 +493,27 @@ class GSTable extends Component {
         )
     }
     createfooter() {
-
+        return (
+            <tfoot>
+                <tr>
+                    {
+                        ( ()=> {
+                            let footerCells = [];
+                            let columns = this.state.columns;
+                            for(let i = 0; i< columns.length; i++) {
+                                let formatter = columns[i].footerFormatter || this.defaultFormatters.footerFormatter;
+                                footerCells.push(
+                                    <td key={i+"-header"} className={columns[i].footerClassName + " footer a-cell"}>
+                                        {formatter()}
+                                    </td>
+                                );
+                            }
+                            return footerCells;
+                        } )()
+                    }
+                </tr>
+            </tfoot>
+        )
     }
     render() {
         return (

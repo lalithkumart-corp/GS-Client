@@ -385,7 +385,7 @@ class GeneralInfo extends Component {
                 thatState.userPicture.holder.confirmedImgSrc = thatState.custDetail.image.image;
         }
     
-        let params = {
+        let apiParams = {
             customerId: thatState.custDetail.customerId,
             cname: thatState.custDetail.name,
             gaurdianName: thatState.custDetail.gaurdianName,
@@ -396,9 +396,10 @@ class GeneralInfo extends Component {
             mobile: thatState.custDetail.mobile || null,
             secMobile: thatState.custDetail.secMobile || null,
             picture: getPicData(thatState),
-            otherDetails: thatState.custDetail.otherDetails
+            otherDetails: thatState.custDetail.otherDetails,
+            accessToken: getAccessToken()
         }
-        let response = await axios.post(UPDATE_CUSTOMER_DETAIL, params);
+        let response = await axios.post(UPDATE_CUSTOMER_DETAIL, apiParams);
         if(response.data.STATUS == 'SUCCESS') {
             toast.success(response.data.MSG);
             this.props.refreshCustomerList();

@@ -1,0 +1,38 @@
+.floating-right-side-bar {
+    position: fixed;
+    top: 0px;
+    right: 0;
+    width: 25%;
+    background-color: #d3d3d3e8;
+    height: 100%;
+    transition: width .3s ease-in-out;
+    display: none;
+    box-shadow: -5px 3px 49px -18px rgba(0,0,0,1);
+    -webkit-box-shadow: -5px 3px 49px -18px rgba(0,0,0,1);
+    -moz-box-shadow: -5px 3px 49px -18px rgba(0,0,0,1);
+}
+.floating-right-side-bar.show {
+    display: block;
+}
+.right-side-trigger-icon {
+    padding-top: 7px;
+    padding-left: 10px;
+    cursor: pointer;
+    z-index: 1;
+}
+.right-side-bar-container .gs-tabs {
+    padding-left: 10%;
+    margin-top: 20px;
+}
+.right-side-bar-container .nav-item.nav-link {
+    width: 40%;
+    text-align: center;
+    padding: 2px 4px 2px 4px;
+    line-height: 18px;
+    height: 23px;
+}
+.right-side-bar-container .tab-content {
+    border-top: 1px solid lightgray;
+    margin-top: 13px;
+    padding: 18px 10px 10px 10px;
+}

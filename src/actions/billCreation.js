@@ -14,14 +14,14 @@ export const insertNewBill = (requestParams) => {
             .then(
                 (resp) => {
                     if(resp.data.STATUS == 'ERROR') {
-                        let errorText = resp.data.MSG;
+                        let errorText = getErrorText(resp);
                         toast.error('Error in adding new bill to pledgebook - ' + errorText);
                         dispatch({
                             type: 'NEW_BILL_INSERTION_ERROR',
                             data: {msg: resp.data.ERROR}
                         });
                     } else {
-                        toast.success('New bill added successfully'); //TODO: Hide this msg automatically after some timeout
+                        toast.success('New bill added successfully', {autoClose: 1000}); //TODO: Hide this msg automatically after some timeout
                         dispatch({
                             type: 'NEW_BILL_INSERTED_SUCCESSFULLY'
                         });
@@ -172,5 +172,25 @@ export const updateBillNoInStore = (billSeries, billNo) => {
             type: 'UPDATE_BILL_NUMBER',
             data: {billSeries: billSeries, billNo: billNo}
         });
+    }
+}
+
+const getErrorText = (resp) => {
+    let errorText = '';
+    try {
+        errorText = resp.data.MSG;
+        if(!errorText && resp.data.ERROR) {
+            if(resp.data.ERROR.length > 0) {
+                if(Array.isArray(resp.data.ERROR)) {
+                    errorText = resp.data.ERROR.join(', ');
+                } else if(typeof resp.data.ERROR == 'string') {
+                    errorText = resp.data.ERROR;
+                }
+            }
+        }
+        return errorText;
+    } catch(e) {
+        console.log(e);
+        return errorText;
     }
 }

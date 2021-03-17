@@ -4,14 +4,14 @@ let config;
 
 if(app.env === env.DEVELOPMENT) {
     config = {        
-        "proxy_api_host": "localhost",
+        "proxy_api_host": window.location.hostname || "localhost",
         "proxy_api_port": 3003,
         "proxy_protocol": "http",
         "restApiRoot": "api"
     }
 } else if (app.env === env.PRODUCTION) {
     config = {        
-        "proxy_api_host": "localhost",
+        "proxy_api_host": window.location.hostname || "localhost",
         "proxy_api_port": 3003,
         "proxy_protocol": "http",
         "restApiRoot": "api"
@@ -19,6 +19,9 @@ if(app.env === env.DEVELOPMENT) {
 }
 
 export const LOGIN = `${config.proxy_protocol}://${config.proxy_api_host}:${config.proxy_api_port}/${config.restApiRoot}/GsUsers/login-user`;
+export const GET_APP_STATUS = `${config.proxy_protocol}://${config.proxy_api_host}:${config.proxy_api_port}/${config.restApiRoot}/AppManagers/get-status`;
+export const CHECK_USED_TRIAL_OFFER = `${config.proxy_protocol}://${config.proxy_api_host}:${config.proxy_api_port}/${config.restApiRoot}/AppManagers/check-used-trial-offer`;
+export const UPDATE_APP_STATUS = `${config.proxy_protocol}://${config.proxy_api_host}:${config.proxy_api_port}/${config.restApiRoot}/AppManagers/update-status`;
 export const LOGOUT = `${config.proxy_protocol}://${config.proxy_api_host}:${config.proxy_api_port}/${config.restApiRoot}/GsUsers/logout`;
 export const ADD_CUSTOMER = `${config.proxy_protocol}://${config.proxy_api_host}:${config.proxy_api_port}/${config.restApiRoot}/GsUsers/add-customer`;
 export const ADD_USER = `${config.proxy_protocol}://${config.proxy_api_host}:${config.proxy_api_port}/${config.restApiRoot}/GsUsers/add-user`;
@@ -36,7 +39,9 @@ export const REOPEN_CLOSED_BILL = `${config.proxy_protocol}://${config.proxy_api
 export const GET_PENDING_BILL_NOS = `${config.proxy_protocol}://${config.proxy_api_host}:${config.proxy_api_port}/${config.restApiRoot}/Pledgebooks/get-pending-bill-nos`;
 export const GET_BILL_DETAILS = `${config.proxy_protocol}://${config.proxy_api_host}:${config.proxy_api_port}/${config.restApiRoot}/Pledgebooks/get-bill-details`;
 export const PLEDGEBOOK_EXPORT = `${config.proxy_protocol}://${config.proxy_api_host}:${config.proxy_api_port}/${config.restApiRoot}/Pledgebooks/export-pledgebook`;
+export const ADD_NEW_INTEREST_RATE = `${config.proxy_protocol}://${config.proxy_api_host}:${config.proxy_api_port}/${config.restApiRoot}/Interests/add-new-interest-rate`;
 export const GET_INTEREST_RATES = `${config.proxy_protocol}://${config.proxy_api_host}:${config.proxy_api_port}/${config.restApiRoot}/Interests/get-interest-rates`;
+export const DELETE_INTEREST_RATE = `${config.proxy_protocol}://${config.proxy_api_host}:${config.proxy_api_port}/${config.restApiRoot}/Interests/del-interest-rate`;
 export const UPDATE_CUSTOMER_DETAIL = `${config.proxy_protocol}://${config.proxy_api_host}:${config.proxy_api_port}/${config.restApiRoot}/Customers/update-customer-detail`;
 export const SAVE_BASE64_IMAGE_AND_GET_ID = `${config.proxy_protocol}://${config.proxy_api_host}:${config.proxy_api_port}/${config.restApiRoot}/Images/save-base64-and-get-id`;
 export const SAVE_BINARY_IMAGE_AND_GET_ID = `${config.proxy_protocol}://${config.proxy_api_host}:${config.proxy_api_port}/${config.restApiRoot}/Images/save-binary-and-get-id`;
@@ -49,6 +54,24 @@ export const DELETE_ORN = `${config.proxy_protocol}://${config.proxy_api_host}:$
 //export const GET_INTEREST_RATES = `${config.proxy_protocol}://${config.proxy_api_host}:${config.proxy_api_port}/${config.restApiRoot}/Interests/fetch-rate-of-interest-details`;
 export const UPDATE_INTEREST_RATES = `${config.proxy_protocol}://${config.proxy_api_host}:${config.proxy_api_port}/${config.restApiRoot}/Interests/update-rate-of-interest-details`;
 export const EXPORT_FULL_DB = `${config.proxy_protocol}://${config.proxy_api_host}:${config.proxy_api_port}/${config.restApiRoot}/Commons/export-db`;
+export const CREATE_NEW_CUSTOMER = `${config.proxy_protocol}://${config.proxy_api_host}:${config.proxy_api_port}/${config.restApiRoot}/Customers/create-new`;
 export const UPDATE_CUSTOMER_BY_MERGING = `${config.proxy_protocol}://${config.proxy_api_host}:${config.proxy_api_port}/${config.restApiRoot}/Customers/update-by-merging`;
 export const UPDATE_CUSTOMER_STATUS = `${config.proxy_protocol}://${config.proxy_api_host}:${config.proxy_api_port}/${config.restApiRoot}/Customers/update-status`;
 export const FETCH_ROLES_LIST = `${config.proxy_protocol}://${config.proxy_api_host}:${config.proxy_api_port}/${config.restApiRoot}/GsRoles/fetch-list`;
+
+export const INSERT_NEW_ORN_JEWELLERY = `${config.proxy_protocol}://${config.proxy_api_host}:${config.proxy_api_port}/${config.restApiRoot}/JewellryOrnaments/create-new-orn`;
+export const UPDATE_ORN_JEWELLERY = `${config.proxy_protocol}://${config.proxy_api_host}:${config.proxy_api_port}/${config.restApiRoot}/JewellryOrnaments/update-orn`;
+export const DELETE_ORN_JEWELLERY = `${config.proxy_protocol}://${config.proxy_api_host}:${config.proxy_api_port}/${config.restApiRoot}/JewellryOrnaments/delete-orn`;
+export const FETCH_ORN_LIST_JEWELLERY = `${config.proxy_protocol}://${config.proxy_api_host}:${config.proxy_api_port}/${config.restApiRoot}/JewellryOrnaments/fetch-orn-list`;
+export const FETCH_STOCK_LIST = `${config.proxy_protocol}://${config.proxy_api_host}:${config.proxy_api_port}/${config.restApiRoot}/Stocks/fetch-list`;
+export const FETCH_STOCK_TOTALS = `${config.proxy_protocol}://${config.proxy_api_host}:${config.proxy_api_port}/${config.restApiRoot}/Stocks/fetch-totals`;
+export const FETCH_STOCK_SOLD_OUT_LIST = `${config.proxy_protocol}://${config.proxy_api_host}:${config.proxy_api_port}/${config.restApiRoot}/Stocks/fetch-sold-out-item-list`;
+export const FETCH_STOCK_SOLD_ITEM_TOTALS = `${config.proxy_protocol}://${config.proxy_api_host}:${config.proxy_api_port}/${config.restApiRoot}/Stocks/fetch-sold-out-item-total`;
+export const FETCH_PROD_IDS = `${config.proxy_protocol}://${config.proxy_api_host}:${config.proxy_api_port}/${config.restApiRoot}/Stocks/fetch-product-ids`;
+export const INSERT_NEW_STOCK_ITEM = `${config.proxy_protocol}://${config.proxy_api_host}:${config.proxy_api_port}/${config.restApiRoot}/Stocks/insert`;
+export const UPDATE_STOCK_ITEM = `${config.proxy_protocol}://${config.proxy_api_host}:${config.proxy_api_port}/${config.restApiRoot}/Stocks/update-item`;
+export const FETCH_STOCKS_BY_PRODID = `${config.proxy_protocol}://${config.proxy_api_host}:${config.proxy_api_port}/${config.restApiRoot}/Stocks/fetch-by-prod-id`;
+export const FETCH_TOUCH_LIST = `${config.proxy_protocol}://${config.proxy_api_host}:${config.proxy_api_port}/${config.restApiRoot}/Touches/list`;
+export const SALE_ITEM = `${config.proxy_protocol}://${config.proxy_api_host}:${config.proxy_api_port}/${config.restApiRoot}/Stocks/sell-item`;
+export const GET_STORE_INFO = `${config.proxy_protocol}://${config.proxy_api_host}:${config.proxy_api_port}/${config.restApiRoot}/Stores/get-info`;
+export const UPDATE_STORE_INFO = `${config.proxy_protocol}://${config.proxy_api_host}:${config.proxy_api_port}/${config.restApiRoot}/Stores/update-info`;

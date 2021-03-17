@@ -12,7 +12,7 @@ import { toast } from 'react-toastify';
 import { calculateData, getRequestParams, getReopenRequestParams } from '../redeem/helper';
 import moment from 'moment';
 import ReactToPrint from 'react-to-print';
-import BillTemplate from '../billcreate/billTemplate';
+import BillTemplate from '../billcreate/billTemplate2';
 
 class PledgebookModal extends Component {
     constructor(props) {
@@ -31,6 +31,14 @@ class PledgebookModal extends Component {
 
     componentWillReceiveProps(nextProps) {
         
+    }
+
+    getPrintModel() {
+        let flag = 'full';
+        if(this.props.auth && this.props.auth.userPreferences 
+            && (this.props.auth.userPreferences.loan_bill_print_model == "partial"))
+            flag = 'partial';
+        return flag;
     }
 
     onReopenClick() {
@@ -65,7 +73,7 @@ class PledgebookModal extends Component {
     }
 
     onCalculateClick() {
-         
+         alert('This module is IN-PROGRESS !');
     }
 
     onEdit() {
@@ -123,9 +131,14 @@ class PledgebookModal extends Component {
             place: this.props.currentBillData.Place,
             city: this.props.currentBillData.City,
             pinCode: this.props.currentBillData.Pincode,
+            mobile: this.props.currentBillData.Mobile,
             userPicture: {url: this.props.currentBillData.UserImagePath},
             ornPicture: {url: this.props.currentBillData.OrnImagePath},
-            orn: JSON.parse(this.props.currentBillData.Orn)
+            orn: JSON.parse(this.props.currentBillData.Orn),
+            storeName: this.props.storeDetail.loanLicenseName,
+            addressLine1: this.props.storeDetail.loanBillAddressLine1,
+            addressLine2: this.props.storeDetail.loanBillAddressLine2,
+            printModel: this.getPrintModel()
         }
         await this.setState({printContent: templateData});
         this.printBtn.handlePrint();
@@ -248,7 +261,9 @@ class PledgebookModal extends Component {
 
 const mapStateToProps = (state) => { 
     return {
-        pledgebookModal: state.pledgebookModal
+        auth: state.auth,
+        pledgebookModal: state.pledgebookModal,
+        storeDetail: state.storeDetail
     };
 };
 export default connect(mapStateToProps, {enableReadOnlyMode, disableReadOnlyMode})(PledgebookModal);

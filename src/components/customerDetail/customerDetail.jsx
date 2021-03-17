@@ -255,7 +255,7 @@ class CustomerDetail extends Component {
                 </Tab>
             </Tabs>);            
         }else{
-            buffer.push(<p>Select any customer to view their detail...</p>)
+            buffer.push(<p style={{marginTop: "50px", letterSpacing: "1px", fontSize: "20px", textAlign: "center"}}>Select any customer to view their detail...</p>)
         }
         return buffer;
     }

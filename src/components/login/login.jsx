@@ -8,8 +8,10 @@ import { ClipLoader } from 'react-spinners';
 
 import { toast } from 'react-toastify';
 
-import { doAuthentication, enableLoader } from '../../actions/login';
+import { doAuthentication, enableLoader, isAccountActive } from '../../actions/login';
 import './login.css';
+
+const ENTER_KEY = 13;
 
 class LoginPage extends Component {
     constructor(props) {
@@ -50,6 +52,11 @@ class LoginPage extends Component {
         this.setState(newState);
     }
 
+    handleKeyUp(e) {
+        if(e.keyCode == ENTER_KEY)
+            this.onLoginClick();
+    }
+
     onLoginClick() {        
         let newState = { ...this.state };
         _.each(newState.formData, (aFormInput, index) => {
@@ -76,6 +83,7 @@ class LoginPage extends Component {
             password: this.state.formData.password.val,
         }
         this.props.doAuthentication(params);
+        this.props.isAccountActive();
     }
 
     validationEngine(formData) {
@@ -130,6 +138,7 @@ class LoginPage extends Component {
                                         value={this.state.formData.password.val}
                                         placeholder="Enter email"
                                         onChange={(e) => this.handleChange(e.target.value, 'password')}
+                                        onKeyUp={(e) => this.handleKeyUp(e)}
                                         onFocus={(e) => this.onTouched('password')}
                                     />
                                     {this.state.formData.email.hasError && <FormControl.Feedback /> }
@@ -140,7 +149,7 @@ class LoginPage extends Component {
                         <Row>
                             <Col md={{span: 4, offset: 1}}>
                                 <ButtonToolbar>
-                                    <Button onClick={this.onLoginClick}> 
+                                    <Button onClick={this.onLoginClick} className={this.props.auth.loading?'loading':''}> 
                                         Login
                                         <ClipLoader
                                             className={"login-spinner"}
@@ -169,4 +178,4 @@ const mapStateToProps = (state) => {
     };
 };
 
-export default connect(mapStateToProps, {doAuthentication, enableLoader})(LoginPage);
+export default connect(mapStateToProps, {doAuthentication, enableLoader, isAccountActive})(LoginPage);
