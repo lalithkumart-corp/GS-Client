@@ -57,3 +57,27 @@ export function SinglyLinkedList () {
         this._length--;
     }
 }
+
+
+
+
+
+/*  TUTORIALS  */
+
+function reverse(node) {
+    if (!node || !node.next)
+      return node; // If last node, then return
+    let tmp = reverse(node.next);
+    node.next.next = node;
+    node.next = undefined;
+    return tmp;
+}
+let inst = new SinglyLinkedList();
+inst.add(10);
+inst.add(101);
+inst.add(123);
+inst.add(145);
+inst.add(199);
+console.log(inst);
+let reversedList = reverse(inst.head);
+console.log(reversedList);
