@@ -220,6 +220,7 @@ class Redeem extends Component {
                 .then(
                     (successResp) => {
                         if(successResp.data.STATUS == 'success') {
+                            toast.success('Success!');
                             this.clearView();
                         }
                     },
@@ -254,7 +255,9 @@ class Redeem extends Component {
         newState.fetchingBillNoList = true;
         //this.setState({billno: {inputVal: nextBillnoSuggestion} , selectedBillData: null, fetchingBillNoList: true});
         this.setState(newState);
-        this.transferFocus(null, 'submitBtn', 'previous');
+        setTimeout(() => {
+            this.transferFocus(null, 'submitBtn', 'previous');
+        }, 300);
         this.getBillNos();
     }
 
@@ -417,7 +420,8 @@ class Redeem extends Component {
                             <input 
                                 type='button'
                                 className='gs-button bordered'
-                                onClick={(e) => this.handleSubmit()}
+                                // onClick={(e) => this.handleSubmit()}
+                                onKeyUp={(e) => this.handleSubmit()}
                                 ref={(domElm) => {this.domElmns.submitBtn = domElm}}
                                 value='Redeem'                    
                                 />
