@@ -18,6 +18,11 @@ export const getDateInUTC = (theDate, options) => {
         minute = 59;
         second = 59;
         milliseconds = 59;
+    } else if(options.withSelectedTime) {
+        hour = theDate.getHours();
+        minute = theDate.getMinutes();
+        second = theDate.getSeconds();
+        milliseconds = theDate.getMilliseconds();
     } else { //current time
         let currentDate = new Date();
         hour = currentDate.getHours();

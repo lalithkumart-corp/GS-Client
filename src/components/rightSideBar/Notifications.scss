@@ -1,0 +1,51 @@
+.notif-main-container {
+    overflow-x: hidden;
+    height: calc(100vh - 120px);
+}
+.notif-card {
+    border: 1px solid #e8e3e3;
+    margin-bottom: 20px;
+    border-radius: 5px;
+    &:hover .actions {
+        visibility: visible;
+    }
+    .head {
+        border-bottom: 1px solid grey;
+        padding: 0;
+        background-color: rgb(0, 121, 191);
+        border-top-right-radius: 5px;
+        border-top-left-radius: 5px;
+        color: white;
+    }
+    .section {
+        padding: 5px 10px;
+        text-transform: capitalize;
+    }
+    .actions {
+        visibility: hidden;
+        position: absolute;
+        top: 0;
+        right: 8px;
+        cursor: pointer;
+        font-size: 20px;
+    }
+    .title {
+        // background-color: white;
+        color: black;
+        // margin: 5px 10px;
+        // border-top-right-radius: 5px;
+        // border-top-left-radius: 5px;
+        // padding: 3px 5px;
+        font-weight: bold;
+    }
+    .subtitle {
+        padding-left: 10px;
+    }
+    .body {
+        padding: 5px 10px;
+        min-height: 100px;
+        background-color: #efefef;
+        border-bottom-left-radius: 5px;
+        border-bottom-right-radius: 5px;
+    }
+}

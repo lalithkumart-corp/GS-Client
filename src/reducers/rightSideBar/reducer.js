@@ -3,7 +3,7 @@ let defaultState = {
 };
 export default function authReducer(state=defaultState, action) {
     let newState = { ...state };
-    switch(action.type){
+    switch(action.type) {
         case 'OPEN':
             newState.visibility = true;
             break;

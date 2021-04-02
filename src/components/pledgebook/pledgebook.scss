@@ -1,3 +1,5 @@
+@import '../../app';
+
 .pledgebook-page-content {
 	width: 100%;
 	max-width: calc(100% - 100px);
@@ -46,6 +48,17 @@
 			z-index: 1;
 		}
 	}
+	.p-for-demo {
+		color: blue;
+	}
+	.p-for-demo2 {
+		@extend .p-for-demo;
+		background-color: grey;
+	}
+	.p-for-demo3 {
+		@include important-text;
+		@include bordered(blue, 1px);
+	}
 }
 .bill-no-cell {
 	cursor: pointer;
@@ -65,6 +78,11 @@
 	table-layout: fixed;
 	thead {
 		background-color: #f5f5f5;
+	}
+	.alert-icon {
+		font-size: 20px;
+		margin-right: 10px;
+		cursor: pointer;
 	}
 }
 .orn-display-dom {
@@ -222,4 +240,59 @@
 	.mobile-cell {
 		font-size: 13px;
 	}
+}
+
+.status-popover {
+	padding-right: 20px;
+}
+.alert-panel {
+	width: 400px;
+	height: 200px;
+    padding: 15px;
+    // border: 10px solid orange;
+    background-color: white;
+}
+.alert-panel.read-mode {
+	
+}
+#dropdown-more-actions {
+	color: #337ab7;
+    background-color: white;
+	border: none;
+	&:hover {
+		outline: none;
+	}
+	&:focus {
+		outline: none;
+	}
+}
+.alert-popever {
+	@include popover-base-style;
+	overflow: visible !important;
+	.gs-input {
+		@include gs-input-style1;
+	}
+	.alert-msg {
+		position: absolute;
+		width: 90%;
+		text-align: center;
+		z-index: 5;
+	}
+	.alert-msg.success {
+		color: green;
+		background-color: #b8eab8;
+	}
+	.alert-msg.error {
+		color: #ce3b3b;
+		background-color: #efb7b7;
+	}
+}
+.lock-symbol-style {
+	position: absolute;
+    right: 10px;
+    color: yellowgreen;
+    // filter: drop-shadow(1px 3px 1px lightgray);
+    font-size: 20px;
+	margin-top: -14px;
+	z-index: 5;
 }

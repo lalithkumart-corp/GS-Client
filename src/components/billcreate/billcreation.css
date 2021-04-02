@@ -19,36 +19,50 @@
     margin-top: 27px;
     z-index: 3;
 }
-.react-datepicker {
+.billcreation-datepicker.react-datepicker-popper {
+    /* width: 290px; */
+}
+.billcreation-datepicker-forBigFontSize .react-datepicker {
     font-size: 1em;
 }
-.react-datepicker__header {
+.billcreation-datepicker-forBigFontSize .react-datepicker__header {
     padding-top: 0.8em;
 }
-.react-datepicker__month {
+.billcreation-datepicker-forBigFontSize .react-datepicker__month {
     margin: 0.4em 1em;
 }
-.react-datepicker__day-name, .react-datepicker__day {
+.billcreation-datepicker-forBigFontSize .react-datepicker__day-name, .react-datepicker__day {
     width: 1.9em;
     line-height: 1.9em;
     margin: 0.166em;
 }
-.react-datepicker__current-month {
+.billcreation-datepicker-forBigFontSize .react-datepicker__current-month {
     font-size: 1em;
 }
-.react-datepicker__navigation {
+.billcreation-datepicker-forBigFontSize .react-datepicker__navigation {
     top: 1em;
     line-height: 1.7em;
     border: 0.45em solid transparent;
 }
-.react-datepicker__navigation--previous {
+.billcreation-datepicker-forBigFontSize .react-datepicker__navigation--previous {
     border-right-color: #ccc;
     left: 1em;
 }
-.react-datepicker__navigation--next {
+.billcreation-datepicker-forBigFontSize .react-datepicker__navigation--next {
     border-left-color: #ccc;
     right: 1em;
 }
+.billcreation-datepicker-forBigFontSize .react-datepicker__time-container .react-datepicker__time .react-datepicker__time-box ul.react-datepicker__time-list {
+    padding-left: 0;
+    padding-right: 0;
+}
+/* .billcreation-datepicker {
+    width: 340px;
+}
+.billcreation-datepicker .react-datepicker__time-container,
+.billcreation-datepicker .react-datepicker__time-box {
+    width: 90px !important;
+} */
 /*END: Custom styles for the Date Picker(to make it bigger font size looking */
 
 .customer-name-field-container .dropdown-menu > li,

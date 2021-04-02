@@ -25,3 +25,42 @@ export const makeRedeemAPIRequestParams = (billData) => {
     // ];
     return requestParams;
 }
+
+export const getCreateAlertParams = (row, params1) => {
+    let anObj = {
+        triggerTime: params1.dates._dateVal,
+        code: row.code || 'PLEDGEBOOK_BILL',
+        title: params1.title,
+        message: params1.msg,
+        extraCtx: {...row.alertExtraCtx, billNo: row.BillNo},
+        hasRead: 0,
+        archived: 0,
+        module: 'pledgebook',
+        link: {
+            to: 'pledgebook',
+            uniqueIdentifier: row.UniqueIdentifier,
+        }
+    }
+    return anObj;
+}
+
+export const getUpdateAlertParams = (row, params1) => {
+    let anObj = {
+        alertId: row.alertId,
+        triggerTime: params1.dates._dateVal,
+        title: params1.title,
+        message: params1.msg
+    };
+    return anObj;
+}
+
+export const getDeleteAlertParams = (row) => {
+    let anObj = {
+        alertId: row.alertId,
+        link: {
+            to: 'pledgebook',
+            uniqueIdentifier: row.UniqueIdentifier,
+        }
+    }
+    return anObj;
+}

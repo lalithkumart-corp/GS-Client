@@ -1777,13 +1777,20 @@ class BillCreation extends Component {
                                     validationState= {this.state.formData.date.hasError ? "error" :null}
                                     >
                                     <DatePicker
-                                        id="example-datepicker" 
+                                        popperClassName="billcreation-datepicker" 
                                         value={this.state.formData.date.inputVal} 
                                         onChange={(fullDateVal, dateVal) => {this.inputControls.onChange(null, fullDateVal, 'date', {currElmKey: 'date'})} }
                                         ref = {(domElm) => { this.domElmns.date = domElm; }}
                                         onKeyUp = {(e) => this.handleKeyUp(e, {currElmKey: 'date'}) }
                                         readOnly={this.props.billCreation.loading}
                                         showMonthDropdown
+                                        
+                                        // timeInputLabel="Time:"
+                                        // showTimeInput
+                                        // dateFormat="dd/MM/yyyy h:mm aa"
+                                        
+                                        // showTimeSelect
+                                        showYearDropdown
                                         className='gs-input-cell'
                                         />
                                 </Form.Group>

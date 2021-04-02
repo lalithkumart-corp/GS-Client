@@ -20,7 +20,7 @@
     "react-bootstrap-daterangepicker": "^4.1.0",
     "react-collapse": "^4.0.3",
     "react-cookies": "^0.1.0",
-    "react-datepicker": "^1.6.0",
+    "react-datepicker": "^3.6.0",
     "react-desktop": "^0.3.7",
     "react-dom": "^17.0.1",
     "react-icons": "^4.2.0",
@@ -45,9 +45,11 @@
     "redux-logger": "^3.0.6",
     "redux-thunk": "^2.3.0",
     "rupees-to-words": "^1.0.4",
-    "shorthash": "0.0.2"
+    "shorthash": "0.0.2",
+    "socket.io-client": "^3.1.2"
   },
   "scripts": {
+    "analyze": "source-map-explorer 'build/static/js/*.js'",
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test --env=jsdom",

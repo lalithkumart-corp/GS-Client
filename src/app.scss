@@ -1,0 +1,26 @@
+@mixin important-text {
+    color: red;
+    font-size: 25px;
+    font-weight: bold;
+    border: 1px solid blue;
+}
+
+@mixin bordered($color, $width) {
+    border: $width solid $color;
+}
+
+@mixin popover-base-style {
+    z-index: 3;
+}
+
+@mixin gs-input-style1 {
+    border-color: lightgrey;
+    outline: none;
+    border-style: solid;
+} 
+.react-tiny-popover-container {
+    @include popover-base-style;
+}
+body {
+    font-size: 12px;
+}

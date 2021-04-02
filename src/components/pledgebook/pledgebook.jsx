@@ -1,9 +1,9 @@
-import React, { Component } from 'react';
+import React, { Component, useState, useRef, useEffect } from 'react';
 import { getPledgebookData, getPledgebookData2, setRefreshFlag } from '../../actions/pledgebook';
-import { parseResponse } from './helper';
+import { parseResponse, getCreateAlertParams, getUpdateAlertParams, getDeleteAlertParams } from './helper';
 import { connect } from 'react-redux';
 import _ from 'lodash';
-import { Container, Form, Row, Col, FormGroup, FormLabel, FormControl, HelpBlock, InputGroup, Button, Glyphicon, FormCheck } from 'react-bootstrap';
+import { Container, Form, Row, Col, FormGroup, FormLabel, FormControl, HelpBlock, InputGroup, Button, Glyphicon, FormCheck, Dropdown } from 'react-bootstrap';
 import moment from 'moment';
 import './pledgebook.scss';
 import CommonModal from '../common-modal/commonModal.jsx';
@@ -11,7 +11,7 @@ import PledgebookModal from './pledgebookModal';
 import GSTable from '../gs-table/GSTable';
 import ReactPaginate from 'react-paginate';
 import DateRangePicker from '../dateRangePicker/dataRangePicker';
-import { convertToLocalTime, dateFormatter, currencyFormatter } from '../../utilities/utility';
+import { getDateInUTC, convertToLocalTime, dateFormatter, currencyFormatter } from '../../utilities/utility';
 import ImageZoom from 'react-medium-image-zoom';
 //import Popover from 'react-simple-popover';
 import Popover, {ArrowContainer} from 'react-tiny-popover'
@@ -19,9 +19,14 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import PledgebookExportPopup from './pledgebookExportPopup';
 import { toast } from 'react-toastify';
 import GSCheckbox from '../ui/gs-checkbox/checkbox';
+import DatePicker from 'react-datepicker';
+import 'react-datepicker/dist/react-datepicker.css';
+
 import BillTemplate from '../billcreate/billTemplate2';
-import { FaBell, FaPencilAlt } from 'react-icons/fa';
+import { FaBell, FaPencilAlt, FaLock, FaLockOpen } from 'react-icons/fa';
 import { MdNotifications, MdNotificationsActive, MdNotificationsNone, MdNotificationsOff, MdNotificationsPaused, MdBorderColor } from 'react-icons/md';
+import axiosMiddleware from '../../core/axios';
+import { CREATE_NEW_ALERT, UPDATE_ALERT, DELETE_ALERT } from '../../core/sitemap';
 
 class Pledgebook extends Component {
     constructor(props) {
@@ -81,7 +86,8 @@ class Pledgebook extends Component {
                     lessThanVal: 2500
                 }
             },
-            columns : [{
+            columns : [
+                {
                     id: 'Date',
                     displayText: 'Pledged Date',
                     width: '22%',
@@ -118,7 +124,7 @@ class Pledgebook extends Component {
                                 </Popover> */}
                                 
                                 <Popover
-                                    className='status-popover'
+                                    containerClassName='status-popover'
                                     padding={0}
                                     isOpen={this.state.statusPopupVisibility}
                                     position={'right'} // preferred position
@@ -322,6 +328,7 @@ class Pledgebook extends Component {
         // this.onMoreFilterPopoverChange.gtrThanAmount = this.onMoreFilterPopoverChange.gtrThanAmount.bind(this);
         // this.onMoreFilterPopoverChange.lessThanAmount = this.onMoreFilterPopoverChange.lessThanAmount.bind(this);
         this.shouldDisableCustomFilterApplyBtn = this.shouldDisableCustomFilterApplyBtn.bind(this);
+        this.closePopover = this.closePopover.bind(this);
     }
 
     componentDidMount() {
@@ -560,6 +567,20 @@ class Pledgebook extends Component {
         this.setState(newState);
     }
 
+    onMoreActionsDpdClick(e, actionIdentifier) {
+
+    }
+
+    closePopover(id) {
+        this.setState((prevProps, props) => {
+            if(prevProps.alertPopups && prevProps.alertPopups[id] && prevProps.alertPopups[id])
+                prevProps.alertPopups[id].isOpen = false;
+            return {
+                prevProps
+            }
+        });
+    }
+
     // START: Helper's
     // dateFormatter(theDate, options) {        
     //     let formattedDate = theDate.toISOString().replace('T', ' ').slice(0,19);        
@@ -686,6 +707,7 @@ class Pledgebook extends Component {
     expandRow = {
         renderer: (row) => {
             let ornData = JSON.parse(row.Orn) || {};
+            let isPopoverVisible = this.getAlertPopoverVisibility(row.UniqueIdentifier);
             return (
                 <Row>
                     <Col xs={{span: 6}} className="orn-display-dom">
@@ -745,27 +767,24 @@ class Pledgebook extends Component {
                     <Col xs={{span: 1, offset: 2}}>
                         <span onClick={(e) => this.onClickAlertIcon(e, row)}>
                             <Popover
-                                className='alert-popover'
+                                containerClassName="alert-popever"
                                 padding={0}
-                                isOpen={this.getAlertPopoverVisibility(row.UniqueIdentifier)}
-                                position={'right'} // preferred position
-                                onClickOutside={() => this.closePopover(row.UniqueIdentifier)}
+                                isOpen={isPopoverVisible}
+                                position={'left'} // preferred position
+                                // onClickOutside={() => this.closePopover(row.UniqueIdentifier)}
                                 content={({ position, targetRect, popoverRect }) => {
                                     return (
-                                        <div>
-                                            {this.getAlertPopoverDOM()}
-                                        </div>
+                                        <AlertComp closePopover={this.closePopover} row={row} refreshPledgebook={this.refresh}/>
                                     )
                                 }}
                                 >
-                                {row.alertId && <MdNotifications/>}
-                                {!row.alertId && <MdNotificationsNone/>}
+                                <span className="alert-icon">
+                                    {row.alertId && <MdNotifications/>}
+                                    {!row.alertId && <MdNotificationsNone/>}
+                                </span>
                             </Popover>
                             <FaPencilAlt />
-                            {/* <MdBorderColor /> */}
                         </span>
-                        {/* <MdNotifications/> */}
-                        {/* <MdNotificationsPaused/> */}
                     </Col>
                 </Row>
             )
@@ -778,25 +797,7 @@ class Pledgebook extends Component {
         let flag = false;
         if(this.state.alertPopups && this.state.alertPopups[id] && this.state.alertPopups[id].isOpen)
             flag = true;
-        console.log('CAN SHOW:', flag);
         return flag;
-    }
-    
-    closePopover(id) {
-        let newState = {...this.state};
-        if(newState.alertPopups && newState.alertPopups[id] && newState.alertPopups[id])
-            newState.alertPopups[id].isOpen = false;
-        this.setState(newState);
-    }
-
-    getAlertPopoverDOM() {
-        return (
-            <Row>
-                <Col>
-                    {row.UniqueIdentifier}
-                </Col>
-            </Row>
-        )
     }
 
     getCustomFilterOptions() {
@@ -852,13 +853,13 @@ class Pledgebook extends Component {
     }
     // END: Helper's
 
-    actionsColFormater() {
-        return (
-            <div>
-                <span><FontAwesomeIcon icon="bell"/></span>
-            </div>
-        )
-    }
+    // actionsColFormater() {
+    //     return (
+    //         <div>
+    //             <span><FontAwesomeIcon icon="bell"/></span>
+    //         </div>
+    //     )
+    // }
 
     render() {                    
         return (
@@ -877,7 +878,7 @@ class Pledgebook extends Component {
                             <FontAwesomeIcon icon='file-excel'/>
                         </span>
                         <Popover
-                            className='more-filter-popover'
+                            containerClassName='more-filter-popover'
                             isOpen={this.state.moreFilter.popoverOpen}
                             onClickOutside={() => this.onMoreFilterPopoverTrigger(false)}
                             position={'right'}
@@ -906,6 +907,19 @@ class Pledgebook extends Component {
                                     <FontAwesomeIcon icon='filter'/>
                                 </span>
                         </Popover>
+                        <>
+                        <Dropdown>
+                            <Dropdown.Toggle id="dropdown-more-actions">
+                                more
+                            </Dropdown.Toggle>
+                            <Dropdown.Menu>
+                                <Dropdown.Item onClick={(e) => this.onMoreActionsDpdClick(e, 'reopen')}>Re-Open</Dropdown.Item>
+                                <Dropdown.Item onClick={(e) => this.onMoreActionsDpdClick(e, 'redeem')}>Redeem</Dropdown.Item>
+                                <Dropdown.Item onClick={(e) => this.onMoreActionsDpdClick(e, 'print')}>Print</Dropdown.Item>
+                                <Dropdown.Item onClick={(e) => this.onMoreActionsDpdClick(e, 'archive')}>Archive</Dropdown.Item>
+                                <Dropdown.Item onClick={(e) => this.onMoreActionsDpdClick(e, 'delete')}>Delete</Dropdown.Item>                           </Dropdown.Menu>
+                        </Dropdown>
+                        </>
                     </Col>
                     <Col xs={{span: 2, order: 3}} className='row-count gs-button'>
                         <span>Rows Count</span>
@@ -957,6 +971,9 @@ class Pledgebook extends Component {
                     <PledgebookExportPopup handleClose={this.handleExportPopupClose}/>
                 </CommonModal>
                 {/* <BillTemplate data={this.state.printContent} /> */}
+                {/* <p className="p-for-demo">Demo1</p>
+                <p className="p-for-demo2">Demo2</p>
+                <p className="p-for-demo3">Demo3</p> */}
             </Container>
         )
     }
@@ -970,3 +987,185 @@ const mapStateToProps = (state) => {
 };
 
 export default connect(mapStateToProps, { getPledgebookData, setRefreshFlag })(Pledgebook);
+
+
+function AlertComp(props) { // {...row}
+    let row = props.row;
+    let closePopover = props.closePopover;
+    let refreshPledgebook = props.refreshPledgebook;
+
+    let [myRow, setMyRow] = useState(row);
+    let [title, setTitle] = useState(row.alertTitle);
+    let [msg, setMsg] = useState(row.alertMsg);
+    let [readOnlyMode, setReadOnlyMode] = useState(true);
+    let [notifObj, setNotifContent] = useState({class: '', msg: '', show: false});
+    let alertRef = useRef(null);
+    let datePickerRef = useRef(null);
+
+    /*useEffect(() => {
+        function handleClickOutside(event) {
+            if (alertRef.current && !alertRef.current.contains(event.target)) {
+                closePopover(row.UniqueIdentifier);
+            }
+        }
+        document.addEventListener("mousedown", handleClickOutside); // Bind the event listener
+        
+        return () => { // Unbind the event listener on clean up
+            document.removeEventListener("mousedown", handleClickOutside);
+        };
+    }, [alertRef]); */
+
+    let getDateValues = () => {
+        return {
+            dateVal: row.alertTriggerTime?new Date(row.alertTriggerTime):new Date(),
+            dateVal2: new Date(),
+            _dateVal: row.alertTriggerTime || new Date().toISOString()
+        }
+    }
+
+    let [dates, setDates] = useState(getDateValues());
+
+    let onChangeTitle = (e) => {
+        setTitle(e.target.value); 
+    }
+
+    let onChangeMsg = (e) => {
+        setMsg(e.target.value);
+    }
+
+    let onChangeDate = (e, fullDateVal) => {
+        setDates({
+            dateVal: fullDateVal,
+            _dateVal: getDateInUTC(fullDateVal, {withSelectedTime: true})
+        });
+    }
+
+    let deleteAlert = async () => {
+        try {
+            let resp = await axiosMiddleware.delete(DELETE_ALERT, {data: getDeleteAlertParams(row)});
+            if(resp && resp.data && resp.data.STATUS == 'SUCCESS') {
+                setNotifContent({class: 'success', msg: 'Deleted Succesfully!', show: true});
+                setTimeout(()=> {
+                    closePopover(row.UniqueIdentifier);
+                    refreshPledgebook();
+                    setNotifContent({show: false})}, 2000);
+            } else {
+                setNotifContent({class: 'error', msg: "Couldn't Delete the alert", show: true});
+                setTimeout(()=> {setNotifContent({show: false})}, 2000);
+            }
+        } catch(e) {
+            console.log(e);
+            setNotifContent({class: 'success', msg: 'Not Deleted', show: true});
+            setTimeout(()=> {setNotifContent({show: false})}, 2000);
+        }
+    };
+
+    let addNewAlert = async () => {
+        try {
+            let resp = await axiosMiddleware.post(CREATE_NEW_ALERT, getCreateAlertParams(row, {title, msg, dates}));
+            if(resp && resp.data && resp.data.STATUS == 'SUCCESS') {
+                setNotifContent({class: 'success', msg: 'New alert Created Succesfully!', show: true});
+                setTimeout(()=> {
+                    closePopover(row.UniqueIdentifier);
+                    refreshPledgebook();
+                    setNotifContent({show: false})}, 2000);
+            } else {
+                setNotifContent({class: 'error', msg: "Couldn't create alert", show: true});
+                setTimeout(()=> {setNotifContent({show: false})}, 2000);
+            }
+        } catch(e) {
+            console.log(e);
+            setNotifContent({class: 'error', msg: 'Error in creating alert', show: true});
+            setTimeout(()=> {setNotifContent({show: false})}, 2000);
+        }
+    }
+    let updateAlert = async () => {
+        try {
+            let resp = await axiosMiddleware.put(UPDATE_ALERT, getUpdateAlertParams(row, {title, msg, dates}));
+            if(resp && resp.data && resp.data.STATUS == 'SUCCESS') {
+                setNotifContent({class: 'success', msg: 'Updated Successfully', show: true});
+                setTimeout(()=> {
+                    closePopover(row.UniqueIdentifier);
+                    refreshPledgebook();
+                    setNotifContent({show: false})}, 2000);
+            } else {
+                setNotifContent({class: 'error', msg: "Couldn't update the alert", show: true});
+                setTimeout(()=> {setNotifContent({show: false})}, 2000);
+            }
+        } catch(e) {
+            console.log(e);
+            setNotifContent({class: 'error', msg: 'Error while updating', show: true});
+            setTimeout(()=> {setNotifContent({show: false})}, 2000);
+        }
+    }
+
+    let getAlertPopoverDOM = () => {
+        return (        
+            <Row style={{paddingTop: '10px'}}>
+                <Col>
+                    <Row style={{paddingBottom: '6px'}}> 
+                        <Col xs={3}>
+                            Title :
+                        </Col>
+                        <Col xs={9}>
+                            <input type="text" className="gs-input" value={title} onChange={(e) => onChangeTitle(e)} readOnly={readOnlyMode}/>
+                        </Col>
+                    </Row>
+                    <Row style={{paddingBottom: '6px'}}>
+                        <Col xs={3}>
+                            Msg: 
+                        </Col>
+                        <Col xs={9}>
+                            <textarea className="gs-input" value={msg} onChange={(e) => onChangeMsg(e)} readOnly={readOnlyMode}/>
+                        </Col>
+                    </Row>
+                    <Row style={{paddingBottom: '6px'}}>
+                        <Col xs={3}> 
+                            Trigger: 
+                        </Col>
+                        <Col xs={9}>
+                            <DatePicker
+                                id="alert-trigger-datepicker" 
+                                selected={dates.dateVal}
+                                onChange={(fullDateVal, dateVal) => {onChangeDate(null, fullDateVal)} }
+                                showMonthDropdown
+                                showYearDropdown
+                                    timeInputLabel="Time:"
+                                    dateFormat="dd/MM/yyyy h:mm aa"
+                                    showTimeInput
+                                className='gs-input-cell'
+                                readOnly={readOnlyMode}
+                                ref={datePickerRef}
+                            />
+                        </Col>
+                    </Row>
+                    <Row>
+                        <Col xs={3}>
+                            {
+                                myRow.alertId && 
+                                <input type="button" className="gs-button" value="Delete" disabled={readOnlyMode} onClick={deleteAlert}/>
+                            }
+                        </Col>
+                        <Col xs={{span: 3, offset: 6}}>
+                            { myRow.alertId
+                                ? <input type="button" className="gs-button" value="Update" disabled={readOnlyMode} onClick={updateAlert}/>
+                                : <input type="button" className="gs-button" value="Add" disabled={readOnlyMode} onClick={addNewAlert}/>
+                            }
+                        </Col>
+                    </Row>
+                </Col>
+            </Row>
+        )
+    }
+
+
+    return (
+        <div className= {`alert-panel arrow-box right ${readOnlyMode?'read-mode':''}`} ref={alertRef}>
+            <span className={`alert-msg ${notifObj.class} ${notifObj.show?'show':'hidden'}`}>{notifObj.msg}</span>
+            <span className="lock-symbol-style">
+                {readOnlyMode ? <FaLock onClick={()=> setReadOnlyMode(false)} />: <FaLockOpen onClick={()=> setReadOnlyMode(true)} />}
+            </span>
+            {getAlertPopoverDOM()}
+        </div>
+    )
+}

@@ -171,6 +171,9 @@ html {
 .gs-input-cell:focus {
     border-bottom: 2px solid #0acfee;
 }
+.read-mode .gs-input-cell:focus {
+    border: none;
+}
 /*END: INPUT FIELD */
 
 
@@ -245,11 +248,6 @@ input[type=checkbox], input[type=radio] {
   margin-left: -1.25rem;
 }
 /* END: ootstrap issue (due to different versions exist among diff npm */
-
-.react-tiny-popover-container {
-  z-index: 3;
-  padding-right: 20px;
-}
 
 .gold-color {
   color: gold;
@@ -340,15 +338,21 @@ input[type=checkbox], input[type=radio] {
 /* arrow left */
 
 /* arrow right */
+.arrow-box.right {
+  margin-right: 1rem;
+}
 .arrow-box.right:after, .arrow-box.right:before {
-  left: 100%;
+  left: 101%;
   top: 50%;
 }
 .arrow-box.right:after {
-	border-left-color: white; /* #88b7d5; */
+  border-left-color: white; /* #88b7d5; */
+  margin-top: -21px;
+  left: 99%;
 }
 .arrow-box.right:before {
-	border-left-color: #c2e1f5;
+  border-left-color: #c2e1f5;
+  margin-top: -21px;
 }
 /* arrow right */
 

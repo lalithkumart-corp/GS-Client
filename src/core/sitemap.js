@@ -17,7 +17,7 @@ if(app.env === env.DEVELOPMENT) {
         "restApiRoot": "api"
     }
 }
-
+export const SERVER_URL = `${config.proxy_protocol}://${config.proxy_api_host}:${config.proxy_api_port}`;
 export const LOGIN = `${config.proxy_protocol}://${config.proxy_api_host}:${config.proxy_api_port}/${config.restApiRoot}/GsUsers/login-user`;
 export const GET_APP_STATUS = `${config.proxy_protocol}://${config.proxy_api_host}:${config.proxy_api_port}/${config.restApiRoot}/AppManagers/get-status`;
 export const CHECK_USED_TRIAL_OFFER = `${config.proxy_protocol}://${config.proxy_api_host}:${config.proxy_api_port}/${config.restApiRoot}/AppManagers/check-used-trial-offer`;
@@ -75,3 +75,9 @@ export const FETCH_TOUCH_LIST = `${config.proxy_protocol}://${config.proxy_api_h
 export const SALE_ITEM = `${config.proxy_protocol}://${config.proxy_api_host}:${config.proxy_api_port}/${config.restApiRoot}/Stocks/sell-item`;
 export const GET_STORE_INFO = `${config.proxy_protocol}://${config.proxy_api_host}:${config.proxy_api_port}/${config.restApiRoot}/Stores/get-info`;
 export const UPDATE_STORE_INFO = `${config.proxy_protocol}://${config.proxy_api_host}:${config.proxy_api_port}/${config.restApiRoot}/Stores/update-info`;
+export const CREATE_NEW_ALERT = `${config.proxy_protocol}://${config.proxy_api_host}:${config.proxy_api_port}/${config.restApiRoot}/Alerts/create-new`;
+export const UPDATE_ALERT = `${config.proxy_protocol}://${config.proxy_api_host}:${config.proxy_api_port}/${config.restApiRoot}/Alerts/update-alert`;
+export const DELETE_ALERT = `${config.proxy_protocol}://${config.proxy_api_host}:${config.proxy_api_port}/${config.restApiRoot}/Alerts/delete-alert`;
+export const GET_ALERTS_LIST = `${config.proxy_protocol}://${config.proxy_api_host}:${config.proxy_api_port}/${config.restApiRoot}/Alerts/get-alerts-list`;
+export const ARCHIVE_AN_ALERT = `${config.proxy_protocol}://${config.proxy_api_host}:${config.proxy_api_port}/${config.restApiRoot}/Alerts/archive-an-alert`;
+export const GET_USERID_BY_TOKEN = `${config.proxy_protocol}://${config.proxy_api_host}:${config.proxy_api_port}/user-id-by-token`;

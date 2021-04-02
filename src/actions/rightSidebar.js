@@ -5,3 +5,19 @@ export const toggleSideBar = (params) => {
         });
     }
 }
+
+export const openSideBar = () => {
+    return (dispatch) => {
+        dispatch({
+            type: 'OPEN'
+        })
+    }
+}
+
+export const closeSideBar = () => {
+    return (dispatch) => {
+        dispatch({
+            type: 'CLOSE'
+        })
+    }
+}

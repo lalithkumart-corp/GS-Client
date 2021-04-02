@@ -113,7 +113,7 @@ export const isAccountActive = () => {
             if(resp && resp.data && resp.data.isActive)
                 isActive = true;
             else if(resp && resp.data && resp.data.STATUS == 'ERROR') {
-                let msg = resp.data.MSG || 'SESSION EXPIRED / Login Again';
+                let msg = resp.data.MSG || 'SESSION EXPIRED / Do Logout+Login Again';
                 toast.error(msg);
             }
             dispatch({

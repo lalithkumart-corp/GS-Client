@@ -7,6 +7,7 @@ import { getStore } from './store';
 import './components/fontAwesomeIconManager';
 
 import './App.css';
+import './app.scss';
 
 const myStore = getStore();
 

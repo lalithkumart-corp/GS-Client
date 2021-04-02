@@ -4,7 +4,7 @@ import { Nav, Navbar, NavDropdown, NavItem, DropdownItem } from 'react-bootstrap
 import { getSession } from '../../core/storage';
 import { Link } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { toggleSideBar } from '../../actions/rightSidebar';
+import { openSideBar } from '../../actions/rightSidebar';
 
 class NavbarComp extends Component {
     constructor(props) {
@@ -19,7 +19,7 @@ class NavbarComp extends Component {
         return title;
     }
     onClickSideTrigger() {
-        this.props.toggleSideBar();
+        this.props.openSideBar();
     }
     getUnactivatedHeader() {
         return (
@@ -100,4 +100,4 @@ const mapStateToProps = (state) => {
     };
 };
 
-export default connect(mapStateToProps, {toggleSideBar})(NavbarComp);
+export default connect(mapStateToProps, {openSideBar})(NavbarComp);

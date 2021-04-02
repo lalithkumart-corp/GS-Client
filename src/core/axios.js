@@ -21,7 +21,24 @@ let axiosMiddleware = {
         //return axios.get(urlPath, configs);
     },
     put: (urlPath, data, configs) => {
-        return axios.put(urlPath, data, configs);
+        return new Promise( (resolve, reject) => {
+            try {
+                let accessToken = getAccessToken();
+                if(data && !data.accessToken)
+                    data.accessToken = accessToken;
+                axios.put(urlPath, data, configs)
+                .then(
+                    (successResp) => {
+                        return resolve(successResp);
+                    },
+                    (errResp) => {
+                        return reject(handleError(errResp));
+                    }
+                )
+            } catch(e) {
+                return reject(e);
+            }
+        });
     },
     post: (urlPath, data, configs) => {
         return new Promise( (resolve, reject) => {
@@ -46,6 +63,11 @@ let axiosMiddleware = {
     delete: (urlPath, configs) => {
         return new Promise( (resolve, reject) => {
             try {
+                configs = configs || {};
+                configs.data = configs.data || {};
+                let accessToken = getAccessToken();
+                if(!configs.data.accessToken)
+                    configs.data.accessToken = accessToken;
                 axios.delete(urlPath, configs)
                 .then(
                     (successResp) => {
