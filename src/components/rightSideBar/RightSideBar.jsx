@@ -24,14 +24,10 @@ class RightSideBar extends Component {
     }
     handleClickOutside(e) {
         console.log('checking outside click logic');
-        if (this.wrapperRef && !this.wrapperRef.current.contains(event.target)) {
+        if (this.wrapperRef && this.wrapperRef.current && !this.wrapperRef.current.contains(event.target)) {
             if(this.props.rightSideBar.visibility)
                 this.props.closeSideBar();
-            // alert('You clicked outside of me!');
         }
-        // if(e && e.target) {
-
-        // }
     }
     render() {
         return (

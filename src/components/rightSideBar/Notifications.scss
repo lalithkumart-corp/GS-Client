@@ -9,6 +9,12 @@
     &:hover .actions {
         visibility: visible;
     }
+    &:hover .time-diff-val {
+        visibility: hidden;
+    }
+    &:hover .bottom-time-display {
+        visibility: visible;
+    }
     .head {
         border-bottom: 1px solid grey;
         padding: 0;
@@ -24,10 +30,16 @@
     .actions {
         visibility: hidden;
         position: absolute;
-        top: 0;
+        top: -2px;
         right: 8px;
         cursor: pointer;
         font-size: 20px;
+    }
+    .time-diff-val {
+        visibility: visible;
+        position: absolute;
+        right: 10px;
+        top: 5px;
     }
     .title {
         // background-color: white;
@@ -47,5 +59,11 @@
         background-color: #efefef;
         border-bottom-left-radius: 5px;
         border-bottom-right-radius: 5px;
+    }
+    .bottom-time-display {
+        position: absolute;
+        bottom: 5px;
+        right: 10px;
+        visibility: hidden;
     }
 }

@@ -75,6 +75,7 @@ class NavbarComp extends Component {
                             <NavDropdown.Item as={Link} to="/logout">Logout</NavDropdown.Item>
                         </NavDropdown>
                         <span className="right-side-trigger-icon"><FontAwesomeIcon icon="list-ul" onClick={this.onClickSideTrigger}/></span>
+                        <span className={`new-notif-identifier ${this.props.rightSideBar.newNotificationsAvl?'has-new':''}`}></span>
                     </Nav>
                 </Navbar.Collapse>
             </Navbar>
@@ -96,7 +97,8 @@ class NavbarComp extends Component {
 
 const mapStateToProps = (state) => {     
     return {        
-        auth: state.auth
+        auth: state.auth,
+        rightSideBar: state.rightSideBar
     };
 };
 
