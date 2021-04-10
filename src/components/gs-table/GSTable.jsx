@@ -35,6 +35,7 @@ class GSTable extends Component {
         this.checkboxOnChangeListener = parsed.checkboxOnChangeListener;
         newState.selectedIndexes = parsed.selectedIndexes || [];
         newState.showFooter = parsed.showFooter;
+        newState.rowClassNameGetter = parsed.rowClassNameGetter;
         this.setState(newState);
     }
     parseInputCollection(props) {
@@ -115,6 +116,7 @@ class GSTable extends Component {
         parsedData.checkboxOnChangeListener = props.checkboxOnChangeListener;
         parsedData.selectedIndexes = props.selectedIndexes || [];
         parsedData.showFooter = props.showFooter || false;
+        parsedData.rowClassNameGetter = props.rowClassNameGetter || (()=>'');
         return parsedData;
     }
     defaults = {
@@ -137,16 +139,18 @@ class GSTable extends Component {
         },
         checkBoxFormatter1: (column, colIndex, row, rowIndex) => {
             let theDom = [];
+            let k = (+new Date())+'-checkbox';
             theDom.push(
-                <span key={colIndex+'-checkbox'}>
+                <span id={k}>
                     <span className="gstable-checkbox-container">
                         <GSCheckbox labelText="" 
                             checked={this.checkIsSelected(rowIndex)} 
-                            onChangeListener = {(e) => {this.callbackMiddleware.checkboxOnChange(e, column, colIndex, row, rowIndex)}} 
-                            className={"gstable-selector-checkbox"}/>
+                            onChangeListener = {(e, optionalArgs) => {this.callbackMiddleware.checkboxOnChange(e, {...optionalArgs} )}} 
+                            className={"gstable-selector-checkbox"}
+                            optionalArgs={{column: column, colIndex: colIndex, row: row, rowIndex: rowIndex}}
+                            />
                     </span>
                 </span>);
-
             return theDom;
         },
         expandIconFormatter: (column, colIndex, row, rowIndex) => {
@@ -180,7 +184,7 @@ class GSTable extends Component {
                     <span className="gstable-checkbox-container">
                         <GSCheckbox labelText="" 
                             checked={this.checkIsSelected(rowIndex)} 
-                            onChangeListener = {(e) => {this.callbackMiddleware.checkboxOnChange(e, column, colIndex, row, rowIndex)}} 
+                            onChangeListener = {(e) => {this.callbackMiddleware.checkboxOnChange(e, {column, colIndex, row, rowIndex})}} 
                             className={"gstable-selector-checkbox"}/>
                     </span>
                 </span>);
@@ -250,7 +254,7 @@ class GSTable extends Component {
         }
     }
     callbackMiddleware = {
-        checkboxOnChange: (e, column, colIndex, row, rowIndex) => {
+        checkboxOnChange: (e, {column, colIndex, row, rowIndex}) => {
             e.stopPropagation();
             let isChecked = e.target.checked;
             this.checkboxOnChangeListener({isChecked, column, colIndex, row, rowIndex});
@@ -430,7 +434,7 @@ class GSTable extends Component {
     createBody() {
         let makeEmptyRowDOM = () => {
             return (
-                <tr>
+                <tr key="empty-row">
                     <td colSpan={this.state.columns.length+1} className='gs-table-empty-view-col'>
                         No Data Available
                     </td>
@@ -442,6 +446,7 @@ class GSTable extends Component {
             let theClassName = (this.checkIsSelected(rowIndex))?"selected":"";
             if(this.state.expandRow)
                 theClassName += ' expandable-row';
+            theClassName += ` ${this.state.rowClassNameGetter(aRowData)}`;
             return (
                 <tr key={rowIndex+"-row"} className={theClassName +" a-row"} onClick={(e) => this.rowClickHandler(aRowData, rowIndex)}>
                     {
@@ -495,7 +500,7 @@ class GSTable extends Component {
     createfooter() {
         return (
             <tfoot>
-                <tr>
+                <tr key="footer-row-1">
                     {
                         ( ()=> {
                             let footerCells = [];

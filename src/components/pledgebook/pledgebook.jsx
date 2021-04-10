@@ -26,7 +26,7 @@ import BillTemplate from '../billcreate/billTemplate2';
 import { FaBell, FaPencilAlt, FaLock, FaLockOpen } from 'react-icons/fa';
 import { MdNotifications, MdNotificationsActive, MdNotificationsNone, MdNotificationsOff, MdNotificationsPaused, MdBorderColor } from 'react-icons/md';
 import axiosMiddleware from '../../core/axios';
-import { CREATE_NEW_ALERT, UPDATE_ALERT, DELETE_ALERT } from '../../core/sitemap';
+import { CREATE_NEW_ALERT, UPDATE_ALERT, DELETE_ALERT, ARCHIVE_PLEDGEBOOK_BILLS, UNARCHIVE_PLEDGEBOOK_BILLS, TRASH_PLEDGEBOOK_BILLS, PERMANENTLY_DELETE_PLEDGEBOOK_BILLS, RESTORE_TRASHED_PLEDGEBOOK_BILLS } from '../../core/sitemap';
 
 class Pledgebook extends Component {
     constructor(props) {
@@ -70,7 +70,11 @@ class Pledgebook extends Component {
                     gold: true,
                     silver: true,
                     brass: true
-                }
+                },
+                includeArchived: false,
+                showOnlyArchived: false,
+                includeTrashed: false,
+                showOnlyTrashed: false,
             },
             sortBy: 'desc',
             sortByColumn: 'pledgedDate',
@@ -159,6 +163,26 @@ class Pledgebook extends Component {
                                                             <Form.Group>
                                                                 <Form.Check id='billstatus-33' type='radio' name='billstatus' checked={this.state.billDisplayFlag=='closed'} value='closed' label='Closed'/>
                                                             </Form.Group>
+                                                        </Form>
+                                                        <hr></hr>
+                                                        <Form>
+                                                            <Form.Group>
+                                                                <Form.Check id='include-archived-bills' type='checkbox' checked={this.state.filters.includeArchived} value='showarchived' label='Show Hidden' onChange={(e)=>this.onShowArchivedCheckboxChange(e)}/>
+                                                            </Form.Group>
+                                                            {this.state.filters.includeArchived && 
+                                                                <Form.Group>
+                                                                    <Form.Check id='show-only-archived-bills' type='checkbox' checked={this.state.filters.showOnlyArchived} value='showonlyarchived' label='Show Only Hidden' onChange={(e)=>this.onShowOnlyArchivedCheckboxChange(e)}/> 
+                                                                </Form.Group>
+                                                            }
+                                                            <Form.Group>
+                                                                <Form.Check id='include-trashed-bills' type='checkbox' checked={this.state.filters.includeTrashed} value='showarchived' label='Show Trashed Bills' onChange={(e)=>this.onShowTrashCheckboxChange(e)}/>
+                                                            </Form.Group>
+                                                            {
+                                                                this.state.filters.includeTrashed && 
+                                                                <Form.Group>
+                                                                    <Form.Check id='show-only-trashed-bills' type='checkbox' checked={this.state.filters.showOnlyTrashed} value='showonlyarchived' label='Show Only Trashed' onChange={(e)=>this.onShowOnlyTrashedCheckboxChange(e)}/> 
+                                                                </Form.Group>
+                                                            }
                                                         </Form>
                                                     </Col>
                                                     <Col xs={{span: 4}} md={{span: 4}} className="bill-sort-order">
@@ -319,6 +343,10 @@ class Pledgebook extends Component {
         this.onPopupTriggerClick = this.onPopupTriggerClick.bind(this);
         this.onStatusPopoverChange = this.onStatusPopoverChange.bind(this);
         this.onOrnCategoryFilterChange = this.onOrnCategoryFilterChange.bind(this);
+        this.onShowArchivedCheckboxChange = this.onShowArchivedCheckboxChange.bind(this);
+        this.onShowOnlyArchivedCheckboxChange = this.onShowOnlyArchivedCheckboxChange.bind(this);
+        this.onShowTrashCheckboxChange = this.onShowTrashCheckboxChange.bind(this);
+        this.onShowOnlyTrashedCheckboxChange = this.onShowOnlyTrashedCheckboxChange.bind(this);
         this.onSortOrderChange = this.onSortOrderChange.bind(this);
         this.onSortByColumnChange = this.onSortByColumnChange.bind(this);
         this.onStatusPopoverSubmit = this.onStatusPopoverSubmit.bind(this);
@@ -392,8 +420,15 @@ class Pledgebook extends Component {
         this.initiateFetchPledgebookAPI();
     }
     async handlePageClick(selectedPage) {
-        await this.setState({selectedPageIndex: selectedPage.selected, selectedIndexes: []});        
-        this.initiateFetchPledgebookAPI();
+        if(this.state.selectedIndexes.length > 0) {
+            if(window.confirm('Selection will be removed when changing page number. Proceed ?')) {
+                await this.setState({selectedPageIndex: selectedPage.selected, selectedRowJson: [], selectedIndexes: []});        
+                this.initiateFetchPledgebookAPI();
+            }
+        } else {
+            await this.setState({selectedPageIndex: selectedPage.selected, selectedRowJson: [], selectedIndexes: []});        
+            this.initiateFetchPledgebookAPI();
+        }
     }
 
     handleClose() {
@@ -408,11 +443,14 @@ class Pledgebook extends Component {
             newState.selectedRowJson.push(params.row);
         } else {
             let rowIndex = newState.selectedIndexes.indexOf(params.rowIndex);
-            newState.selectedIndexes.splice(rowIndex, 1);            
-            newState.selectedRowJson= newState.selectedRowJson.filter(
+            newState.selectedIndexes.splice(rowIndex, 1);
+            newState.selectedRowJson = newState.selectedRowJson.filter(
                 (anItem) => {
-                    if(newState.selectedIndexes.indexOf(anItem.rowNumber) == -1)
-                        return true;                                                  
+                    if(newState.selectedIndexes.indexOf(anItem.rowNumber-1) == -1) {
+                        return false;
+                    } else {
+                        return true;
+                    }
                 }
             );
         }        
@@ -533,6 +571,30 @@ class Pledgebook extends Component {
         this.setState(newState);
     }
 
+    onShowArchivedCheckboxChange(e) {
+        let newState = {...this.state};
+        newState.filters.includeArchived = !newState.filters.includeArchived;
+        this.setState(newState);
+    }
+
+    onShowOnlyArchivedCheckboxChange(e) {
+        let newState = {...this.state};
+        newState.filters.showOnlyArchived = !newState.filters.showOnlyArchived;
+        this.setState(newState);
+    }
+
+    onShowTrashCheckboxChange(e) {
+        let newState = {...this.state};
+        newState.filters.includeTrashed = !newState.filters.includeTrashed;
+        this.setState(newState);
+    }
+
+    onShowOnlyTrashedCheckboxChange(e) {
+        let newState = {...this.state};
+        newState.filters.showOnlyTrashed = !newState.filters.showOnlyTrashed;
+        this.setState(newState);
+    }
+
     onSortOrderChange(e) {
         this.setState({sortBy: e.target.value});
     }
@@ -568,7 +630,33 @@ class Pledgebook extends Component {
     }
 
     onMoreActionsDpdClick(e, actionIdentifier) {
-
+        switch(actionIdentifier) {
+            case 'archive':
+                var uniqIdentifiers = this.state.selectedRowJson.map((a)=> a.UniqueIdentifier);
+                var billNos = this.state.selectedRowJson.map((a)=> a.BillNo);
+                this.archiveBills(uniqIdentifiers, billNos);
+                break;
+            case 'unarchive':
+                var uniqIdentifiers = this.state.selectedRowJson.map((a)=> a.UniqueIdentifier);
+                var billNos = this.state.selectedRowJson.map((a)=> a.BillNo);
+                this.unArchiveBills(uniqIdentifiers, billNos);
+                break;
+            case 'trash':
+                var uniqIdentifiers = this.state.selectedRowJson.map((a)=> a.UniqueIdentifier);
+                var billNos = this.state.selectedRowJson.map((a)=> a.BillNo);
+                this.trashBills(uniqIdentifiers, billNos);
+                break;
+            case 'restore':
+                var uniqIdentifiers = this.state.selectedRowJson.map((a)=> a.UniqueIdentifier);
+                var billNos = this.state.selectedRowJson.map((a)=> a.BillNo);
+                this.restoreBills(uniqIdentifiers, billNos);
+                break;
+            case 'delete':
+                var theUniqIdentifiers = this.state.selectedRowJson.map((a)=> a.UniqueIdentifier);
+                let billNos2 = this.state.selectedRowJson.map((a)=> a.BillNo);
+                this.deleteBills(theUniqIdentifiers, billNos2);
+                break;
+        }
     }
 
     closePopover(id) {
@@ -579,6 +667,81 @@ class Pledgebook extends Component {
                 prevProps
             }
         });
+    }
+
+    async archiveBills(uniqueIdentifiers, billNos) {
+        try {
+            let resp = await axiosMiddleware.put(ARCHIVE_PLEDGEBOOK_BILLS, {uniqueIdentifiers: uniqueIdentifiers});
+            if(resp && resp.data && resp.data.STATUS=='SUCCESS') {
+                toast.success(`Archived  ${billNos.join(' , ')}  successfully!`);
+                this.refresh();
+            } else {
+                toast.error('Could not archive the bills. Please Contact admin');
+            }
+        } catch(e) {
+            toast.error('ERROR! Please Contact admin');
+            console.log(e);
+        }
+    }
+
+    async unArchiveBills(uniqueIdentifiers, billNos) {
+        try {
+            let resp = await axiosMiddleware.put(UNARCHIVE_PLEDGEBOOK_BILLS, {uniqueIdentifiers: uniqueIdentifiers});
+            if(resp && resp.data && resp.data.STATUS=='SUCCESS') {
+                toast.success(`Showing  ${billNos.join(' , ')} Now`);
+                this.refresh();
+            } else {
+                toast.error('Could not show the bills. Please Contact admin');
+            }
+        } catch(e) {
+            toast.error('ERROR! Please Contact admin');
+            console.log(e);
+        }
+    }
+
+    async trashBills(uniqueIdentifiers, billNos) {
+        try {
+            let resp = await axiosMiddleware.put(TRASH_PLEDGEBOOK_BILLS, {uniqueIdentifiers: uniqueIdentifiers});
+            if(resp && resp.data && resp.data.STATUS=='SUCCESS') {
+                toast.success(`Moved  ${billNos.join(' , ')}  to Trash!`);
+                this.refresh();
+            } else {
+                toast.error('Could not move to trash the bills. Please Contact admin');
+            }
+        } catch(e) {
+            toast.error('ERROR! Please Contact admin');
+            console.log(e);
+        }
+    }
+
+    async restoreBills(uniqueIdentifiers, billNos) {
+        try {
+            let resp = await axiosMiddleware.put(RESTORE_TRASHED_PLEDGEBOOK_BILLS, {uniqueIdentifiers: uniqueIdentifiers});
+            if(resp && resp.data && resp.data.STATUS=='SUCCESS') {
+                toast.success(`Restored  ${billNos.join(' , ')}  from Trash!`);
+                this.refresh();
+            } else {
+                toast.error('Could not restore from trash. Please Contact admin');
+            }
+        } catch(e) {
+            toast.error('ERROR! Please Contact admin');
+            console.log(e);
+        }
+    }
+
+    async deleteBills(uniqueIdentifiers, billNos) {
+        try {
+            let resp = await axiosMiddleware.delete(PERMANENTLY_DELETE_PLEDGEBOOK_BILLS, {data: {uniqueIdentifiers: uniqueIdentifiers}});
+            if(resp && resp.data && resp.data.STATUS=='SUCCESS') {
+                toast.success(`Deleted  ${billNos.join(' , ')}  successfully!`);
+                this.refresh();
+            } else {
+                toast.error('Could not delete the bills permanently. Please Contact admin');
+            }
+        } catch(e) {
+            toast.error('ERROR! Please Contact admin');
+            console.log(e);
+        }
     }
 
     // START: Helper's
@@ -622,7 +785,11 @@ class Pledgebook extends Component {
             include: this.state.billDisplayFlag, //"all" or "pending" or "closed"
             custom: {
 
-            }
+            },
+            includeArchived: this.state.filters.includeArchived,
+            showOnlyArchived: this.state.filters.includeArchived?this.state.filters.showOnlyArchived:false,
+            includeTrashed: this.state.filters.includeTrashed,
+            showOnlyTrashed: this.state.filters.includeTrashed?this.state.filters.showOnlyTrashed:false,
         };
         if(this.state.filters.mobile)
             filters.custom.mobile = this.state.filters.mobile;
@@ -660,6 +827,7 @@ class Pledgebook extends Component {
     initiateFetchPledgebookAPI() {
         clearTimeout(this.timer);
         this.timer = setTimeout(() => {
+            this.resetSelections();
             let validation = this.doValidation();
             if(validation.status == 'success') {
                 let params = this.getAPIParams();
@@ -688,6 +856,10 @@ class Pledgebook extends Component {
 
     refresh() {
         this.initiateFetchPledgebookAPI();
+    }
+
+    resetSelections() {
+        this.setState({selectedIndexes: [], selectedRowJson: []});
     }
 
     shouldDisableCustomFilterApplyBtn() {
@@ -793,6 +965,15 @@ class Pledgebook extends Component {
         expandByColumnOnly: true
     }
 
+    rowClassNameGetter = (row) => {
+        let className = '';
+        if(row && row.PledgebookBillArchived)
+            className += 'bill-archived';
+        if(row && row.PledgebookBillTrashed)
+            className += ' bill-trashed';
+        return className;
+    }
+
     getAlertPopoverVisibility(id) {
         let flag = false;
         if(this.state.alertPopups && this.state.alertPopups[id] && this.state.alertPopups[id].isOpen)
@@ -851,6 +1032,73 @@ class Pledgebook extends Component {
             </Row>
         )
     }
+
+    canDisableThisMenu(menuIdentifier) {
+        let flag = false;
+        switch(menuIdentifier) {
+            case 'redeem':
+                let redeemedBills = this.state.selectedRowJson.filter((aRow, index) => {
+                    if(!aRow.Status)
+                        return true;
+                    else
+                        return false;
+                });
+                if(redeemedBills.length > 0)
+                    flag = true;
+                break;
+            case 'archive':
+                var archivedBills = this.state.selectedRowJson.filter((aRow, index) => {
+                    if(aRow.PledgebookBillArchived || aRow.PledgebookBillTrashed)
+                        return true;
+                    else
+                        return false;
+                });
+                if(archivedBills.length > 0)
+                    flag = true;
+                break;
+            case 'unarchive':
+                var unarchivedBills = this.state.selectedRowJson.filter((aRow, index) => {
+                    if(!aRow.PledgebookBillArchived)
+                        return true;
+                    else
+                        return false;
+                });
+                if(unarchivedBills.length > 0)
+                    flag = true;
+                break;
+            case 'trash':
+                var trashed = this.state.selectedRowJson.filter((aRow, index) => {
+                    if(aRow.PledgebookBillTrashed)
+                        return true;
+                    else
+                        return false;
+                });
+                if(trashed.length > 0)
+                    flag = true;
+                break;
+            case 'restore':
+                var unTrashed = this.state.selectedRowJson.filter((aRow, index) => {
+                    if(!aRow.PledgebookBillTrashed)
+                        return true;
+                    else
+                        return false;
+                });
+                if(unTrashed.length > 0)
+                    flag = true;
+                break;
+            case 'delete':
+                let nonArchivedBills = this.state.selectedRowJson.filter((aRow, index) => {
+                    if(!aRow.PledgebookBillTrashed)
+                        return true;
+                    else
+                        return false;
+                });
+                if(nonArchivedBills.length > 0)
+                    flag = true;
+                break;
+        }
+        return flag;
+    }
     // END: Helper's
 
     // actionsColFormater() {
@@ -874,9 +1122,9 @@ class Pledgebook extends Component {
                 </Row>
                 <Row className='second-row'>
                     <Col xs={3} className='action-container'>
-                        <span className='export-btn action-btn' onClick={this.onExportClick}>
+                        <div className='export-btn action-btn' onClick={this.onExportClick}>
                             <FontAwesomeIcon icon='file-excel'/>
-                        </span>
+                        </div>
                         <Popover
                             containerClassName='more-filter-popover'
                             isOpen={this.state.moreFilter.popoverOpen}
@@ -903,23 +1151,29 @@ class Pledgebook extends Component {
                                 )
                             }}
                             >
-                                <span className={(this.isAnyCustomFiltersEnabled()?'custom-filters ':'') + 'more-filter-popover-trigger action-btn'} onClick={this.onMoreFilterPopoverTrigger}>
+                                <div className={(this.isAnyCustomFiltersEnabled()?'custom-filters ':'') + 'more-filter-popover-trigger action-btn'} onClick={this.onMoreFilterPopoverTrigger}>
                                     <FontAwesomeIcon icon='filter'/>
-                                </span>
+                                </div>
                         </Popover>
+                        { this.state.selectedIndexes.length>0 &&
                         <>
-                        <Dropdown>
-                            <Dropdown.Toggle id="dropdown-more-actions">
-                                more
-                            </Dropdown.Toggle>
-                            <Dropdown.Menu>
-                                <Dropdown.Item onClick={(e) => this.onMoreActionsDpdClick(e, 'reopen')}>Re-Open</Dropdown.Item>
-                                <Dropdown.Item onClick={(e) => this.onMoreActionsDpdClick(e, 'redeem')}>Redeem</Dropdown.Item>
-                                <Dropdown.Item onClick={(e) => this.onMoreActionsDpdClick(e, 'print')}>Print</Dropdown.Item>
-                                <Dropdown.Item onClick={(e) => this.onMoreActionsDpdClick(e, 'archive')}>Archive</Dropdown.Item>
-                                <Dropdown.Item onClick={(e) => this.onMoreActionsDpdClick(e, 'delete')}>Delete</Dropdown.Item>                           </Dropdown.Menu>
-                        </Dropdown>
+                            <Dropdown className="more-actions-dropdown action-btn">
+                                <Dropdown.Toggle id="dropdown-more-actions" disabled={!this.state.selectedIndexes.length}>
+                                    More Actions 
+                                </Dropdown.Toggle>
+                                <Dropdown.Menu>
+                                    {/* <Dropdown.Item disabled={true} onClick={(e) => this.onMoreActionsDpdClick(e, 'reopen')}>Re-Open</Dropdown.Item> */}
+                                    {/* <Dropdown.Item disabled={this.canDisableThisMenu('redeem')} onClick={(e) => this.onMoreActionsDpdClick(e, 'redeem')}>Redeem</Dropdown.Item> */}
+                                    {/* <Dropdown.Item disabled={true} onClick={(e) => this.onMoreActionsDpdClick(e, 'print')}>Print</Dropdown.Item> */}
+                                    <Dropdown.Item disabled={this.canDisableThisMenu('archive')} onClick={(e) => this.onMoreActionsDpdClick(e, 'archive')}>Hide</Dropdown.Item>
+                                    <Dropdown.Item disabled={this.canDisableThisMenu('unarchive')} onClick={(e) => this.onMoreActionsDpdClick(e, 'unarchive')}>Show</Dropdown.Item>
+                                    <Dropdown.Item disabled={this.canDisableThisMenu('trash')} onClick={(e) => this.onMoreActionsDpdClick(e, 'trash')}>Move to Recycle Bin</Dropdown.Item>
+                                    <Dropdown.Item disabled={this.canDisableThisMenu('restore')} onClick={(e) => this.onMoreActionsDpdClick(e, 'restore')}>Restore</Dropdown.Item>
+                                    <Dropdown.Item disabled={this.canDisableThisMenu('delete')} onClick={(e) => this.onMoreActionsDpdClick(e, 'delete')}>Permanently Delete</Dropdown.Item>
+                                </Dropdown.Menu>
+                            </Dropdown>
                         </>
+                        }
                     </Col>
                     <Col xs={{span: 2, order: 3}} className='row-count gs-button'>
                         <span>Rows Count</span>
@@ -960,7 +1214,8 @@ class Pledgebook extends Component {
                         checkboxOnChangeListener = {this.handleCheckboxChangeListener}
                         globalCheckBoxListener = {this.handleGlobalCheckboxChange}
                         selectedIndexes = {this.state.selectedIndexes}
-                        
+                        selectedRowJson = {this.state.selectedRowJson}
+                        rowClassNameGetter = {this.rowClassNameGetter}
                     />
                 </Row>
                 <CommonModal modalOpen={this.state.PBmodalIsOpen} handleClose={this.handleClose}>
