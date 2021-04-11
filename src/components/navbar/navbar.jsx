@@ -5,11 +5,38 @@ import { getSession } from '../../core/storage';
 import { Link } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { openSideBar } from '../../actions/rightSidebar';
+import { FaGalacticSenate } from 'react-icons/fa';
 
 class NavbarComp extends Component {
     constructor(props) {
         super(props);
+        this.state = {
+            enablePledgebookModule: true,
+            enableStockModule: true,
+            enableTallyModule: true,
+            enableUserModule: true,
+            enableBackupModule: true,
+        }
         this.onClickSideTrigger = this.onClickSideTrigger.bind(this);
+    }
+    componentWillMount() {
+        let jewellery = true;
+        let girvi = true;
+        let enableTallyModule = true;
+        let enableUserModule = true;
+        let enableBackupModule = true;
+        let session = getSession();
+        if(session.roleId == 5)
+            girvi = false;
+        if(session.roleId == 4)
+            jewellery = false;
+        if(session.roleId > 2) {
+            enableUserModule = false;
+            enableTallyModule = false;
+        }
+        if(session.roleId > 3)
+            enableBackupModule = false;
+        this.setState({enablePledgebookModule: girvi, enableStockModule: jewellery, enableTallyModule, enableUserModule, enableBackupModule});
     }
     getTitie() {
         let title = 'Welcome';
@@ -41,7 +68,8 @@ class NavbarComp extends Component {
                 <Navbar.Collapse id="basic-navbar-nav">
                     <Nav>
                         <Nav.Link as={Link} to="/">Home</Nav.Link>
-                        <NavDropdown title="Loan" id="basic-nav-dropdown">
+                        {this.state.enablePledgebookModule && 
+                            <NavDropdown title="Loan" id="basic-nav-dropdown">
                             <NavDropdown.Item as={Link} to="/billcreate">Bill Creation</NavDropdown.Item>
                             <NavDropdown.Item as={Link} to="/redeem">Bill Redeem</NavDropdown.Item>
                             <NavDropdown.Divider />
@@ -49,25 +77,30 @@ class NavbarComp extends Component {
                             <NavDropdown.Divider />
                             <NavDropdown.Item as={Link} to="/loan-settings">Setup</NavDropdown.Item>
                         </NavDropdown>
-                        <Nav.Link as={Link} to="/tally">Tally</Nav.Link>
-                        <Nav.Link as={Link} to="/users">User</Nav.Link>
+                        }
+                    </Nav>
+                    {this.state.enableStockModule && 
+                        <Nav>
+                            <NavDropdown title="Stock" id="basic-nav-dropdown">
+                                <NavDropdown.Item as={Link} to="/stock-add">Add Items</NavDropdown.Item>
+                                <NavDropdown.Item as={Link} to="/stock-view">View</NavDropdown.Item>
+                                <NavDropdown.Item as={Link} to="/sell-item">Sale</NavDropdown.Item>
+                                <NavDropdown.Divider />
+                                <NavDropdown.Item as={Link} to="/stock-setup">Setup</NavDropdown.Item>
+                                <NavDropdown.Divider />
+                                <NavDropdown.Item as={Link} to="/tag-demo">Tag-Custom</NavDropdown.Item>
+                            </NavDropdown>
+                        </Nav>
+    }
+                    <Nav className="mr-auto">
+                        {this.state.enableTallyModule && <Nav.Link as={Link} to="/tally">Tally</Nav.Link>}
+                        {this.state.enableUserModule && <Nav.Link as={Link} to="/users">User</Nav.Link>}
                         <NavDropdown title="Others" id="basic-nav-dropdown">
                             <NavDropdown.Item as={Link} to="/customerdetail">Customer Detail</NavDropdown.Item>
                             {/* <NavDropdown.Item as={Link} to="/picture">Webcam</NavDropdown.Item>
                             <NavDropdown.Item as={Link} to="/uploadpicdemo">Upload Pic Demo</NavDropdown.Item>
                             <NavDropdown.Item as={Link} to="/demo">Demo</NavDropdown.Item> */}
-                            <NavDropdown.Item as={Link} to="/backup_restore">Backup/Restore</NavDropdown.Item>
-                        </NavDropdown>
-                    </Nav>
-                    <Nav className="mr-auto" style={{borderLeft: "1px solid lightgray"}}>
-                        <NavDropdown title="Stock" id="basic-nav-dropdown">
-                            <NavDropdown.Item as={Link} to="/stock-add">Add Items</NavDropdown.Item>
-                            <NavDropdown.Item as={Link} to="/stock-view">View</NavDropdown.Item>
-                            <NavDropdown.Item as={Link} to="/sell-item">Sale</NavDropdown.Item>
-                            <NavDropdown.Divider />
-                            <NavDropdown.Item as={Link} to="/stock-setup">Setup</NavDropdown.Item>
-                            <NavDropdown.Divider />
-                            <NavDropdown.Item as={Link} to="/tag-demo">Tag-Custom</NavDropdown.Item>
+                            {this.state.enableBackupModule && <NavDropdown.Item as={Link} to="/backup_restore">Backup/Restore</NavDropdown.Item>}
                         </NavDropdown>
                     </Nav>
                     <Nav>

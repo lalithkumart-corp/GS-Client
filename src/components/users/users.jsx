@@ -46,8 +46,8 @@ export default class Users extends Component {
             formatter: (column, columnIndex, row, rowIndex) => {
                 return (
                     <span>
-                        <span className='icon edit-icon' onClick={(e) => this.onEditDetailIconClick(row)}><FontAwesomeIcon icon="edit" /></span>
-                        <span className='icon delete-icon' onClick={(e) => this.onEditDetailIconClick(row)}><FontAwesomeIcon icon="trash" /></span>
+                        <span className='icon edit-icon' onClick={(e) => this.onEditDetailIconClick(e, row)}><FontAwesomeIcon icon="edit" /></span>
+                        <span className='icon delete-icon' onClick={(e) => this.onEditDetailIconClick(e, row)}><FontAwesomeIcon icon="trash" /></span>
                     </span>
                 )
             }
@@ -75,7 +75,9 @@ export default class Users extends Component {
         )
     }
 
-    onEditDetailIconClick(row) {
+    onEditDetailIconClick(e, row) {
+        e.stopPropagation();
+        alert('Module is in progress');
         console.log(row);
     }
 

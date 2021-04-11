@@ -132,6 +132,22 @@
     outline: none;
 }
 
+.bill-creation-container .form-control[readonly]:focus,
+.react-autosuggest__input.cust-name[readonly]:focus,
+.react-autosuggest__input.guardian-name[readonly]:focus,
+.react-autosuggest__input.address[readonly]:focus,
+.react-autosuggest__input.place[readonly]:focus,
+.react-autosuggest__input.city[readonly]:focus,
+.react-autosuggest__input.pincode[readonly]:focus,
+.react-autosuggest__input.mobile[readonly]:focus,
+.react-autosuggest__input.morecustdetail[readonly]:focus,
+.ornament-dom-container .form-control[readonly]:focus {
+    border: none;
+    box-shadow: none;
+    outline: none;
+}
+
+
 .ornament-dom-container .input-group {
     width: calc(100% - 10px);
 }

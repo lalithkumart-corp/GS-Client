@@ -241,11 +241,14 @@ class PledgebookModal extends Component {
                             type="button"
                             className={'gs-button bordered ' + this.getBtnVisibilityClass('ignore')}
                             onClick={(e) => this.onIgnore()}
-                            value='Ignore'
+                            value='Discard'
                             disabled={this.canDisableBtn('ignore')}
                             />
                     </Col>
                 </Row>
+                {/* {this.props.currentBillData.Status
+                ?<BillCreation loadedInPledgebook={true} billData={this.props.currentBillData}/>
+                :<BillClosedView />} */}
                 <BillCreation loadedInPledgebook={true} billData={this.props.currentBillData}/>
                 <ReactToPrint
                     ref={(domElm) => {this.printBtn = domElm}}
@@ -267,3 +270,9 @@ const mapStateToProps = (state) => {
     };
 };
 export default connect(mapStateToProps, {enableReadOnlyMode, disableReadOnlyMode})(PledgebookModal);
+
+function BillClosedView() {
+    return (
+        <>Hello</>
+    )
+}

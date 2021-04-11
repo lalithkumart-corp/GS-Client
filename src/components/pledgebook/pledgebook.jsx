@@ -21,7 +21,7 @@ import { toast } from 'react-toastify';
 import GSCheckbox from '../ui/gs-checkbox/checkbox';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
-
+import { getSession } from '../../core/storage';
 import BillTemplate from '../billcreate/billTemplate2';
 import { FaBell, FaPencilAlt, FaLock, FaLockOpen } from 'react-icons/fa';
 import { MdNotifications, MdNotificationsActive, MdNotificationsNone, MdNotificationsOff, MdNotificationsPaused, MdBorderColor } from 'react-icons/md';
@@ -90,6 +90,7 @@ class Pledgebook extends Component {
                     lessThanVal: 2500
                 }
             },
+            canShowCoreActions: false,
             columns : [
                 {
                     id: 'Date',
@@ -165,6 +166,7 @@ class Pledgebook extends Component {
                                                             </Form.Group>
                                                         </Form>
                                                         <hr></hr>
+                                                        { this.state.canShowCoreActions && 
                                                         <Form>
                                                             <Form.Group>
                                                                 <Form.Check id='include-archived-bills' type='checkbox' checked={this.state.filters.includeArchived} value='showarchived' label='Show Hidden' onChange={(e)=>this.onShowArchivedCheckboxChange(e)}/>
@@ -184,6 +186,7 @@ class Pledgebook extends Component {
                                                                 </Form.Group>
                                                             }
                                                         </Form>
+                                                        }
                                                     </Col>
                                                     <Col xs={{span: 4}} md={{span: 4}} className="bill-sort-order">
                                                         <h5>Order By</h5>
@@ -357,10 +360,12 @@ class Pledgebook extends Component {
         // this.onMoreFilterPopoverChange.lessThanAmount = this.onMoreFilterPopoverChange.lessThanAmount.bind(this);
         this.shouldDisableCustomFilterApplyBtn = this.shouldDisableCustomFilterApplyBtn.bind(this);
         this.closePopover = this.closePopover.bind(this);
+        this.setAllowanceOfActions = this.setAllowanceOfActions.bind(this);
     }
 
     componentDidMount() {
         this.initiateFetchPledgebookAPI();
+        this.setAllowanceOfActions();
     }
 
     componentWillReceiveProps(nextProps) {
@@ -676,10 +681,12 @@ class Pledgebook extends Component {
                 toast.success(`Archived  ${billNos.join(' , ')}  successfully!`);
                 this.refresh();
             } else {
-                toast.error('Could not archive the bills. Please Contact admin');
+                if(!e._IsDeterminedError)
+                    toast.error('Could not archive the bills. Please Contact admin');
             }
         } catch(e) {
-            toast.error('ERROR! Please Contact admin');
+            if(!e._IsDeterminedError)
+                toast.error('ERROR! Please Contact admin');
             console.log(e);
         }
     }
@@ -691,10 +698,12 @@ class Pledgebook extends Component {
                 toast.success(`Showing  ${billNos.join(' , ')} Now`);
                 this.refresh();
             } else {
-                toast.error('Could not show the bills. Please Contact admin');
+                if(!e._IsDeterminedError)
+                    toast.error('Could not show the bills. Please Contact admin');
             }
         } catch(e) {
-            toast.error('ERROR! Please Contact admin');
+            if(!e._IsDeterminedError)
+                toast.error('ERROR! Please Contact admin');
             console.log(e);
         }
     }
@@ -706,10 +715,12 @@ class Pledgebook extends Component {
                 toast.success(`Moved  ${billNos.join(' , ')}  to Trash!`);
                 this.refresh();
             } else {
-                toast.error('Could not move to trash the bills. Please Contact admin');
+                if(!e._IsDeterminedError)
+                    toast.error('Could not move to trash the bills. Please Contact admin');
             }
         } catch(e) {
-            toast.error('ERROR! Please Contact admin');
+            if(!e._IsDeterminedError)
+                toast.error('ERROR! Please Contact admin');
             console.log(e);
         }
     }
@@ -721,10 +732,12 @@ class Pledgebook extends Component {
                 toast.success(`Restored  ${billNos.join(' , ')}  from Trash!`);
                 this.refresh();
             } else {
-                toast.error('Could not restore from trash. Please Contact admin');
+                if(!e._IsDeterminedError)
+                    toast.error('Could not restore from trash. Please Contact admin');
             }
         } catch(e) {
-            toast.error('ERROR! Please Contact admin');
+            if(!e._IsDeterminedError)
+                toast.error('ERROR! Please Contact admin');
             console.log(e);
         }
     }
@@ -736,10 +749,12 @@ class Pledgebook extends Component {
                 toast.success(`Deleted  ${billNos.join(' , ')}  successfully!`);
                 this.refresh();
             } else {
-                toast.error('Could not delete the bills permanently. Please Contact admin');
+                if(!e._IsDeterminedError)
+                    toast.error('Could not delete the bills permanently. Please Contact admin');
             }
         } catch(e) {
-            toast.error('ERROR! Please Contact admin');
+            if(!e._IsDeterminedError)
+                toast.error('ERROR! Please Contact admin');
             console.log(e);
         }
     }
@@ -1033,6 +1048,12 @@ class Pledgebook extends Component {
         )
     }
 
+    setAllowanceOfActions() {
+        let sessionObj = getSession();
+        if(sessionObj && sessionObj.roleId <= 2)
+            this.setState({canShowCoreActions: true});
+    }
+
     canDisableThisMenu(menuIdentifier) {
         let flag = false;
         switch(menuIdentifier) {
@@ -1165,11 +1186,16 @@ class Pledgebook extends Component {
                                     {/* <Dropdown.Item disabled={true} onClick={(e) => this.onMoreActionsDpdClick(e, 'reopen')}>Re-Open</Dropdown.Item> */}
                                     {/* <Dropdown.Item disabled={this.canDisableThisMenu('redeem')} onClick={(e) => this.onMoreActionsDpdClick(e, 'redeem')}>Redeem</Dropdown.Item> */}
                                     {/* <Dropdown.Item disabled={true} onClick={(e) => this.onMoreActionsDpdClick(e, 'print')}>Print</Dropdown.Item> */}
-                                    <Dropdown.Item disabled={this.canDisableThisMenu('archive')} onClick={(e) => this.onMoreActionsDpdClick(e, 'archive')}>Hide</Dropdown.Item>
-                                    <Dropdown.Item disabled={this.canDisableThisMenu('unarchive')} onClick={(e) => this.onMoreActionsDpdClick(e, 'unarchive')}>Show</Dropdown.Item>
-                                    <Dropdown.Item disabled={this.canDisableThisMenu('trash')} onClick={(e) => this.onMoreActionsDpdClick(e, 'trash')}>Move to Recycle Bin</Dropdown.Item>
-                                    <Dropdown.Item disabled={this.canDisableThisMenu('restore')} onClick={(e) => this.onMoreActionsDpdClick(e, 'restore')}>Restore</Dropdown.Item>
-                                    <Dropdown.Item disabled={this.canDisableThisMenu('delete')} onClick={(e) => this.onMoreActionsDpdClick(e, 'delete')}>Permanently Delete</Dropdown.Item>
+                                    
+                                    { this.state.canShowCoreActions && 
+                                        <>
+                                        <Dropdown.Item disabled={this.canDisableThisMenu('archive')} onClick={(e) => this.onMoreActionsDpdClick(e, 'archive')}>Hide</Dropdown.Item>
+                                        <Dropdown.Item disabled={this.canDisableThisMenu('unarchive')} onClick={(e) => this.onMoreActionsDpdClick(e, 'unarchive')}>Show</Dropdown.Item>
+                                        <Dropdown.Item disabled={this.canDisableThisMenu('trash')} onClick={(e) => this.onMoreActionsDpdClick(e, 'trash')}>Move to Recycle Bin</Dropdown.Item>
+                                        <Dropdown.Item disabled={this.canDisableThisMenu('restore')} onClick={(e) => this.onMoreActionsDpdClick(e, 'restore')}>Restore</Dropdown.Item>
+                                        <Dropdown.Item disabled={this.canDisableThisMenu('delete')} onClick={(e) => this.onMoreActionsDpdClick(e, 'delete')}>Permanently Delete</Dropdown.Item>
+                                        </>
+                                    }
                                 </Dropdown.Menu>
                             </Dropdown>
                         </>

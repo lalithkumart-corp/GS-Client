@@ -644,7 +644,8 @@ class AddStock extends Component {
                 return false;
             }
         } catch(e) {
-            toast.error('Error occured while inserting new stock item');
+            if(!e._IsDeterminedError)
+                toast.error('Error occured while inserting new stock item');
             return false;
         }
     }
