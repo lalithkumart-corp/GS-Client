@@ -197,7 +197,7 @@ export default class Settings extends Component {
                                     <Row>
                                         <Col className='mergeto-custinfo-note'>
                                             <p>Info</p>
-                                            <p>You are trying to Merge with Other Customer Id. This change will update the details(Name, GuardianName, Address, Place, City, MobileNumber) of current customer details to above customer detail. And all the bills will get updated as well. </p>
+                                            <p>You are trying to Merge "{this.state.custDetail.hashKey}" with Other Customer Id "{this.state.mergeToCustomerInfo.hashKey}". This change will update the details(Name, GuardianName, Address, Place, City, MobileNumber) of current customer details to above customer detail. And all the bills will get updated as well. </p>
                                         </Col>
                                     </Row>
                                     <Row>

@@ -33,6 +33,9 @@ import BillHistoryView from './billHistoryView';
 import Popover from 'react-tiny-popover';
 import BillTemplate from './billTemplate2';
 import ReactToPrint from 'react-to-print';
+import { FaEdit } from 'react-icons/fa';
+import CommonModal from '../common-modal/commonModal';
+import GeneralInfo from '../customerDetail/generalInfo';
 
 const ENTER_KEY = 13;
 const SPACE_KEY = 32;
@@ -172,6 +175,7 @@ class BillCreation extends Component {
                 selectedCustomer: {}
             },
             amountPopoverOpen: false,
+            showCustomerEditModal: false,
             userPicture: JSON.parse(JSON.stringify(defaultPictureState)),
             ornPicture: JSON.parse(JSON.stringify(defaultOrnPictureState))
         };
@@ -234,6 +238,9 @@ class BillCreation extends Component {
         this.amtPopoverTrigger = this.amtPopoverTrigger.bind(this);
         this.calcLandedCost = this.calcLandedCost.bind(this);
         this.printReceipt = this.printReceipt.bind(this);
+        this.onClickEditCustomerBtn = this.onClickEditCustomerBtn.bind(this);
+        this.handleCustomerEditModalClose = this.handleCustomerEditModalClose.bind(this);
+        this.afterUpdateCustomerDetail = this.afterUpdateCustomerDetail.bind(this);
     }
 
     /*async uploadImage(e) {
@@ -1410,6 +1417,22 @@ class BillCreation extends Component {
         }
     }
 
+    onClickEditCustomerBtn(e) {
+        this.setState({showCustomerEditModal: true});
+    }
+
+    afterUpdateCustomerDetail() {
+        this.fetchMetaData();
+        let newState = {...this.state};
+        newState.selectedCustomer = {};
+        newState.showCustomerEditModal = false;
+        this.setState(newState);
+    }
+
+    handleCustomerEditModalClose() {
+        this.setState({showCustomerEditModal: false});
+    }
+
     amtPopoverTrigger(flag) {
         let newState = {...this.state};
         if(typeof flag == 'undefined')
@@ -1808,7 +1831,12 @@ class BillCreation extends Component {
                             <Form.Group
                                 validationState= {this.state.formData.cname.hasError ? "error" :null}
                                 >
-                                <Form.Label>Customer Name {(this.state.selectedCustomer && this.state.selectedCustomer.name)?'':'  (New Customer)'} </Form.Label>
+                                <Form.Label>
+                                    Customer Name 
+                                    {(this.state.selectedCustomer && this.state.selectedCustomer.name)
+                                    ?<span className="gs-button customer-shortuct-edit" onClick={(e)=>this.onClickEditCustomerBtn(e)}> <FaEdit /> </span>
+                                    :'  (New Customer)'} 
+                                </Form.Label>
                                 {/* <Autosuggest
                                     datalist={this.state.formData.cname.limitedList}
                                     itemAdapter={CustomerListAdaptor.instance}
@@ -2181,6 +2209,9 @@ class BillCreation extends Component {
                 </Col>
                 <EditDetailsDialog {...this.state.editModalContent} update={this.updateItemInMoreDetail} />
                 <BillTemplate ref={el => (this.componentRef = el)} data={this.state.printContent} />
+                <CommonModal modalOpen={this.state.showCustomerEditModal} handleClose={this.handleCustomerEditModalClose} wrapperClassName="bill-creation-customer-edit-modal-wrapper">
+                    <GeneralInfo selectedCust={Object.assign({}, this.state.selectedCustomer)} loadedInModal={true} handleClose={this.handleCustomerEditModalClose} afterUpdate={this.afterUpdateCustomerDetail}/>
+                </CommonModal>
                 </Form>
             </Container>
         )

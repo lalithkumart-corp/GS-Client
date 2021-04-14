@@ -315,3 +315,16 @@
     background-color: transparent;
     border-color: white;
 }
+
+.bill-creation-customer-edit-modal-wrapper {
+    z-index: 3 !important;
+}
+.bill-creation-customer-edit-modal-wrapper .common-modal-content {
+    width: 50%;
+}
+.bill-creation-customer-edit-modal-wrapper .common-modal-content .body {
+    padding-bottom: 40px;
+}
+.customer-shortuct-edit {
+    padding :2px 5px 5px 5px;
+}

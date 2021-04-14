@@ -37,6 +37,7 @@ class CustomerDetail extends Component {
         //this.filterCustomerList = this.filterCustomerList.bind(this);
         this.refreshCustomerList = this.refreshCustomerList.bind(this);
         this.handlePageClick = this.handlePageClick.bind(this);
+        this.afterUpdate = this.afterUpdate.bind(this);
     }
 
     componentDidMount() {
@@ -157,6 +158,10 @@ class CustomerDetail extends Component {
         this.setState({customerList: customerList, rawCustomerList: customerList, selectedCust: null});        
     }
 
+    afterUpdate() {
+        this.refreshCustomerList();
+    }
+
     getPageCount() {
         if(this.state.customersCount > 0)
             return this.state.customersCount/this.state.pageLimit;
@@ -242,7 +247,7 @@ class CustomerDetail extends Component {
         if(this.state.selectedCust){
             buffer.push(<Tabs defaultActiveKey="general" variant='pills' id='uncontrollerd'>
                 <Tab eventKey="general" title="General" >
-                    <GeneralInfo {...this.state} refreshCustomerList={this.refreshCustomerList}/>
+                    <GeneralInfo {...this.state} afterUpdate={this.afterUpdate}/>
                 </Tab>
                 <Tab eventKey="history" title="History">
                     <History {...this.state}/>
