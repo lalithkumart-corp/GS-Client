@@ -15,10 +15,10 @@ class TallyPage extends Component {
         super(props);
         this.state = {
             startDateObj: moment(),
-            startDate: moment().format('DD-MM-YYYY'),
+            startDate: new Date(), //moment().format('DD-MM-YYYY'),
             _startDateUTC: new Date(new Date().setHours(0,0,0,0)).toISOString(),
             endDateObj: moment(),
-            endDate: moment().format('DD-MM-YYYY'),
+            endDate: new Date(), //moment().format('DD-MM-YYYY'),
             _endDateUTC: new Date(new Date().setHours(23,59,59,59)).toISOString(),
             refreshLoanPreviewTable: false,
             refreshRedeemPreviewTable: false,
@@ -55,12 +55,12 @@ class TallyPage extends Component {
             switch(identifier) {
                 case 'startDate':
                     newState.startDateObj = dateVal;
-                    newState[identifier] = moment(dateVal).format('DD-MM-YYYY');
+                    newState[identifier] = dateVal; //moment(dateVal).format('DD-MM-YYYY');
                     newState._startDateUTC = getDateInUTC(dateVal, {time: 'start'});
                     break;
                 case 'endDate':
                     newState.endDateObj = dateVal;
-                    newState[identifier] = moment(dateVal).format('DD-MM-YYYY');
+                    newState[identifier] = dateVal; //moment(dateVal).format('DD-MM-YYYY');
                     newState._endDateUTC = getDateInUTC(dateVal, {time: 'end'});
                     break;
             }
@@ -78,23 +78,33 @@ class TallyPage extends Component {
                 <Row className='date-picker-row'>
                     <Col xs={2} className="start-date-container">
                         <DatePicker
-                            value={this.state.startDate}
-                            //selected={this.state.startDate}
+                            // value={this.state.startDate}
+                            selected={this.state.startDate}
                             onChange={(fullDate, dateVal) => this.actionListener.dateChangeListener(fullDate, 'startDate')}
                             selectsStart
                             startDate={this.state.startDateObj}
                             endDate={this.state.endDateObj}
+                            showMonthDropdown
+                            showYearDropdown
+                                timeInputLabel="Time:"
+                                dateFormat="dd/MM/yyyy h:mm aa"
+                                showTimeInput
                         />
                     </Col>
                     <Col xs={2} className="end-date-container">
                         <DatePicker
-                            value={this.state.endDate}
-                            //selected={this.state.endDate}
+                            // value={this.state.endDate}
+                            selected={this.state.endDate}
                             onChange={(fullDate, dateVal) => this.actionListener.dateChangeListener(fullDate, 'endDate')}
                             selectsEnd
                             startDate={this.state.startDateObj}
                             endDate={this.state.endDateObj}
                             minDate={this.state.startDateObj}
+                            showMonthDropdown
+                            showYearDropdown
+                                timeInputLabel="Time:"
+                                dateFormat="dd/MM/yyyy h:mm aa"
+                                showTimeInput
                         />
                     </Col>
                     <Col xs={1}>
