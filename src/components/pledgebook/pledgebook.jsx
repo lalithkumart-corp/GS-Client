@@ -1385,26 +1385,26 @@ function AlertComp(props) { // {...row}
             <Row style={{paddingTop: '10px'}}>
                 <Col>
                     <Row style={{paddingBottom: '6px'}}> 
-                        <Col xs={3}>
+                        <Col xs={2}>
                             Title :
                         </Col>
                         <Col xs={9}>
-                            <input type="text" className="gs-input" value={title} onChange={(e) => onChangeTitle(e)} readOnly={readOnlyMode}/>
+                            <input type="text" className="gs-input title-input" value={title} onChange={(e) => onChangeTitle(e)} readOnly={readOnlyMode}/>
                         </Col>
                     </Row>
                     <Row style={{paddingBottom: '6px'}}>
-                        <Col xs={3}>
+                        <Col xs={2}>
                             Msg: 
                         </Col>
                         <Col xs={9}>
-                            <textarea className="gs-input" value={msg} onChange={(e) => onChangeMsg(e)} readOnly={readOnlyMode}/>
+                            <textarea className="gs-input msg-input" value={msg} onChange={(e) => onChangeMsg(e)} readOnly={readOnlyMode}/>
                         </Col>
                     </Row>
-                    <Row style={{paddingBottom: '6px'}}>
-                        <Col xs={3}> 
+                    <Row>
+                        <Col xs={2}> 
                             Trigger: 
                         </Col>
-                        <Col xs={9}>
+                        <Col xs={6}>
                             <DatePicker
                                 id="alert-trigger-datepicker" 
                                 selected={dates.dateVal}
@@ -1424,7 +1424,7 @@ function AlertComp(props) { // {...row}
                         <Col xs={3}>
                             {
                                 myRow.alertId && 
-                                <input type="button" className="gs-button" value="Delete" disabled={readOnlyMode} onClick={deleteAlert}/>
+                                <input type="button" className="gs-button red" value="Delete" disabled={readOnlyMode} onClick={deleteAlert}/>
                             }
                         </Col>
                         <Col xs={{span: 3, offset: 6}}>

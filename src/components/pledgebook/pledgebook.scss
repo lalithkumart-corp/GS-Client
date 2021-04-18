@@ -279,7 +279,7 @@
 }
 .alert-panel {
 	width: 400px;
-	height: 200px;
+	height: 235px;
     padding: 15px;
     // border: 10px solid orange;
     background-color: white;
@@ -292,6 +292,13 @@
 	overflow: visible !important;
 	.gs-input {
 		@include gs-input-style1;
+	}
+	.title-input,
+	.msg-input {
+		width: 95%;
+	}
+	.msg-input {
+		height: 100px;
 	}
 	.alert-msg {
 		position: absolute;
