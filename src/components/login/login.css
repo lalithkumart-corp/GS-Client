@@ -22,3 +22,12 @@
     position: absolute;
     left: 28%;
 }
+.sso-google-btn {
+    margin-top: 1px;
+    padding: 6px 9px !important;
+    display: inline-block;
+    border: 1px solid #007bff !important;
+    background-color: #007bff !important;
+    color: white !important;
+    border-radius: 50% !important;
+}

@@ -50,6 +50,28 @@ export default function authReducer(state=defaultState, action){
                 ...newState,
                 isAuthenticated: false
             };
+            break;
+        case 'REGISTER_NEW_SSO_USER':
+            let providerDataArr = action.data.user.providerData;
+            let providerData = {};
+            if(providerDataArr.length>0)
+                providerData = providerDataArr[0];
+            newState = {
+                ...newState,
+                signUpFormSSOUserDetails: {
+                    email: action.data.user.email,
+                    gateway: action.data.user.gateway,
+                    uid: action.data.user.uid,
+                    token: action.data.idToken,
+                    displayName: action.data.user.displayName,
+                    emailVerified: action.data.user.emailVerified,
+                    photoURL: providerData.photoURL,
+                    providerId: providerData.providerId,
+                    // emailVerified: action.data.user.emailVerified
+                }
+            };
+
+            break;
     }
     return newState;
 }

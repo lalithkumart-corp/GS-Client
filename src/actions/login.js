@@ -1,9 +1,13 @@
 import axios from 'axios';
-import { getAccessToken, saveSession, clearSession, saveUserPreferences } from '../core/storage';
-import { LOGIN, LOGOUT, GET_APP_STATUS } from '../core/sitemap';
+import { getAccessToken, saveSession, clearSession, saveUserPreferences, setSsoUserFlag, storeAccessToken } from '../core/storage';
+import { LOGIN, LOGOUT, GET_APP_STATUS, CHECK_EMAIL_EXISTANCE, SSO_LOGIN } from '../core/sitemap';
 import { toast } from 'react-toastify';
 import history from '../history';
 import axiosMiddleware from '../core/axios';
+import { getAuth, signInWithPopup, GoogleAuthProvider } from 'firebase/auth';
+import { getFirestore } from 'firebase/firestore';
+// const provider = new GoogleAuthProvider();
+
 
 export const enableLoader = (params) => {
     return (dispatch) => {
@@ -21,12 +25,12 @@ export const doAuthentication = (params) => {
                 let data = successResp.data;
                 // let accessToken = data.id;
                 // storeAccessToken(accessToken);
-                saveSession(data.session);
-                saveUserPreferences(data.userPreferences);
+                saveSession(data.RESP.session);
+                saveUserPreferences(data.RESP.userPreferences);
                 // history.push('/billcreate'); // TIP: Enable this line, if want to land directly on 'billCreation' page after successfull Login
                 dispatch({
                     type: 'AUTH_SUCCESS',
-                    data: data
+                    data: data.RESP
                 });
             },
             (errorResponse) => {
@@ -141,4 +145,66 @@ export const updateAccountStatus = (flag) => {
             data: flag
         });
     }
+}
+
+export const doGoogleAuth = () => async dispatch => {
+    const auth = getAuth();
+    let theGoogleAuthProvider= new GoogleAuthProvider();
+    theGoogleAuthProvider.addScope('https://www.googleapis.com/auth/drive.readonly')
+    const res = await signInWithPopup(auth, theGoogleAuthProvider);
+    let credential = GoogleAuthProvider.credentialFromResult(res);
+    const idToken = res.user.accessToken;
+    const user = res.user;
+    let vr = await checkForEmailExistance(user.email);
+      if(vr) {
+         if(vr.canSignup) {
+             dispatch({
+                 type: 'REGISTER_NEW_SSO_USER',
+                 data: {user, idToken}
+             });
+             history.push('/signup');
+         } else if(vr.userExists) {
+            let ssoLoginResp = await axiosMiddleware.post(SSO_LOGIN, {accessToken: idToken});
+            // storeAccessToken(ssoLoginResp.data.RESP.session.id);
+            // setSsoUserFlag(true);
+            saveSession(ssoLoginResp.data.RESP.session);
+            saveUserPreferences(ssoLoginResp.data.RESP.userPreferences);
+            dispatch({
+               type: 'AUTH_SUCCESS',
+               data: ssoLoginResp.data.RESP
+           });
+         }
+      }
+}
+
+const checkForEmailExistance = (email) => {
+    return new Promise((resolve, reject) => {
+       try {
+           axiosMiddleware.post(CHECK_EMAIL_EXISTANCE, {email: email})
+           .then((successResp) => {
+               if(successResp.data) {
+                   if(successResp.data.STATUS == 'SUCCESS') {
+                       if(successResp.data.USER_EXISTS == 0)
+                           return resolve({canSignup: true});
+                       else if(successResp.data.USER_EXISTS == 1)
+                           return resolve({canSignup: false, userExists: 1});
+                   } else {
+                       return resolve({canSignup: false, error: true});
+                   }
+               }
+           })
+           .catch((exception) => {
+               console.log(exception);
+           });
+       } catch(e) {
+           console.log(e);
+       }
+   });
+}
+
+export const storeAuthInRedux = (data) => dispatch => {
+    dispatch({
+        type: 'AUTH_SUCCESS',
+        data: data
+    });
 }

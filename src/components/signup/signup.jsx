@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import { connect } from 'react-redux';
 import {Row, Col, FormControl, FormGroup, FormLabel, InputGroup, Container} from 'react-bootstrap';
 import { DoublyLinkedList } from '../../utilities/doublyLinkedList';
 import './signup.css';
@@ -7,6 +8,8 @@ import { ADD_CUSTOMER } from '../../core/sitemap';
 import axios from 'axios';
 import history from '../../history';
 import axiosMiddleware from '../../core/axios';
+import { doAuthentication, storeAuthInRedux } from '../../actions/login';
+import { saveSession, saveUserPreferences } from '../../core/storage';
 
 const ENTER_KEY = 13;
 const SPACE_KEY = 32;
@@ -21,7 +24,7 @@ domList.add('storeName', {type: 'formControl', enabled: true});
 domList.add('phone', {type: 'formControl', enabled: true});
 domList.add('submitBtn', {type: 'defaultInput', enabled: true});
 
-export default class SignUpPage extends Component {
+class SignUpPage extends Component {
     constructor(props) {
         super(props);
         this.domElmns = {};
@@ -64,6 +67,22 @@ export default class SignUpPage extends Component {
     bindMethods() {
         this.handleSubmit = this.handleSubmit.bind(this);
         this.getSignupArgs = this.getSignupArgs.bind(this);
+        this.isSsoUser = this.isSsoUser.bind(this);
+    }
+
+    componentDidMount() {
+        if(this.props.auth && this.props.auth.signUpFormSSOUserDetails) {
+            let newState = {...this.state};
+            newState.formData.email.inputVal = this.props.auth.signUpFormSSOUserDetails.email;
+            newState.formData.name.inputVal = this.props.auth.signUpFormSSOUserDetails.displayName;
+            newState.gateWay = this.props.auth.signUpFormSSOUserDetails.gateway;
+            newState.ssoUserId = this.props.auth.signUpFormSSOUserDetails.uid;
+            newState.ssoToken = this.props.auth.signUpFormSSOUserDetails.token;
+            newState.photoURL = this.props.auth.signUpFormSSOUserDetails.photoURL;
+            newState.providerId = this.props.auth.signUpFormSSOUserDetails.providerId;
+            newState.isSsoUserSignup = true;
+            this.setState(newState);
+        }
     }
 
     handleKeyUp(e, options) {        
@@ -126,7 +145,13 @@ export default class SignUpPage extends Component {
                                     msg = successResp.data.MSG;
                                 toast.success(msg);
                                 console.log(successResp.data);
-                                this.redirectToLoginPage();
+                                // this.doSilentLogin();
+                                // this.redirectToLoginPage();
+                                let data = successResp.data.RESP;
+                                saveSession(data.session);
+                                saveUserPreferences(data.userPreferences);
+                                this.props.storeAuthInRedux(data);
+                                history.push('/');
                             }                            
                         },
                         (errResp) => {
@@ -145,19 +170,36 @@ export default class SignUpPage extends Component {
         }
     }
 
+    isSsoUser() {
+        let gateWay = this.state.gateWay || 'direct';
+        if(gateWay != 'direct')
+            return true;
+        return false;
+    }
+
     redirectToLoginPage() {
         history.push('/');
     }
 
     getSignupArgs() {
-        return {
+        let signUpArgs =  {
             userName: this.state.formData.name.inputVal,
             guardianName: this.state.formData.guardianName.inputVal,
             password: this.state.formData.password.inputVal,
             email: this.state.formData.email.inputVal,
             storeName: this.state.formData.storeName.inputVal,
-            phone: this.state.formData.phone.inputVal
+            phone: this.state.formData.phone.inputVal,
+            gateWay: this.state.gateWay || 'direct',
+            ssoUserId: this.state.ssoUserId
         };
+
+        if(this.state.isSsoUserSignup) {
+            signUpArgs.accessToken = this.state.ssoToken;
+            signUpArgs.isSsoUserSignup = true;
+            signUpArgs.photoUrl = this.state.photoUrl;
+            // signUpArgs.emailVerified = this.state.emailVerified;
+        };
+        return signUpArgs;
     }
 
     transferFocus(e, currentElmKey, direction='forward') {
@@ -401,3 +443,11 @@ export default class SignUpPage extends Component {
         )
     }
 }
+
+const mapStateToProps = (state) => {
+    return {
+        auth: state.auth
+    };
+};
+
+export default connect(mapStateToProps, {doAuthentication, storeAuthInRedux})(SignUpPage);

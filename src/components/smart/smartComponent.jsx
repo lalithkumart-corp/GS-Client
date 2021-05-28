@@ -74,6 +74,7 @@ class SmartComponent extends Component {
                             <div className='page-content'>
                                 <ToastContainer position={'top-center'} hideProgressBar={false}/>
                                 <Route exact path= '/' component={ActivationPage} />
+                                <Route path= '/signup' component={SignUpPage} />
                                 <Route path= '/logout' component={Logout} />
                             </div>
                         </div>

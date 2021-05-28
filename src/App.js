@@ -10,7 +10,7 @@ import './App.css';
 import './app.scss';
 
 const myStore = getStore();
-
+import firebaseApp from './firebase';
 
 class App extends Component {
   render() {

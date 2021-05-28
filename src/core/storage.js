@@ -6,7 +6,8 @@ const keys = {
     userPreferences: 'userPreferences',
     accessToken: 'accessToken',
     interestRates: 'interestRates',
-    rates: 'rates'
+    rates: 'rates',
+    ssoUserFlag: 'ssoUserFlag'
 };
 
 const keyMaps = {
@@ -15,7 +16,8 @@ const keyMaps = {
         keys.userPreferences,
         keys.interestRates,
         keys.session,
-        keys.rates
+        keys.rates,
+        keys.ssoUserFlag
     ],
     session: [
 
@@ -153,10 +155,23 @@ export const clearAccessToken = (data) => {
     _clear(keys.accessToken);
 };
 
+export const setSsoUserFlag = (data) => {
+    _save(keys.ssoUserFlag, data);
+};
+
+export const getSsoUserFlag = () => {
+    return _read(keys.ssoUserFlag);
+};
+
+export const clearSsoFlag = () => {
+    _clear(keys.ssoUserFlag);
+}
+
 export const clearSession = () => {
     clearAccessToken();
     clearUserPreference();
     clearInterestRates();
+    clearSsoFlag();
 }
 
 export const setInterestRates = (data) => {

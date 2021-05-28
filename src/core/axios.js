@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { getAccessToken } from '../core/storage';
+import { getAccessToken, getSsoUserFlag } from '../core/storage';
 import { toast } from 'react-toastify';
 let axiosMiddleware = {
     get: (urlPath, configs) => {
@@ -24,8 +24,11 @@ let axiosMiddleware = {
         return new Promise( (resolve, reject) => {
             try {
                 let accessToken = getAccessToken();
-                if(data && !data.accessToken)
+                if(!data)
+                    data = {};
+                if(!data.accessToken)
                     data.accessToken = accessToken;
+                data.ssoUser = getSsoUserFlag();
                 axios.put(urlPath, data, configs)
                 .then(
                     (successResp) => {
@@ -44,8 +47,11 @@ let axiosMiddleware = {
         return new Promise( (resolve, reject) => {
             try {
                 let accessToken = getAccessToken();
-                if(data && !data.accessToken)
+                if(!data)
+                    data = {};
+                if(!data.accessToken)
                     data.accessToken = accessToken;
+                data.ssoUser = getSsoUserFlag();
                 axios.post(urlPath, data, configs)
                 .then(
                     (successResp) => {
