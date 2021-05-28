@@ -20,23 +20,25 @@ class NavbarComp extends Component {
         this.onClickSideTrigger = this.onClickSideTrigger.bind(this);
     }
     componentWillMount() {
-        let jewellery = true;
-        let girvi = true;
-        let enableTallyModule = true;
-        let enableUserModule = true;
-        let enableBackupModule = true;
         let session = getSession();
-        if(session.roleId == 5)
+        if(session) {
+            let jewellery = true;
+            let girvi = true;
+            let enableTallyModule = true;
+            let enableUserModule = true;
+            let enableBackupModule = true;
+            if(session.roleId == 5)
             girvi = false;
-        if(session.roleId == 4)
-            jewellery = false;
-        if(session.roleId > 2) {
-            enableUserModule = false;
-            enableTallyModule = false;
+            if(session.roleId == 4)
+                jewellery = false;
+            if(session.roleId > 2) {
+                enableUserModule = false;
+                enableTallyModule = false;
+            }
+            if(session.roleId > 3)
+                enableBackupModule = false;
+            this.setState({enablePledgebookModule: girvi, enableStockModule: jewellery, enableTallyModule, enableUserModule, enableBackupModule});
         }
-        if(session.roleId > 3)
-            enableBackupModule = false;
-        this.setState({enablePledgebookModule: girvi, enableStockModule: jewellery, enableTallyModule, enableUserModule, enableBackupModule});
     }
     getTitie() {
         let title = 'Welcome';
