@@ -172,6 +172,7 @@ export const clearSession = () => {
     clearUserPreference();
     clearInterestRates();
     clearSsoFlag();
+    _clear(keys.session);
 }
 
 export const setInterestRates = (data) => {

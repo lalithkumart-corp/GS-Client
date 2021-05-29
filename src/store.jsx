@@ -9,6 +9,7 @@ import pledgeBookModalReducer from './reducers/pledgebookModal/pdm-reducer';
 import rateReducer from './reducers/rate/reducer';
 import storeReducer from './reducers/storeDetail/reducer';
 import rightSideBarReducer from './reducers/rightSideBar/reducer';
+import storeInfoReducer from './reducers/storeDetail/reducer';
 export const getStore = () => {
 
     const theReducers = combineReducers({
@@ -18,7 +19,8 @@ export const getStore = () => {
         pledgeBookModal: pledgeBookModalReducer,
         rate: rateReducer,
         storeDetail: storeReducer,
-        rightSideBar: rightSideBarReducer
+        rightSideBar: rightSideBarReducer,
+        storeInfoReducer: storeInfoReducer,
     });
 
     const middleware = applyMiddleware(reduxThunk, logger);

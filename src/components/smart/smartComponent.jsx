@@ -54,9 +54,15 @@ class SmartComponent extends Component {
     }
     componentDidMount() {
         if(this.props.auth.isAuthenticated) {
-            // if(!this.props.auth.isActivated) {
+            if(this.props.auth.isActivated) {
                 this.props.getStoreDetails();
-            // }
+            }
+        }
+    }
+    componentWillReceiveProps(nextprops) {
+        if((nextprops.auth.isAuthenticated !== this.props.auth.isAuthenticated) || (nextprops.auth.isActivated !== this.props.auth.isActivated)) {
+            if(nextprops.auth.isActivated)
+                this.props.getStoreDetails();
         }
     }
     render() {
