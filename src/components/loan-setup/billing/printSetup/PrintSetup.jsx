@@ -4,6 +4,7 @@ import { connect } from 'react-redux';
 import axiosMiddleware from '../../../../core/axios';
 import { UPDATE_USER_PREFERENCES } from '../../../../core/sitemap';
 import { toast } from 'react-toastify';
+import { refreshUserPreferences } from '../../../../utilities/authUtils';
 
 class PrintSetup extends Component {
     constructor(props) {
@@ -33,10 +34,12 @@ class PrintSetup extends Component {
     async updateDefaultsInDB() {
         try {
             let resp = await axiosMiddleware.post(UPDATE_USER_PREFERENCES, this.getApiParamsForUpdate());
-            if(resp && resp.data && resp.data.STATUS == 'success')
-                toast.success('Successfully updated print setup. Please logout and login again to make affect');
-            else
+            if(resp && resp.data && resp.data.STATUS == 'success') {
+               toast.success('Successfully updated print setup.'); // Please logout and login again to make affect
+               refreshUserPreferences();
+            } else {
                 toast.error('Could not able to update');
+            }
         } catch(e) {
             console.log(e);
             toast.error('Error occured while updating print setup values');

@@ -1,5 +1,5 @@
-import { getAccessToken} from '../core/storage';
-import { GET_APP_STATUS } from '../core/sitemap';
+import { getAccessToken, saveUserPreferences } from '../core/storage';
+import { GET_APP_STATUS, FETCH_USER_PREFERENCES  } from '../core/sitemap';
 import axiosMiddleware from '../core/axios';
 
 export let isAuthenticated = () => {
@@ -24,3 +24,10 @@ export const isActivated = async () => {
         return false;
     }
 }
+
+export const refreshUserPreferences = async () => {
+    let at = getAccessToken();
+    let resp = await axiosMiddleware.get(`${FETCH_USER_PREFERENCES}?access_token=${at}`)
+    if(resp && resp.data && resp.data.STATUS == 'SUCCESS')
+        saveUserPreferences(resp.data.USER_PREFERENCES);
+};

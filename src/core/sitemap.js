@@ -35,6 +35,7 @@ export const CHECK_EMAIL_EXISTANCE = `${config.proxy_protocol}://${config.proxy_
 export const GET_APP_STATUS = `${config.proxy_protocol}://${config.proxy_api_host}:${config.proxy_api_port}/${config.restApiRoot}/AppManagers/get-status`;
 export const CHECK_USED_TRIAL_OFFER = `${config.proxy_protocol}://${config.proxy_api_host}:${config.proxy_api_port}/${config.restApiRoot}/AppManagers/check-used-trial-offer`;
 export const UPDATE_APP_STATUS = `${config.proxy_protocol}://${config.proxy_api_host}:${config.proxy_api_port}/${config.restApiRoot}/AppManagers/update-status`;
+export const FETCH_USER_PREFERENCES = `${config.proxy_protocol}://${config.proxy_api_host}:${config.proxy_api_port}/${config.restApiRoot}/UserPreferences/get-user-preferences`;
 export const LOGOUT = `${config.proxy_protocol}://${config.proxy_api_host}:${config.proxy_api_port}/${config.restApiRoot}/GsUsers/logout-user`;
 export const ADD_CUSTOMER = `${config.proxy_protocol}://${config.proxy_api_host}:${config.proxy_api_port}/${config.restApiRoot}/GsUsers/add-customer`;
 export const ADD_USER = `${config.proxy_protocol}://${config.proxy_api_host}:${config.proxy_api_port}/${config.restApiRoot}/GsUsers/add-user`;

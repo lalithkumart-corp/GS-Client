@@ -5,9 +5,6 @@ import { toast } from 'react-toastify';
 import history from '../history';
 import axiosMiddleware from '../core/axios';
 import { getAuth, signInWithPopup, GoogleAuthProvider } from 'firebase/auth';
-import { getFirestore } from 'firebase/firestore';
-// const provider = new GoogleAuthProvider();
-
 
 export const enableLoader = (params) => {
     return (dispatch) => {
