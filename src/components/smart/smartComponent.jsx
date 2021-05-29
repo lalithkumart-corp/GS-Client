@@ -54,14 +54,14 @@ class SmartComponent extends Component {
     }
     componentDidMount() {
         if(this.props.auth.isAuthenticated) {
-            if(!this.props.auth.isActivated) {
+            // if(!this.props.auth.isActivated) {
                 this.props.getStoreDetails();
-            }
+            // }
         }
     }
-    render() {        
+    render() {
         if(this.props.auth.isAuthenticated) {
-            if(!this.props.auth.isActivated) 
+            if(!this.props.auth.isActivated) {
                 return (
                     <Router history={history}>
                         <div>
@@ -80,7 +80,7 @@ class SmartComponent extends Component {
                         </div>
                     </Router>
                 )
-
+            }
             return (
                 <Router history={history}>
                         <div>

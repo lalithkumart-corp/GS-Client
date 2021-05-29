@@ -201,6 +201,7 @@ class StoreInfo extends Component {
                                             type="text"
                                             value={this.state.email.inputVal}
                                             onChange={(e) => this.onChange(e, 'email')}
+                                            readOnly={true}
                                         />
                                         <FormControl.Feedback />
                                     </FormGroup>

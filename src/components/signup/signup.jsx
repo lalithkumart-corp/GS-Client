@@ -285,13 +285,15 @@ class SignUpPage extends Component {
                                             onChange={(e) => this.inputControls.onChange(null, e.target.value, "email")}
                                             ref = {(domElm) => { this.domElmns.email = domElm; }}
                                             onKeyUp = {(e) => this.handleKeyUp(e, {currElmKey: 'email'}) }
-                                            readOnly={this.state.loading}
+                                            readOnly={this.state.loading || this.state.isSsoUserSignup}
                                         />
                                         <FormControl.Feedback />
                                     </InputGroup>
                                 </FormGroup>
                             </Col>
                         </Row>
+                        {!this.state.isSsoUserSignup && <>
+
                         <Row>
                             <Col md={6} sm={6}>
                                 <FormGroup
@@ -380,6 +382,7 @@ class SignUpPage extends Component {
                                 </FormGroup>
                             </Col>
                         </Row>
+                        </>}
                         <Row>
                             <Col md={6} sm={6}>
                                 <FormGroup
