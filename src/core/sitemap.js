@@ -2,21 +2,32 @@ let app = require('./app');
 let env = require('./environment');
 let config;
 
-if(app.env === env.DEVELOPMENT) {
-    config = {        
-        "proxy_api_host": window.location.hostname || "localhost",
-        "proxy_api_port": 3003,
-        "proxy_protocol": "http",
-        "restApiRoot": "api"
-    }
-} else if (app.env === env.PRODUCTION) {
-    config = {        
-        "proxy_api_host": window.location.hostname || "localhost",
-        "proxy_api_port": 3003,
-        "proxy_protocol": "http",
-        "restApiRoot": "api"
-    }
-}
+// if(app.env === env.DEVELOPMENT) {
+//     config = {        
+//         "proxy_api_host": window.location.hostname || "localhost",
+//         "proxy_api_port": 3003,
+//         "proxy_protocol": "http",
+//         "restApiRoot": "api"
+//     }
+// } else if (app.env === env.PRODUCTION) {
+//     config = {        
+//         "proxy_api_host": window.location.hostname || "localhost",
+//         "proxy_api_port": 3003,
+//         "proxy_protocol": "http",
+//         "restApiRoot": "api"
+//     }
+// }
+console.log(process.env.NODE_ENV);
+console.log(process.env.REACT_APP_FLAG);
+console.log(process.env.REACT_APP_API_HOST);
+
+config = {        
+    "proxy_api_host": process.env.REACT_APP_API_HOST,
+    "proxy_api_port": process.env.REACT_APP_API_PORT,
+    "proxy_protocol": process.env.REACT_APP_API_PROTOCOL,
+    "restApiRoot": process.env.REACT_APP_API_ROOT
+};
+
 export const SERVER_URL = `${config.proxy_protocol}://${config.proxy_api_host}:${config.proxy_api_port}`;
 export const LOGIN = `${config.proxy_protocol}://${config.proxy_api_host}:${config.proxy_api_port}/${config.restApiRoot}/GsUsers/login-user`;
 export const SSO_LOGIN = `${config.proxy_protocol}://${config.proxy_api_host}:${config.proxy_api_port}/${config.restApiRoot}/GsUsers/sso-login`;

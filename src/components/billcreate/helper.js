@@ -132,8 +132,10 @@ const _getMobileNumber = (state) => {
     let mobNo = null;
     if(state.formData.mobile.hasTextUpdated)
         mobNo = state.formData.mobile.inputVal || null;
-    else
+    else if(state.selectedCustomer)
         mobNo = state.selectedCustomer.mobile || null; 
+    else
+        mobNo = state.formData.mobile.inputVal || null;
 
     return mobNo;
     
