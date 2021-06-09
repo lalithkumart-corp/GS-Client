@@ -36,6 +36,7 @@ import ReactToPrint from 'react-to-print';
 import { FaEdit } from 'react-icons/fa';
 import CommonModal from '../common-modal/commonModal';
 import GeneralInfo from '../customerDetail/generalInfo';
+import { getLoanDate, setLoanDate } from '../../core/storage';
 
 const ENTER_KEY = 13;
 const SPACE_KEY = 32;
@@ -180,6 +181,7 @@ class BillCreation extends Component {
             ornPicture: JSON.parse(JSON.stringify(defaultOrnPictureState))
         };
         this.bindMethods();
+        this.state = this.populateFromLocalStorage(this.state);
     }
 
     /* START: Lifecycle methods */
@@ -218,9 +220,27 @@ class BillCreation extends Component {
             this.props.updateClearEntriesFlag(false);
         }
         this.setState(newState);
-        this.domElmns["amount"].focus();
+        // this.domElmns["amount"].focus();
     }
     /* END: Lifecycle methods */
+
+    populateFromLocalStorage(state) {
+        try {
+            let dateVal = getLoanDate();
+            debugger;
+            if(dateVal) {
+                state.formData.date = {
+                    inputVal: moment(dateVal).format('DD-MM-YYYY'),
+                    hasError: false,
+                    _inputVal: getDateInUTC(dateVal)
+                };
+            }
+        } catch(e) {
+            console.log(e);
+        } finally {
+            return state;
+        }
+    }
 
     /* START: "this" Binders */
     bindMethods() {        
@@ -1381,6 +1401,7 @@ class BillCreation extends Component {
                     setTimeout(() => {
                         this.transferFocus(e, options.currElmKey, options.traverseDirection);
                     }, 300);
+                    setLoanDate(val); // set in localstorage
                     break;
                 case 'billRemarks':
                     newState.formData.moreDetails.billRemarks = val;

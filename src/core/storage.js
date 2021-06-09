@@ -7,7 +7,9 @@ const keys = {
     accessToken: 'accessToken',
     interestRates: 'interestRates',
     rates: 'rates',
-    ssoUserFlag: 'ssoUserFlag'
+    ssoUserFlag: 'ssoUserFlag',
+    loanDate: 'loanDate',
+    pledgebookFilters: 'pledgebookFilters'
 };
 
 const keyMaps = {
@@ -17,7 +19,9 @@ const keyMaps = {
         keys.interestRates,
         keys.session,
         keys.rates,
-        keys.ssoUserFlag
+        keys.ssoUserFlag,
+        keys.loanDate,
+        keys.pledgebookFilters
     ],
     session: [
 
@@ -36,7 +40,9 @@ const _save = (key, dataObj, options) => {
     let storageVal = '';
     switch(storageType) {
         case 'local':
-            localStorage.setItem(key, JSON.stringify(dataObj));
+            if(typeof dataObj === 'object')
+                dataObj = JSON.stringify(dataObj);
+            localStorage.setItem(key, dataObj);
             break;
         case 'session':
             sessionStorage.setItem(key, JSON.stringify(dataObj));
@@ -210,5 +216,31 @@ export const setStoreInfo = () => {
         return JSON.parse(storeStr);
     } catch(e) {
         return storeStr;
+    }
+}
+
+export const setLoanDate = (dateVal) => {
+    _save(keys.loanDate, dateVal);
+}
+
+export const getLoanDate = () => {
+    let loanDate = _read(keys.loanDate);
+    try {
+        return JSON.parse(loanDate);
+    } catch(e) {
+        return loanDate;
+    }
+}
+
+export const setPledgebookFilter = (filterObj) => {
+    _save(keys.pledgebookFilter, filterObj);
+}
+
+export const getPledgebookFilters = () => {
+    let filters = _read(keys.pledgebookFilters);
+    try {
+        return JSON.parse(filters);
+    } catch(e) {
+        return filters;
     }
 }

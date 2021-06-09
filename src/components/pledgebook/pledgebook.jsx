@@ -21,7 +21,7 @@ import { toast } from 'react-toastify';
 import GSCheckbox from '../ui/gs-checkbox/checkbox';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
-import { getSession } from '../../core/storage';
+import { getSession, getPledgebookFilters } from '../../core/storage';
 import BillTemplate from '../billcreate/billTemplate2';
 import { FaBell, FaPencilAlt, FaLock, FaLockOpen } from 'react-icons/fa';
 import { MdNotifications, MdNotificationsActive, MdNotificationsNone, MdNotificationsOff, MdNotificationsPaused, MdBorderColor } from 'react-icons/md';
@@ -37,7 +37,10 @@ class Pledgebook extends Component {
         past7daysStartDate.setDate(past7daysStartDate.getDate()-730);
         todaysDate.setHours(0,0,0,0);
         let todaysEndDate = new Date();
-        todaysEndDate.setHours(23,59,59,999);        
+        todaysEndDate.setHours(23,59,59,999);    
+        
+        this.filtersFromLocal = getPledgebookFilters();
+        
         this.state = {
             PBmodalIsOpen: false,
             statusPopupVisibility: false,
@@ -67,9 +70,9 @@ class Pledgebook extends Component {
                     }
                 },
                 ornCategory: {
-                    gold: true,
-                    silver: true,
-                    brass: true
+                    gold: this.getFilterValFromLocal('ORN_CATEG_GOLD') || true,
+                    silver: this.getFilterValFromLocal('ORN_CATEG_SILVER') || true,
+                    brass: this.getFilterValFromLocal('ORN_CATEG_BRASS') || true,
                 },
                 includeArchived: false,
                 showOnlyArchived: false,
@@ -334,6 +337,26 @@ class Pledgebook extends Component {
         let billDisplayFlag = this.state.billDisplayFlag;
         this.bindMethods();
     }
+
+    getFilterValFromLocal(key) {
+        let returnVal = null;
+        switch(key) {
+            case 'ORN_CATEG_GOLD':
+                if(this.filtersFromLocal && this.filtersFromLocal.ornCategory)
+                    returnVal = this.filtersFromLocal.ornCategory.gold || true;
+                break;
+            case 'ORN_CATEG_SILVER':
+                if(this.filtersFromLocal && this.filtersFromLocal.ornCategory)
+                    returnVal = this.filtersFromLocal.ornCategory.silver || true;
+                break;
+            case 'ORN_CATEG_BRASS':
+                if(this.filtersFromLocal && this.filtersFromLocal.ornCategory)
+                    returnVal = this.filtersFromLocal.ornCategory.brass || true;
+                break;
+        }
+        return returnVal;
+    }
+
     bindMethods() {
         this.handleClose = this.handleClose.bind(this);
         this.cellClickCallbacks.onBillNoClick = this.cellClickCallbacks.onBillNoClick.bind(this);
