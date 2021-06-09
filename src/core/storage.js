@@ -233,7 +233,7 @@ export const getLoanDate = () => {
 }
 
 export const setPledgebookFilter = (filterObj) => {
-    _save(keys.pledgebookFilter, filterObj);
+    _save(keys.pledgebookFilters, filterObj);
 }
 
 export const getPledgebookFilters = () => {

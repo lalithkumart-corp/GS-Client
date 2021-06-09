@@ -1,6 +1,6 @@
 import React, { Component, useState, useRef, useEffect } from 'react';
 import { getPledgebookData, getPledgebookData2, setRefreshFlag } from '../../actions/pledgebook';
-import { parseResponse, getCreateAlertParams, getUpdateAlertParams, getDeleteAlertParams } from './helper';
+import { parseResponse, getCreateAlertParams, getUpdateAlertParams, getDeleteAlertParams, getFilterValFromLocalStorage } from './helper';
 import { connect } from 'react-redux';
 import _ from 'lodash';
 import { Container, Form, Row, Col, FormGroup, FormLabel, FormControl, HelpBlock, InputGroup, Button, Glyphicon, FormCheck, Dropdown } from 'react-bootstrap';
@@ -21,7 +21,7 @@ import { toast } from 'react-toastify';
 import GSCheckbox from '../ui/gs-checkbox/checkbox';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
-import { getSession, getPledgebookFilters } from '../../core/storage';
+import { getSession, getPledgebookFilters, setPledgebookFilter } from '../../core/storage';
 import BillTemplate from '../billcreate/billTemplate2';
 import { FaBell, FaPencilAlt, FaLock, FaLockOpen } from 'react-icons/fa';
 import { MdNotifications, MdNotificationsActive, MdNotificationsNone, MdNotificationsOff, MdNotificationsPaused, MdBorderColor } from 'react-icons/md';
@@ -44,7 +44,7 @@ class Pledgebook extends Component {
         this.state = {
             PBmodalIsOpen: false,
             statusPopupVisibility: false,
-            billDisplayFlag: 'pending',
+            billDisplayFlag: getFilterValFromLocalStorage('BILL_DISPLAY_FLAG', this.filtersFromLocal) || 'pending',
             offsetStart: 0,
             offsetEnd: 10,
             alertPopups: {},
@@ -70,14 +70,14 @@ class Pledgebook extends Component {
                     }
                 },
                 ornCategory: {
-                    gold: this.getFilterValFromLocal('ORN_CATEG_GOLD') || true,
-                    silver: this.getFilterValFromLocal('ORN_CATEG_SILVER') || true,
-                    brass: this.getFilterValFromLocal('ORN_CATEG_BRASS') || true,
+                    gold: getFilterValFromLocalStorage('ORN_CATEG_GOLD', this.filtersFromLocal) || false,
+                    silver: getFilterValFromLocalStorage('ORN_CATEG_SILVER', this.filtersFromLocal) || false,
+                    brass: getFilterValFromLocalStorage('ORN_CATEG_BRASS', this.filtersFromLocal) || false,
                 },
-                includeArchived: false,
-                showOnlyArchived: false,
-                includeTrashed: false,
-                showOnlyTrashed: false,
+                includeArchived: getFilterValFromLocalStorage('INCLUDE_ARCH', this.filtersFromLocal) || false,
+                showOnlyArchived: getFilterValFromLocalStorage('INCLUDE_ONLY_ARCH', this.filtersFromLocal) || false,
+                includeTrashed: getFilterValFromLocalStorage('INCLUDE_TRASHED', this.filtersFromLocal) || false,
+                showOnlyTrashed: getFilterValFromLocalStorage('INCLUDE_ONLY_TRASHED', this.filtersFromLocal) || false,
             },
             sortBy: 'desc',
             sortByColumn: 'pledgedDate',
@@ -338,25 +338,6 @@ class Pledgebook extends Component {
         this.bindMethods();
     }
 
-    getFilterValFromLocal(key) {
-        let returnVal = null;
-        switch(key) {
-            case 'ORN_CATEG_GOLD':
-                if(this.filtersFromLocal && this.filtersFromLocal.ornCategory)
-                    returnVal = this.filtersFromLocal.ornCategory.gold || true;
-                break;
-            case 'ORN_CATEG_SILVER':
-                if(this.filtersFromLocal && this.filtersFromLocal.ornCategory)
-                    returnVal = this.filtersFromLocal.ornCategory.silver || true;
-                break;
-            case 'ORN_CATEG_BRASS':
-                if(this.filtersFromLocal && this.filtersFromLocal.ornCategory)
-                    returnVal = this.filtersFromLocal.ornCategory.brass || true;
-                break;
-        }
-        return returnVal;
-    }
-
     bindMethods() {
         this.handleClose = this.handleClose.bind(this);
         this.cellClickCallbacks.onBillNoClick = this.cellClickCallbacks.onBillNoClick.bind(this);
@@ -591,18 +572,21 @@ class Pledgebook extends Component {
 
     onStatusPopoverChange(e) {
         this.setState({billDisplayFlag: e.target.value});
+        setPledgebookFilter({...this.state.filters, billDisplayFlag: e.target.value});
     }
 
     onOrnCategoryFilterChange(e, category) {
         let newState = {...this.state};
         newState.filters.ornCategory[category] = !newState.filters.ornCategory[category];
         this.setState(newState);
+        setPledgebookFilter({...newState.filters, billDisplayFlag: newState.billDisplayFlag});
     }
 
     onShowArchivedCheckboxChange(e) {
         let newState = {...this.state};
         newState.filters.includeArchived = !newState.filters.includeArchived;
         this.setState(newState);
+        setPledgebookFilter({...newState.filters, billDisplayFlag: newState.billDisplayFlag});
     }
 
     onShowOnlyArchivedCheckboxChange(e) {
@@ -615,12 +599,14 @@ class Pledgebook extends Component {
         let newState = {...this.state};
         newState.filters.includeTrashed = !newState.filters.includeTrashed;
         this.setState(newState);
+        setPledgebookFilter({...newState.filters, billDisplayFlag: newState.billDisplayFlag});
     }
 
     onShowOnlyTrashedCheckboxChange(e) {
         let newState = {...this.state};
         newState.filters.showOnlyTrashed = !newState.filters.showOnlyTrashed;
         this.setState(newState);
+        setPledgebookFilter({...newState.filters, billDisplayFlag: newState.billDisplayFlag});
     }
 
     onSortOrderChange(e) {

@@ -64,3 +64,36 @@ export const getDeleteAlertParams = (row) => {
     }
     return anObj;
 }
+
+export const getFilterValFromLocalStorage = (key, dataSet) => {
+    let returnVal = null;
+    if(dataSet) {
+        switch(key) {
+            case 'BILL_DISPLAY_FLAG':
+                returnVal = dataSet.billDisplayFlag || 'pending';
+                break;
+            case 'ORN_CATEG_GOLD':
+                if(dataSet.ornCategory) returnVal = dataSet.ornCategory.gold || false;
+                break;
+            case 'ORN_CATEG_SILVER':
+                if(dataSet.ornCategory) returnVal = dataSet.ornCategory.silver || false;
+                break;
+            case 'ORN_CATEG_BRASS':
+                if(dataSet.ornCategory) returnVal = dataSet.ornCategory.brass || false;
+                break;
+            case 'INCLUDE_ARCH':
+                returnVal = dataSet.includeArchived || false;
+                break;
+            case 'INCLUDE_ONLY_ARCH':
+                returnVal = dataSet.showOnlyArchived || false;
+                break;
+            case 'INCLUDE_TRASHED':
+                returnVal = dataSet.includeTrashed || false;
+                break;
+            case 'INCLUDE_ONLY_TRASHED':
+                returnVal = dataSet.showOnlyTrashed || false;
+                break;
+        }
+    }
+    return returnVal;
+}

@@ -67,9 +67,9 @@ export default class BillTemplate extends Component {
     }
 
     getBillNo() {
-        let billNo = 'null';
+        let billNo = '';
         if(this.state.data.billSeries)
-            billNo += this.state.data.billSeries + ':';
+            billNo = this.state.data.billSeries + ':';
         if(this.state.data.billNo)
             billNo += this.state.data.billNo;
         return billNo;
@@ -197,8 +197,8 @@ export default class BillTemplate extends Component {
             <Row className="bill-no-date font16">
                 <Col className="bill-no" xs={{span: 5}} md={{span: 5}}>
                     <span>{this.getBillNo()}</span>
-                    <span style={{width: '200px'}}>
-                        <Barcode value={this.getBillNo()} fontSize={20} height={25} displayValue={false}/>
+                    <span style={{width: '50px'}}>
+                        <Barcode value={this.getBillNo()} width={1} fontSize={20} height={25} displayValue={false}/>
                     </span>
                 </Col>
                 <Col xs={3}>
