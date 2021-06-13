@@ -9,7 +9,7 @@ import DatePicker from 'react-datepicker';
 import { getDateInUTC, dateFormatterV2 } from '../../utilities/utility';
 import { getPledgebookData, getPledgebookData2 , setRefreshFlag } from '../../actions/pledgebook';
 import { connect } from 'react-redux';
-import CashBook from './cashBook/cashBook';
+import CashBookPreview from './cashBook/cashBookPreview';
 
 class TallyPage extends Component {
     constructor(props) {
@@ -138,7 +138,7 @@ class TallyPage extends Component {
                                     updateCommonStore = {this.updateMyState} />
                             </Tab>
                             <Tab eventKey="cash" title="Cash">
-                                <CashBook 
+                                <CashBookPreview 
                                     _startDateUTC={this.state._startDateUTC}
                                     _endDateUTC={this.state._endDateUTC} 
                                     />

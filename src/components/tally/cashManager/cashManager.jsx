@@ -6,6 +6,7 @@ import './cashManager.scss';
 import axiosMiddleware from '../../../core/axios';
 import { toast } from 'react-toastify';
 import CashBook from '../cashBook/cashBook';
+import { getDateInUTC } from '../../../utilities/utility';
 
 export default class CashManager extends Component {
     constructor(props) {
@@ -54,6 +55,8 @@ function CashIn() {
     let [amount, setAmount] = useState();
     let [remarks, setRemarks] = useState('');
     let [fundHouseVal, setFundHouseVal] = useState('shop');
+    let [category, setCategoryVal] = useState('others');
+
     let datePickerRef = useRef(null);
     let getDateValues = () => {
         return {
@@ -79,6 +82,10 @@ function CashIn() {
         setFundHouseVal(val);
     }
 
+    let onChangeCategory = (val) => {
+        setCategoryVal(val);
+    }
+
     let onChangeRemarks = (val) => {
         setRemarks(val);
     }
@@ -88,6 +95,7 @@ function CashIn() {
             transactionDate: dates._dateVal,
             amount: amount,
             fundHouse: fundHouseVal,
+            category: category,
             remarks: remarks,
         }
         try {
@@ -102,7 +110,7 @@ function CashIn() {
     }
 
     return (
-            <Row className="gs-card-content">
+            <Row className="gs-card-content" style={{padding: "20px 0"}}>
                 <Col xs={12} md={12} sm={12}><h4>CASH IN</h4></Col>
                 <Col xs={12}>
                     <Row>
@@ -138,12 +146,11 @@ function CashIn() {
                         </Col>
                     </Row>
                     <Row>
-                        <Col xs={10} md={10} cm={10}>
+                        <Col xs={6} md={6} cm={6}>
                             <Form.Group>
                                 <Form.Label>Location</Form.Label>
                                 <Form.Control
                                     as="select"
-                                    placeholder="0.00"
                                     value={fundHouseVal}
                                     onChange={(e) => onChangeFundHouse(e.target.value)}
                                 >
@@ -152,9 +159,23 @@ function CashIn() {
                                 </Form.Control>
                             </Form.Group>
                         </Col>
+                        <Col xs={6} md={6} cm={6}>
+                            <Form.Group>
+                                <Form.Label>Category</Form.Label>
+                                <Form.Control
+                                    as="select"
+                                    value={category}
+                                    onChange={(e) => onChangeCategory(e.target.value)}
+                                >
+                                    <option key='categ-1' value='interest'>Interest</option>
+                                    <option key='categ-2' value='investment'>Investment</option>
+                                    <option key='categ-2' value='others'>Others</option>
+                                </Form.Control>
+                            </Form.Group>
+                        </Col>
                     </Row>
                     <Row>
-                        <Col xs={10} md={10} cm={10}>
+                        <Col xs={12} md={12} cm={12}>
                             <Form.Group>
                                 <Form.Label>Remarks</Form.Label>
                                 <Form.Control
@@ -180,6 +201,8 @@ function CashOut() {
     let [amount, setAmount] = useState();
     let [remarks, setRemarks] = useState('');
     let [fundHouseVal, setFundHouseVal] = useState('shop');
+    let [category, setCategoryVal] = useState('others');
+
     let datePickerRef = useRef(null);
     let getDateValues = () => {
         return {
@@ -205,6 +228,10 @@ function CashOut() {
         });
     }
 
+    let onChangeCategory = (val) => {
+        setCategoryVal(val);
+    }
+
     let onChangeRemarks = (val) => {
         setRemarks(val);
     }
@@ -214,6 +241,7 @@ function CashOut() {
             transactionDate: dates._dateVal,
             amount: amount,
             fundHouse: fundHouseVal,
+            category: category,
             remarks: remarks,
         }
         try {
@@ -264,7 +292,7 @@ function CashOut() {
                         </Col>
                     </Row>
                     <Row>
-                        <Col xs={10} md={10} cm={10}>
+                        <Col xs={6} md={6} cm={6}>
                             <Form.Group>
                                 <Form.Label>Location</Form.Label>
                                 <Form.Control
@@ -278,9 +306,25 @@ function CashOut() {
                                 </Form.Control>
                             </Form.Group>
                         </Col>
+                        <Col xs={6} md={6} cm={6}>
+                            <Form.Group>
+                                <Form.Label>Category</Form.Label>
+                                <Form.Control
+                                    as="select"
+                                    value={category}
+                                    onChange={(e) => onChangeCategory(e.target.value)}
+                                >
+                                    <option key='categ-1' value='interest'>Interest</option>
+                                    <option key='categ-2' value='expense'>Expenses</option>
+                                    <option key='categ-3' value='shop_expense'>Shop Expenses</option>
+                                    <option key='categ-4' value='home_expense'>Home Expenses</option>
+                                    <option key='categ-5' value='others'>Others</option>
+                                </Form.Control>
+                            </Form.Group>
+                        </Col>
                     </Row>
                     <Row>
-                        <Col xs={10} md={10} cm={10}>
+                        <Col xs={12} md={12} cm={12}>
                             <Form.Group>
                                 <Form.Label>Remarks</Form.Label>
                                 <Form.Control
