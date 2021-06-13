@@ -9,7 +9,8 @@ import DatePicker from 'react-datepicker';
 import { getDateInUTC, dateFormatterV2 } from '../../utilities/utility';
 import { getPledgebookData, getPledgebookData2 , setRefreshFlag } from '../../actions/pledgebook';
 import { connect } from 'react-redux';
-import { parseResponse } from '../pledgebook/helper';
+import CashBook from './cashBook/cashBook';
+
 class TallyPage extends Component {
     constructor(props) {
         super(props);
@@ -22,6 +23,7 @@ class TallyPage extends Component {
             _endDateUTC: new Date(new Date().setHours(23,59,59,59)).toISOString(),
             refreshLoanPreviewTable: false,
             refreshRedeemPreviewTable: false,
+            // refreshCashBookTable: false,
             commonStore: {}
         }
         this.bindMethods();
@@ -49,6 +51,10 @@ class TallyPage extends Component {
         this.setState({refreshRedeemPreviewTable: flag});
     }
 
+    // setRefreshCashBookTableFlag(flag) {
+    //     this.setState({refreshCashBookTable: flag});
+    // }
+
     actionListener = {
         dateChangeListener: (dateVal, identifier) => {
             let newState = {...this.state}
@@ -69,6 +75,7 @@ class TallyPage extends Component {
         onDateSubmitClick: async (e) => {
             this.setRefreshLoanPreviewTableFlag(true);
             this.setRefreshRedeemPreviewTableFlag(true);
+            // this.setRefreshCashBookTableFlag(true);
         }
     }
 
@@ -129,6 +136,12 @@ class TallyPage extends Component {
                                     refreshRedeemPreviewTable={this.state.refreshRedeemPreviewTable} 
                                     setRefreshRedeemPreviewTableFlag={this.setRefreshRedeemPreviewTableFlag} 
                                     updateCommonStore = {this.updateMyState} />
+                            </Tab>
+                            <Tab eventKey="cash" title="Cash">
+                                <CashBook 
+                                    _startDateUTC={this.state._startDateUTC}
+                                    _endDateUTC={this.state._endDateUTC} 
+                                    />
                             </Tab>
                             <Tab eventKey="balancesheet" title="Balance Sheet" >
                                 <BalanceSheet {...this.state.commonStore} />

@@ -67,13 +67,15 @@ export const getDeleteAlertParams = (row) => {
 
 export const getFilterValFromLocalStorage = (key, dataSet) => {
     let returnVal = null;
+    dataSet = dataSet || {};
     if(dataSet) {
         switch(key) {
             case 'BILL_DISPLAY_FLAG':
                 returnVal = dataSet.billDisplayFlag || 'pending';
                 break;
             case 'ORN_CATEG_GOLD':
-                if(dataSet.ornCategory) returnVal = dataSet.ornCategory.gold || false;
+                if(dataSet.ornCategory && typeof dataSet.ornCategory.gold !== 'undefined') returnVal = dataSet.ornCategory.gold || false;
+                else returnVal = true;
                 break;
             case 'ORN_CATEG_SILVER':
                 if(dataSet.ornCategory) returnVal = dataSet.ornCategory.silver || false;

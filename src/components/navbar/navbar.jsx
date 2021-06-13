@@ -6,6 +6,7 @@ import { Link } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { openSideBar } from '../../actions/rightSidebar';
 import { FaGalacticSenate } from 'react-icons/fa';
+import './navbar.scss';
 
 class NavbarComp extends Component {
     constructor(props) {
@@ -67,9 +68,10 @@ class NavbarComp extends Component {
     getRegularNavBar() {
         return (
             <Navbar bg="light" expand="lg">
+                <Nav.Link as={Link} to="/">Home</Nav.Link>
+                <Navbar.Toggle aria-controls="basic-navbar-nav" />
                 <Navbar.Collapse id="basic-navbar-nav">
                     <Nav>
-                        <Nav.Link as={Link} to="/">Home</Nav.Link>
                         {this.state.enablePledgebookModule && 
                             <NavDropdown title="Loan" id="basic-nav-dropdown">
                             <NavDropdown.Item as={Link} to="/billcreate">Bill Creation</NavDropdown.Item>
@@ -95,7 +97,15 @@ class NavbarComp extends Component {
                         </Nav>
     }
                     <Nav className="mr-auto">
-                        {this.state.enableTallyModule && <Nav.Link as={Link} to="/tally">Tally</Nav.Link>}
+                        {this.state.enableTallyModule && 
+                            <Nav>
+                                <NavDropdown title="Tally" id="">
+                                    <NavDropdown.Item as={Link} to="/cash-manager">Cash Manager</NavDropdown.Item>
+                                    <NavDropdown.Divider />
+                                    <NavDropdown.Item as={Link} to="/tally">DayBook</NavDropdown.Item>
+                                </NavDropdown>
+                            </Nav>
+                        }
                         {this.state.enableUserModule && <Nav.Link as={Link} to="/users">User</Nav.Link>}
                         <NavDropdown title="Others" id="basic-nav-dropdown">
                             <NavDropdown.Item as={Link} to="/customerdetail">Customer Detail</NavDropdown.Item>

@@ -25,6 +25,7 @@ import './smartComponent.css';
 import SignUpPage from '../signup/signup';
 import LoanSetup from '../loan-setup/setup';
 import BackupRestore from '../backup_restore/backupRestore';
+import CashManager from '../tally/cashManager/cashManager';
 import TallyPage from '../tally/tallyPage';
 //import Products from '../products/Products';
 import AddStock from '../stock/addStock/AddStock';
@@ -111,6 +112,7 @@ class SmartComponent extends Component {
                                 <Route path= '/uploadpicdemo' component={UploadPicDemo} />
                                 <Route path= '/loan-settings' component={LoanSetup} />
                                 <Route path= '/backup_restore' component={BackupRestore} />
+                                <Route path= '/cash-manager' component={CashManager} />
                                 <Route path= '/tally' component={TallyPage} />
                                 {/* <Route path= "/products" component={Products} /> */}
                                 <Route path= "/stock-add" component={AddStock} />
