@@ -227,7 +227,6 @@ class BillCreation extends Component {
     populateFromLocalStorage(state) {
         try {
             let dateVal = getLoanDate();
-            debugger;
             if(dateVal) {
                 state.formData.date = {
                     inputVal: moment(dateVal).format('DD-MM-YYYY'),

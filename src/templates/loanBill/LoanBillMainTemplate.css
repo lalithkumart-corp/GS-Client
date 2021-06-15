@@ -1,0 +1,52 @@
+.template-main-card {
+    width: 830px;
+    margin-left: 5px;
+    position: absolute;
+    margin-top: 40px;
+    left: 12%;
+    border: 1px solid grey;
+}
+.template-main-card span {
+    font-weight: bold;
+}
+.header-logo1-div {
+    height: 65px;
+    position: absolute;
+    left: 15px;
+    top: 69px;
+}
+
+.header-logo2-div {
+    height: 70px;
+    position: absolute;
+    right: 15px;
+    top: 69px;
+}
+
+.font12 {
+    font-size: 12px;
+}
+.font16 {
+    font-size: 16px;
+}
+.font17 {
+    font-size: 17px;
+}
+.font18 {
+    font-size: 18px;
+}
+.font19 {
+    font-size: 19px;
+}
+.font20 {
+    font-size: 20px;
+}
+.font22 {
+    font-size: 22px;
+}
+.font23 {
+    font-size: 23px;
+}
+.font30 {
+    font-size: 30px;
+}

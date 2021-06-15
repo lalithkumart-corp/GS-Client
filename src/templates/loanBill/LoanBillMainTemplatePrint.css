@@ -1,0 +1,48 @@
+@media print {
+    .template-main-card {
+        width: 830px;
+        margin-left: 5px;
+        margin-top: 40px;
+        border: none;
+        left: 0;
+    }
+    .template-main-card span {
+        font-weight: bold;
+    }
+
+    .header-logo1-div {
+        position: absolute;
+    }
+
+    .header-logo2-div {
+        position: absolute;
+    }
+
+    .font12 {
+        font-size: 12px;
+    }
+    .font16 {
+        font-size: 16px;
+    }
+    .font17 {
+        font-size: 17px;
+    }
+    .font18 {
+        font-size: 18px;
+    }
+    .font19 {
+        font-size: 19px;
+    }
+    .font20 {
+        font-size: 20px;
+    }
+    .font22 {
+        font-size: 22px;
+    }
+    .font23 {
+        font-size: 23px;
+    }
+    .font30 {
+        font-size: 30px;
+    }
+}

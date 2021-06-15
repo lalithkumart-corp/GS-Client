@@ -3,6 +3,9 @@
     .card-heading-text-col {
         margin-top: 20px;
     }
+    .action-container1 {
+        text-align: right;
+    }
     .first-line-header {
         padding-bottom: 10px;
     }
@@ -30,4 +33,7 @@
             border-top: 1px dashed lightgrey;
         }
     }
+}
+.bill-template-preview-modal .body {
+    min-height: 1200px;
 }

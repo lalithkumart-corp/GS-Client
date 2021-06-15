@@ -1,0 +1,89 @@
+.loan-bill-body-template {
+    margin: 30px 20px 0 20px;
+    font-size: 20px;
+}
+.bill-no {
+    text-align: left;
+}
+.bill-no-val {
+    font-size: 30px;
+    vertical-align: middle;
+}
+.loan-bill-body-template .date-val {
+    font-size: 24px;
+    padding-left: 10px;
+}
+
+.loan-bill-body-template .cust-info-col {
+    margin-top: 20px;
+    border: 1px solid lightgray;
+    border-radius: 7px;
+}
+
+.orn-info-col {
+    border: 1px solid lightgray;
+}
+.orn-table-header {
+    height: 40px;
+    text-align: center;
+    border-bottom: 1px solid lightgray;
+    background-color: whitesmoke;
+}
+
+.orn-table-th-cell {
+    padding-top: 6px;
+    border-right: 1px solid lightgray;
+}
+
+.orn-table-body-cell.nos,
+.orn-table-body-cell.item,
+.orn-table-body-cell.nos,
+.orn-table-body-cell.wt {
+    border-right: 1px solid lightgray;
+}
+
+@media print {
+    .loan-bill-body-template {
+        margin: 30px 20px 0 20px;
+        font-size: 20px;
+    }
+    .bill-no {
+        /* text-align: left; */
+    }
+    .bill-no-val {
+        font-size: 30px;
+        vertical-align: middle;
+    }
+    .loan-bill-body-template .date-val {
+        font-size: 24px;
+        padding-left: 10px;
+    }
+    
+    .loan-bill-body-template .cust-info-col {
+        margin-top: 20px;
+        border: 1px solid lightgray;
+        border-radius: 7px;
+    }
+    
+    .orn-info-col {
+        border: 1px solid lightgray;
+    }
+    .orn-table-header {
+        height: 40px;
+        text-align: center;
+        border-bottom: 1px solid lightgray;
+        background-color: whitesmoke;
+    }
+    
+    .orn-table-th-cell {
+        padding-top: 6px;
+        border-right: 1px solid lightgray;
+    }
+    
+    .orn-table-body-cell.nos,
+    .orn-table-body-cell.item,
+    .orn-table-body-cell.nos,
+    .orn-table-body-cell.wt {
+        border-right: 1px solid lightgray;
+    }
+}

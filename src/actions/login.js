@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { getAccessToken, saveSession, clearSession, saveUserPreferences, setSsoUserFlag, storeAccessToken } from '../core/storage';
+import { getAccessToken, saveSession, clearSession, saveUserPreferences, setSsoUserFlag, storeAccessToken, saveLoanBillTemplateSettings } from '../core/storage';
 import { LOGIN, LOGOUT, GET_APP_STATUS, CHECK_EMAIL_EXISTANCE, SSO_LOGIN } from '../core/sitemap';
 import { toast } from 'react-toastify';
 import history from '../history';
@@ -24,6 +24,7 @@ export const doAuthentication = (params) => {
                 // storeAccessToken(accessToken);
                 saveSession(data.RESP.session);
                 saveUserPreferences(data.RESP.userPreferences);
+                saveLoanBillTemplateSettings(data.RESP.loanBillTemplateSettings);
                 // history.push('/billcreate'); // TIP: Enable this line, if want to land directly on 'billCreation' page after successfull Login
                 dispatch({
                     type: 'AUTH_SUCCESS',

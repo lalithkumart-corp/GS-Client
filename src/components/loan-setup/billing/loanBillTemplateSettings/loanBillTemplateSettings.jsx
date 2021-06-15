@@ -6,11 +6,45 @@ import { GET_LOAN_BILL_TEMPLATE_SETTINGS, UPDATE_LOAN_BILL_TEMPLATE } from '../.
 import { getAccessToken } from '../../../../core/storage';
 import { toast } from 'react-toastify';
 import { refreshLoanBillTemplateData } from '../../../../utilities/authUtils';
+import LoanBillMainTemplate from '../../../../templates/loanBill/LoanBillMainTemplate';
 import './loanBillTemplateSettings.scss';
+import CommonModal from '../../../common-modal/commonModal.jsx';
+import ReactToPrint from 'react-to-print';
 
+
+const sampleBillContent = {
+    amount: 10000,
+    billSeries: 'A',
+    billNo: 1425,
+    date: '2021-01-10 11:11:37',
+    cname: 'RAJ KUMAR',
+    gaurdianName: 'GOVINDRAJ',
+    address: "3/3 K.K NGR 2ND CROSS STREET",
+    place: "KATTUPAKKAM",
+    city: "CHENNAI",
+    pinCode: "600056",
+    mobile: '8148588004',
+    userPicture: {imageId: 1 , url: "http://localhost:3003/uploads/1595149324639.png"},
+    ornPicture: {imageId: 1 , url: "http://localhost:3003/uploads/1595149324639.png"},
+    orn: {
+        1: {ornItem: "G Ring", ornNWt: "1.8", ornNos: "1", ornSpec: ""},
+        2: {ornItem: "G Ring", ornNWt: "1.8", ornNos: "1", ornSpec: ""},
+        3: {ornItem: "G Ring", ornNWt: "1.8", ornNos: "1", ornSpec: ""},
+        4: {ornItem: "G Ring", ornNWt: "1.8", ornNos: "1", ornSpec: ""},
+        5: {ornItem: "G Ring", ornNWt: "1.8", ornNos: "1", ornSpec: ""},
+        6: {ornItem: "G Ring", ornNWt: "1.8", ornNos: "1", ornSpec: ""},
+        7: {ornItem: "G Ring", ornNWt: "1.8", ornNos: "1", ornSpec: ""},
+        8: {ornItem: "G Ring", ornNWt: "1.8", ornNos: "1", ornSpec: ""},
+        9: {ornItem: "G Ring", ornNWt: "1.8", ornNos: "1", ornSpec: ""},
+        10: {ornItem: "G Ring", ornNWt: "1.8", ornNos: "1", ornSpec: ""},
+        11: {ornItem: "G Ring", ornNWt: "1.8", ornNos: "1", ornSpec: ""},
+        12: {ornItem: "G Ring", ornNWt: "1.8", ornNos: "1", ornSpec: ""},
+    },
+};
 export default class LoanBillTemplateSettings extends Component {
     constructor(props) {
         super(props);
+        this.domElmns = {};
         this.state = {
             firstLine: {
                 left: {
@@ -32,7 +66,8 @@ export default class LoanBillTemplateSettings extends Component {
             secondLine: {
                 text: '',
                 styles: {
-                    fontSize: null
+                    fontSize: null,
+                    letterSpacing: null
                 }
             },
             thirdLine: {
@@ -53,12 +88,16 @@ export default class LoanBillTemplateSettings extends Component {
                     fontSize: null
                 }
             },
+            currBillContent: {}
         }
         this.bindMethods();
     }
     bindMethods() {
         this.updateDB = this.updateDB.bind(this);
         this.updateStateObj = this.updateStateObj.bind(this);
+        this.showPreview = this.showPreview.bind(this);
+        this.handlePreviewClose = this.handlePreviewClose.bind(this);
+        this.printClick = this.printClick.bind(this);
     }
     componentDidMount() {
         this.initFetchApi();
@@ -86,8 +125,7 @@ export default class LoanBillTemplateSettings extends Component {
         newState.firstLine.styles.marginRight = headerObj.firstLine.styles.marginRight;
         newState.firstLine.styles.marginLeft = headerObj.firstLine.styles.marginLeft;
         
-        newState.secondLine.text = headerObj.secondLine.text;
-        newState.secondLine.styles.fontSize = headerObj.secondLine.styles.fontSize;
+        newState.secondLine = headerObj.secondLine;
 
         newState.thirdLine.text = headerObj.thirdLine.text;
         newState.thirdLine.styles.fontSize = headerObj.thirdLine.styles.fontSize;
@@ -169,12 +207,7 @@ export default class LoanBillTemplateSettings extends Component {
                     marginLeft: this.state.firstLine.styles.marginLeft
                 }
             },
-            secondLine: {
-                text: this.state.secondLine.text,
-                styles: {
-                    fontSize: this.state.secondLine.styles.fontSize
-                }
-            },
+            secondLine: this.state.secondLine,
             thirdLine: {
                 text: this.state.thirdLine.text,
                 styles: {
@@ -204,6 +237,15 @@ export default class LoanBillTemplateSettings extends Component {
             console.log(e);
         }
     }
+    showPreview() {
+        this.setState({showPreview: true, currBillContent: sampleBillContent});
+    }
+    handlePreviewClose() {
+        this.setState({showPreview: false, currBillContent: {}});
+    }
+    printClick() {
+        this.domElmns.printBtn.handlePrint();
+    }
     render() {
         return (
             <div className="bill-creation-temlpate-setup">
@@ -211,9 +253,22 @@ export default class LoanBillTemplateSettings extends Component {
                     <Col clasName="gs-card-content">
                         {/* <Col> */}
                             <Row>
-                                <Col xs={{span: 12}} md={{span: 12}} className="card-heading-text-col">
+                                <Col xs={{span: 6}} md={{span: 6}} className="card-heading-text-col">
                                     <h3 style={{marginBottom: '30px'}}>Loan Bill - Templete Setup</h3>
                                 </Col>
+                                <Col xs={{span: 6}} md={{span: 6}} className="action-container1">
+                                    <input type='button' className='gs-button' value='PREVIEW' onClick={this.showPreview}/>
+                                </Col>
+                                <CommonModal modalOpen={this.state.showPreview} handleClose={this.handlePreviewClose} secClass="bill-template-preview-modal">
+                                    <ReactToPrint
+                                        ref={(domElm) => {this.domElmns.printBtn = domElm}}
+                                        trigger={() => <a href="#"></a>}
+                                        content={() => this.componentRef}
+                                        className="print-hidden-btn"
+                                    />
+                                    <input type="button" className="gs-button" onClick={this.printClick} value="PRINT" />
+                                    <LoanBillMainTemplate ref={el => (this.componentRef = el)} currBillContent={this.state.currBillContent} handleClose={this.handlePreviewClose}/>
+                                </CommonModal>
                             </Row>
                             <Row>
                                 <Col xs={12} className="first-line-header">
@@ -303,7 +358,7 @@ export default class LoanBillTemplateSettings extends Component {
                                 <Col xs={12} className="second-line-header">
                                     <h5>SECOND LINE</h5>
                                 </Col>
-                                <Col xs={12} md={12}>
+                                <Col xs={6} md={6}>
                                     <Form.Group>
                                         <Form.Label>Text</Form.Label>
                                         <Form.Control
@@ -327,6 +382,17 @@ export default class LoanBillTemplateSettings extends Component {
                                                 />
                                             </Form.Group>
                                         </Col>
+                                        <Col xs={3} md={3}>
+                                            <Form.Group>
+                                                <Form.Label>Letter Spacing</Form.Label>
+                                                <Form.Control
+                                                    type="number"
+                                                    placeholder="1"
+                                                    value={this.state.secondLine.styles.letterSpacing}
+                                                    onChange={(e) => this.onChangeSecondLineStyles(e.target.value, 'letterSpacing')}
+                                                />
+                                            </Form.Group>
+                                        </Col>
                                     </Row>
                                 </Col>
                             </Row>
@@ -334,7 +400,7 @@ export default class LoanBillTemplateSettings extends Component {
                                 <Col xs={12} className="third-line-header">
                                     <h5>THIRD LINE</h5>
                                 </Col>
-                                <Col xs={12} md={12}>
+                                <Col xs={6} md={6}>
                                     <Form.Group>
                                         <Form.Label>Text</Form.Label>
                                         <Form.Control
@@ -365,7 +431,7 @@ export default class LoanBillTemplateSettings extends Component {
                                 <Col xs={12} className="fourth-line-header">
                                     <h5>FOURTH LINE</h5>
                                 </Col>
-                                <Col xs={12} md={12}>
+                                <Col xs={6} md={6}>
                                     <Form.Group>
                                         <Form.Label>Text</Form.Label>
                                         <Form.Control
@@ -396,7 +462,7 @@ export default class LoanBillTemplateSettings extends Component {
                                 <Col xs={12} className="fifth-line-header">
                                     <h5>FIFTH LINE</h5>
                                 </Col>
-                                <Col xs={12} md={12}>
+                                <Col xs={6} md={6}>
                                     <Form.Group>
                                         <Form.Label>Text</Form.Label>
                                         <Form.Control
