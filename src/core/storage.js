@@ -9,7 +9,8 @@ const keys = {
     rates: 'rates',
     ssoUserFlag: 'ssoUserFlag',
     loanDate: 'loanDate',
-    pledgebookFilters: 'pledgebookFilters'
+    pledgebookFilters: 'pledgebookFilters',
+    loanBillTemplate: 'loanBillTemplate',
 };
 
 const keyMaps = {
@@ -21,7 +22,8 @@ const keyMaps = {
         keys.rates,
         keys.ssoUserFlag,
         keys.loanDate,
-        keys.pledgebookFilters
+        keys.pledgebookFilters,
+        keys.loanBillTemplate
     ],
     session: [
 
@@ -242,5 +244,18 @@ export const getPledgebookFilters = () => {
         return JSON.parse(filters);
     } catch(e) {
         return filters;
+    }
+}
+
+export const saveLoanBillTemplateSettings = (data) => {
+    _save(keys.loanBillTemplate, data);
+}
+
+export const getLoanBillTemplateSettings = () => {
+    let templateData = _read(keys.loanBillTemplate);
+    try {
+        return JSON.parse(templateData);
+    } catch(e) {
+        return templateData;
     }
 }
