@@ -33,6 +33,26 @@
             border-top: 1px dashed lightgrey;
         }
     }
+    .template-list-col {
+        h5 {
+            border-top: 1px dashed lightgrey;
+            padding: 8px 0 17px 0;
+        }
+        .screenshot-prview-container {
+            height: 250px;
+            .template-image-viewer {
+                height: 100%;
+            }
+        }
+        .screenshot-radio-btn-label {
+            text-align: center;
+            margin-top: 17px;
+            label {
+                padding-left: 10px;
+                font-size: 17px;
+            }
+        }
+    }
 }
 .bill-template-preview-modal .body {
     min-height: 1200px;

@@ -249,11 +249,25 @@ export default class LoanBillBodyTemplate extends Component {
     }
 
     getFourthSection() {
+        let imgSectionBuffer = this.getImageSection('orn');
+        let canDisplayImgDiv = true;
+        let colSpanVal = 9;
+
+        if(imgSectionBuffer.length <= 0)
+            canDisplayImgDiv = false;
+        
+        if(!canDisplayImgDiv)
+            colSpanVal = 12;
         return (
             <Row className="row-name-3">
-                <Col xs={{span: 12}} md={{span: 12}} className={`orn-info-col`}>
+                <Col xs={{span: colSpanVal}} md={{span: colSpanVal}} className={`orn-info-col`}>
                     {this.getOrnSecction()}
                 </Col>
+                {canDisplayImgDiv && 
+                    <Col xs={{span: 3}} md={{span: 3}} className="image-col orn">
+                        {imgSectionBuffer}
+                    </Col>
+                }
             </Row>
         )
     }
@@ -261,10 +275,7 @@ export default class LoanBillBodyTemplate extends Component {
     getDeclarationRow() {
         return (
             <Row>
-                <Col xs={{span: 2}} md={{span: 2}} className="image-col orn">
-                    {this.getImageSection('orn')}
-                </Col>
-                <Col xs={10} md={10}>
+                <Col xs={12} md={12}>
                     <p className="interest-pay-mon no-margin">Interest Should be paid in every 3 months</p>
                     <p className="no-margin">I declare that the above articles are my own.</p>
                     <p>Date of consent to recover jewellry ______________</p>
@@ -297,7 +308,7 @@ export default class LoanBillBodyTemplate extends Component {
 
     render() {
         return (
-            <div className="loan-bill-body-template1">
+            <div className="loan-bill-body-template2">
                 {this.getSecondRow()}
                 {this.getThirdSection()}
                 {this.getFourthSection()}

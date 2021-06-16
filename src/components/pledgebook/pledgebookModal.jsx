@@ -12,8 +12,7 @@ import { toast } from 'react-toastify';
 import { calculateData, getRequestParams, getReopenRequestParams } from '../redeem/helper';
 import moment from 'moment';
 import ReactToPrint from 'react-to-print';
-import BillTemplate from '../billcreate/billTemplate2';
-
+import LoanBillMainTemplate from '../../templates/loanBill/LoanBillMainTemplate';
 class PledgebookModal extends Component {
     constructor(props) {
         super(props);
@@ -256,7 +255,8 @@ class PledgebookModal extends Component {
                     content={() => this.componentRef}
                     className="print-hidden-btn"
                 />
-                <BillTemplate ref={el => (this.componentRef = el)} data={this.state.printContent} />
+                {/* <BillTemplate ref={el => (this.componentRef = el)} data={this.state.printContent} /> */}
+                {<LoanBillMainTemplate ref={el => (this.componentRef = el)} currBillContent={this.state.printContent}/>}
             </div>
         )
     }

@@ -5,7 +5,7 @@ import './LoanBillMainTemplate.css';
 import './LoanBillMainTemplatePrint.css';
 
 import LoanBillBodyTemplate from './bodyTemplate1/LoanBillBodyTemplate';
-import LoanBillBodyTemplate2 from './bodyTemplate2/LoanBillBodyTemplate2';
+import LoanBillBodyTemplate2 from './bodyTemplate2/LoanBillBodyTemplate';
 
 const DEFAULTS = {
     FIRSTLINE_LEFT: 'Form-F',
@@ -205,8 +205,8 @@ export default class LoanBillMainTemplate extends Component {
 
     getBodyDom() {
         let bodyTemplateId = DEFAULTS.BODY_TEMPLATE_ID;
-        if(this.state.settings && this.state.settings.bodyTemplateId)
-            bodyTemplateId = this.state.settings.bodyTemplateId;
+        if(this.state.settings && this.state.settings.bodyTemplate)
+            bodyTemplateId = this.state.settings.bodyTemplate;
         if(bodyTemplateId == 1)
             return (<LoanBillBodyTemplate currBillContent={this.state.currBillContent} settings = {this.state.settings}/>);
         else if(bodyTemplateId == 2)

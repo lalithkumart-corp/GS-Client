@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { Container, Row, Col, Form } from 'react-bootstrap';
 import { connect } from 'react-redux';
 import axiosMiddleware from '../../../../core/axios';
-import { GET_LOAN_BILL_TEMPLATE_SETTINGS, UPDATE_LOAN_BILL_TEMPLATE } from '../../../../core/sitemap';
+import { GET_LOAN_BILL_TEMPLATE_SETTINGS, UPDATE_LOAN_BILL_TEMPLATE, FETCH_AVL_LOAN_BILL_TEMPLATES } from '../../../../core/sitemap';
 import { getAccessToken } from '../../../../core/storage';
 import { toast } from 'react-toastify';
 import { refreshLoanBillTemplateData } from '../../../../utilities/authUtils';
@@ -10,6 +10,7 @@ import LoanBillMainTemplate from '../../../../templates/loanBill/LoanBillMainTem
 import './loanBillTemplateSettings.scss';
 import CommonModal from '../../../common-modal/commonModal.jsx';
 import ReactToPrint from 'react-to-print';
+import ImageZoom from 'react-medium-image-zoom';
 
 
 const sampleBillContent = {
@@ -24,21 +25,21 @@ const sampleBillContent = {
     city: "CHENNAI",
     pinCode: "600056",
     mobile: '8148588004',
-    userPicture: {imageId: 1 , url: "http://localhost:3003/uploads/1595149324639.png"},
-    ornPicture: {imageId: 1 , url: "http://localhost:3003/uploads/1595149324639.png"},
+    userPicture: {imageId: 1 , url: "http://localhost:3003/uploads/system/user-male.png"},
+    ornPicture: {imageId: 1 , url: "http://localhost:3003/uploads/system/default-orn.webp"},
     orn: {
-        1: {ornItem: "G Ring", ornNWt: "1.8", ornNos: "1", ornSpec: ""},
-        2: {ornItem: "G Ring", ornNWt: "1.8", ornNos: "1", ornSpec: ""},
-        3: {ornItem: "G Ring", ornNWt: "1.8", ornNos: "1", ornSpec: ""},
-        4: {ornItem: "G Ring", ornNWt: "1.8", ornNos: "1", ornSpec: ""},
-        5: {ornItem: "G Ring", ornNWt: "1.8", ornNos: "1", ornSpec: ""},
-        6: {ornItem: "G Ring", ornNWt: "1.8", ornNos: "1", ornSpec: ""},
-        7: {ornItem: "G Ring", ornNWt: "1.8", ornNos: "1", ornSpec: ""},
-        8: {ornItem: "G Ring", ornNWt: "1.8", ornNos: "1", ornSpec: ""},
-        9: {ornItem: "G Ring", ornNWt: "1.8", ornNos: "1", ornSpec: ""},
-        10: {ornItem: "G Ring", ornNWt: "1.8", ornNos: "1", ornSpec: ""},
-        11: {ornItem: "G Ring", ornNWt: "1.8", ornNos: "1", ornSpec: ""},
-        12: {ornItem: "G Ring", ornNWt: "1.8", ornNos: "1", ornSpec: ""},
+        1: {ornItem: "G Ring", ornNWt: "2", ornNos: "1", ornSpec: ""},
+        // 2: {ornItem: "G Ring", ornNWt: "", ornNos: "1", ornSpec: ""},
+        // 3: {ornItem: "G Ring", ornNWt: "", ornNos: "1", ornSpec: ""},
+        // 4: {ornItem: "G Ring", ornNWt: "", ornNos: "1", ornSpec: ""},
+        // 5: {ornItem: "G Ring", ornNWt: "", ornNos: "1", ornSpec: ""},
+        // 6: {ornItem: "G Ring", ornNWt: "", ornNos: "1", ornSpec: ""},
+        // 7: {ornItem: "G Ring", ornNWt: "", ornNos: "1", ornSpec: ""},
+        // 8: {ornItem: "G Ring", ornNWt: "", ornNos: "1", ornSpec: ""},
+        // 9: {ornItem: "G Ring", ornNWt: "", ornNos: "1", ornSpec: ""},
+        // 10: {ornItem: "G Ring", ornNWt: "", ornNos: "1", ornSpec: ""},
+        // 11: {ornItem: "G Ring", ornNWt: "", ornNos: "1", ornSpec: ""},
+        // 12: {ornItem: "G Ring", ornNWt: "", ornNos: "1", ornSpec: ""},
     },
 };
 export default class LoanBillTemplateSettings extends Component {
@@ -88,6 +89,8 @@ export default class LoanBillTemplateSettings extends Component {
                     fontSize: null
                 }
             },
+            bodyTemplateId: null,
+            avlTemplates: [],
             currBillContent: {}
         }
         this.bindMethods();
@@ -100,14 +103,28 @@ export default class LoanBillTemplateSettings extends Component {
         this.printClick = this.printClick.bind(this);
     }
     componentDidMount() {
-        this.initFetchApi();
+        this.fetchSettings();
+        this.fetchAvlTemplates();
     }
-    async initFetchApi() {
+    async fetchSettings() {
         try {
             let at = getAccessToken();
             let resp = await axiosMiddleware.get(`${GET_LOAN_BILL_TEMPLATE_SETTINGS}?access_token=${at}`);
             if(resp && resp.data && resp.data.STATUS == 'SUCCESS' && resp.data.RESP) {
                 this.updateStateObj(resp.data.RESP);
+            }
+        } catch(e) {
+            console.error(e);
+        }
+    }
+    async fetchAvlTemplates() {
+        try {
+            let at = getAccessToken();
+            let resp = await axiosMiddleware.get(`${FETCH_AVL_LOAN_BILL_TEMPLATES}?access_token=${at}`);
+            if(resp && resp.data && resp.data.STATUS == 'SUCCESS' && resp.data.RESP) {
+                let newState = {...this.state};
+                newState.avlTemplates = resp.data.RESP;
+                this.setState(newState);
             }
         } catch(e) {
             console.error(e);
@@ -136,6 +153,7 @@ export default class LoanBillTemplateSettings extends Component {
         newState.fifthLine.text = headerObj.fifthLine.text;
         newState.fifthLine.styles.fontSize = headerObj.fifthLine.styles.fontSize;
 
+        newState.bodyTemplateId = respData.bodyTemplate;
         this.setState(newState);
     }
     onChangeFirstLine(val, part) {
@@ -188,6 +206,11 @@ export default class LoanBillTemplateSettings extends Component {
         newState.fifthLine.styles[part] = val;
         this.setState(newState);
     }
+    onChangeTemplateId(val) {
+        let newState = {...this.state};
+        newState.bodyTemplateId = val;
+        this.setState(newState);
+    }
     getApiParamsForUpdate() {
         let cntxt = {
             firstLine: {
@@ -227,15 +250,21 @@ export default class LoanBillTemplateSettings extends Component {
                 }
             }
         }
-        return {headerSettings: cntxt};
+        return {headerSettings: cntxt, bodyTemplateId: this.state.bodyTemplateId};
     }
     async updateDB() {
         try {
-            await axiosMiddleware.post(UPDATE_LOAN_BILL_TEMPLATE, this.getApiParamsForUpdate());
+            let resp = await axiosMiddleware.post(UPDATE_LOAN_BILL_TEMPLATE, this.getApiParamsForUpdate());
+            if(resp && resp.data && resp.data.STATUS == 'SUCCESS')
+                toast.success('Updated Successfully!');
             refreshLoanBillTemplateData();    
         } catch(e) {
+            toast.error('Error!');
             console.log(e);
         }
+    }
+    onChangeTemplateSelection(e, id) {
+        this.setState({bodyTemplateId: id});
     }
     showPreview() {
         this.setState({showPreview: true, currBillContent: sampleBillContent});
@@ -245,6 +274,37 @@ export default class LoanBillTemplateSettings extends Component {
     }
     printClick() {
         this.domElmns.printBtn.handlePrint();
+    }
+
+    getTemplateListSelectionContainer() {
+        let templatesContainer = [];
+        _.each(this.state.avlTemplates, (aTemplate, index) => {
+            let checked = false;
+            if(aTemplate.template_id == this.state.bodyTemplateId)
+                checked = true;
+            templatesContainer.push(
+                <Col xs={3} md={3}>
+                    <div className="screenshot-prview-container">
+                        <ImageZoom
+                            image={{
+                                src: aTemplate.screenshot_url,
+                                alt: 'Image Not Found',
+                                className: 'template-image-viewer',
+                            }}
+                        />
+                    </div>
+                    <div className="screenshot-radio-btn-label">
+                        <input type="radio" id={`loan-bill-body-template-id-${index}`} name="loan-bill-body-template" onChange={(e)=>this.onChangeTemplateSelection(e, aTemplate.template_id)} value={aTemplate.template_id} checked={checked}/>
+                        <label for={`loan-bill-body-template-id-${index}`}>{aTemplate.template_id}</label>
+                    </div>
+                </Col>
+            )
+        });
+        return (
+            <div>
+                {templatesContainer}
+            </div>
+        )
     }
     render() {
         return (
@@ -308,7 +368,7 @@ export default class LoanBillTemplateSettings extends Component {
                                     </Form.Group>
                                 </Col>
                             </Row>
-                            <Row className="first-line-style-input-row">
+                            {/* <Row className="first-line-style-input-row">
                                 <Col xs={3}>
                                     <Form.Group>
                                         <Form.Label>Margin-Top</Form.Label>
@@ -353,7 +413,7 @@ export default class LoanBillTemplateSettings extends Component {
                                         />
                                     </Form.Group>
                                 </Col>
-                            </Row>
+                            </Row> */}
                             <Row className="second-line-row">
                                 <Col xs={12} className="second-line-header">
                                     <h5>SECOND LINE</h5>
@@ -487,6 +547,12 @@ export default class LoanBillTemplateSettings extends Component {
                                             </Form.Group>
                                         </Col>
                                     </Row>
+                                </Col>
+                            </Row>
+                            <Row>
+                                <Col xs={12} md={12} className="template-list-col">
+                                    <h5>Content Template</h5>
+                                    {this.getTemplateListSelectionContainer()}
                                 </Col>
                             </Row>
                             <Row>

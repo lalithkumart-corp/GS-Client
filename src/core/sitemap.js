@@ -105,4 +105,5 @@ export const CASH_IN = `${config.proxy_protocol}://${config.proxy_api_host}:${co
 export const CASH_OUT = `${config.proxy_protocol}://${config.proxy_api_host}:${config.proxy_api_port}/${config.restApiRoot}/FundTransactions/cash-out`;
 export const GET_FUND_TRN_LIST = `${config.proxy_protocol}://${config.proxy_api_host}:${config.proxy_api_port}/${config.restApiRoot}/FundTransactions/fetch-transactions`;
 export const GET_LOAN_BILL_TEMPLATE_SETTINGS = `${config.proxy_protocol}://${config.proxy_api_host}:${config.proxy_api_port}/${config.restApiRoot}/LoanBillTemplates/get-settings`;
-export const UPDATE_LOAN_BILL_TEMPLATE = `${config.proxy_protocol}://${config.proxy_api_host}:${config.proxy_api_port}/${config.restApiRoot}/LoanBillTemplates/update-header-settings`;
+export const UPDATE_LOAN_BILL_TEMPLATE = `${config.proxy_protocol}://${config.proxy_api_host}:${config.proxy_api_port}/${config.restApiRoot}/LoanBillTemplates/update-settings`;
+export const FETCH_AVL_LOAN_BILL_TEMPLATES = `${config.proxy_protocol}://${config.proxy_api_host}:${config.proxy_api_port}/${config.restApiRoot}/LoanBillTemplates/fetch-avl-loan-bill-templates`;
