@@ -53,7 +53,7 @@ class NavbarComp extends Component {
     }
     getUnactivatedHeader() {
         return (
-            <Navbar bg="light" expand="lg">
+            <Navbar bg="light" expand="true">
                 <Navbar.Collapse id="basic-navbar-nav">
                     <Nav className="mr-auto" style={{borderLeft: "1px solid lightgray"}}></Nav>
                     <Nav>
@@ -67,13 +67,13 @@ class NavbarComp extends Component {
     }
     getRegularNavBar() {
         return (
-            <Navbar bg="light" expand="lg">
+            <Navbar bg="light">
                 <Nav.Link as={Link} to="/">Home</Nav.Link>
                 <Navbar.Toggle aria-controls="basic-navbar-nav" />
                 <Navbar.Collapse id="basic-navbar-nav">
                     <Nav>
                         {this.state.enablePledgebookModule && 
-                            <NavDropdown title="Loan" id="basic-nav-dropdown">
+                            <NavDropdown title="Loan" id="loan-dropdown">
                             <NavDropdown.Item as={Link} to="/billcreate">Bill Creation</NavDropdown.Item>
                             <NavDropdown.Item as={Link} to="/redeem">Bill Redeem</NavDropdown.Item>
                             <NavDropdown.Divider />
@@ -85,7 +85,7 @@ class NavbarComp extends Component {
                     </Nav>
                     {this.state.enableStockModule && 
                         <Nav>
-                            <NavDropdown title="Stock" id="basic-nav-dropdown">
+                            <NavDropdown title="Stock" id="stock-dropdown">
                                 <NavDropdown.Item as={Link} to="/stock-add">Add Items</NavDropdown.Item>
                                 <NavDropdown.Item as={Link} to="/stock-view">View</NavDropdown.Item>
                                 <NavDropdown.Item as={Link} to="/sell-item">Sale</NavDropdown.Item>
@@ -95,19 +95,23 @@ class NavbarComp extends Component {
                                 <NavDropdown.Item as={Link} to="/tag-demo">Tag-Custom</NavDropdown.Item>
                             </NavDropdown>
                         </Nav>
-    }
+                    }
+                    {this.state.enableTallyModule && 
+                    <Nav>
+                        <NavDropdown title="Tally" id="">
+                            <NavDropdown.Item as={Link} to="/cash-manager">Cash Manager</NavDropdown.Item>
+                            <NavDropdown.Divider />
+                            <NavDropdown.Item as={Link} to="/tally">DayBook</NavDropdown.Item>
+                        </NavDropdown>
+                    </Nav>
+                    }
+                    {this.state.enableUserModule && 
+                    <Nav>
+                        <Nav.Link as={Link} to="/users">User</Nav.Link>
+                    </Nav>
+                    }
                     <Nav className="mr-auto">
-                        {this.state.enableTallyModule && 
-                            <Nav>
-                                <NavDropdown title="Tally" id="">
-                                    <NavDropdown.Item as={Link} to="/cash-manager">Cash Manager</NavDropdown.Item>
-                                    <NavDropdown.Divider />
-                                    <NavDropdown.Item as={Link} to="/tally">DayBook</NavDropdown.Item>
-                                </NavDropdown>
-                            </Nav>
-                        }
-                        {this.state.enableUserModule && <Nav.Link as={Link} to="/users">User</Nav.Link>}
-                        <NavDropdown title="Others" id="basic-nav-dropdown">
+                        <NavDropdown title="Others" id="customer-dropdown">
                             <NavDropdown.Item as={Link} to="/customerdetail">Customer Detail</NavDropdown.Item>
                             {/* <NavDropdown.Item as={Link} to="/picture">Webcam</NavDropdown.Item>
                             <NavDropdown.Item as={Link} to="/uploadpicdemo">Upload Pic Demo</NavDropdown.Item>
