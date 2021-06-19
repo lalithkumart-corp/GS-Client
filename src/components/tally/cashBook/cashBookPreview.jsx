@@ -5,22 +5,27 @@ import axiosMiddleware from '../../../core/axios';
 import { convertToLocalTime } from '../../../utilities/utility';
 import { GET_FUND_TRN_LIST } from '../../../core/sitemap';
 import { getAccessToken } from '../../../core/storage';
+import { getOffsets2 } from './helper';
+import ReactPaginate from 'react-paginate';
+import './cashBookPreview.scss';
 
 export default function CashBook(props) {
-    // let getDateRange = () => {
-    //     return {
-    //         startDate: props._startDateUTC,
-    //         endDate: props._endDateUTC
-    //     }
-    // }
-
-    // const [dateRange, setDateRange] = useState(getDateRange());
-
     const [transactions, setTransactions] = useState([]);
+    const [selectedPageIndex, setSelectedPageIndex] = useState(0);
+    const [pageLimit, setPageLimit] = useState(10);
+    const [totalTransactionsCount, setTotalTransactionsCount] = useState(0);
+    const [totals, setTotals] = useState({cashIn: 0, cashOut: 0});
 
     useEffect(() => {
-        fetchTransactions();
-    }, [props._startDateUTC, props._endDateUTC]);
+        if(props.refreshCashBookTable) {
+            fetchTransactions();
+            props.setRefreshCashBookTableFlag(false);
+        }
+    }, [props.refreshCashBookTable]);
+
+    // useEffect(() => {
+    //     fetchTransactions();
+    // }, [props._startDateUTC, props._endDateUTC]);
 
     const columns = [
         {
@@ -29,7 +34,7 @@ export default function CashBook(props) {
             width: '10%',
             formatter: (column, columnIndex, row, rowIndex) => {
                 return (
-                    <span>{convertToLocalTime(row[column.id], {excludeTime: true})}</span>
+                    <span style={{padding: '8px'}}>{convertToLocalTime(row[column.id], {excludeTime: true})}</span>
                 )
             },
         },{
@@ -37,40 +42,86 @@ export default function CashBook(props) {
             displayText: 'Location',
             width: '7%'
         },{
-            id: 'amount',
-            displayText: 'Amount',
+            id: 'cash_in',
+            displayText: 'Cash In',
+            width: '8%',
+            footerClassName: 'cash-transaction-total-cashin-footer-cell',
+            footerFormatter: () => <span>{totals.cashIn}</span>
+        },{
+            id: 'cash_out',
+            displayText: 'Cash Out',
+            width: '8%',
+            footerClassName: 'cash-transaction-total-cashout-footer-cell',
+            footerFormatter: () => <span>{totals.cashOut}</span>
+        },{
+            id: 'category',
+            displayText: 'Category',
             width: '8%',
         },{
             id: 'remarks',
             displayText: 'Remarks',
             width: '15%',
         }
-    ]
+    ];
     
     const fetchTransactions = async () => {
         try {
             let at = getAccessToken();
+            let offsets = getOffsets2(selectedPageIndex, pageLimit);
             let params = {
                 startDate: props._startDateUTC,
-                endDate: props._endDateUTC
+                endDate: props._endDateUTC,
+                offsetStart: offsets[0],
+                offsetEnd: offsets[1]
             }
             let resp = await axiosMiddleware.get(`${GET_FUND_TRN_LIST}?access_token=${at}&params=${JSON.stringify(params)}`);
-            if(resp && resp.data) {
-                setTransactions(resp.data.RESP);
+            if(resp && resp.data.RESP) {
+                setTransactions(resp.data.RESP.results);
+                setTotalTransactionsCount(resp.data.RESP.collections.count);
+                if(resp.data.RESP.collections) {
+                    setTotals({cashIn: resp.data.RESP.collections.totalCashIn, cashOut: resp.data.RESP.collections.totalCashOut});
+                    props.updateCommonStore('cashTransactions', {totalCashIn: resp.data.RESP.collections.totalCashIn, totalCashOut: resp.data.RESP.collections.totalCashOut});
+                }
                 console.log(resp.data);
             }
         } catch(e) {
             console.log(e);
         }
     };
+
+    const getPageCount = () => {
+        let totalRecords = totalTransactionsCount;
+        return (totalRecords/pageLimit);
+    }
+
+    const handlePageClick = async (selectedPage) => {
+        await setSelectedPageIndex(selectedPage.selected);
+        fetchTransactions();      
+    }
     
     return (
         <Row className="gs-card-content">
-            <Col xs={12} md={12} sm={12}><h4>CASH BOOK</h4></Col>
+            <Col xs={12} md={12} sm={12}><h4>CASH Transactions</h4></Col>
+            <Col xs={12}>
+                <ReactPaginate previousLabel={"<"}
+                    nextLabel={">"}
+                    breakLabel={"..."}
+                    breakClassName={"break-me"}
+                    pageCount={getPageCount()}
+                    marginPagesDisplayed={2}
+                    pageRangeDisplayed={5}
+                    onPageChange={handlePageClick}
+                    containerClassName={"gs-pagination pagination"}
+                    subContainerClassName={"pages pagination"}
+                    activeClassName={"active"}
+                    forcePage={selectedPageIndex} />
+            </Col>
             <Col xs={12} md={12} xs={12}>
                 <GSTable 
                     columns={columns}
                     rowData={transactions}
+                    className= {"my-cashbook-preview-table"}
+                    showFooter={true}
                 />
             </Col>
         </Row>

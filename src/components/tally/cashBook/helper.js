@@ -16,10 +16,16 @@ export const constructFetchApiParams = (stateObj) => {
     return params;
 }
 
-
 const getOffsets = (stateObj) => {        
     let pageNumber = parseInt(stateObj.selectedPageIndex);
     let offsetStart = pageNumber * parseInt(stateObj.pageLimit);
     let offsetEnd = offsetStart + parseInt(stateObj.pageLimit);
+    return [offsetStart, offsetEnd];
+}
+
+export const getOffsets2 = (selectedPageIndex, pageLimit) => {
+    let pageNumber = parseInt(selectedPageIndex);
+    let offsetStart = pageNumber * parseInt(pageLimit);
+    let offsetEnd = offsetStart + parseInt(pageLimit);
     return [offsetStart, offsetEnd];
 }

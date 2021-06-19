@@ -27,3 +27,21 @@ body {
 #root {
     min-width: 1000px;
 }
+.gs-pagination.pagination {
+    margin: 0;
+    float: right;
+    li {
+        >a {
+            border: none;
+            border-radius: 50%;
+            outline: none;
+            color: black;
+            font-weight: bold;
+        }
+    }
+    >.active {
+        >a {
+            color: white;
+        }
+    }
+}

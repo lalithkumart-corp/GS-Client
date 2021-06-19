@@ -104,6 +104,7 @@ export const GET_ALERTS_LIST = `${config.proxy_protocol}://${config.proxy_api_ho
 export const ARCHIVE_AN_ALERT = `${config.proxy_protocol}://${config.proxy_api_host}:${config.proxy_api_port}/${config.restApiRoot}/Alerts/archive-an-alert`;
 export const GET_USERID_BY_TOKEN = `${config.proxy_protocol}://${config.proxy_api_host}:${config.proxy_api_port}/user-id-by-token`;
 
+export const FETCH_CATEGORY_SUGGESTIONS = `${config.proxy_protocol}://${config.proxy_api_host}:${config.proxy_api_port}/${config.restApiRoot}/FundTransactions/fetch-category-suggestions`;
 export const CASH_IN = `${config.proxy_protocol}://${config.proxy_api_host}:${config.proxy_api_port}/${config.restApiRoot}/FundTransactions/cash-in`;
 export const CASH_OUT = `${config.proxy_protocol}://${config.proxy_api_host}:${config.proxy_api_port}/${config.restApiRoot}/FundTransactions/cash-out`;
 export const GET_FUND_TRN_LIST = `${config.proxy_protocol}://${config.proxy_api_host}:${config.proxy_api_port}/${config.restApiRoot}/FundTransactions/fetch-transactions`;

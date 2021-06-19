@@ -485,7 +485,7 @@ class GSTable extends Component {
                         if(rowData.length) {
                             for(let i=0; i< rowData.length; i++) {
                                 rows.push(makeARow(rowData[i], i));
-                                if(rowData[i]._expanded)
+                                if(this.state.expandRow && rowData[i]._expanded)
                                     rows.push(makeExpandedRow(rowData[i], i));
                             }
                         } else {

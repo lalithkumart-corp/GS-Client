@@ -68,18 +68,34 @@ class BalanceSheet extends Component {
         let loanInterest = this.getLoanInterest();
         let redeemAmount = this.getRedeemAmount();
         let redeemInterest = this.getRedeemInterest();
+        let cashIn = this.getTotalCashIn();
         //return format((loanInterest + redeemAmount + redeemInterest), {code: "INR"});
-        return (loanInterest + redeemAmount + redeemInterest);
+        return (loanInterest + redeemAmount + redeemInterest + cashIn);
     }
 
     getOutTotal(format=true) {
         let loanAmount = this.getLoanAmount();
+        let cashOut = this.getTotalCashOut();
         //return format(loanAmount, {code: 'INR'});
-        return loanAmount;
+        return (loanAmount+cashOut);
     }
 
     getAvailableFunds() {
         return (this.getInTotal(false) - this.getOutTotal(false));
+    }
+
+    getTotalCashIn() {
+        let totalCashIn = 0;
+        if(this.state.commonStore.cashTransactions && this.state.commonStore.cashTransactions.totalCashIn)
+            totalCashIn = this.state.commonStore.cashTransactions.totalCashIn;
+        return totalCashIn;
+    }
+
+    getTotalCashOut() {
+        let totalCashOut = 0;
+        if(this.state.commonStore.cashTransactions && this.state.commonStore.cashTransactions.totalCashOut)
+            totalCashOut = this.state.commonStore.cashTransactions.totalCashOut;
+        return totalCashOut;
     }
 
     render() {
@@ -101,7 +117,6 @@ class BalanceSheet extends Component {
                             <Col xs={{span: 3}} className="cell border-right"></Col>
                             <Col xs={{span: 3}} className="cell">{format(0, {code: 'INR'})}</Col>
                         </Row>
-
                         <Row className="overview-row">
                             <Col xs={{span: 3}} className="cell border-right">Loan Amount</Col>
                             <Col xs={{span: 3}} className="cell border-right"></Col>
@@ -129,7 +144,12 @@ class BalanceSheet extends Component {
                             <Col xs={{span: 3}} className="cell border-right"></Col>
                             <Col xs={{span: 3}} className="cell"></Col>
                         </Row>
-
+                        <Row className="overview-row">
+                            <Col xs={{span: 3}} className="cell border-right">Cash Transactions</Col>
+                            <Col xs={{span: 3}} className="cell border-right">{format(this.getTotalCashIn(), {code: 'INR'})}</Col>
+                            <Col xs={{span: 3}} className="cell border-right">{format(this.getTotalCashOut(), {code: 'INR'})}</Col>
+                            <Col xs={{span: 3}} className="cell"></Col>
+                        </Row>
                         <Row className="overview-footer">
                             <Col xs={{span: 3}} className="cell border-right"></Col>
                             <Col xs={{span: 3}} className="cell border-right">{format(this.getInTotal(), {code: 'INR'})}</Col>

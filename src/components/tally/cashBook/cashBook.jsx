@@ -9,11 +9,11 @@ import moment from 'moment';
 import DateRangePicker from '../../dateRangePicker/dataRangePicker';
 import { constructFetchApiParams } from './helper';
 import ReactPaginate from 'react-paginate';
+import './cashBook.scss';
+
 export default class CashBook extends Component {
     constructor(props) {
         super(props);
-        // let todaysDate = new Date();
-        // todaysDate.setHours(0,0,0,0);
         let past7daysStartDate = new Date();
         past7daysStartDate.setDate(past7daysStartDate.getDate()-730);
         past7daysStartDate.setHours(0,0,0,0);
@@ -46,7 +46,7 @@ export default class CashBook extends Component {
                 width: '10%',
                 formatter: (column, columnIndex, row, rowIndex) => {
                     return (
-                        <span>{convertToLocalTime(row[column.id], {excludeTime: true})}</span>
+                        <div style={{padding: '8px'}}>{convertToLocalTime(row[column.id], {excludeTime: true})}</div>
                     )
                 }
             },{
@@ -71,8 +71,12 @@ export default class CashBook extends Component {
                     );
                 }
             },{
-                id: 'amount',
-                displayText: 'Amount',
+                id: 'cash_in',
+                displayText: 'Cash In',
+                width: '8%',
+            },{
+                id: 'cash_out',
+                displayText: 'Cash Out',
                 width: '8%',
             },{
                 id: 'category',
@@ -134,7 +138,6 @@ export default class CashBook extends Component {
         location: async (val) => {
             let newState = {...this.state};
             newState.filters.fundHouse = val;
-            debugger;
             await this.setState(newState);
             this.fetchTransactions();
         },
@@ -146,19 +149,20 @@ export default class CashBook extends Component {
         }
     }
 
-    handlePageClick() {
-
+    async handlePageClick(selectedPage) {
+        await this.setState({selectedPageIndex: selectedPage.selected});  
+        this.fetchTransactions();      
     }
 
     getPageCount() {
-        let totalRecords = this.state.totalCount;
+        let totalRecords = this.state.totalTransactionsCount;
         return (totalRecords/this.state.pageLimit);
     }
     
     render() {
         return (
             <Row className="gs-card-content cash-book-main-card">
-                <Col xs={12} md={12} sm={12}><h4>CASH BOOK</h4></Col>
+                <Col xs={12} md={12} sm={12}><h4>CASH TRANSACTIONS</h4></Col>
                 <Col xs={6} md={6} sm={6}>
                     <DateRangePicker 
                         className = 'cash-book-date-filter'
@@ -176,7 +180,7 @@ export default class CashBook extends Component {
                             marginPagesDisplayed={2}
                             pageRangeDisplayed={5}
                             onPageChange={this.handlePageClick}
-                            containerClassName={"cashbook pagination"}
+                            containerClassName={"gs-pagination pagination"}
                             subContainerClassName={"pages pagination"}
                             activeClassName={"active"}
                             forcePage={this.state.selectedPageIndex} />

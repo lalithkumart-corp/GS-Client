@@ -23,7 +23,7 @@ class TallyPage extends Component {
             _endDateUTC: new Date(new Date().setHours(23,59,59,59)).toISOString(),
             refreshLoanPreviewTable: false,
             refreshRedeemPreviewTable: false,
-            // refreshCashBookTable: false,
+            refreshCashBookTable: false,
             commonStore: {}
         }
         this.bindMethods();
@@ -31,6 +31,7 @@ class TallyPage extends Component {
     bindMethods() {
         this.setRefreshLoanPreviewTableFlag = this.setRefreshLoanPreviewTableFlag.bind(this);
         this.setRefreshRedeemPreviewTableFlag = this.setRefreshRedeemPreviewTableFlag.bind(this);
+        this.setRefreshCashBookTableFlag = this.setRefreshCashBookTableFlag.bind(this);
         this.updateMyState = this.updateMyState.bind(this);
     }
     componentWillReceiveProps(nextProps) {
@@ -51,9 +52,9 @@ class TallyPage extends Component {
         this.setState({refreshRedeemPreviewTable: flag});
     }
 
-    // setRefreshCashBookTableFlag(flag) {
-    //     this.setState({refreshCashBookTable: flag});
-    // }
+    setRefreshCashBookTableFlag(flag) {
+        this.setState({refreshCashBookTable: flag});
+    }
 
     actionListener = {
         dateChangeListener: (dateVal, identifier) => {
@@ -75,7 +76,7 @@ class TallyPage extends Component {
         onDateSubmitClick: async (e) => {
             this.setRefreshLoanPreviewTableFlag(true);
             this.setRefreshRedeemPreviewTableFlag(true);
-            // this.setRefreshCashBookTableFlag(true);
+            this.setRefreshCashBookTableFlag(true);
         }
     }
 
@@ -141,6 +142,9 @@ class TallyPage extends Component {
                                 <CashBookPreview 
                                     _startDateUTC={this.state._startDateUTC}
                                     _endDateUTC={this.state._endDateUTC} 
+                                    refreshCashBookTable= {this.state.refreshCashBookTable}
+                                    setRefreshCashBookTableFlag={this.setRefreshCashBookTableFlag}
+                                    updateCommonStore = {this.updateMyState}
                                     />
                             </Tab>
                             <Tab eventKey="balancesheet" title="Balance Sheet" >
