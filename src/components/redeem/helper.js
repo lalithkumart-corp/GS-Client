@@ -51,6 +51,7 @@ export const getRequestParams = (billData) => {
     let requestParams = [];    
     let anObj = {
         //pledgeBookID: billData.PledgeBookID,
+        redeemUID: (+new Date()),
         pledgeBookUID: billData.UniqueIdentifier,
         billNo: billData.BillNo,
         pledgedDate: billData.Date.replace('T', ' ').slice(0,23),
@@ -121,7 +122,8 @@ export const getReopenRequestParams = (billData) => {
     let requestParams = [];    
     let anObj = {
         //pledgeBookID: billData.PledgeBookID,
-        pledgeBookUID: billData.UniqueIdentifier                
+        pledgeBookUID: billData.UniqueIdentifier,
+        closedBillReference: billData.closedBillReference
     };
     requestParams.push(anObj);
     return requestParams;

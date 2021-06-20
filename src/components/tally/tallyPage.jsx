@@ -24,6 +24,7 @@ class TallyPage extends Component {
             refreshLoanPreviewTable: false,
             refreshRedeemPreviewTable: false,
             refreshCashBookTable: false,
+            refreshBalanceSheet: false,
             commonStore: {}
         }
         this.bindMethods();
@@ -32,6 +33,7 @@ class TallyPage extends Component {
         this.setRefreshLoanPreviewTableFlag = this.setRefreshLoanPreviewTableFlag.bind(this);
         this.setRefreshRedeemPreviewTableFlag = this.setRefreshRedeemPreviewTableFlag.bind(this);
         this.setRefreshCashBookTableFlag = this.setRefreshCashBookTableFlag.bind(this);
+        this.setRefreshBalanceSheetFlag = this.setRefreshBalanceSheetFlag.bind(this);
         this.updateMyState = this.updateMyState.bind(this);
     }
     componentWillReceiveProps(nextProps) {
@@ -56,6 +58,10 @@ class TallyPage extends Component {
         this.setState({refreshCashBookTable: flag});
     }
 
+    setRefreshBalanceSheetFlag(flag) {
+        this.setState({refreshBalanceSheet: flag});
+    }
+
     actionListener = {
         dateChangeListener: (dateVal, identifier) => {
             let newState = {...this.state}
@@ -77,6 +83,7 @@ class TallyPage extends Component {
             this.setRefreshLoanPreviewTableFlag(true);
             this.setRefreshRedeemPreviewTableFlag(true);
             this.setRefreshCashBookTableFlag(true);
+            this.setRefreshBalanceSheetFlag(true);
         }
     }
 
@@ -95,8 +102,8 @@ class TallyPage extends Component {
                             showMonthDropdown
                             showYearDropdown
                                 timeInputLabel="Time:"
-                                dateFormat="dd/MM/yyyy h:mm aa"
-                                showTimeInput
+                                dateFormat="dd/MM/yyyy"
+                                // showTimeInput
                         />
                     </Col>
                     <Col xs={2} className="end-date-container">
@@ -111,8 +118,8 @@ class TallyPage extends Component {
                             showMonthDropdown
                             showYearDropdown
                                 timeInputLabel="Time:"
-                                dateFormat="dd/MM/yyyy h:mm aa"
-                                showTimeInput
+                                dateFormat="dd/MM/yyyy"
+                                // showTimeInput
                         />
                     </Col>
                     <Col xs={1}>
@@ -121,7 +128,7 @@ class TallyPage extends Component {
                 </Row>
                 <Row className='tab-view'>
                     <Col xs={12} style={{padding: 0}}>
-                        <Tabs defaultActiveKey="loan" className='gs-tabs'>
+                        <Tabs defaultActiveKey="balancesheet" className='gs-tabs'>
                             <Tab eventKey="loan" title="Loan" >
                                 <LoanPreview 
                                     _startDateUTC={this.state._startDateUTC}
@@ -148,7 +155,11 @@ class TallyPage extends Component {
                                     />
                             </Tab>
                             <Tab eventKey="balancesheet" title="Balance Sheet" >
-                                <BalanceSheet {...this.state.commonStore} />
+                                <BalanceSheet 
+                                    commonStore={this.state.commonStore} 
+                                    _startDateUTC={this.state._startDateUTC}
+                                    refreshBalanceSheet={this.state.refreshBalanceSheet}
+                                    setRefreshBalanceSheetFlag={this.setRefreshBalanceSheetFlag}/>
                             </Tab>
                         </Tabs>
                     </Col>

@@ -1,7 +1,9 @@
 import React, { Component } from 'react';
 import { Container, Row, Col } from 'react-bootstrap';
 import { format } from 'currency-formatter';
-
+import { GET_OPENING_BALANCE } from '../../../core/sitemap';
+import { getAccessToken } from '../../../core/storage';
+import axiosMiddleware from '../../../core/axios';
 import './balanceSheet.css';
 
 const GOLD = 'gold';
@@ -11,12 +13,33 @@ class BalanceSheet extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            commonStore: {}
+            commonStore: {},
+            _startDateUTC: this.props._startDateUTC,
+            openingBalance: 0
         }
     }
 
     componentWillReceiveProps(nextProps) {
-        this.state.commonStore = nextProps;
+        if(nextProps.refreshBalanceSheet) {
+            this.state._startDateUTC = nextProps._startDateUTC;
+            this.fetchOpeningBalance();
+            this.props.setRefreshBalanceSheetFlag(false);
+            this.state.commonStore = nextProps.commonStore;
+        } else {
+            this.state.commonStore = nextProps.commonStore;
+        }
+    }
+
+    async fetchOpeningBalance() {
+        try {
+            let at = getAccessToken();
+            let resp = await axiosMiddleware.get(`${GET_OPENING_BALANCE}?access_token=${at}&date=${this.state._startDateUTC}`);
+            if(resp && resp.data && resp.data.STATUS == 'SUCCESS')
+                this.setState({openingBalance: resp.data.RESP});
+            console.log(resp.data);
+        } catch(e) {
+            console.error(e);
+        }
     }
 
     get(key, category, action) {
@@ -115,7 +138,7 @@ class BalanceSheet extends Component {
                             <Col xs={{span: 3}} className="cell border-right">Opening Balance</Col>
                             <Col xs={{span: 3}} className="cell border-right"></Col>
                             <Col xs={{span: 3}} className="cell border-right"></Col>
-                            <Col xs={{span: 3}} className="cell">{format(0, {code: 'INR'})}</Col>
+                            <Col xs={{span: 3}} className="cell">{format(this.state.openingBalance, {code: 'INR'})}</Col>
                         </Row>
                         <Row className="overview-row">
                             <Col xs={{span: 3}} className="cell border-right">Loan Amount</Col>
