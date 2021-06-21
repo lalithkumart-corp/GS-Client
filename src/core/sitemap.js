@@ -1,6 +1,6 @@
 let app = require('./app');
 let env = require('./environment');
-let config;
+// let config;
 
 // if(app.env === env.DEVELOPMENT) {
 //     config = {        
@@ -17,21 +17,27 @@ let config;
 //         "restApiRoot": "api"
 //     }
 // }
-const port = window.location.port || process.env.REACT_APP_API_PORT;
-const protocol = window.location.protocol.substring(0, window.location.protocol.indexOf(':')) || process.env.REACT_APP_API_PROTOCOL;
+
 console.log('NODE_ENV:', process.env.NODE_ENV);
 console.log('REACT ENV File:', process.env.REACT_APP_FLAG);
 
-config = {        
+let port = window.location.port;
+if(process.env.NODE_ENV == 'development')
+    port = process.env.REACT_APP_API_PORT;
+const protocol = window.location.protocol.substring(0, window.location.protocol.indexOf(':')) || process.env.REACT_APP_API_PROTOCOL;
+
+export let config = {
     "proxy_api_host": process.env.REACT_APP_API_HOST,
     "proxy_api_port": port,
     "proxy_protocol": protocol,
-    "restApiRoot": process.env.REACT_APP_API_ROOT
+    "restApiRoot": process.env.REACT_APP_API_ROOT,
+    "assetsRoot": process.env.SERVER_ASSETS_ROOT || '',
 };
 
 console.log(config);
 
 export const SERVER_URL = `${config.proxy_protocol}://${config.proxy_api_host}:${config.proxy_api_port}`;
+export const SERVER_ASSETS_URL_PATH = `${config.proxy_protocol}://${config.proxy_api_host}:${config.proxy_api_port}${config.assetsRoot}`;
 export const LOGIN = `${config.proxy_protocol}://${config.proxy_api_host}:${config.proxy_api_port}/${config.restApiRoot}/GsUsers/login-user`;
 export const SSO_LOGIN = `${config.proxy_protocol}://${config.proxy_api_host}:${config.proxy_api_port}/${config.restApiRoot}/GsUsers/sso-login`;
 export const CHECK_EMAIL_EXISTANCE = `${config.proxy_protocol}://${config.proxy_api_host}:${config.proxy_api_port}/${config.restApiRoot}/GsUsers/check-email-existance`;

@@ -1,5 +1,5 @@
 import { getInterestRates, setInterestRates, clearInterestRates, getAccessToken } from '../core/storage';
-import { GET_INTEREST_RATES } from '../core/sitemap';
+import { SERVER_ASSETS_URL_PATH , GET_INTEREST_RATES } from '../core/sitemap';
 import axios from 'axios';
 
 export const getDateInUTC = (theDate, options) => {
@@ -145,4 +145,7 @@ export const isNull = (val) => {
             isNull = false;
     }
     return isNull;
+}
+export const constructApiAssetUrl = (urlPath) => {
+    return `${SERVER_ASSETS_URL_PATH}${urlPath}`;
 }

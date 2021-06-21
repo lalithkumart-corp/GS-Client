@@ -6,6 +6,7 @@ import { GET_LOAN_BILL_TEMPLATE_SETTINGS, UPDATE_LOAN_BILL_TEMPLATE, FETCH_AVL_L
 import { getAccessToken } from '../../../../core/storage';
 import { toast } from 'react-toastify';
 import { refreshLoanBillTemplateData } from '../../../../utilities/authUtils';
+import { constructApiAssetUrl } from '../../../../utilities/utility';
 import LoanBillMainTemplate from '../../../../templates/loanBill/LoanBillMainTemplate';
 import './loanBillTemplateSettings.scss';
 import CommonModal from '../../../common-modal/commonModal.jsx';
@@ -282,6 +283,9 @@ export default class LoanBillTemplateSettings extends Component {
             let checked = false;
             if(aTemplate.template_id == this.state.bodyTemplateId)
                 checked = true;
+
+            aTemplate.screenshot_url = constructApiAssetUrl(aTemplate.screenshot_url);
+            
             templatesContainer.push(
                 <Col xs={3} md={3}>
                     <div className="screenshot-prview-container">
