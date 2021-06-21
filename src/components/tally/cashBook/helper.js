@@ -5,10 +5,11 @@ export const constructFetchApiParams = (stateObj) => {
         startDate: getDateInUTC(stateObj.filters.date.startDate, {time: 'start'}),
         endDate: getDateInUTC(stateObj.filters.date.endDate, {time: 'end'}),
     };
-    if(stateObj.filters.fundHouse && stateObj.filters.fundHouse !== 'all')
-        params.fundHouse = stateObj.filters.fundHouse;
-    if(stateObj.filters.category && stateObj.filters.category !== 'all')
-        params.category = stateObj.filters.category;
+    if(stateObj.filters.selectedAccounts.length > 0)
+        params.accounts = stateObj.filters.selectedAccounts.map((anAccount)=> anAccount.value);
+    if(stateObj.filters.selectedCategories.length > 0 ) {
+        params.category = stateObj.filters.selectedCategories.map((aCateg)=> aCateg.value);
+    }
 
     let offsets = getOffsets(stateObj);
     params.offsetStart = offsets[0] || 0;

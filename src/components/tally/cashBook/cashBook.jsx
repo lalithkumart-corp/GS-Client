@@ -10,6 +10,7 @@ import DateRangePicker from '../../dateRangePicker/dataRangePicker';
 import { constructFetchApiParams } from './helper';
 import ReactPaginate from 'react-paginate';
 import './cashBook.scss';
+import MultiSelect from "react-multi-select-component";
 
 export default class CashBook extends Component {
     constructor(props) {
@@ -27,10 +28,10 @@ export default class CashBook extends Component {
                     startDate: past7daysStartDate,
                     endDate: todaysEndDate
                 },
-                fundHouse: 'all',
-                category: 'all',
+                selectedAccounts: [],
+                selectedCategories: [],
                 collections: {
-                    fundHouses: [],
+                    fundAccounts: [],
                     categories: []
                 }
             },
@@ -62,43 +63,46 @@ export default class CashBook extends Component {
                 }
             },{
                 id: 'fund_house_name',
-                displayText: 'Location',
+                displayText: 'Account',
                 width: '7%',
                 isFilterable: true,
                 filterFormatter: (column, colIndex) => {
                     let options = [];
-                    _.each(this.state.filters.collections.fundHouses, (aFundHouse, index) => {
-                        options.push(
-                            <option key={`house-${index}`} value={aFundHouse}>{aFundHouse.toUpperCase()}</option>
-                        );
+                    _.each(this.state.filters.collections.fundAccounts, (anAccount, index) => {
+                        options.push({label: anAccount.toUpperCase(), value: anAccount});
                     });
                     return (
                         <div>
-                            <select onChange={(e) => this.filterCallbacks.location(e.target.value)}>
-                                <option key='house-1' value='all'>All</option>
-                                {options}
-                            </select>
+                            <MultiSelect
+                                options={options}
+                                value={this.state.filters.selectedAccounts}
+                                onChange={this.filterCallbacks.account}
+                                labelledBy="Select"
+                                className="account-multiselect-dpd"
+                            />
                         </div>
                     );
                 }
             },{
                 id: 'category',
                 displayText: 'Category',
-                width: '8%',
+                width: '20%',
                 isFilterable: true,
                 filterFormatter: (column, colIndex) => {
                     let options = [];
                     _.each(this.state.filters.collections.categories, (aCateg, index) => {
-                        options.push(
-                            <option key={`house-${index}`} value={aCateg}>{aCateg.toUpperCase()}</option>
-                        );
+                        options.push({label: aCateg.toUpperCase(), value: aCateg});
                     });
+
                     return (
                         <div>
-                            <select onChange={(e) => this.filterCallbacks.category(e.target.value)}>
-                                <option key='house-1' value='all'>All</option>
-                                {options}
-                            </select>
+                            <MultiSelect
+                                options={options}
+                                value={this.state.filters.selectedCategories}
+                                onChange={this.filterCallbacks.category}
+                                labelledBy="Select"
+                                className="category-multiselect-dpd"
+                            />
                         </div>
                     );
                 }
@@ -212,15 +216,15 @@ export default class CashBook extends Component {
             await this.setState(newState);
             this.fetchTransactions();
         },
-        location: async (val) => {
+        account: async (val) => {
             let newState = {...this.state};
-            newState.filters.fundHouse = val;
+            newState.filters.selectedAccounts = val;
             await this.setState(newState);
             this.fetchTransactions();
         },
         category: async (val) => {
             let newState = {...this.state};
-            newState.filters.category = val;
+            newState.filters.selectedCategories = val;
             await this.setState(newState);
             this.fetchTransactions();
         }
