@@ -3,19 +3,23 @@ import moment from 'moment';
 
 export const getRateOfInterest = (interestRatesDB, amount, options={}) => {
     let rateOfInterest = 0;
-    if(typeof interestRatesDB == 'string')
-        interestRatesDB = JSON.parse(interestRatesDB);
-    if(typeof amount == 'string')
-        amount = parseInt(amount);
-    let type = options.type;    
-    if(!type && options.orn)
-        type = getTypeBasedOnOrn(options.orn);
-    if(type) {
-        _.each(interestRatesDB, (aRateObj, index) => {
-            if(type == aRateObj.type && amount >= aRateObj.rangeFrom && amount <= aRateObj.rangeTo ) {
-                rateOfInterest = aRateObj.rateOfInterest;
-            }
-        });
+    if(options && options.interestDuringBillCreation) {
+        rateOfInterest = options.interestDuringBillCreation;
+    } else {
+        if(typeof interestRatesDB == 'string')
+            interestRatesDB = JSON.parse(interestRatesDB);
+        if(typeof amount == 'string')
+            amount = parseInt(amount);
+        let type = options.type;    
+        if(!type && options.orn)
+            type = getTypeBasedOnOrn(options.orn);
+        if(type) {
+            _.each(interestRatesDB, (aRateObj, index) => {
+                if(type == aRateObj.type && amount >= aRateObj.rangeFrom && amount <= aRateObj.rangeTo ) {
+                    rateOfInterest = aRateObj.rateOfInterest;
+                }
+            });
+        }
     }
     return rateOfInterest;
 }
@@ -74,7 +78,7 @@ export const calculateData = (selectedBillData, options) => {
     let todayDate = options.date; 
     let pledgedDate = moment.utc(selectedBillData.Date).local().format('DD/MM/YYYY');    
     let diffInMonths = calcMonthDiff(pledgedDate, todayDate);        
-    let roi = getRateOfInterest(options.interestRates, selectedBillData.Amount, {orn: selectedBillData.Orn});
+    let roi = getRateOfInterest(options.interestRates, selectedBillData.Amount, {orn: selectedBillData.Orn, interestDuringBillCreation: selectedBillData.IntPercent});
     let interestPerMonth = getInterestPerMonth(selectedBillData.Amount, roi);
 
     selectedBillData._interestPerMonth = interestPerMonth;
