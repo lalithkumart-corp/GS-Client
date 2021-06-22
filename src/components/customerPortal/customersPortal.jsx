@@ -4,7 +4,7 @@ import axios from 'axios';
 import { PLEDGEBOOK_METADATA, PLEDGEBOOK_FETCH_CUSTOMER_HISTORY } from '../../core/sitemap';
 import { getAccessToken } from '../../core/storage';
 import _ from 'lodash';
-import './customerDetail.css';
+import './customerPortal.css';
 import GeneralInfo from './generalInfo';
 import History from './history';
 import Notes from './notes';
@@ -12,8 +12,10 @@ import Settings from './settings';
 import ReactPaginate from 'react-paginate';
 import axiosMiddleware from '../../core/axios';
 import { toast } from 'react-toastify';
+import CommonModal from '../common-modal/commonModal';
+import CustomerPicker from '../customerPanel/CustomerPicker';
 
-class CustomerDetail extends Component {
+class CustomerPortal extends Component {
     constructor(props) {
         super(props);
         this.state = {
@@ -27,7 +29,8 @@ class CustomerDetail extends Component {
                 fgname: '',
                 hashKey: '',
                 onlyIsActive: false
-            }
+            },
+            customerSelectionModalOpen: false,
         }
         this.bindMethods();
     }
@@ -38,6 +41,9 @@ class CustomerDetail extends Component {
         this.refreshCustomerList = this.refreshCustomerList.bind(this);
         this.handlePageClick = this.handlePageClick.bind(this);
         this.afterUpdate = this.afterUpdate.bind(this);
+        this.showAddNewCustomerScreen = this.showAddNewCustomerScreen.bind(this);
+        this.closeCustomerModal = this.closeCustomerModal.bind(this);
+        this.onSelectCustomer = this.onSelectCustomer.bind(this);
     }
 
     componentDidMount() {
@@ -83,9 +89,11 @@ class CustomerDetail extends Component {
         this.setState({searchVal: custName, customerList: filteredCustList, selectedCust: null});
     }*/
 
-    async initiateFetchPledgebookAPI() {
+    async initiateFetchPledgebookAPI(cb) {
         let customers = await this._fetchCustomers();        
-        this.setState({customerList: customers.list, customersCount: customers.count, rawCustomerList: customers.list});
+        await this.setState({customerList: customers.list, customersCount: customers.count, rawCustomerList: customers.list});
+        if(cb)
+            cb();
     }
 
     async _fetchCustomers() {
@@ -94,6 +102,7 @@ class CustomerDetail extends Component {
         try {
             let accessToken = getAccessToken();
             let offsetStart = (this.state.selectedPageIndex*this.state.pageLimit);
+            debugger;
             let response = await axiosMiddleware.get(PLEDGEBOOK_METADATA + `?access_token=${accessToken}&identifiers=["all", "otherDetails"]&offsetStart=${offsetStart}&limit=${this.state.pageLimit}&filters=${JSON.stringify(this.state.filters)}`);
             //let response = await axios.get(PLEDGEBOOK_METADATA + `?access_token=${accessToken}&identifiers=["all", "otherDetails"]`);
             list = this.parseCustomerDataList(response.data.customers.list);
@@ -189,16 +198,43 @@ class CustomerDetail extends Component {
             </Row>
         )
     }
+    async onSelectCustomer(selectedCustomer) {
+        let newState = {...this.state};
+        newState.customerSelectionModalOpen = false;
+        newState.filters.hashKey = selectedCustomer.hashKey;
+        await this.setState(newState);
+        this.initiateFetchPledgebookAPI(()=> {
+            this.onCardClick(null, this.state.customerList[0], 0);
+        });
+    }
+
+    showAddNewCustomerScreen() {
+        this.setState({customerSelectionModalOpen: true});
+    }
+
+    closeCustomerModal() {
+        this.setState({customerSelectionModalOpen: false});
+    }
+
+    addNewCustomerOption() {
+        return (
+            <Row>
+                <Col xs={12} md={12}>
+                    <input type="button" class="gs-button bordered" value="Add New Customer" style={{marginBottom: '10px'}} onClick={this.showAddNewCustomerScreen} />
+                </Col>
+            </Row>
+        )
+    }
     getSearchBox() {
         return (
             <Row className='head-section'>
-                <Col xs={12} md={12}>
+                <Col xs={8} md={8} style={{padding: 0}}>
                     <FormGroup
                         className='cname-input-box'>
                         <FormControl
                             type="text"
                             className="autosuggestion-box"
-                            placeholder="Enter cust/guardian"
+                            placeholder="cust/guardian"
                             onChange={(e) => this.inputControls.onChange(null, e.target.value, 'custOrGuardianName')} 
                             //onKeyUp={(e) => this.handleKeyUp(e, {currElmKey: 'moreCustomerDetailValue', isToAddMoreDetail: true, traverseDirection: 'backward'})} 
                             value={this.state.searchVal}
@@ -206,13 +242,14 @@ class CustomerDetail extends Component {
                         <FormControl.Feedback />
                     </FormGroup>
                 </Col>
-                <Col xs={12} md={12} style={{textAlign: 'center', marginBottom: '10px', color: 'lightgrey', fontSize: '12px'}}><span>(OR)</span></Col>
-                <Col xs={12} md={12}>
+                <span>/</span>
+                {/* <Col xs={12} md={12} style={{textAlign: 'center', marginBottom: '10px', color: 'lightgrey', fontSize: '12px'}}><span>(OR)</span></Col> */}
+                <Col xs={3} md={3} style={{padding: 0}}>
                     <FormGroup>
                         <FormControl
                             type="text"
                             className="autosuggestion-box"
-                            placeholder="Enter CustId"
+                            placeholder="CustId"
                             onChange={(e) => this.inputControls.onChange(null, e.target.value, 'custId')} 
                             //onKeyUp={(e) => this.handleKeyUp(e, {currElmKey: 'moreCustomerDetailValue', isToAddMoreDetail: true, traverseDirection: 'backward'})} 
                             value={this.state.filters.hashKey}
@@ -271,16 +308,20 @@ class CustomerDetail extends Component {
                 <Row>
                     <Col className="left-pane" xs={3} md={3}>
                         {this.getPagination()}
+                        {this.addNewCustomerOption()}
                         {this.getSearchBox()}
                         {this.getCustomerListView()}
                     </Col>
                     <Col className="right-pane" xs={9} md={9}>
                         {this.getDetailView()}
                     </Col>
+                    <CommonModal modalOpen={this.state.customerSelectionModalOpen} handleClose={this.closeCustomerModal} secClass="create-customer-modal">
+                        <CustomerPicker onSelectCustomer={this.onSelectCustomer} handleClose={this.closeCustomerModal}/>
+                    </CommonModal>
                 </Row>
             </Container>
         )
     }
 }
 
-export default CustomerDetail;
+export default CustomerPortal;

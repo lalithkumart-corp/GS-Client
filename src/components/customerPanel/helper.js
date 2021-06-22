@@ -11,6 +11,7 @@ export const constructCreateCustParams = (thatState) => {
         city: !isNull(state.selectedCustomer.city)?(state.selectedCustomer.city):(state.formData.city.inputVal),
         pinCode: !isNull(state.selectedCustomer.pincode)?(state.selectedCustomer.pincode):(state.formData.pincode.inputVal),
         mobile: _getMobileNumber(state),
+        hashKey: state.selectedCustomer.hashKey || null,
     };
     return params;
 }

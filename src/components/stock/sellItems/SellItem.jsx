@@ -6,7 +6,7 @@ import * as ReactAutosuggest from 'react-autosuggest';
 import { FETCH_PROD_IDS, FETCH_STOCKS_BY_PRODID, SALE_ITEM } from '../../../core/sitemap';
 import axiosMiddleware from '../../../core/axios';
 import { getAccessToken } from '../../../core/storage';
-import Customer from '../../customerPanel/Customer';
+import CustomerPicker from '../../customerPanel/CustomerPicker';
 import CommonModal from '../../common-modal/commonModal';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import GSCheckbox from '../../ui/gs-checkbox/checkbox';
@@ -1223,7 +1223,7 @@ class SellItem extends Component {
         return (
             <Container className="sell-item-container">
                 <CommonModal modalOpen={this.state.customerSelectionModalOpen} handleClose={this.closeCustomerModal}>
-                    <Customer onSelectCustomer={this.onSelectCustomer} handleClose={this.closeCustomerModal}/>
+                    <CustomerPicker onSelectCustomer={this.onSelectCustomer} handleClose={this.closeCustomerModal}/>
                 </CommonModal>
                 <Row>
                     <Col xs={9}>
