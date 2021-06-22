@@ -284,14 +284,14 @@ export default class LoanBillTemplateSettings extends Component {
             if(aTemplate.template_id == this.state.bodyTemplateId)
                 checked = true;
 
-            aTemplate.screenshot_url = constructApiAssetUrl(aTemplate.screenshot_url);
-            
+            let theUrl = constructApiAssetUrl(aTemplate.screenshot_url);
+
             templatesContainer.push(
                 <Col xs={3} md={3}>
                     <div className="screenshot-prview-container">
                         <ImageZoom
                             image={{
-                                src: aTemplate.screenshot_url,
+                                src: theUrl,
                                 alt: 'Image Not Found',
                                 className: 'template-image-viewer',
                             }}
