@@ -21,7 +21,7 @@ let env = require('./environment');
 console.log('NODE_ENV:', process.env.NODE_ENV);
 console.log('REACT ENV File:', process.env.REACT_APP_FLAG);
 
-let port = window.location.port;
+let port = window.location.port || process.env.REACT_APP_API_PORT;
 if(process.env.NODE_ENV == 'development')
     port = process.env.REACT_APP_API_PORT;
 const protocol = window.location.protocol.substring(0, window.location.protocol.indexOf(':')) || process.env.REACT_APP_API_PROTOCOL;
@@ -31,7 +31,7 @@ export let config = {
     "proxy_api_port": port,
     "proxy_protocol": protocol,
     "restApiRoot": process.env.REACT_APP_API_ROOT,
-    "assetsRoot": process.env.SERVER_ASSETS_ROOT || '',
+    "assetsRoot": process.env.REACT_APP_SERVER_ASSETS_ROOT || '',
 };
 
 console.log(config);
