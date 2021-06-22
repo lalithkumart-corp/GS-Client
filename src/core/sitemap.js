@@ -19,10 +19,10 @@ let env = require('./environment');
 // }
 
 console.log('NODE_ENV:', process.env.NODE_ENV);
-console.log('REACT ENV File:', process.env.REACT_APP_FLAG);
+console.log('REACT ENV File:', process.env.REACT_APP_ENV);
 
 let port = window.location.port;
-if(process.env.NODE_ENV == 'development')
+if(process.env.REACT_APP_ENV == 'development')
     port = process.env.REACT_APP_API_PORT;
 const protocol = window.location.protocol.substring(0, window.location.protocol.indexOf(':')) || process.env.REACT_APP_API_PROTOCOL;
 
