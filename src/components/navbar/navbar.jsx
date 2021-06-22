@@ -112,7 +112,7 @@ class NavbarComp extends Component {
                     }
                     <Nav className="mr-auto">
                         <NavDropdown title="Others" id="customer-dropdown">
-                            <NavDropdown.Item as={Link} to="/customerdetail">Customer Detail</NavDropdown.Item>
+                            <NavDropdown.Item as={Link} to="/customer-portal">Customers</NavDropdown.Item>
                             {/* <NavDropdown.Item as={Link} to="/picture">Webcam</NavDropdown.Item>
                             <NavDropdown.Item as={Link} to="/uploadpicdemo">Upload Pic Demo</NavDropdown.Item>
                             <NavDropdown.Item as={Link} to="/demo">Demo</NavDropdown.Item> */}

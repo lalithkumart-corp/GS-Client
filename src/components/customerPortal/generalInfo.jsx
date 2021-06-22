@@ -121,7 +121,7 @@ class GeneralInfo extends Component {
     autuSuggestionControls = {
         onChange: (val, identifier, options) => {
             let newState = {...this.state};
-            if(identifier == 'moreCustomerDetailsField') {
+            if(identifier == 'moreDetails') {
                 let anObj = this.parseCustomerDetailsVal(val);                
                 newState.formData.moreDetails.currCustomerInputField = anObj.value;
                 newState.formData.moreDetails.currCustomerInputKey = anObj.key;                
@@ -212,7 +212,7 @@ class GeneralInfo extends Component {
             this.setState(newState);
         },
         onSuggestionSelected: (event, { suggestion, suggestionValue, suggestionIndex, sectionIndex, method }, identifier, options) => {
-            this.autuSuggestionControls.onChange(suggestion, 'moreCustomerDetailsField');
+            this.autuSuggestionControls.onChange(suggestion, 'moreDetails');
         },
         getSuggestionValue: (suggestion, identifier) => {
             return suggestion;
@@ -225,6 +225,9 @@ class GeneralInfo extends Component {
                 </div>
             );
             return theDom;
+        },
+        onChange: (e, {newValue, method}, identifier) => {
+            this.autuSuggestionControls.onChange(e.target.value, identifier);
         }
     }
 

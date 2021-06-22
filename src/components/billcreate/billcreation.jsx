@@ -35,7 +35,7 @@ import BillTemplate from './billTemplate2';
 import ReactToPrint from 'react-to-print';
 import { FaEdit } from 'react-icons/fa';
 import CommonModal from '../common-modal/commonModal';
-import GeneralInfo from '../customerDetail/generalInfo';
+import GeneralInfo from '../customerPortal/generalInfo';
 import { getLoanDate, setLoanDate } from '../../core/storage';
 
 const ENTER_KEY = 13;
