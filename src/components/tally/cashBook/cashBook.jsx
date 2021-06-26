@@ -1,9 +1,9 @@
 import React, { Component, useState, useRef, useEffect } from 'react';
-import {Tabs, Tab, Container, Row, Col} from 'react-bootstrap';
+import {Tabs, Tab, Container, Row, Col, Dropdown} from 'react-bootstrap';
 import GSTable from '../../gs-table/GSTable';
 import axiosMiddleware from '../../../core/axios';
 import { convertToLocalTime } from '../../../utilities/utility';
-import { GET_FUND_TRN_LIST } from '../../../core/sitemap';
+import { GET_FUND_TRN_LIST, DELETE_FUND_TRANSACTION } from '../../../core/sitemap';
 import { getAccessToken } from '../../../core/storage';
 import moment from 'moment';
 import DateRangePicker from '../../dateRangePicker/dataRangePicker';
@@ -11,6 +11,7 @@ import { constructFetchApiParams } from './helper';
 import ReactPaginate from 'react-paginate';
 import './cashBook.scss';
 import MultiSelect from "react-multi-select-component";
+import { toast } from 'react-toastify';
 
 export default class CashBook extends Component {
     constructor(props) {
@@ -35,6 +36,8 @@ export default class CashBook extends Component {
                     categories: []
                 }
             },
+            selectedIndexes: [],
+            selectedRowJson: [],
             selectedPageIndex: 0,
             pageLimit: 500,
             openingBalance: 0,
@@ -49,7 +52,7 @@ export default class CashBook extends Component {
                 width: '3%',
                 formatter: (column, columnIndex, row, rowIndex) => {
                     return (
-                        <div style={{padding: '8px'}}>{rowIndex+1}</div>
+                        <div>{rowIndex+1}</div>
                     )
                 } 
             },{
@@ -58,13 +61,13 @@ export default class CashBook extends Component {
                 width: '15%',
                 formatter: (column, columnIndex, row, rowIndex) => {
                     return (
-                        <div style={{padding: '8px'}}>{convertToLocalTime(row[column.id], {excludeTime: true})}</div>
+                        <div>{convertToLocalTime(row[column.id], {excludeTime: true})}</div>
                     )
                 }
             },{
                 id: 'fund_house_name',
                 displayText: 'Account',
-                width: '7%',
+                width: '5%',
                 isFilterable: true,
                 filterFormatter: (column, colIndex) => {
                     let options = [];
@@ -124,7 +127,7 @@ export default class CashBook extends Component {
                 width: '8%',
                 formatter: (column, columnIndex, row, rowIndex) => {
                     return (
-                        <div style={{padding: '8px'}}>{this.getBalance(row, rowIndex)}</div>
+                        <div>{this.getBalance(row, rowIndex)}</div>
                     )
                 } 
             }
@@ -132,9 +135,16 @@ export default class CashBook extends Component {
         this.bindMethods();
     }
     bindMethods() {
+        this.refresh = this.refresh.bind(this);
         this.handlePageClick = this.handlePageClick.bind(this);
+        this.handleCheckboxChangeListener = this.handleCheckboxChangeListener.bind(this);
+        this.handleGlobalCheckboxChange = this.handleGlobalCheckboxChange.bind(this);
     }
     componentDidMount() {
+        this.fetchTransactions();
+    }
+
+    refresh() {
         this.fetchTransactions();
     }
 
@@ -239,7 +249,84 @@ export default class CashBook extends Component {
         let totalRecords = this.state.totalTransactionsCount;
         return (totalRecords/this.state.pageLimit);
     }
+
+    handleCheckboxChangeListener(params) {
+        let newState = {...this.state};
+        if(params.isChecked) {
+            newState.selectedIndexes.push(params.rowIndex);        
+            newState.selectedRowJson.push(params.row);
+        } else {
+            let rowIndex = newState.selectedIndexes.indexOf(params.rowIndex);
+            newState.selectedIndexes.splice(rowIndex, 1);
+            newState.selectedRowJson = newState.selectedRowJson.filter(
+                (anItem) => {
+                    if(newState.selectedIndexes.indexOf(anItem.rowNumber-1) == -1) {
+                        return false;
+                    } else {
+                        return true;
+                    }
+                }
+            );
+        }        
+        this.setState(newState);
+    }
+
+    handleGlobalCheckboxChange(params) {
+        let newState = {...this.state};
+        if(params.isChecked) {
+            _.each(params.rows, (aRow, index) => {
+                newState.selectedIndexes.push(index);
+                newState.selectedRowJson.push(aRow);
+            });
+        } else {
+            newState.selectedIndexes = [];
+            newState.selectedRowJson = [];
+        }
+        this.setState(newState);
+    }
+
+    canDisableThisMenu(menuIdentifier) {
+        let flag = false;
+        switch(menuIdentifier) {
+            case 'delete':
+                let trns = this.state.selectedRowJson.filter((aRow, index) => {
+                    if(aRow.category == 'Girvi' || aRow.category == 'Redeem')
+                        return true;
+                    else
+                        return false;
+                });
+                if(trns.length > 0)
+                    flag = true;
+                break;
+        }
+        return flag;
+    }
+    onMoreActionsDpdClick(e, identifier) {
+        switch(identifier) {
+            case 'delete':
+                var transactionIds = this.state.selectedRowJson.map((a)=> a.id);
+                this.deleteTransactions(transactionIds);
+                break;
+        }
+    }
     
+    async deleteTransactions(transactionIds) {
+        try {
+            let resp = await axiosMiddleware.delete(DELETE_FUND_TRANSACTION, {data:{transactionIds}});
+            if(resp && resp.data && resp.data.STATUS=='SUCCESS') {
+                toast.success(`Deleted successfully!`);
+                this.refresh();
+            } else {
+                if(!e._IsDeterminedError)
+                    toast.error('Could not delete the Fund Transactions. Please Contact admin');
+            }
+        } catch(e) {
+            console.log(e);
+            if(!e._IsDeterminedError)
+                toast.error('ERROR! Please Contact admin');
+        }
+    }
+
     render() {
         return (
             <Row className="gs-card-content cash-book-main-card">
@@ -247,13 +334,27 @@ export default class CashBook extends Component {
                 <Col xs={6} md={6}>
                     <Row>
                         <Col xs={12} md={12} sm={12}><h4>CASH TRANSACTIONS</h4></Col>
-                        <Col xs={12} md={12} sm={12}>
+                        <Col xs={12} md={7} sm={7}>
                             <DateRangePicker 
                                 className = 'cash-book-date-filter'
                                 selectDateRange={this.filterCallbacks.date}
                                 startDate={this.state.filters.date.startDate}
                                 endDate={this.state.filters.date.endDate}
                             />
+                        </Col>
+                        <Col xs={12} md={5} sm={5}>
+                            { this.state.selectedIndexes.length>0 &&
+                            <>
+                                <Dropdown className="more-actions-dropdown action-btn">
+                                    <Dropdown.Toggle id="dropdown-more-actions" disabled={!this.state.selectedIndexes.length}>
+                                        More Actions 
+                                    </Dropdown.Toggle>
+                                    <Dropdown.Menu>
+                                        <Dropdown.Item disabled={this.canDisableThisMenu('delete')} onClick={(e) => this.onMoreActionsDpdClick(e, 'delete')}>Delete</Dropdown.Item>
+                                    </Dropdown.Menu>
+                                </Dropdown>
+                            </>
+                            }
                         </Col>
                     </Row>
                 </Col>
@@ -291,6 +392,11 @@ export default class CashBook extends Component {
                     <GSTable 
                         columns={this.columns}
                         rowData={this.state.transactions}
+                        checkbox = {true}
+                        checkboxOnChangeListener = {this.handleCheckboxChangeListener}
+                        globalCheckBoxListener = {this.handleGlobalCheckboxChange}
+                        selectedIndexes = {this.state.selectedIndexes}
+                        selectedRowJson = {this.state.selectedRowJson}
                     />
                 </Col>
             </Row>

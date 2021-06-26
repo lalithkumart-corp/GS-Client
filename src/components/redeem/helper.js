@@ -127,7 +127,7 @@ export const getReopenRequestParams = (billData) => {
     let anObj = {
         //pledgeBookID: billData.PledgeBookID,
         pledgeBookUID: billData.UniqueIdentifier,
-        closedBillReference: billData.closedBillReference
+        closedBillReference: billData.uid
     };
     requestParams.push(anObj);
     return requestParams;

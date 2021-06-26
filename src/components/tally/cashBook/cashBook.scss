@@ -1,7 +1,7 @@
 .cash-book-main-card {
     .cash-book-date-filter {
         border: 1px solid;
-        margin: 10px 0;
+        // margin: 10px 0;
         width: 220px;
         .arrow-down-icon {
             padding-left: 7px;
@@ -25,5 +25,10 @@
         .dropdown-heading {
             height: 26px;
         }
+    }
+    #dropdown-more-actions {
+        color: #337ab7;
+        background-color: white;
+        border: none;
     }
 }

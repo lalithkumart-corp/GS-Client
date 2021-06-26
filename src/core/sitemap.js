@@ -114,6 +114,7 @@ export const FETCH_CATEGORY_SUGGESTIONS = `${config.proxy_protocol}://${config.p
 export const CASH_IN = `${config.proxy_protocol}://${config.proxy_api_host}:${config.proxy_api_port}/${config.restApiRoot}/FundTransactions/cash-in`;
 export const CASH_OUT = `${config.proxy_protocol}://${config.proxy_api_host}:${config.proxy_api_port}/${config.restApiRoot}/FundTransactions/cash-out`;
 export const GET_FUND_TRN_LIST = `${config.proxy_protocol}://${config.proxy_api_host}:${config.proxy_api_port}/${config.restApiRoot}/FundTransactions/fetch-transactions`;
+export const DELETE_FUND_TRANSACTION = `${config.proxy_protocol}://${config.proxy_api_host}:${config.proxy_api_port}/${config.restApiRoot}/FundTransactions/delete-by-transactionid`;
 export const GET_OPENING_BALANCE = `${config.proxy_protocol}://${config.proxy_api_host}:${config.proxy_api_port}/${config.restApiRoot}/FundTransactions/get-opening-balance`;
 export const GET_LOAN_BILL_TEMPLATE_SETTINGS = `${config.proxy_protocol}://${config.proxy_api_host}:${config.proxy_api_port}/${config.restApiRoot}/LoanBillTemplates/get-settings`;
 export const UPDATE_LOAN_BILL_TEMPLATE = `${config.proxy_protocol}://${config.proxy_api_host}:${config.proxy_api_port}/${config.restApiRoot}/LoanBillTemplates/update-settings`;

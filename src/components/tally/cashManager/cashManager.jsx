@@ -139,12 +139,20 @@ function CashIn() {
         try {
             let resp = await axiosMiddleware.post(CASH_IN, params);
             if(resp && resp.data) {
-                if(resp.data.STATUS == 'SUCCESS')
+                if(resp.data.STATUS == 'SUCCESS') {
                     toast.success('Success!');
+                    clearInputs();
+                }
             }
         } catch(e) {
             toast.error('Error occured while saving the Cash Transaction.');
         }
+    }
+
+    let clearInputs = () => {
+        setAmount('');
+        setRemarks('');
+        setCategoryVal('');
     }
 
     return (
@@ -323,12 +331,20 @@ function CashOut() {
         try {
             let resp = await axiosMiddleware.post(CASH_OUT, params);
             if(resp && resp.data) {
-                if(resp.data.STATUS == 'SUCCESS')
+                if(resp.data.STATUS == 'SUCCESS') {
+                    clearInputs();
                     toast.success('Success!');
+                }
             }
         } catch(e) {
             toast.error('Error occured while saving the Cash Transaction.');
         }
+    }
+
+    let clearInputs = () => {
+        setAmount('');
+        setRemarks('');
+        setCategoryVal('');
     }
 
     return (

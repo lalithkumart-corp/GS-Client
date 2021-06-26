@@ -181,7 +181,7 @@ class CustomerPortal extends Component {
     getPagination() {
         return (
             <Row>
-                <Col xs={12} md={12}>
+                <Col xs={12} md={12} style={{zIndex: 1}}>
                     <ReactPaginate previousLabel={"<"}
                         nextLabel={">"}
                         breakLabel={"..."}

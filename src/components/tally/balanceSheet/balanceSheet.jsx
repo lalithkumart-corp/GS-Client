@@ -88,16 +88,16 @@ class BalanceSheet extends Component {
     }
 
     getInTotal(format=true) {
-        let loanInterest = this.getLoanInterest();
-        let redeemAmount = this.getRedeemAmount();
-        let redeemInterest = this.getRedeemInterest();
+        let loanInterest = 0; //this.getLoanInterest();
+        let redeemAmount = 0; //this.getRedeemAmount();
+        let redeemInterest = 0; //this.getRedeemInterest();
         let cashIn = this.getTotalCashIn();
         //return format((loanInterest + redeemAmount + redeemInterest), {code: "INR"});
         return (loanInterest + redeemAmount + redeemInterest + cashIn);
     }
 
     getOutTotal(format=true) {
-        let loanAmount = this.getLoanAmount();
+        let loanAmount = 0; // this.getLoanAmount();
         let cashOut = this.getTotalCashOut();
         //return format(loanAmount, {code: 'INR'});
         return (loanAmount+cashOut);
@@ -138,7 +138,7 @@ class BalanceSheet extends Component {
                             <Col xs={{span: 3}} className="cell border-right">Opening Balance</Col>
                             <Col xs={{span: 3}} className="cell border-right"></Col>
                             <Col xs={{span: 3}} className="cell border-right"></Col>
-                            <Col xs={{span: 3}} className="cell">{format(this.state.openingBalance, {code: 'INR'})}</Col>
+                            <Col xs={{span: 3}} className="cell" style={{color: 'blue'}}>{format(this.state.openingBalance, {code: 'INR'})}</Col>
                         </Row>
                         <Row className="overview-row">
                             <Col xs={{span: 3}} className="cell border-right">Loan Amount</Col>
@@ -169,15 +169,15 @@ class BalanceSheet extends Component {
                         </Row>
                         <Row className="overview-row">
                             <Col xs={{span: 3}} className="cell border-right">Cash Transactions</Col>
-                            <Col xs={{span: 3}} className="cell border-right">{format(this.getTotalCashIn(), {code: 'INR'})}</Col>
-                            <Col xs={{span: 3}} className="cell border-right">{format(this.getTotalCashOut(), {code: 'INR'})}</Col>
+                            <Col xs={{span: 3}} className="cell border-right" style={{color: 'blue'}}>{format(this.getTotalCashIn(), {code: 'INR'})}</Col>
+                            <Col xs={{span: 3}} className="cell border-right" style={{color: 'blue'}}>{format(this.getTotalCashOut(), {code: 'INR'})}</Col>
                             <Col xs={{span: 3}} className="cell"></Col>
                         </Row>
                         <Row className="overview-footer">
                             <Col xs={{span: 3}} className="cell border-right"></Col>
-                            <Col xs={{span: 3}} className="cell border-right">{format(this.getInTotal(), {code: 'INR'})}</Col>
-                            <Col xs={{span: 3}} className="cell border-right">{format(this.getOutTotal(), {code: 'INR'})}</Col>
-                            <Col xs={{span: 3}} className="cell">{format(this.getAvailableFunds(), {code: 'INR'})}</Col>
+                            <Col xs={{span: 3}} className="cell border-right" style={{color: 'blue'}}>{format(this.getInTotal(), {code: 'INR'})}</Col>
+                            <Col xs={{span: 3}} className="cell border-right" style={{color: 'blue'}}>{format(this.getOutTotal(), {code: 'INR'})}</Col>
+                            <Col xs={{span: 3}} className="cell" style={{color: 'blue'}}>{format(this.getAvailableFunds(), {code: 'INR'})}</Col>
                         </Row>
 
                     </Col>

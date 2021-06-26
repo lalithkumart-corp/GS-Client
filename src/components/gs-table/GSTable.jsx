@@ -44,40 +44,39 @@ class GSTable extends Component {
             rowData: []
         };
         if(props && props.columns) {
-            if(props.expandRow && props.expandRow.renderer !== undefined) {
+            if(props.expandRow && props.expandRow.renderer !== undefined)
                 parsedData.expandRow = props.expandRow;
-                if(!this.indicatorExistsAlready(props.columns)) {
-                    if(props.expandRow.showIndicator) {
-                        let id = "_expandIndicator";
-                        let formatter = this.defaultFormatters.expandIconFormatter;
-                        if(props.checkbox){
-                            id = "_expandIndicatorWithCheckbox";
-                            formatter = this.defaultFormatters.expandIconWithCheckboxFormatter;
-                        }                    
-                        props.columns.unshift({
-                            id: id,
-                            displayText: '',
-                            formatter: formatter,
-                            width: '6%'
-                        });
+            if(!this.indicatorExistsAlready(props.columns)) {
+                if(props.expandRow && props.expandRow.showIndicator) {
+                    let id = "_expandIndicator";
+                    let formatter = this.defaultFormatters.expandIconFormatter;
+                    if(props.checkbox){
+                        id = "_expandIndicatorWithCheckbox";
+                        formatter = this.defaultFormatters.expandIconWithCheckboxFormatter;
+                    }                    
+                    props.columns.unshift({
+                        id: id,
+                        displayText: '',
+                        formatter: formatter,
+                        width: '6%'
+                    });
+                } else {
+                    let id = null;
+                    let formatter = null;
+                    if(props.checkbox) {
+                        id = "_onlyCheckBox";
+                        formatter = this.defaultFormatters.checkBoxFormatter1;
                     } else {
-                        let id = null;
-                        let formatter = null;
-                        if(props.checkbox) {
-                            id = "_onlyCheckBox";
-                            formatter = this.defaultFormatters.checkBoxFormatter1;
-                        } else {
-                            id = "_onlySerialNo";
-                            formatter = this.defaultFormatters.serialNo;
-                        }
-
-                        props.columns.unshift({
-                            id: id,
-                            displayText: '',
-                            formatter: formatter,
-                            width: '3%'
-                        });
+                        id = "_onlySerialNo";
+                        formatter = this.defaultFormatters.serialNo;
                     }
+
+                    props.columns.unshift({
+                        id: id,
+                        displayText: '',
+                        formatter: formatter,
+                        width: '3%'
+                    });
                 }
             }
             _.each(props.columns, (aCol, index) => {                
@@ -141,7 +140,7 @@ class GSTable extends Component {
             let theDom = [];
             let k = (+new Date())+'-checkbox';
             theDom.push(
-                <span id={k}>
+                <div id={k} style={{width: '29px'}}>
                     <span className="gstable-checkbox-container">
                         <GSCheckbox labelText="" 
                             checked={this.checkIsSelected(rowIndex)} 
@@ -150,7 +149,7 @@ class GSTable extends Component {
                             optionalArgs={{column: column, colIndex: colIndex, row: row, rowIndex: rowIndex}}
                             />
                     </span>
-                </span>);
+                </div>);
             return theDom;
         },
         expandIconFormatter: (column, colIndex, row, rowIndex) => {
@@ -233,12 +232,12 @@ class GSTable extends Component {
         },
         getGlobalCheckBoxDOMFormatter: () => {
             return (
-                <span className="global-checkbox-only gstable-checkbox-container">
+                <div  style={{width: '29px', marginTop: '4px', marginLeft: '3px'}} className="global-checkbox-only gstable-checkbox-container">
                     <GSCheckbox labelText="" 
                         checked={this.IsGlobalCheckboxSelected()} 
                         onChangeListener = {(e) => {this.onGlobalCheckcboxChange(e)}} 
                         className={"gstable-selector-checkbox"}/>
-                </span>
+                </div>
             )
         },
         filter: (column, colIndex) => {   
