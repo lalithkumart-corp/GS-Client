@@ -21,7 +21,12 @@ let env = require('./environment');
 console.log('NODE_ENV:', process.env.NODE_ENV);
 console.log('REACT ENV File:', process.env.REACT_APP_ENV);
 
-let port = window.location.port || process.env.REACT_APP_API_PORT;
+let port;
+if(window.location.protocol == "https:")
+    port = 443;
+else
+    port = 80;
+// port = window.location.port || process.env.REACT_APP_API_PORT;
 if(process.env.REACT_APP_ENV == 'development')
     port = process.env.REACT_APP_API_PORT;
 const protocol = window.location.protocol.substring(0, window.location.protocol.indexOf(':')) || process.env.REACT_APP_API_PROTOCOL;

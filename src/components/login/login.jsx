@@ -27,7 +27,8 @@ class LoginPage extends Component {
                     val: '',
                     hasError: false
                 }
-            },            
+            },
+            canShowSignup: false,
         };
         this.bindMethods();
     }
@@ -171,7 +172,7 @@ class LoginPage extends Component {
                                 <span className="gs-button sso-google-btn" onClick={this.initGoogleAuth}> <FaGoogle/> </span>
                             </Col>
                             <Col md={{span: 3, offset: 3}} className='gs-button'>
-                                <a href='/signup'>Sign Up</a>
+                                {this.state.canShowSignup && <a href='/signup'>Sign Up</a>}
                             </Col>
                         </Row>
                     </Col>
