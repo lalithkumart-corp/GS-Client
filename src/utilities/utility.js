@@ -19,10 +19,12 @@ export const getDateInUTC = (theDate, options) => {
         second = 59;
         milliseconds = 59;
     } else if(options.withSelectedTime) {
+        if(typeof theDate == 'string')
+            theDate = new Date(theDate);
         hour = theDate.getHours();
         minute = theDate.getMinutes();
         second = theDate.getSeconds();
-        milliseconds = theDate.getMilliseconds();
+        milliseconds = theDate.getMilliseconds();   
     } else { //current time
         let currentDate = new Date();
         hour = currentDate.getHours();

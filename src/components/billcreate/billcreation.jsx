@@ -25,7 +25,7 @@ import { insertNewBill, updateBill, updateClearEntriesFlag, showEditDetailModal,
 import { DoublyLinkedList } from '../../utilities/doublyLinkedList';
 import { getGaurdianNameList, getAddressList, getPlaceList, getCityList, getPincodeList, getMobileList, buildRequestParams, buildRequestParamsForUpdate, updateBillNumber, resetState, defaultPictureState, defaultOrnPictureState, validateFormValues, fetchCustomerMetaData, fetchOrnList } from './helper';
 // import { getAccessToken } from '../../core/storage';
-import { getDateInUTC, currencyFormatter, getInterestRate } from '../../utilities/utility';
+import { getDateInUTC, currencyFormatter, getInterestRate, convertToLocalTime } from '../../utilities/utility';
 import { getRateOfInterest } from '../redeem/helper';
 import Picture from '../profilePic/picture';
 import { toast } from 'react-toastify';
@@ -421,7 +421,8 @@ class BillCreation extends Component {
     }
     updateFieldValuesInState(data) {
         let newState = {...this.state};
-        newState.formData.date.inputVal = data.Date;
+        newState.formData.date.inputVal = convertToLocalTime(data.Date);
+        newState.formData.date._inputVal = data.Date; //getDateInUTC(data.Date, {withSelectedTime: true});
         let splits = data.BillNo.split('.');
         if(splits.length > 1){
             newState.formData.billseries.inputVal = data.BillNo.split('.')[0];
