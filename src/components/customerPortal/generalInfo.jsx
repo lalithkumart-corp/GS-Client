@@ -124,7 +124,7 @@ class GeneralInfo extends Component {
             if(identifier == 'moreDetails') {
                 let anObj = this.parseCustomerDetailsVal(val);                
                 newState.formData.moreDetails.currCustomerInputField = anObj.value;
-                newState.formData.moreDetails.currCustomerInputKey = anObj.key;                
+                newState.formData.moreDetails.currCustomerInputKey = anObj.key;
             }
             this.setState(newState);
         }
@@ -206,7 +206,7 @@ class GeneralInfo extends Component {
         onSuggestionsFetchRequested: ({value}) => {
             let newState = {...this.state};
             var lowerCaseVal = value.toLowerCase();
-            let suggestionsList = this.state.formData.moreDetails.list.filter(aSuggestion => aSuggestion.toLowerCase().indexOf(lowerCaseVal) != -1);
+            let suggestionsList = this.state.formData.moreDetails.list.filter(aSuggestion => aSuggestion.value.toLowerCase().indexOf(lowerCaseVal) != -1);
             suggestionsList = suggestionsList.slice(0, 35);
             newState.formData.moreDetails.limitedList = suggestionsList;
             this.setState(newState);
@@ -215,13 +215,13 @@ class GeneralInfo extends Component {
             this.autuSuggestionControls.onChange(suggestion, 'moreDetails');
         },
         getSuggestionValue: (suggestion, identifier) => {
-            return suggestion;
+            return suggestion.value;
         },
         renderSuggestion: (suggestion, identifier) => {
             let theDom;
             theDom = (
                 <div className='react-auto-suggest-list-item'>
-                    <span>{suggestion}</span>
+                    <span>{suggestion.value}</span>
                 </div>
             );
             return theDom;

@@ -170,7 +170,7 @@ class BillCreation extends Component {
                     currCustomerInputVal: '',
                     customerInfo: [],                    
                     billRemarks: '',
-                    list: ['Aadhar card', 'Pan Card', 'License Number', 'SBI Bank Account Number', 'Email'],
+                    list: [], //['Aadhar card', 'Pan Card', 'License Number', 'SBI Bank Account Number', 'Email'],
                     limitedList: []
                 },
                 selectedCustomer: {}

@@ -102,7 +102,6 @@ class CustomerPortal extends Component {
         try {
             let accessToken = getAccessToken();
             let offsetStart = (this.state.selectedPageIndex*this.state.pageLimit);
-            debugger;
             let response = await axiosMiddleware.get(PLEDGEBOOK_METADATA + `?access_token=${accessToken}&identifiers=["all", "otherDetails"]&offsetStart=${offsetStart}&limit=${this.state.pageLimit}&filters=${JSON.stringify(this.state.filters)}`);
             //let response = await axios.get(PLEDGEBOOK_METADATA + `?access_token=${accessToken}&identifiers=["all", "otherDetails"]`);
             list = this.parseCustomerDataList(response.data.customers.list);
