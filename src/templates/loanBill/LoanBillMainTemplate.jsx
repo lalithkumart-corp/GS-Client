@@ -164,13 +164,13 @@ export default class LoanBillMainTemplate extends Component {
             <div>
                 <Row>
                     <Col xs={4} md={4} style={{textAlign: 'left'}}>
-                        <span>{this.getFirstLineLeftText()}</span>
+                        <span style={{paddingLeft: '9px'}}>{this.getFirstLineLeftText()}</span>
                     </Col>
-                    <Col xs={4} md={4} style={{textAlign: 'center'}}>
+                    <Col xs={3} md={3} style={{textAlign: 'center'}}>
                         <span>{this.getFirstLineCenterText()}</span>
                     </Col>
-                    <Col xs={4} md={4} style={{textAlign: 'right'}}>
-                        <span>{this.getFirstLineRightText()}</span>
+                    <Col xs={5} md={5} style={{textAlign: 'right'}}>
+                        <span style={{paddingRight: '9px'}}>{this.getFirstLineRightText()}</span>
                     </Col>
                 </Row>
                 <Row>

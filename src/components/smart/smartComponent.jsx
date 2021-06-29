@@ -37,6 +37,8 @@ import TagDemo from '../stock/tag/TagDemo';
 import ActivationPage from '../activation/ActivationPage';
 import FontViewerPage from '../fontViewer/FontView';
 import { getStoreDetails } from '../../actions/storeDetails';
+import CustomLabel from '../stock/tag/CustomLabel';
+
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'react-tippy/dist/tippy.css'
 // var config  = {
@@ -120,6 +122,7 @@ class SmartComponent extends Component {
                                 <Route path= "/sell-item" component={SellItem} />
                                 <Route path= "/stock-setup" component={StockSetup} />
                                 <Route path= "/tag-demo" component={TagDemo} />
+                                <Route path="/label-generator" component={CustomLabel} />
                                 <Route path= "/font-view" component={FontViewerPage} />
                             </div>
                             {/* <div className="floating-right-side-bar"> */}
