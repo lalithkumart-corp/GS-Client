@@ -157,7 +157,7 @@ export default class LabelGenerator extends Component {
                             </Row>
                         </Col>
                         <Col xs={4} md={4} style={{border: '1px solid lightgray'}}>
-                            <h6>Padding</h6>
+                            <h6 style={{marginTop: '4px'}}>Padding</h6>
                             <Row>
                                 <Col xs={{span: 4, offset: 4}}>
                                     <Form.Group>
@@ -166,6 +166,7 @@ export default class LabelGenerator extends Component {
                                             type="number"
                                             placeholder="0"
                                             value={this.state.paddingTop}
+                                            style={{padding: '4px'}}
                                             onChange={(e) => this.onChangePadding(e.target.value, 'paddingTop')}
                                         />
                                     </Form.Group>
@@ -179,6 +180,7 @@ export default class LabelGenerator extends Component {
                                             type="number"
                                             placeholder="0"
                                             value={this.state.paddingLeft}
+                                            style={{padding: '4px'}}
                                             onChange={(e) => this.onChangePadding(e.target.value, 'paddingLeft')}
                                         />
                                     </Form.Group>
@@ -193,6 +195,7 @@ export default class LabelGenerator extends Component {
                                             type="number"
                                             placeholder="0"
                                             value={this.state.paddingRight}
+                                            style={{padding: '4px'}}
                                             onChange={(e) => this.onChangePadding(e.target.value, 'paddingRight')}
                                         />
                                     </Form.Group>
@@ -206,6 +209,7 @@ export default class LabelGenerator extends Component {
                                             type="number"
                                             placeholder="0"
                                             value={this.state.paddingBottom}
+                                            style={{padding: '4px'}}
                                             onChange={(e) => this.onChangePadding(e.target.value, 'paddingBottom')}
                                         />
                                     </Form.Group>
