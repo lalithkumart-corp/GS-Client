@@ -18,7 +18,8 @@ export default class LabelGenerator extends Component {
             paddingBottom: 0,
             paddingLeft: 2,
             columnsLayoutCount: 2,
-            noOfCopies: 1
+            noOfCopies: 1,
+            gapBetweenLabels: 0,
         }
         this.bindMethods();
     }
@@ -33,6 +34,7 @@ export default class LabelGenerator extends Component {
         this.onChangeFontWeight = this.onChangeFontWeight.bind(this);
         this.onChangePosition = this.onChangePosition.bind(this);
         this.onChangeColumnLayoutCount = this.onChangeColumnLayoutCount.bind(this);
+        this.onChangeGapBetweenLabels = this.onChangeGapBetweenLabels.bind(this);
     }
 
     onChangeLabelWidth(val) {
@@ -73,6 +75,10 @@ export default class LabelGenerator extends Component {
 
     onChangeCopiesCount(val) {
         this.setState({...this.state, noOfCopies: val});
+    }
+
+    onChangeGapBetweenLabels(val) {
+        this.setState({...this.state, gapBetweenLabels: val});
     }
 
     render() {
@@ -230,6 +236,19 @@ export default class LabelGenerator extends Component {
                                 </Col>
                             </Row>
                             <Row>
+                                <Col xs={6}>
+                                    <Form.Group>
+                                        <Form.Label>Label Gaps</Form.Label>
+                                        <Form.Control
+                                            type="number"
+                                            placeholder="0"
+                                            value={this.state.gapBetweenLabels}
+                                            onChange={(e) => this.onChangeGapBetweenLabels(e.target.value)}
+                                        />
+                                    </Form.Group>
+                                </Col>
+                            </Row>
+                            <Row>
                                 <Col xs={12}>
                                     <ReactToPrint
                                         ref={(domElm) => {this.printBtn = domElm}}
@@ -312,19 +331,23 @@ class Label extends Component {
         let dom = [];
         let inner = [];
         
+        const style1 = {
+            marginBottom: `${this.state.gapBetweenLabels}px`
+        }
+
         for(let i = 0; i< this.state.noOfCopies; i++) {
             inner.push(this.getLabelDom());
 
             if(this.state.columnsLayoutCount > 1) {
                 if(this.state.columnsLayoutCount == inner.length) {
-                    dom.push(<div>{inner}</div>);
+                    dom.push(<div style={style1}>{inner}</div>);
                     inner = [];
                 } else if(i == this.state.noOfCopies-1) {
-                    dom.push(<div>{inner}</div>);
+                    dom.push(<div style={style1}>{inner}</div>);
                     inner = [];
                 }
             } else {
-                dom.push(<div>{inner}</div>);
+                dom.push(<div style={style1}>{inner}</div>);
                 inner = [];
             }
         }
