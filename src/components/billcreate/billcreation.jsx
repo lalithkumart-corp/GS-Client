@@ -40,10 +40,15 @@ import { getLoanDate, setLoanDate } from '../../core/storage';
 
 const ENTER_KEY = 13;
 const SPACE_KEY = 32;
-
+const PAYMENT_MODE = {
+    1: 'cash',
+    2: 'cheque',
+    3: 'online'
+}
 var domList = new DoublyLinkedList();
 domList.add('billno', {type: 'formControl', enabled: true});
 domList.add('amount', {type: 'formControl', enabled: true});
+domList.add('presentValue', {type: 'formControl', enabled: true});
 domList.add('date', {type: 'datePicker', enabled: false});
 domList.add('cname', {type: 'rautosuggest', enabled: true});
 domList.add('gaurdianName', {type: 'rautosuggest', enabled: true});
@@ -98,6 +103,19 @@ class BillCreation extends Component {
                     autoFetch: true
                 },
                 amount: {
+                    inputVal: '',
+                    hasError: false,
+                    landedCost: 0
+                },
+                cashInHand: {
+                    inputVal: '',
+                    hasError: false,
+                },
+                interestAmtVal: {
+                    inputVal: '',
+                    hasError: false,
+                },
+                presentValue: {
                     inputVal: '',
                     hasError: false,
                     landedCost: 0
@@ -173,7 +191,8 @@ class BillCreation extends Component {
                     list: [], //['Aadhar card', 'Pan Card', 'License Number', 'SBI Bank Account Number', 'Email'],
                     limitedList: []
                 },
-                selectedCustomer: {}
+                selectedCustomer: {},
+                paymentMode: 'cash'
             },
             amountPopoverOpen: false,
             showCustomerEditModal: false,
@@ -260,6 +279,7 @@ class BillCreation extends Component {
         this.onClickEditCustomerBtn = this.onClickEditCustomerBtn.bind(this);
         this.handleCustomerEditModalClose = this.handleCustomerEditModalClose.bind(this);
         this.afterUpdateCustomerDetail = this.afterUpdateCustomerDetail.bind(this);
+        this.onChangePaymentMode = this.onChangePaymentMode.bind(this);
     }
 
     /*async uploadImage(e) {
@@ -432,6 +452,7 @@ class BillCreation extends Component {
             newState.formData.billno.inputVal = data.BillNo;
         }
         newState.formData.amount.inputVal = data.Amount;
+        newState.formData.presentValue.inputVal = data.PresentValue;
         newState.formData.cname.inputVal = data.Name;
         newState.formData.gaurdianName.inputVal = data.GaurdianName;
         newState.formData.address.inputVal = data.Address;
@@ -487,7 +508,7 @@ class BillCreation extends Component {
         }
 
         newState.uniqueIdentifier = data.UniqueIdentifier;        
-        
+        newState.formData.paymentMode = PAYMENT_MODE[data.PaymentMode] || 'cash';
         this.setState(newState);
     }
     async setInterestRates() {
@@ -1004,6 +1025,12 @@ class BillCreation extends Component {
         await this.setState(newState);        
     }
 
+    fillPresentValue(amtVal) {
+        let newState = {...this.state};
+        newState.formData.presentValue.inputVal = parseFloat(amtVal)+100;
+        this.setState(newState);
+    }
+
     fillNetWtValue(serialNo) {
         let newState = {...this.state};
         newState.formData.orn.inputs[serialNo].ornNWt = newState.formData.orn.inputs[serialNo].ornGWt;
@@ -1085,7 +1112,9 @@ class BillCreation extends Component {
     
     async handleEnterKeyPress(evt, options) {
         await this.updateInputVal(evt, options);
-        if(options && options.isOrnSpecsInput && (this.canAppendNewRow(options))) {
+        if(options && options.isAmountValInput) {
+            this.fillPresentValue(evt.target.value);
+        } else if(options && options.isOrnSpecsInput && (this.canAppendNewRow(options))) {
             await this.appendNewRow(evt, options.nextSerialNo);
         } else if(options && options.isOrnItemInput) {
             options = await this.checkOrnRowClearance(evt, options);
@@ -1391,6 +1420,9 @@ class BillCreation extends Component {
                     newState.formData.interest.autoFetch = true;
                     newState = this.calcLandedCost(newState);
                     break;
+                case 'presentValue':
+                    newState.formData[identifier].inputVal = val;
+                    break;
                 case 'billno':
                     newState.formData[identifier].inputVal = val;
                     this.props.updateBillNoInStore(newState.formData.billseries.inputVal, val);
@@ -1436,6 +1468,12 @@ class BillCreation extends Component {
             }            
             this.setState(newState); */
         }
+    }
+
+    onChangePaymentMode(paymentMode) {
+        let newState = {...this.state};
+        newState.formData.paymentMode = paymentMode;
+        this.setState(newState);
     }
 
     onClickEditCustomerBtn(e) {
@@ -1787,7 +1825,37 @@ class BillCreation extends Component {
                                 </InputGroup>
                             </Form.Group>
                         </Col>
-                        <Col xs={3} md={3} className='customer-id'>
+                        <Col xs={3} md={3} className="date-picker-container bill-creation">
+                            {/* <DatePicker 
+                                selected={this.state.formData.date.inputVal}
+                                onChange={(e) => this.handleChange('date', e) }
+                                isClearable={true}
+                                showWeekNumbers
+                                shouldCloseOnSelect={false}
+                                ref = {(domElm) => { this.domElmns.date = domElm; }}
+                                onKeyUp = {(e) => this.handleKeyUp(e, {currElmKey: 'date'}) }
+                                /> */}
+                                <Form.Group
+                                    validationState= {this.state.formData.date.hasError ? "error" :null}
+                                    >
+                                    <Form.Label>Date</Form.Label>
+                                    <DatePicker
+                                        popperClassName="billcreation-datepicker" 
+                                        value={this.state.formData.date.inputVal} 
+                                        onChange={(fullDateVal, dateVal) => {this.inputControls.onChange(null, fullDateVal, 'date', {currElmKey: 'date'})} }
+                                        ref = {(domElm) => { this.domElmns.date = domElm; }}
+                                        onKeyUp = {(e) => this.handleKeyUp(e, {currElmKey: 'date'}) }
+                                        readOnly={this.props.billCreation.loading}
+                                        showMonthDropdown
+                                        // timeInputLabel="Time:"
+                                        // showTimeInput
+                                        // dateFormat="dd/MM/yyyy h:mm aa"
+                                        
+                                        // showTimeSelect
+                                        showYearDropdown
+                                        className='gs-input-cell'
+                                        />
+                                </Form.Group>
                         </Col>
                         <Col xs={3} md={3} >
                             <Form.Group
@@ -1807,44 +1875,36 @@ class BillCreation extends Component {
                                         onChange={(e) => this.inputControls.onChange(null, e.target.value, "amount")}
                                         onFocus={(e) => this.onTouched('amount')}
                                         ref={(domElm) => { this.domElmns.amount = domElm; }}
-                                        onKeyUp = {(e) => this.handleKeyUp(e, {currElmKey: 'amount'}) }
+                                        onKeyUp = {(e) => this.handleKeyUp(e, {currElmKey: 'amount', isAmountValInput: true}) }
                                         readOnly={this.props.billCreation.loading}
                                     />
                                     <FormControl.Feedback />
                                 </InputGroup>
                             </Form.Group>
                         </Col>
-                        <Col xs={3} md={3} className="date-picker-container">
-                            {/* <DatePicker 
-                                selected={this.state.formData.date.inputVal}
-                                onChange={(e) => this.handleChange('date', e) }
-                                isClearable={true}
-                                showWeekNumbers
-                                shouldCloseOnSelect={false}
-                                ref = {(domElm) => { this.domElmns.date = domElm; }}
-                                onKeyUp = {(e) => this.handleKeyUp(e, {currElmKey: 'date'}) }
-                                /> */}
-                                <Form.Group
-                                    validationState= {this.state.formData.date.hasError ? "error" :null}
-                                    >
-                                    <DatePicker
-                                        popperClassName="billcreation-datepicker" 
-                                        value={this.state.formData.date.inputVal} 
-                                        onChange={(fullDateVal, dateVal) => {this.inputControls.onChange(null, fullDateVal, 'date', {currElmKey: 'date'})} }
-                                        ref = {(domElm) => { this.domElmns.date = domElm; }}
-                                        onKeyUp = {(e) => this.handleKeyUp(e, {currElmKey: 'date'}) }
+                        <Col xs={3} md={3} >
+                            <Form.Group
+                                validationState= {this.state.formData.presentValue.hasError ? "error" :null}
+                                >
+                                <Form.Label>Present Value</Form.Label>
+                                <InputGroup>
+                                    <InputGroup.Prepend>
+                                        <InputGroup.Text id="rupee-addon" className={this.props.billCreation.loading?"readOnly": ""}>Value</InputGroup.Text>
+                                    </InputGroup.Prepend>
+                                    <FormControl
+                                        type="number"
+                                        value={this.state.formData.presentValue.inputVal}
+                                        placeholder="0.00"
+                                        className="present-value-amt-field"
+                                        onChange={(e) => this.inputControls.onChange(null, e.target.value, "presentValue")}
+                                        onFocus={(e) => this.onTouched('presentValue')}
+                                        ref={(domElm) => { this.domElmns.presentValue = domElm; }}
+                                        onKeyUp = {(e) => this.handleKeyUp(e, {currElmKey: 'presentValue'}) }
                                         readOnly={this.props.billCreation.loading}
-                                        showMonthDropdown
-                                        
-                                        // timeInputLabel="Time:"
-                                        // showTimeInput
-                                        // dateFormat="dd/MM/yyyy h:mm aa"
-                                        
-                                        // showTimeSelect
-                                        showYearDropdown
-                                        className='gs-input-cell'
-                                        />
-                                </Form.Group>
+                                    />
+                                    <FormControl.Feedback />
+                                </InputGroup>
+                            </Form.Group>
                         </Col>
                     </Row>
                     <Row className='second-row'>
@@ -2113,10 +2173,7 @@ class BillCreation extends Component {
                         </Col>                        
                     </Row>
                     <Row className='weight-amt-preview-dom'>
-                        <Col xs={6} md={6} style={{paddingTop: '4px'}}>
-                            <span style={{fontWeight: 'bold', fontSize: '20px'}}>Net Wt. {parseFloat(this.state.formData.orn.totalWeight).toFixed(3)}</span>
-                        </Col>
-                        <Col xs={6} md={6} style={{textAlign: 'right', paddingTop: '4px'}}>
+                    <Col xs={6} md={6} style={{textAlign: 'left', paddingTop: '4px'}}>
                             <Popover
                                 className='amount-popover'
                                 isOpen={this.state.amountPopoverOpen}
@@ -2185,9 +2242,38 @@ class BillCreation extends Component {
                                     <span className='amount-display-text' style={{fontWeight: 'bold', fontSize: '20px'}} onClick={(e) => this.amtPopoverTrigger()}>RS: {currencyFormatter(this.state.formData.amount.inputVal) || 0.00}</span>
                             </Popover>
                         </Col>
+                        <Col xs={6} md={6} style={{paddingTop: '4px', textAlign: 'right'}}>
+                            <span style={{fontWeight: 'bold', fontSize: '20px'}}>Net Wt. {parseFloat(this.state.formData.orn.totalWeight).toFixed(3)}</span>
+                        </Col>
                     </Row>
                     <Row>
-                        <Col xs={{span: 3, offset: 4}} md={{span: 3, offset: 4}} className='submit-container'>
+                        <Col xs={4}>
+                            <Row>
+                                <Col xs={6} style={{paddingRight: 0}}>
+                                    Interest <br></br> ₹ {this.state.formData.interest.value}({this.state.formData.interest.percent}%)
+                                </Col>
+                                <Col xs={6}>
+                                    Amount  <br></br>  ₹ {this.state.formData.amount.landedCost}
+                                </Col>
+                            </Row>
+                        </Col>
+                        <Col xs={5}>
+                            <span style={{marginBottom: '4px', display: 'inline-block'}}>Payment Method</span>
+                            <div>
+                                <span className={`a-payment-item ${this.state.formData.paymentMode=='cash'?'choosen':''}`} onClick={(e)=>this.onChangePaymentMode('cash')}>
+                                    Cash
+                                </span>
+                                <span className={`a-payment-item ${this.state.formData.paymentMode=='cheque'?'choosen':''}`} onClick={(e)=>this.onChangePaymentMode('cheque')}>
+                                    Cheque
+                                </span>
+                                <span className={`a-payment-item ${this.state.formData.paymentMode=='online'?'choosen':''}`} onClick={(e)=>this.onChangePaymentMode('online')}>
+                                    Online
+                                </span>
+                            </div>
+                        </Col>
+                    </Row>
+                    <Row>
+                        <Col xs={{span: 4, offset: 4}} md={{span: 4, offset: 4}} className='submit-container'>
                             { !this.props.loadedInPledgebook &&
                                 
                                 <>
@@ -2204,6 +2290,7 @@ class BillCreation extends Component {
                                         // onKeyUp= { (e) => this.handleKeyUp(e, {currElmKey:'submitBtn', isSubmitBtn: true})}
                                         onClick={(e) => this.handleSubmit()}
                                         value='Add Bill'
+                                        style={{width: '100%'}}
                                         />
                                     </>
                             }
@@ -2216,6 +2303,7 @@ class BillCreation extends Component {
                                     onClick={(e) => this.handleUpdate()}
                                     disabled={this.props.billCreation.loading}
                                     value='Update Bill'
+                                    style={{width: '100%'}}
                                     />
                             }
                         </Col>

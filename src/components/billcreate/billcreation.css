@@ -16,8 +16,24 @@
 
 /*START: Custom styles for the Date Picker(to make it bigger font size looking */
 .date-picker-container {
-    margin-top: 27px;
+    /* margin-top: 25px; */
     z-index: 3;
+    /* height: 34px; */
+}
+.bill-creation-container .date-picker-container {
+    /* padding: 6px 12px; */
+}
+.bill-creation-container .date-picker-container .form-group {
+    
+}
+.bill-creation-container .react-datepicker-wrapper {
+    width: 100%;
+    border-radius: 4px;
+    border: 1px solid #ccc;
+    box-shadow: inset 0 1px 1px rgb(0 0 0 / 8%);
+}
+.bill-creation-container .gs-input-cell {
+    padding-left: 8px;
 }
 .billcreation-datepicker.react-datepicker-popper {
     /* width: 290px; */
@@ -327,4 +343,15 @@
 }
 .customer-shortuct-edit {
     padding :2px 5px 5px 5px;
+}
+.bill-creation-container .a-payment-item {
+    padding: 3px 6px;
+    border: 1px solid lightgray;
+    border-radius: 6px;
+    margin-right: 5px;
+    cursor: pointer;
+}
+.bill-creation-container .a-payment-item.choosen,
+.bill-creation-container .a-payment-item:focus {
+    background-color: #d3d3d382;
 }

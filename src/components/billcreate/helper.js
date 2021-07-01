@@ -55,6 +55,7 @@ export const buildRequestParams = (thatState = {}) => {
         billSeries: state.formData.billseries.inputVal,
         billNo: state.formData.billno.inputVal, //_getBillNo(thatState),
         amount: state.formData.amount.inputVal,
+        presentValue: thatState.formData.presentValue.inputVal,
         cname: state.selectedCustomer.name || state.formData.cname.inputVal,
         gaurdianName: state.selectedCustomer.gaurdianName || state.formData.gaurdianName.inputVal,
         address: state.selectedCustomer.address || state.formData.address.inputVal,
@@ -72,7 +73,8 @@ export const buildRequestParams = (thatState = {}) => {
         interestPercent: thatState.formData.interest.percent,
         interestValue: thatState.formData.interest.value,
         otherCharges: thatState.formData.interest.other,
-        landedCost: thatState.formData.amount.landedCost
+        landedCost: thatState.formData.amount.landedCost,
+        paymentMode: thatState.formData.paymentMode,
     };
     return params;
 }
@@ -85,6 +87,7 @@ export const buildRequestParamsForUpdate = (thatState = {}) => {
         billSeries: state.formData.billseries.inputVal,
         billNo: state.formData.billno.inputVal, //_getBillNo(thatState),     
         amount: state.formData.amount.inputVal,
+        presentValue: state.formData.presentValue.inputVal,
         cname: state.selectedCustomer.name || state.formData.cname.inputVal,
         gaurdianName: state.selectedCustomer.gaurdianName || state.formData.gaurdianName.inputVal,
         address: state.selectedCustomer.address || state.formData.address.inputVal,
@@ -102,6 +105,7 @@ export const buildRequestParamsForUpdate = (thatState = {}) => {
         billRemarks: _getBillRemarks(thatState),
         userPicture: getPicData(thatState),
         ornPicture: getOrnPicData(thatState),
+        paymentMode: state.formData.paymentMode,
         uniqueIdentifier: state.uniqueIdentifier
     };
     return params;
@@ -265,6 +269,8 @@ export const resetState = (nextProps, newState) => {
             anItem.value = 0;
             anItem.other = 0;
             anItem.autoFetch = true;
+        } else if(index == 'paymentMode') {
+            anItem = 'cash';
         } else {
             if(index !== 'date' && index !== 'billseries') {
                 anItem.hasError = false;
