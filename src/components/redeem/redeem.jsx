@@ -209,6 +209,10 @@ class Redeem extends Component {
         console.log('-------Space key pressed');
     }
 
+    onClickSubmit() {
+        toast.info('Press Enter Key to Redeem');
+    }
+
     handleSubmit() {
         let params = {...this.state.selectedBillData};
         if(window.confirm(`${params.BillNo} Do you really want to close this bill ?`)) {
@@ -319,7 +323,7 @@ class Redeem extends Component {
                         </Row>
                         <Row className='tail-section'>
                             <Col xs={6} className='font-family-monospace gram-field'><b>{this.getTotalNWt(billData.Orn)}</b>&nbsp;gm</Col>
-                            <Col xs={6} className='amount-field text-align-right'>{billData.Amount}</Col>
+                            <Col xs={6} className='amount-field text-align-right'>₹: &nbsp; {billData.Amount}</Col>
                         </Row>
                     </Col>
                     <Col xs={4}>
@@ -338,53 +342,79 @@ class Redeem extends Component {
             <Row>
                 <Col xs={{ span: 6, offset: 2}} xs={{span: 6, offset: 2}}>
                     <Row>
-                        <Col xs={8} style={{fontSize: "13px"}}>
+                        <Col xs={6} style={{fontSize: "13px"}}>
                             <Row>
-                                <Col sm={4} xs={4} style={{paddingBottom: "5px"}}>Pledged Date: </Col><Col sm={8} xs={8}>{selectedBillData._pledgedDate}</Col>
+                                <Col sm={5} xs={5} style={{paddingBottom: "5px"}}>Pledged Date: </Col><Col sm={7} xs={7}>{selectedBillData._pledgedDate}</Col>
                             </Row>
                             <Row>
-                                <Col sm={4} xs={4} style={{paddingBottom: "5px"}}>Today Date: </Col><Col sm={8} xs={8}>{selectedBillData._todayDate}</Col>
+                                <Col sm={5} xs={5} style={{paddingBottom: "5px"}}>Today Date: </Col><Col sm={7} xs={7}>{selectedBillData._todayDate}</Col>
                             </Row>
                             <Row>
-                                <Col sm={4} xs={4} style={{paddingBottom: "5px"}}>Int. Rate</Col> <Col sm={8} xs={8}>{selectedBillData._roi}% per/month</Col>
+                                <Col sm={5} xs={5} style={{paddingBottom: "5px"}}>Int. Rate</Col> <Col sm={7} xs={7}>{selectedBillData._roi}% per/month</Col>
                             </Row>
                         </Col>
-                        <Col xs={4}>
-                            <Row>
+                        <Col xs={6}>
+                            <Row style={{height: '24px'}}>
                                 <Col xs={4} className='no-padding'>
-                                    <input className='interest-value-input' type = 'text' value={selectedBillData._interestPerMonth} onChange={(e) => this.inputControls.onChange(e, e.target.value, 'interestPerMonth')}/>
+                                    <InputGroup>
+                                        <InputGroup.Prepend>
+                                            <InputGroup.Text className="int-amt-per-mon-addon" >₹</InputGroup.Text>
+                                        </InputGroup.Prepend>
+                                        <FormControl
+                                            type="number"
+                                            value={selectedBillData._interestPerMonth}
+                                            placeholder=""
+                                            className="int-amt-per-mon-input"
+                                            onChange={(e) => this.inputControls.onChange(e, e.target.value, "interestPerMonth")}
+                                        />
+                                        <FormControl.Feedback />
+                                    </InputGroup>
+                                    {/* <input className='interest-value-input' type = 'text' value={selectedBillData._interestPerMonth} onChange={(e) => this.inputControls.onChange(e, e.target.value, 'interestPerMonth')}/> */}
                                 </Col>
-                                <Col xs={4} className='no-padding'>
-                                    &nbsp;<span style={{fontSize: "10px"}}>X</span> &nbsp;
+                                <Col xs={2} className='no-padding'>
+                                    &nbsp;<span className="multiplier-symbol" style={{fontSize: "10px"}}>X</span> &nbsp;
                                     {selectedBillData._monthDiff}
                                     &nbsp;&nbsp;&nbsp;<span style={{fontSize: "10px"}}>=</span> &nbsp;
                                 </Col>
-                                <Col xs={4}>
-                                    <p>{selectedBillData._totalInterestValue}</p>
+                                <Col xs={6}>
+                                    <p className="redeem-int-total-val">₹: &nbsp; {selectedBillData._totalInterestValue}</p>
                                 </Col>
                             </Row>
                         </Col> 
                     </Row>
                     <Row>
-                        <Col xs={{span: 4, offset: 8}} xs={{span: 4, offset: 8}}>
+                        <Col xs={{span: 6, offset: 6}} xs={{span: 6, offset: 6}}>
                             <Row>
-                                <Col xs={8}>
-                                    <p className='text-align-right lightgrey'>Discount</p>
+                                <Col xs={6}>
+                                    <p className='text-align-right lightgrey' style={{margin: '7px 0 0 0'}}>Discount</p>
                                 </Col>
-                                <Col xs={4}>
-                                    <input className='discount-value-input' type='text' value={selectedBillData._discountValue} onChange={(e) => this.inputControls.onChange(e, e.target.value, 'discount')}/>
+                                <Col xs={6}>
+                                    <InputGroup>
+                                        <InputGroup.Prepend>
+                                            <InputGroup.Text className="discount-amt-per-mon-addon" >₹</InputGroup.Text>
+                                        </InputGroup.Prepend>
+                                        <FormControl
+                                            type="number"
+                                            value={selectedBillData._discountValue}
+                                            placeholder=""
+                                            className="discount-amt-per-mon-input"
+                                            onChange={(e) => this.inputControls.onChange(e, e.target.value, "discount")}
+                                        />
+                                        <FormControl.Feedback />
+                                    </InputGroup>
+                                    {/* <input className='discount-value-input' type='text' value={selectedBillData._discountValue} onChange={(e) => this.inputControls.onChange(e, e.target.value, 'discount')}/> */}
                                 </Col>
                             </Row>
                         </Col>
                     </Row>
                     <Row>
-                        <Col xs={{span: 4, offset: 8}} xs={{span: 4, offset: 8}}>
+                        <Col xs={{span: 6, offset: 6}} xs={{span: 6, offset: 6}}>
                             <Row>
-                                <Col xs={8}>
-                                    <p className='text-align-right lightgrey'>Total</p>
+                                <Col xs={6}>
+                                    <p className='text-align-right lightgrey' style={{margin: '7px 0 0 0'}}>Total</p>
                                 </Col>
-                                <Col xs={4}>
-                                    <p className='total-value-field'>{selectedBillData._totalValue}</p>
+                                <Col xs={6}>
+                                    <p className='total-value-field'> ₹: &nbsp; {selectedBillData._totalValue}</p>
                                 </Col>
                             </Row>
                         </Col>                        
@@ -419,8 +449,8 @@ class Redeem extends Component {
                         <Col xs={{span: 6, offset: 2}} md={{span: 6, offset: 2}} className='text-align-right'>
                             <input 
                                 type='button'
-                                className='gs-button bordered'
-                                // onClick={(e) => this.handleSubmit()}
+                                className='redeem-submit-btn gs-button bordered'
+                                // onClick={(e) => this.onClickSubmit()}
                                 onKeyUp={(e) => this.handleSubmit()}
                                 ref={(domElm) => {this.domElmns.submitBtn = domElm}}
                                 value='Redeem'                    
@@ -439,7 +469,7 @@ class Redeem extends Component {
         _.each(ornObj, (anItem, index) => {
             totalNWt += parseFloat(anItem.ornNWt) || 0;
         });
-        return totalNWt;
+        return parseFloat(totalNWt).toFixed(3);
     }
 
     parseResponse(selectedBillData) {
@@ -511,6 +541,26 @@ class Redeem extends Component {
             <Container className='bill-closing-container'>
                 <Row className='main-input-container'>
                     <Col xs={2}>
+                        {/* <DatePicker
+                            id="example-datepicker" 
+                            value={this.state.date.inputVal} 
+                            onChange={(fullDateVal, dateVal) => {this.inputControls.onChange(null, fullDateVal, 'date')} }
+                            ref = {(domElm) => { this.domElmns.date = domElm; }}
+                            onKeyUp = {(e) => this.handleKeyUp(e, {currElmKey: 'date'}) }
+                            readOnly={this.state.loading}
+                            dateFormat="yyyy/MM/dd"
+                        /> */}
+
+                        <DatePicker
+                            id="redeem-datepicker" 
+                            value={this.state.date._inputVal} 
+                            onChange={(fullDateVal, dateVal) => {this.inputControls.onChange(null, fullDateVal, 'date')} }
+                            ref = {(domElm) => { this.domElmns.date = domElm; }}
+                            onKeyUp = {(e) => this.handleKeyUp(e, {currElmKey: 'date'}) }
+                            readOnly={this.state.loading}
+                        />
+                    </Col>
+                    <Col xs={2}>
                         {/* <Autosuggest
                             datalist={this.state.filteredBillNoList}
                             placeholder="Bill No"
@@ -541,26 +591,6 @@ class Redeem extends Component {
                             ref = {(domElm) => { this.domElmns.billInputBox = domElm?domElm.input:domElm; }}
                         />
                         {/* <input type='text' value={this.state.temp} onChange={(e) => this.setState({temp: e.target.value})} /> */}
-                    </Col>
-                    <Col xs={2}>
-                        {/* <DatePicker
-                            id="example-datepicker" 
-                            value={this.state.date.inputVal} 
-                            onChange={(fullDateVal, dateVal) => {this.inputControls.onChange(null, fullDateVal, 'date')} }
-                            ref = {(domElm) => { this.domElmns.date = domElm; }}
-                            onKeyUp = {(e) => this.handleKeyUp(e, {currElmKey: 'date'}) }
-                            readOnly={this.state.loading}
-                            dateFormat="yyyy/MM/dd"
-                        /> */}
-
-                        <DatePicker
-                            id="example-datepicker" 
-                            value={this.state.date._inputVal} 
-                            onChange={(fullDateVal, dateVal) => {this.inputControls.onChange(null, fullDateVal, 'date')} }
-                            ref = {(domElm) => { this.domElmns.date = domElm; }}
-                            onKeyUp = {(e) => this.handleKeyUp(e, {currElmKey: 'date'}) }
-                            readOnly={this.state.loading}
-                        />
                     </Col>
                 </Row>
                 <Row className='bill-display-container'>

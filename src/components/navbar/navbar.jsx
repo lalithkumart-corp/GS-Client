@@ -36,7 +36,7 @@ class NavbarComp extends Component {
                 enableUserModule = false;
                 enableTallyModule = false;
             }
-            if(session.roleId > 3)
+            if(session.roleId > 1)
                 enableBackupModule = false;
             this.setState({enablePledgebookModule: girvi, enableStockModule: jewellery, enableTallyModule, enableUserModule, enableBackupModule});
         }

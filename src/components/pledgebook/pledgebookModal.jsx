@@ -13,6 +13,7 @@ import { calculateData, getRequestParams, getReopenRequestParams } from '../rede
 import moment from 'moment';
 import ReactToPrint from 'react-to-print';
 import LoanBillMainTemplate from '../../templates/loanBill/LoanBillMainTemplate';
+import RedeemPreview from '../redeem/redeem-preview';
 class PledgebookModal extends Component {
     constructor(props) {
         super(props);
@@ -248,6 +249,9 @@ class PledgebookModal extends Component {
                 {/* {this.props.currentBillData.Status
                 ?<BillCreation loadedInPledgebook={true} billData={this.props.currentBillData}/>
                 :<BillClosedView />} */}
+                {!this.props.currentBillData.Status && 
+                    <RedeemPreview currentBillData={this.props.currentBillData} />
+                }
                 <BillCreation loadedInPledgebook={true} billData={this.props.currentBillData}/>
                 <ReactToPrint
                     ref={(domElm) => {this.printBtn = domElm}}

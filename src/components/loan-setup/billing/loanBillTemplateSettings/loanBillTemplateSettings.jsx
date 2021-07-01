@@ -422,7 +422,7 @@ export default class LoanBillTemplateSettings extends Component {
                                 <Col xs={12} className="second-line-header">
                                     <h5>SECOND LINE</h5>
                                 </Col>
-                                <Col xs={6} md={6}>
+                                <Col xs={4} md={4}>
                                     <Form.Group>
                                         <Form.Label>Text</Form.Label>
                                         <Form.Control
@@ -433,7 +433,7 @@ export default class LoanBillTemplateSettings extends Component {
                                         />
                                     </Form.Group>
                                 </Col>
-                                <Col xs={12}>
+                                <Col xs={6}>
                                     <Row>
                                         <Col xs={3} md={3}>
                                             <Form.Group>
@@ -464,7 +464,7 @@ export default class LoanBillTemplateSettings extends Component {
                                 <Col xs={12} className="third-line-header">
                                     <h5>THIRD LINE</h5>
                                 </Col>
-                                <Col xs={6} md={6}>
+                                <Col xs={4} md={4}>
                                     <Form.Group>
                                         <Form.Label>Text</Form.Label>
                                         <Form.Control
@@ -475,7 +475,7 @@ export default class LoanBillTemplateSettings extends Component {
                                         />
                                     </Form.Group>
                                 </Col>
-                                <Col xs={12}>
+                                <Col xs={6}>
                                     <Row>
                                         <Col xs={3} md={3}>
                                             <Form.Group>
@@ -495,7 +495,7 @@ export default class LoanBillTemplateSettings extends Component {
                                 <Col xs={12} className="fourth-line-header">
                                     <h5>FOURTH LINE</h5>
                                 </Col>
-                                <Col xs={6} md={6}>
+                                <Col xs={4} md={4}>
                                     <Form.Group>
                                         <Form.Label>Text</Form.Label>
                                         <Form.Control
@@ -506,7 +506,7 @@ export default class LoanBillTemplateSettings extends Component {
                                         />
                                     </Form.Group>
                                 </Col>
-                                <Col xs={12}>
+                                <Col xs={6}>
                                     <Row>
                                         <Col xs={3} md={3}>
                                             <Form.Group>
@@ -526,7 +526,7 @@ export default class LoanBillTemplateSettings extends Component {
                                 <Col xs={12} className="fifth-line-header">
                                     <h5>FIFTH LINE</h5>
                                 </Col>
-                                <Col xs={6} md={6}>
+                                <Col xs={4} md={4}>
                                     <Form.Group>
                                         <Form.Label>Text</Form.Label>
                                         <Form.Control
@@ -537,7 +537,7 @@ export default class LoanBillTemplateSettings extends Component {
                                         />
                                     </Form.Group>
                                 </Col>
-                                <Col xs={12}>
+                                <Col xs={6}>
                                     <Row>
                                         <Col xs={3} md={3}>
                                             <Form.Group>
