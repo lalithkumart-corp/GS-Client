@@ -37,14 +37,12 @@ import { FaEdit } from 'react-icons/fa';
 import CommonModal from '../common-modal/commonModal';
 import GeneralInfo from '../customerPortal/generalInfo';
 import { getLoanDate, setLoanDate } from '../../core/storage';
+import { format } from 'currency-formatter';
+import { PAYMENT_MODE } from '../../constants';
 
 const ENTER_KEY = 13;
 const SPACE_KEY = 32;
-const PAYMENT_MODE = {
-    1: 'cash',
-    2: 'cheque',
-    3: 'online'
-}
+
 var domList = new DoublyLinkedList();
 domList.add('billno', {type: 'formControl', enabled: true});
 domList.add('amount', {type: 'formControl', enabled: true});
@@ -2250,15 +2248,15 @@ class BillCreation extends Component {
                         <Col xs={4}>
                             <Row>
                                 <Col xs={6} style={{paddingRight: 0}}>
-                                    Interest <br></br> ₹ {this.state.formData.interest.value}({this.state.formData.interest.percent}%)
+                                    <span className="interest-display-span">Interest</span> <br></br> {format(this.state.formData.interest.value, {code: 'INR'})}({this.state.formData.interest.percent}%)
                                 </Col>
                                 <Col xs={6}>
-                                    Amount  <br></br>  ₹ {this.state.formData.amount.landedCost}
+                                    <span className="landedcost-display-span">Amount</span>  <br></br>  {format(this.state.formData.amount.landedCost, {code: 'INR'})}
                                 </Col>
                             </Row>
                         </Col>
                         <Col xs={5}>
-                            <span style={{marginBottom: '4px', display: 'inline-block'}}>Payment Method</span>
+                            <span className="payment-mode-selection-span" style={{marginBottom: '4px', display: 'inline-block'}}>Payment Method</span>
                             <div>
                                 <span className={`a-payment-item ${this.state.formData.paymentMode=='cash'?'choosen':''}`} onClick={(e)=>this.onChangePaymentMode('cash')}>
                                     Cash

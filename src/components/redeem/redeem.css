@@ -42,6 +42,7 @@
 }
 .bill-closing-container .total-value-field {
     font-size: 20px;
+    margin-bottom: 0;
 }
 .bill-closing-container #redeem-datepicker {
     padding: 6px 12px;
@@ -51,7 +52,7 @@
 }
 .bill-closing-container .int-amt-per-mon-addon,
 .bill-closing-container .discount-amt-per-mon-addon {
-    padding: 2px;
+    padding: 7px;
     height: 24px;
 }
 .bill-closing-container .int-amt-per-mon-input,
@@ -73,4 +74,21 @@
 }
 .bill-closing-container .gram-field {
     font-size: 16px;
+}
+.bill-closing-container .a-payment-item {
+    padding: 3px 6px;
+    border: 1px solid lightgray;
+    border-radius: 6px;
+    margin-right: 5px;
+    cursor: pointer;
+}
+.bill-closing-container .a-payment-item.choosen,
+.bill-closing-container .a-payment-item:focus {
+    background-color: #d3d3d382;
+}
+.bill-closing-container .bill-notes-text-area:focus {
+    box-shadow: none;
+    outline: none;
+    border-color: #ced4da;
+    border-bottom: 2px solid #0acfee;
 }

@@ -175,6 +175,20 @@ html {
 .read-mode .gs-input-cell:focus {
     border: none;
 }
+
+.gs-input-cell2 {  
+  width: calc(100% - 15px);
+  padding: 6px 12px 6px 0;
+  outline: none;
+}
+.gs-input-cell2:focus {
+  box-shadow: none;
+  border-color: #ced4da;
+  border-bottom: 2px solid #0acfee;
+}
+.read-mode .gs-input-cell2:focus {
+    border: none;
+}
 /*END: INPUT FIELD */
 
 

@@ -1,5 +1,6 @@
 import _ from 'lodash';
 import moment from 'moment';
+import { PAYMENT_MODE_KEY } from '../../constants';
 
 export const getRateOfInterest = (interestRatesDB, amount, options={}) => {
     let rateOfInterest = 0;
@@ -48,7 +49,7 @@ export const getInterestPerMonth = (amount, roi) => {
 export const calculateInterestBasedOnRate = (interestPerMonth, amount) => { 
     interestPerMonth = parseFloat(interestPerMonth) || 0;
     amount = parseFloat(amount) || 0;
-    return parseFloat((interestPerMonth*100)/amount);
+    return parseFloat(((interestPerMonth*100)/amount).toFixed(2));
 }
 
 export const getRequestParams = (billData) => {
@@ -68,7 +69,9 @@ export const getRequestParams = (billData) => {
         estimatedAmount: billData.Amount + billData._interestPerMonth,
         discountValue: billData._discountValue,
         paidAmount: billData._totalValue,
-        handedTo: billData.Name
+        handedTo: billData.Name,
+        paymentMode: PAYMENT_MODE_KEY[billData._paymentMode],
+        billRemarks: billData._billRemarks || ''
     };
     requestParams.push(anObj);
     return requestParams;

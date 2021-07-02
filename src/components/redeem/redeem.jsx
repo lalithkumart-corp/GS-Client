@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Container, Row, Col, FormGroup, FormLabel, FormControl, HelpBlock, InputGroup, Button, Glyphicon } from 'react-bootstrap';
+import { Container, Row, Col, Form, FormGroup, FormLabel, FormControl, HelpBlock, InputGroup, Button, Glyphicon } from 'react-bootstrap';
 //import Autosuggest, { ItemAdapter } from 'react-bootstrap-autosuggest';
 import * as ReactAutosuggest from 'react-autosuggest';
 import { DoublyLinkedList } from '../../utilities/doublyLinkedList';
@@ -16,6 +16,8 @@ import moment from 'moment';
 import { getInterestRate } from '../../utilities/utility';
 import { calculateData, calculateInterestBasedOnRate, getRequestParams } from './helper';
 import 'bootstrap/dist/css/bootstrap.min.css';
+import { format } from 'currency-formatter';
+import { PAYMENT_MODE } from '../../constants';
 
 let domList = new DoublyLinkedList();
 domList.add('billInputBox', {type: 'rautosuggest', enabled: true});
@@ -178,6 +180,12 @@ class Redeem extends Component {
                     newState.selectedBillData._discountValue = val;
                     newState.selectedBillData._totalValue = newState.selectedBillData.Amount + newState.selectedBillData._totalInterestValue - newState.selectedBillData._discountValue;
                     break;
+                case 'paymentMode':
+                    newState.selectedBillData._paymentMode = val;
+                    break;
+                case 'billRemarks':
+                    newState.selectedBillData._billRemarks = val;
+                    break;
             }
             this.setState(newState);
         }
@@ -323,7 +331,7 @@ class Redeem extends Component {
                         </Row>
                         <Row className='tail-section'>
                             <Col xs={6} className='font-family-monospace gram-field'><b>{this.getTotalNWt(billData.Orn)}</b>&nbsp;gm</Col>
-                            <Col xs={6} className='amount-field text-align-right'>₹: &nbsp; {billData.Amount}</Col>
+                            <Col xs={6} className='amount-field text-align-right'>{format(billData.Amount, {code: 'INR'})}</Col>
                         </Row>
                     </Col>
                     <Col xs={4}>
@@ -347,7 +355,7 @@ class Redeem extends Component {
                                 <Col sm={5} xs={5} style={{paddingBottom: "5px"}}>Pledged Date: </Col><Col sm={7} xs={7}>{selectedBillData._pledgedDate}</Col>
                             </Row>
                             <Row>
-                                <Col sm={5} xs={5} style={{paddingBottom: "5px"}}>Today Date: </Col><Col sm={7} xs={7}>{selectedBillData._todayDate}</Col>
+                                <Col sm={5} xs={5} style={{paddingBottom: "5px"}}>Redeem Date: </Col><Col sm={7} xs={7}>{selectedBillData._todayDate}</Col>
                             </Row>
                             <Row>
                                 <Col sm={5} xs={5} style={{paddingBottom: "5px"}}>Int. Rate</Col> <Col sm={7} xs={7}>{selectedBillData._roi}% per/month</Col>
@@ -364,7 +372,7 @@ class Redeem extends Component {
                                             type="number"
                                             value={selectedBillData._interestPerMonth}
                                             placeholder=""
-                                            className="int-amt-per-mon-input"
+                                            className="gs-input-cell2 int-amt-per-mon-input"
                                             onChange={(e) => this.inputControls.onChange(e, e.target.value, "interestPerMonth")}
                                         />
                                         <FormControl.Feedback />
@@ -377,7 +385,7 @@ class Redeem extends Component {
                                     &nbsp;&nbsp;&nbsp;<span style={{fontSize: "10px"}}>=</span> &nbsp;
                                 </Col>
                                 <Col xs={6}>
-                                    <p className="redeem-int-total-val">₹: &nbsp; {selectedBillData._totalInterestValue}</p>
+                                    <p className="redeem-int-total-val">{format(selectedBillData._totalInterestValue, {code: 'INR'})}</p>
                                 </Col>
                             </Row>
                         </Col> 
@@ -396,8 +404,8 @@ class Redeem extends Component {
                                         <FormControl
                                             type="number"
                                             value={selectedBillData._discountValue}
-                                            placeholder=""
-                                            className="discount-amt-per-mon-input"
+                                            placeholder="0"
+                                            className="gs-input-cell2 discount-amt-per-mon-input"
                                             onChange={(e) => this.inputControls.onChange(e, e.target.value, "discount")}
                                         />
                                         <FormControl.Feedback />
@@ -408,16 +416,47 @@ class Redeem extends Component {
                         </Col>
                     </Row>
                     <Row>
-                        <Col xs={{span: 6, offset: 6}} xs={{span: 6, offset: 6}}>
-                            <Row>
+                        <Col xs={6} md={6}>
+                            <span className="payment-mode-selection-span" style={{marginBottom: '4px', display: 'inline-block'}}>Payment Method</span>
+                            <div>
+                                <span className={`a-payment-item ${this.state.selectedBillData._paymentMode=='cash'?'choosen':''}`} onClick={(e)=>this.inputControls.onChange(e, 'cash', 'paymentMode')}>
+                                    Cash
+                                </span>
+                                <span className={`a-payment-item ${this.state.selectedBillData._paymentMode=='cheque'?'choosen':''}`} onClick={(e)=>this.inputControls.onChange(e, 'cheque', 'paymentMode')}>
+                                    Cheque
+                                </span>
+                                <span className={`a-payment-item ${this.state.selectedBillData._paymentMode=='online'?'choosen':''}`} onClick={(e)=>this.inputControls.onChange(e, 'online', 'paymentMode')}>
+                                    Online
+                                </span>
+                            </div>
+                        </Col>
+                        <Col xs={{span: 6}} md={{span: 6}}>
+                            <Row style={{paddingTop: '7px'}}>
                                 <Col xs={6}>
                                     <p className='text-align-right lightgrey' style={{margin: '7px 0 0 0'}}>Total</p>
                                 </Col>
                                 <Col xs={6}>
-                                    <p className='total-value-field'> ₹: &nbsp; {selectedBillData._totalValue}</p>
+                                    <p className='total-value-field'> {format(selectedBillData._totalValue, {code: 'INR'})}</p>
                                 </Col>
                             </Row>
                         </Col>                        
+                    </Row>
+                    <Row style={{marginTop: '20px'}}>
+                        <Col>
+                            <Form.Group>
+                                <InputGroup>
+                                    <InputGroup.Prepend>
+                                        <InputGroup.Text>Bill Notes</InputGroup.Text>
+                                    </InputGroup.Prepend>
+                                    <FormControl as="textarea" 
+                                        placeholder="Type here..." 
+                                        value={this.state.selectedBillData._billRemarks} 
+                                        onChange={(e) => this.inputControls.onChange(null, e.target.value, "billRemarks")}
+                                        className="bill-notes-text-area"
+                                    />
+                                </InputGroup>
+                            </Form.Group>
+                        </Col>
                     </Row>
                 </Col>
             </Row>
@@ -491,6 +530,7 @@ class Redeem extends Component {
         } else {
             selectedBillData._picture.holder.imgSrc = 'images/default.jpg';
         }
+        selectedBillData._paymentMode = PAYMENT_MODE[selectedBillData.PaymentMode];
         return selectedBillData;
     }
 
@@ -558,6 +598,7 @@ class Redeem extends Component {
                             ref = {(domElm) => { this.domElmns.date = domElm; }}
                             onKeyUp = {(e) => this.handleKeyUp(e, {currElmKey: 'date'}) }
                             readOnly={this.state.loading}
+                            className="gs-input-cell2"
                         />
                     </Col>
                     <Col xs={2}>
@@ -586,7 +627,7 @@ class Redeem extends Component {
                                 value: this.state.formData.billNo.inputVal || '',
                                 onChange: (e, {newValue, method}) => this.reactAutosuggestControls.onChange(e, {newValue, method}, 'billno'),//this.setState({billno: e.target.value}),
                                 onKeyUp: (e) => this.reactAutosuggestControls.handleKeyUp(e, {currElmKey: 'billno'}),
-                                className: "react-autosuggest__input"
+                                className: "react-autosuggest__input gs-input-cell2"
                             }}
                             ref = {(domElm) => { this.domElmns.billInputBox = domElm?domElm.input:domElm; }}
                         />

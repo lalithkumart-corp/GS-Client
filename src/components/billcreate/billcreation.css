@@ -355,3 +355,10 @@
 .bill-creation-container .a-payment-item:focus {
     background-color: #d3d3d382;
 }
+.bill-creation-container .interest-display-span,
+.bill-creation-container .landedcost-display-span,
+.bill-creation-container .payment-mode-selection-span {
+    font-size: 14px;
+    color: darkgray;
+    font-weight: 500;
+}
