@@ -1,0 +1,17 @@
+.other-settings-container {
+    .settings-header-text {
+        position: absolute;
+    }
+    .settings-left-panel {
+        border-right: 1px solid gray;
+        height: 100%;
+        /* position: sticky; */
+        /* top: 4rem; */
+        z-index: 1000;
+        height: calc(100vh - 4rem);
+        border-right: 1px solid gray;
+        padding-top: 50px;
+        padding-left: 0;
+        padding-right: 0;
+    }
+}

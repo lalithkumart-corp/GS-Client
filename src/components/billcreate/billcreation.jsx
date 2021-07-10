@@ -235,9 +235,9 @@ class BillCreation extends Component {
             this.injectDefaults(newState);
             this.updateDomList('disableMoreDetailsInputElmns');
             this.props.updateClearEntriesFlag(false);
+            this.domElmns["amount"].focus();
         }
         this.setState(newState);
-        // this.domElmns["amount"].focus();
     }
     /* END: Lifecycle methods */
 
