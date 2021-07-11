@@ -124,3 +124,9 @@ export const GET_OPENING_BALANCE = `${config.proxy_protocol}://${config.proxy_ap
 export const GET_LOAN_BILL_TEMPLATE_SETTINGS = `${config.proxy_protocol}://${config.proxy_api_host}:${config.proxy_api_port}/${config.restApiRoot}/LoanBillTemplates/get-settings`;
 export const UPDATE_LOAN_BILL_TEMPLATE = `${config.proxy_protocol}://${config.proxy_api_host}:${config.proxy_api_port}/${config.restApiRoot}/LoanBillTemplates/update-settings`;
 export const FETCH_AVL_LOAN_BILL_TEMPLATES = `${config.proxy_protocol}://${config.proxy_api_host}:${config.proxy_api_port}/${config.restApiRoot}/LoanBillTemplates/fetch-avl-loan-bill-templates`;
+
+export const FETCH_FUND_ACCOUNTS_LIST = `${config.proxy_protocol}://${config.proxy_api_host}:${config.proxy_api_port}/${config.restApiRoot}/FundAccounts/get-list`;
+export const ADD_NEW_FUND_ACCOUNT = `${config.proxy_protocol}://${config.proxy_api_host}:${config.proxy_api_port}/${config.restApiRoot}/FundAccounts/insert-account`;
+export const UPDATE_FUND_ACCOUNT = `${config.proxy_protocol}://${config.proxy_api_host}:${config.proxy_api_port}/${config.restApiRoot}/FundAccounts/update-account`;
+export const DELETE_FUND_ACCOUNT = `${config.proxy_protocol}://${config.proxy_api_host}:${config.proxy_api_port}/${config.restApiRoot}/FundAccounts/delete-account`;
+export const FETCH_ALL_BANK_LIST = `${config.proxy_protocol}://${config.proxy_api_host}:${config.proxy_api_port}/${config.restApiRoot}/Commons/fetch-bank-list`;

@@ -47,6 +47,21 @@ export const defaultOrnPictureState = {
     uploadMethod: 'DIRECT_UPLOAD'
 };
 
+const defaultPaymentObj = {
+    mode: 'cash',
+    cash: {fromAccountId: ''},
+    cheque: {fromAccountId: ''},
+    online: {
+        fromAccountId: '',
+        toAccount: {
+            toAccountId: '',
+            accNo: '',
+            upiId: '',
+            ifscCode: ''
+        }
+    }
+};
+
 export const buildRequestParams = (thatState = {}) => {
     let state = {...thatState}; //for preventing reference issue  
     state.selectedCustomer = state.selectedCustomer || {};  
@@ -74,7 +89,8 @@ export const buildRequestParams = (thatState = {}) => {
         interestValue: thatState.formData.interest.value,
         otherCharges: thatState.formData.interest.other,
         landedCost: thatState.formData.amount.landedCost,
-        paymentMode: thatState.formData.paymentMode,
+        paymentMode: thatState.formData.payment.mode,
+        paymentDetails: state.formData.payment
     };
     return params;
 }
@@ -105,7 +121,8 @@ export const buildRequestParamsForUpdate = (thatState = {}) => {
         billRemarks: _getBillRemarks(thatState),
         userPicture: getPicData(thatState),
         ornPicture: getOrnPicData(thatState),
-        paymentMode: state.formData.paymentMode,
+        paymentMode: state.formData.payment.mode,
+        paymentDetails: state.formData.payment,
         uniqueIdentifier: state.uniqueIdentifier
     };
     return params;
@@ -281,6 +298,7 @@ export const resetState = (nextProps, newState) => {
                 anItem.landedCost = 0;
         }            
     });
+    newState.formData.payment = JSON.parse(JSON.stringify(defaultPaymentObj));
     newState.selectedCustomer = {};
     newState.showMoreInputs = false; //!newState.showMoreInputs;
     newState.userPicture = JSON.parse(JSON.stringify(defaultPictureState));

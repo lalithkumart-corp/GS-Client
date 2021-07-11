@@ -72,7 +72,7 @@ export default class CashBook extends Component {
                 filterFormatter: (column, colIndex) => {
                     let options = [];
                     _.each(this.state.filters.collections.fundAccounts, (anAccount, index) => {
-                        options.push({label: anAccount.toUpperCase(), value: anAccount});
+                        options.push({label: anAccount.name.toUpperCase(), value: anAccount.id});
                     });
                     return (
                         <div>

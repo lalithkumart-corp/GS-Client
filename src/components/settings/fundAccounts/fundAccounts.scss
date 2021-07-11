@@ -1,0 +1,31 @@
+.fund-account-main-div {
+    .add-account-btn {
+        width: 100%;
+        margin-bottom: 20px;
+    }
+    .acc-card-div {
+        border: 1px solid #cdba32;
+        box-shadow: -1px 2px #cdba32;
+        background-color: #f3dd42;
+        padding: 5px 12px;
+        margin-bottom: 30px;
+        border-radius: 10px;
+        .acc-name {
+            padding: 5px 15px;
+            font-size: 20px;
+        }
+        .acc-id {
+
+        }
+        .acc-branch {
+
+        }
+        .edit-acc-icon,
+        .delete-acc-icon {
+            padding-right: 10px;
+            cursor: pointer;
+            color: black;
+            font-size: 13px;
+        }
+    }
+}

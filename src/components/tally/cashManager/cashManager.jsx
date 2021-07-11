@@ -2,26 +2,59 @@ import React, { Component, useState, useRef, useEffect } from 'react';
 import {Container,  Row, Col, Form } from 'react-bootstrap';
 import * as ReactAutosuggest from 'react-autosuggest';
 import DatePicker from 'react-datepicker';
-import { CASH_IN, CASH_OUT, FETCH_CATEGORY_SUGGESTIONS } from '../../../core/sitemap';
+import { CASH_IN, CASH_OUT, FETCH_CATEGORY_SUGGESTIONS, FETCH_FUND_ACCOUNTS_LIST } from '../../../core/sitemap';
 import './cashManager.scss';
 import axiosMiddleware from '../../../core/axios';
 import { getAccessToken } from '../../../core/storage';
 import { toast } from 'react-toastify';
 import CashBook from '../cashBook/cashBook';
 import { getDateInUTC } from '../../../utilities/utility';
-
+import { fetchMyAccountsList } from '../../../utilities/apiUtils';
 export default class CashManager extends Component {
     constructor(props) {
         super(props);
         
         this.state = {
-            
+            accountsList: [],
         }
     }
     
     componentDidMount() {
-        
+        this.fetchAccountsList();
     }
+
+    async fetchAccountsList() {
+        let list = await fetchMyAccountsList();
+        if(list && list.length > 0)
+            this.setState({accountsList: list});
+        // try {
+        //     let at = getAccessToken();
+        //     let resp = await axiosMiddleware.get(`${FETCH_FUND_ACCOUNTS_LIST}?access_token=${at}`);
+        //     if(resp && resp.data.RESP && resp.data.STATUS == 'SUCCESS') {
+        //         let list = this.parseList(resp.data.RESP);
+        //         this.setState({accountsList: list});
+        //     } else {
+        //         let msg = 'Error!';
+        //         if(resp.data.ERR && resp.data.ERR.message)
+        //             msg = resp.data.ERR.message;
+        //         toast.error(msg);
+        //     }
+        // } catch(e) {
+        //     console.error(e);
+        // }
+    }
+    // parseList(respList) {
+    //     let parsedList = [];
+    //     _.each(respList, (anObj, index) => {
+    //         parsedList.push({
+    //             id: anObj.id,
+    //             name: anObj.name,
+    //             account_no: anObj.account_no,
+    //             branch: anObj.branch
+    //         });
+    //     });
+    //     return parsedList;
+    // }
 
     inputControls = {
         onChange: () => {
@@ -38,10 +71,10 @@ export default class CashManager extends Component {
                 <Row className="cash-manager">
                     <Col xs={3} md={3} sm={3}>
                         <Col xs={12} md={12} sm={12} className="gs-card">
-                            <CashIn />
+                            <CashIn accountsList={this.state.accountsList} />
                         </Col>
                         <Col xs={12} md={12} sm={12} className="gs-card">
-                            <CashOut />
+                            <CashOut accountsList={this.state.accountsList}/>
                         </Col>
                     </Col>
                     <Col xs={{span: 9}} md={{span: 9}} sm={{span: 9}} className="middle-card gs-card">
@@ -53,7 +86,7 @@ export default class CashManager extends Component {
     }
 }
 
-function CashIn() {
+function CashIn(props) {
     let [amount, setAmount] = useState();
     let [remarks, setRemarks] = useState('');
     let [fundHouseVal, setFundHouseVal] = useState('shop');
@@ -155,6 +188,14 @@ function CashIn() {
         setCategoryVal('');
     }
 
+    let fetchAcccountListDropdown = () => {
+        let theDom = [];
+        _.each(props.accountsList, (anAcc, index) => {
+            theDom.push(<option key={`house-${index}`} value={anAcc.id}>{anAcc.name}</option>);
+        });
+        return theDom;
+    }
+
     return (
             <Row className="gs-card-content cash-in" style={{padding: "20px 0"}}>
                 <Col xs={12} md={12} sm={12}><h4>CASH IN</h4></Col>
@@ -200,8 +241,7 @@ function CashIn() {
                                     value={fundHouseVal}
                                     onChange={(e) => onChangeFundHouse(e.target.value)}
                                 >
-                                    <option key='house-1' value='bank'>BANK</option>
-                                    <option key='house-2' value='shop'>SHOP</option>
+                                    {fetchAcccountListDropdown()}
                                 </Form.Control>
                             </Form.Group>
                         </Col>
@@ -246,7 +286,7 @@ function CashIn() {
 }
 
 
-function CashOut() {
+function CashOut(props) {
     let [amount, setAmount] = useState();
     let [remarks, setRemarks] = useState('');
     let [fundHouseVal, setFundHouseVal] = useState('shop');
@@ -347,6 +387,14 @@ function CashOut() {
         setCategoryVal('');
     }
 
+    let fetchAcccountListDropdown = () => {
+        let theDom = [];
+        _.each(props.accountsList, (anAcc, index) => {
+            theDom.push(<option key={`house-${index}`} value={anAcc.id}>{anAcc.name}</option>);
+        });
+        return theDom;
+    }
+
     return (
             <Row className="gs-card-content cash-out">
                 <Col xs={12} md={12} sm={12}><h4>CASH OUT</h4></Col>
@@ -393,8 +441,7 @@ function CashOut() {
                                     value={fundHouseVal}
                                     onChange={(e) => onChangeFundHouse(e.target.value)}
                                 >
-                                    <option key='house-1' value='bank'>BANK</option>
-                                    <option key='house-2' value='shop'>SHOP</option>
+                                    {fetchAcccountListDropdown()}
                                 </Form.Control>
                             </Form.Group>
                         </Col>

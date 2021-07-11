@@ -37,6 +37,7 @@ import { FaEdit } from 'react-icons/fa';
 import CommonModal from '../common-modal/commonModal';
 import GeneralInfo from '../customerPortal/generalInfo';
 import { getLoanDate, setLoanDate } from '../../core/storage';
+import { fetchMyAccountsList, fetchAllBanksList } from '../../utilities/apiUtils';
 import { format } from 'currency-formatter';
 import { PAYMENT_MODE } from '../../constants';
 
@@ -190,12 +191,28 @@ class BillCreation extends Component {
                     limitedList: []
                 },
                 selectedCustomer: {},
-                paymentMode: 'cash'
+                paymentMode: 'cash',
+                payment: {
+                    mode: 'cash',
+                    cash: {fromAccountId: ''},
+                    cheque: {fromAccountId: ''},
+                    online: {
+                        fromAccountId: '',
+                        toAccount: {
+                            toAccountId: '',
+                            accNo: '',
+                            upiId: '',
+                            ifscCode: ''
+                        }
+                    }
+                }
             },
             amountPopoverOpen: false,
             showCustomerEditModal: false,
             userPicture: JSON.parse(JSON.stringify(defaultPictureState)),
-            ornPicture: JSON.parse(JSON.stringify(defaultOrnPictureState))
+            ornPicture: JSON.parse(JSON.stringify(defaultOrnPictureState)),
+            accountsList: [],
+            allBanksList: [],
         };
         this.bindMethods();
         this.state = this.populateFromLocalStorage(this.state);
@@ -217,6 +234,7 @@ class BillCreation extends Component {
             this.updateDomList('resetOrnTableRows', this.state);
             this.updateDomList('ornInputFields');
         }
+        this.fetchAccountDroddownList()
         this.setInterestRates();
     }
 
@@ -255,6 +273,26 @@ class BillCreation extends Component {
             console.log(e);
         } finally {
             return state;
+        }
+    }
+
+    async fetchAccountDroddownList() {
+        let list = await fetchMyAccountsList();
+        let allBanksList = await fetchAllBanksList();
+        if(list && list.length > 0) {
+            let defaultFundAcc = list.filter((aFundAcc)=> {
+                if(aFundAcc.is_default)
+                    return aFundAcc;
+            });
+            let defaultAcc = '';
+
+            if(defaultFundAcc && defaultFundAcc.length > 0)
+                defaultAcc = defaultFundAcc[0].id;
+            let newState = {...this.state};
+            newState.formData.payment.cash.fromAccountId = defaultAcc;
+            newState.accountsList = list;
+            newState.allBanksList = allBanksList;
+            this.setState(newState);
         }
     }
 
@@ -506,7 +544,20 @@ class BillCreation extends Component {
         }
 
         newState.uniqueIdentifier = data.UniqueIdentifier;        
-        newState.formData.paymentMode = PAYMENT_MODE[data.PaymentMode] || 'cash';
+        newState.formData.payment.mode = data.PaymentMode || 'cash';
+        if(newState.formData.payment.mode == 'cash') {
+            newState.formData.payment.cash.fromAccountId = data.fund_accounts_id;
+        } else if(newState.formData.payment.mode == 'cheque') {
+            newState.formData.payment.cheque.fromAccountId = data.fund_accounts_id;
+        } else if(newState.formData.payment.mode == 'online') {
+            newState.formData.payment.online.fromAccountId = data.fund_accounts_id;
+            newState.formData.payment.online.toAccount = {
+                toAccountId: data.fundTransaction_cash_out_to_bank_id,
+                accNo: data.fundTransaction_cash_out_to_bank_acc_no,
+                upiId: data.fundTransaction_cash_out_to_upi,
+                ifscCode: data.fundTransaction_cash_out_to_bank_ifsc
+            }
+        }
         this.setState(newState);
     }
     async setInterestRates() {
@@ -1470,7 +1521,35 @@ class BillCreation extends Component {
 
     onChangePaymentMode(paymentMode) {
         let newState = {...this.state};
-        newState.formData.paymentMode = paymentMode;
+        newState.formData.payment.mode = paymentMode;
+        this.setState(newState);
+    }
+
+    onChangePaymentInputs(val, identifier) {
+        let newState = {...this.state};
+        switch(identifier) {
+            case 'cash-from-acc':
+                newState.formData.payment.cash.fromAccountId = val;
+                break;
+            case 'cheque-from-acc':
+                newState.formData.payment.cheque.fromAccountId = val;
+                break;
+            case 'online-from-acc':
+                newState.formData.payment.online.fromAccountId = val;
+                break;
+            case 'online-to-acc-platform':
+                newState.formData.payment.online.toAccount.toAccountId = val;
+                break;
+            case 'online-to-acc-upiid':
+                newState.formData.payment.online.toAccount.upiId = val;
+                break;
+            case 'online-to-acc-no':
+                newState.formData.payment.online.toAccount.accNo = val;
+                break;
+            case 'online-to-acc-ifsc':
+                newState.formData.payment.online.toAccount.ifscCode = val;
+                break;
+        }
         this.setState(newState);
     }
 
@@ -1789,6 +1868,22 @@ class BillCreation extends Component {
                 </Collapse>
             </Col>
         );
+    }
+    getFromAccountDropdown() {
+        let theDom = [];
+        _.each(this.state.accountsList, (anAcc, index) => {
+            theDom.push(<option key={`house-${index}`} value={anAcc.id} selected={anAcc.is_default == 1 && "selected"}>{anAcc.name}</option>);
+        });
+        return theDom;
+    }
+    getToAccountDropdown() {
+        // let accountsList = [{id: 1, name: 'Bank'}, {id: 2, name: 'UPI'}];
+        let theDom = [];
+        theDom.push(<option key={`house-${0}`} value={0}>select...</option>);
+        _.each(this.state.allBanksList, (anAcc, index) => {
+            theDom.push(<option key={`house-${index}`} value={anAcc.id}>{anAcc.name}</option>);
+        });
+        return theDom;
     }
     /* END: DOM Getter's */    
     
@@ -2258,15 +2353,116 @@ class BillCreation extends Component {
                         <Col xs={5}>
                             <span className="payment-mode-selection-span" style={{marginBottom: '4px', display: 'inline-block'}}>Payment Method</span>
                             <div>
-                                <span className={`a-payment-item ${this.state.formData.paymentMode=='cash'?'choosen':''}`} onClick={(e)=>this.onChangePaymentMode('cash')}>
+                                <span className={`a-payment-item ${this.state.formData.payment.mode=='cash'?'choosen':''}`} onClick={(e)=>this.onChangePaymentMode('cash')}>
                                     Cash
                                 </span>
-                                <span className={`a-payment-item ${this.state.formData.paymentMode=='cheque'?'choosen':''}`} onClick={(e)=>this.onChangePaymentMode('cheque')}>
+                                <span className={`a-payment-item ${this.state.formData.payment.mode=='cheque'?'choosen':''}`} onClick={(e)=>this.onChangePaymentMode('cheque')}>
                                     Cheque
                                 </span>
-                                <span className={`a-payment-item ${this.state.formData.paymentMode=='online'?'choosen':''}`} onClick={(e)=>this.onChangePaymentMode('online')}>
+                                <span className={`a-payment-item ${this.state.formData.payment.mode=='online'?'choosen':''}`} onClick={(e)=>this.onChangePaymentMode('online')}>
                                     Online
                                 </span>
+                            </div>
+                            <div className="payment-option-input-div">
+                                {this.state.formData.payment.mode == 'cash' && 
+                                <Row>
+                                    <Col xs={6}>
+                                        <Form.Group>
+                                            <Form.Label>From</Form.Label>
+                                            <Form.Control
+                                                as="select"
+                                                value={this.state.formData.payment.cash.fromAccountId}
+                                                onChange={(e) => this.onChangePaymentInputs(e.target.value, 'cash-from-acc')}
+                                            >
+                                                {this.getFromAccountDropdown()}
+                                            </Form.Control>
+                                        </Form.Group>
+                                    </Col>
+                                </Row>
+                                }
+
+                                {this.state.formData.payment.mode=='cheque' && 
+                                    <Row>
+                                        <Col xs={6}>
+                                            <Form.Group>
+                                                <Form.Label>From</Form.Label>
+                                                <Form.Control
+                                                    as="select"
+                                                    value={this.state.formData.payment.cheque.fromAccountId}
+                                                    onChange={(e) => this.onChangePaymentInputs(e.target.value, 'cheque-from-acc')}
+                                                >
+                                                    {this.getFromAccountDropdown()}
+                                                </Form.Control>
+                                            </Form.Group>
+                                        </Col>
+                                    </Row>
+                                }
+
+                                {this.state.formData.payment.mode=='online' && 
+                                    <Row>
+                                        <Col xs={6}>
+                                            <Form.Group>
+                                                <Form.Label>From</Form.Label>
+                                                <Form.Control
+                                                    as="select"
+                                                    value={this.state.formData.payment.online.fromAccountId}
+                                                    onChange={(e) => this.onChangePaymentInputs(e.target.value, 'online-from-acc')}
+                                                >
+                                                    {this.getFromAccountDropdown()}
+                                                </Form.Control>
+                                            </Form.Group>
+                                        </Col>
+                                        <Col xs={6}>
+                                            <Form.Group>
+                                                <Form.Label>To</Form.Label>
+                                                <Form.Control
+                                                    as="select"
+                                                    value={this.state.formData.payment.online.toAccount.toAccountId}
+                                                    onChange={(e) => this.onChangePaymentInputs(e.target.value, 'online-to-acc-platform')}
+                                                >
+                                                    {this.getToAccountDropdown()}
+                                                </Form.Control>
+                                            </Form.Group>
+                                        </Col>
+                                        <Col xs={12}>
+                                            {this.state.formData.payment.online.toAccount.toAccountId == '19' &&
+                                                <Form.Group>
+                                                    <Form.Label>{'UPI-ID'}</Form.Label>
+                                                    <Form.Control
+                                                        type="text"
+                                                        value={this.state.formData.payment.online.toAccount.upiId}
+                                                        onChange={(e) => this.onChangePaymentInputs(e.target.value, 'online-to-acc-upiid')}
+                                                        >
+                                                    </Form.Control>
+                                                </Form.Group>
+                                            }
+
+                                            {this.state.formData.payment.online.toAccount.toAccountId !== '19' &&
+                                                <>
+                                                <Form.Group>
+                                                    <Form.Label>Acc No</Form.Label>
+                                                    <Form.Control
+                                                        type="text"
+                                                        value={this.state.formData.payment.online.toAccount.accNo}
+                                                        onChange={(e) => this.onChangePaymentInputs(e.target.value, 'online-to-acc-no')}
+                                                        >
+                                                    </Form.Control>
+                                                </Form.Group>
+                                                
+                                                <Form.Group>
+                                                    <Form.Label>IFSC</Form.Label>
+                                                    <Form.Control
+                                                        type="text"
+                                                        value={this.state.formData.payment.online.toAccount.ifscCode}
+                                                        onChange={(e) => this.onChangePaymentInputs(e.target.value, 'online-to-acc-ifsc')}
+                                                        >
+                                                    </Form.Control>
+                                                </Form.Group>
+                                                </>
+                                            }
+                                        </Col>
+                                    </Row>
+                                }
                             </div>
                         </Col>
                     </Row>

@@ -345,11 +345,12 @@
     padding :2px 5px 5px 5px;
 }
 .bill-creation-container .a-payment-item {
-    padding: 3px 6px;
+    padding: 6px 8px;
     border: 1px solid lightgray;
     border-radius: 6px;
     margin-right: 5px;
     cursor: pointer;
+    font-size: 13px;
 }
 .bill-creation-container .a-payment-item.choosen,
 .bill-creation-container .a-payment-item:focus {
@@ -361,4 +362,7 @@
     font-size: 14px;
     color: darkgray;
     font-weight: 500;
+}
+.payment-option-input-div {
+    margin-top: 16px;
 }
