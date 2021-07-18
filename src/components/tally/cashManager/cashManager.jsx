@@ -16,6 +16,7 @@ export default class CashManager extends Component {
         
         this.state = {
             accountsList: [],
+            defaultAccId: null,
         }
     }
     
@@ -25,8 +26,10 @@ export default class CashManager extends Component {
 
     async fetchAccountsList() {
         let list = await fetchMyAccountsList();
-        if(list && list.length > 0)
-            this.setState({accountsList: list});
+        if(list && list.length > 0) {
+            let defaultAccId = this.getDefaultAccountId(list);
+            this.setState({accountsList: list, defaultAccId: defaultAccId});
+        }
         // try {
         //     let at = getAccessToken();
         //     let resp = await axiosMiddleware.get(`${FETCH_FUND_ACCOUNTS_LIST}?access_token=${at}`);
@@ -56,6 +59,15 @@ export default class CashManager extends Component {
     //     return parsedList;
     // }
 
+    getDefaultAccountId(accountsList) {
+        let accId = null;
+        _.each(accountsList, (anAcc, index) => {
+            if(anAcc.is_default)
+                accId = anAcc.id;
+        });
+        return accId;
+    }
+
     inputControls = {
         onChange: () => {
 
@@ -71,10 +83,10 @@ export default class CashManager extends Component {
                 <Row className="cash-manager">
                     <Col xs={3} md={3} sm={3}>
                         <Col xs={12} md={12} sm={12} className="gs-card">
-                            <CashIn accountsList={this.state.accountsList} />
+                            <CashIn accountsList={this.state.accountsList} defaultAccId={this.state.defaultAccId} />
                         </Col>
                         <Col xs={12} md={12} sm={12} className="gs-card">
-                            <CashOut accountsList={this.state.accountsList}/>
+                            <CashOut accountsList={this.state.accountsList} defaultAccId={this.state.defaultAccId}/>
                         </Col>
                     </Col>
                     <Col xs={{span: 9}} md={{span: 9}} sm={{span: 9}} className="middle-card gs-card">
@@ -89,7 +101,7 @@ export default class CashManager extends Component {
 function CashIn(props) {
     let [amount, setAmount] = useState();
     let [remarks, setRemarks] = useState('');
-    let [fundHouseVal, setFundHouseVal] = useState('shop');
+    let [fundHouseVal, setFundHouseVal] = useState(props.defaultAccId);
     let [category, setCategoryVal] = useState('');
     let [categoryList, setCategoryList] = useState([]);
     let [filteredCategoryList, setFilteredCategoryList] = useState([]);
@@ -165,7 +177,7 @@ function CashIn(props) {
         let params = {
             transactionDate: dates._dateVal,
             amount: amount,
-            fundHouse: fundHouseVal,
+            fundHouse: fundHouseVal || props.defaultAccId,
             category: category,
             remarks: remarks,
         }
@@ -289,7 +301,7 @@ function CashIn(props) {
 function CashOut(props) {
     let [amount, setAmount] = useState();
     let [remarks, setRemarks] = useState('');
-    let [fundHouseVal, setFundHouseVal] = useState('shop');
+    let [fundHouseVal, setFundHouseVal] = useState(props.defaultAccId);
     let [category, setCategoryVal] = useState('');
     let [categoryList, setCategoryList] = useState([]);
     let [filteredCategoryList, setFilteredCategoryList] = useState([]);
@@ -364,7 +376,7 @@ function CashOut(props) {
         let params = {
             transactionDate: dates._dateVal,
             amount: amount,
-            fundHouse: fundHouseVal,
+            fundHouse: fundHouseVal || props.defaultAccId,
             category: category,
             remarks: remarks,
         }
