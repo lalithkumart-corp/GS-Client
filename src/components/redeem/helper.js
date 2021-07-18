@@ -52,7 +52,7 @@ export const calculateInterestBasedOnRate = (interestPerMonth, amount) => {
     return parseFloat(((interestPerMonth*100)/amount).toFixed(2));
 }
 
-export const getRequestParams = (billData) => {
+export const getRequestParams = (billData, thatState) => {
     let requestParams = [];    
     let anObj = {
         //pledgeBookID: billData.PledgeBookID,
@@ -70,7 +70,8 @@ export const getRequestParams = (billData) => {
         discountValue: billData._discountValue,
         paidAmount: billData._totalValue,
         handedTo: billData.Name,
-        paymentMode: PAYMENT_MODE_KEY[billData._paymentMode],
+        paymentMode: billData._paymentMode, //|| thatState.payment.mode,
+        paymentDetails: thatState.formData.payment,
         billRemarks: billData._billRemarks || ''
     };
     requestParams.push(anObj);

@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import { Container, Row, Col, Form, FormGroup, FormLabel, FormControl, HelpBlock, InputGroup, Button, Glyphicon } from 'react-bootstrap';
+import { Collapse } from 'react-collapse';
 //import Autosuggest, { ItemAdapter } from 'react-bootstrap-autosuggest';
 import * as ReactAutosuggest from 'react-autosuggest';
 import { DoublyLinkedList } from '../../utilities/doublyLinkedList';
@@ -40,6 +41,7 @@ class Redeem extends Component {
             filteredBillNoList: ['loading'],
             totalBillNoList: [],
             fetchingBillNoList: true,
+            openPaymentInputDiv: false,
             formData: {
                 billNo: {
                     inputVal: ''
@@ -62,6 +64,7 @@ class Redeem extends Component {
         };
         this.autuSuggestionControls.onChange = this.autuSuggestionControls.onChange.bind(this);
         this.reactAutosuggestControls.onSuggestionsFetchRequested = this.reactAutosuggestControls.onSuggestionsFetchRequested.bind(this);
+        this.togglePaymentDom = this.togglePaymentDom.bind(this);
     }
     async componentDidMount() {
         this.getBillNos();
@@ -70,18 +73,33 @@ class Redeem extends Component {
         this.setState({interestRates: rates});
     }
 
-    getToAccountDropdown() {
+    getToAccountDropdown(key) {
         let theDom = [];
+        let paymentMode = this.state.formData.payment.mode;
+        let accId = null;
+        if(paymentMode) {
+            if(this.state.formData.payment[paymentMode].toAccountId)
+                accId = this.state.formData.payment[paymentMode].toAccountId;
+        }
+       
         _.each(this.state.accountsList, (anAcc, index) => {
-            theDom.push(<option key={`house-${index}`} value={anAcc.id} selected={anAcc.is_default == 1 && "selected"}>{anAcc.name}</option>);
+            let flag = null;
+            if(accId) {
+                if(anAcc.id == accId)
+                    flag = "selected";
+            } else {
+                if(anAcc.is_default)
+                    flag = "selected";
+            }
+            theDom.push(<option key={`house-${index}-${key}`} value={anAcc.id} selected={flag}>{anAcc.name}</option>);
         });
         return theDom;
     }
-    getFromAccountDropdown() {
+    getFromAccountDropdown(key) {
         let theDom = [];
         theDom.push(<option key={`house-${0}`} value={0}>select...</option>);
         _.each(this.state.allBanksList, (anAcc, index) => {
-            theDom.push(<option key={`house-${index}`} value={anAcc.id}>{anAcc.name}</option>);
+            theDom.push(<option key={`house-${index}-${key}`} value={anAcc.id}>{anAcc.name}</option>);
         });
         return theDom;
     }
@@ -135,7 +153,8 @@ class Redeem extends Component {
                     if(successResp.data && successResp.data && successResp.data.billDetails && successResp.data.billDetails[0]){
                         let selectedBillData = successResp.data.billDetails[0];
                         selectedBillData = this.parseResponse(selectedBillData);
-                        this.setState({selectedBillData: selectedBillData, billNotFound: false});
+                        let paymentInfo = this.parsePaymentInfo(selectedBillData);
+                        this.setState({selectedBillData: selectedBillData, billNotFound: false, formData: {...this.state.formData, payment: paymentInfo} });
                         this.transferFocus(null, 'billInputBox');
                     }else{
                         this.setState({selectedBillData: null, billNotFound: true});
@@ -297,6 +316,18 @@ class Redeem extends Component {
         console.log('-------Space key pressed');
     }
 
+    handleClick(e, options) {
+        if(options) {
+            if(options.currElmKey == 'paymentCollapsibleDiv') {
+                this.togglePaymentDom();
+            }
+        }
+    }
+
+    togglePaymentDom() {
+        this.setState({openPaymentInputDiv: !this.state.openPaymentInputDiv});
+    }
+    
     onClickSubmit() {
         toast.info('Press Enter Key to Redeem');
     }
@@ -305,7 +336,7 @@ class Redeem extends Component {
         let params = {...this.state.selectedBillData};
         if(window.confirm(`${params.BillNo} Do you really want to close this bill ?`)) {
             params.closingDate = this.state.date.inputVal; // ISO string
-            let requestParams = getRequestParams(params);
+            let requestParams = getRequestParams(params, this.state);
             let accessToken = getAccessToken();
             let apiParams = {requestParams, accessToken};
             axios.post(REDEEM_PENDING_BILLS, apiParams)
@@ -497,121 +528,133 @@ class Redeem extends Component {
                     </Row>
                     <Row>
                         <Col xs={6} md={6}>
-                            <span className="payment-mode-selection-span" style={{marginBottom: '4px', display: 'inline-block'}}>Payment Method</span>
-                            <div>
-                                <span className={`a-payment-item ${this.state.selectedBillData._paymentMode=='cash'?'choosen':''}`} onClick={(e)=>this.inputControls.onChange(e, 'cash', 'paymentMode')}>
-                                    Cash
-                                </span>
-                                <span className={`a-payment-item ${this.state.selectedBillData._paymentMode=='cheque'?'choosen':''}`} onClick={(e)=>this.inputControls.onChange(e, 'cheque', 'paymentMode')}>
-                                    Cheque
-                                </span>
-                                <span className={`a-payment-item ${this.state.selectedBillData._paymentMode=='online'?'choosen':''}`} onClick={(e)=>this.inputControls.onChange(e, 'online', 'paymentMode')}>
-                                    Online
-                                </span>
-                            </div>
+                            <div className="payment-component">
+                                <div className="payment-component-header"
+                                    onClick={(e) => {this.handleClick(e, {currElmKey: 'paymentCollapsibleDiv'})}}>                                
+                                    Payment Mode - {this.state.selectedBillData._paymentMode.toUpperCase()}
+                                </div>
+                                <Collapse isOpened={this.state.openPaymentInputDiv} className="payment-component-body">
+                                    <div className="payment-component-body-content">
 
-                            <div className="payment-option-input-div">
-                                {this.state.formData.payment.mode == 'cash' && 
-                                <Row>
-                                    <Col xs={6}>
-                                        <Form.Group>
-                                            <Form.Label>To</Form.Label>
-                                            <Form.Control
-                                                as="select"
-                                                value={this.state.formData.payment.cash.toAccountId}
-                                                onChange={(e) => this.onChangePaymentInputs(e.target.value, 'cash-to-acc')}
-                                            >
-                                                {this.getToAccountDropdown()}
-                                            </Form.Control>
-                                        </Form.Group>
-                                    </Col>
-                                </Row>
-                                }
+                                    <div>
+                                        <span className={`a-payment-item ${this.state.selectedBillData._paymentMode=='cash'?'choosen':''}`} onClick={(e)=>this.inputControls.onChange(e, 'cash', 'paymentMode')}>
+                                            Cash
+                                        </span>
+                                        <span className={`a-payment-item ${this.state.selectedBillData._paymentMode=='cheque'?'choosen':''}`} onClick={(e)=>this.inputControls.onChange(e, 'cheque', 'paymentMode')}>
+                                            Cheque
+                                        </span>
+                                        <span className={`a-payment-item ${this.state.selectedBillData._paymentMode=='online'?'choosen':''}`} onClick={(e)=>this.inputControls.onChange(e, 'online', 'paymentMode')}>
+                                            Online
+                                        </span>
+                                    </div>
 
-                                {this.state.formData.payment.mode=='cheque' && 
-                                    <Row>
-                                        <Col xs={6}>
-                                            <Form.Group>
-                                                <Form.Label>To</Form.Label>
-                                                <Form.Control
-                                                    as="select"
-                                                    value={this.state.formData.payment.cheque.toAccountId}
-                                                    onChange={(e) => this.onChangePaymentInputs(e.target.value, 'cheque-to-acc')}
-                                                >
-                                                    {this.getToAccountDropdown()}
-                                                </Form.Control>
-                                            </Form.Group>
-                                        </Col>
-                                    </Row>
-                                }
-
-                                {this.state.formData.payment.mode=='online' && 
-                                    <Row>
-                                        <Col xs={6}>
-                                            <Form.Group>
-                                                <Form.Label>To</Form.Label>
-                                                <Form.Control
-                                                    as="select"
-                                                    value={this.state.formData.payment.online.fromAccount.fromAccountId}
-                                                    onChange={(e) => this.onChangePaymentInputs(e.target.value, 'online-to-acc')}
-                                                >
-                                                    {this.getToAccountDropdown()}
-                                                </Form.Control>
-                                            </Form.Group>
-                                        </Col>
-                                        <Col xs={6}>
-                                            <Form.Group>
-                                                <Form.Label>From</Form.Label>
-                                                <Form.Control
-                                                    as="select"
-                                                    value={this.state.formData.payment.online.fromAccountId}
-                                                    onChange={(e) => this.onChangePaymentInputs(e.target.value, 'online-from-acc-platform')}
-                                                >
-                                                    {this.getFromAccountDropdown()}
-                                                </Form.Control>
-                                            </Form.Group>
-                                        </Col>
-                                        <Col xs={12}>
-                                            {this.state.formData.payment.online.fromAccount.fromAccountId == '19' &&
-                                                <Form.Group>
-                                                    <Form.Label>{'UPI-ID'}</Form.Label>
-                                                    <Form.Control
-                                                        type="text"
-                                                        value={this.state.formData.payment.online.fromAccount.upiId}
-                                                        onChange={(e) => this.onChangePaymentInputs(e.target.value, 'online-from-acc-upiid')}
+                                    <div className="payment-option-input-div">
+                                            {this.state.formData.payment.mode == 'cash' && 
+                                            <Row>
+                                                <Col xs={6}>
+                                                    <Form.Group>
+                                                        <Form.Label>To</Form.Label>
+                                                        <Form.Control
+                                                            as="select"
+                                                            value={this.state.formData.payment.cash.toAccountId}
+                                                            onChange={(e) => this.onChangePaymentInputs(e.target.value, 'cash-to-acc')}
                                                         >
-                                                    </Form.Control>
-                                                </Form.Group>
+                                                            {this.getToAccountDropdown('cash')}
+                                                        </Form.Control>
+                                                    </Form.Group>
+                                                </Col>
+                                            </Row>
                                             }
 
-                                            {this.state.formData.payment.online.fromAccount.fromAccountId !== '19' &&
-                                                <>
-                                                <Form.Group>
-                                                    <Form.Label>Acc No</Form.Label>
-                                                    <Form.Control
-                                                        type="text"
-                                                        value={this.state.formData.payment.online.fromAccount.accNo}
-                                                        onChange={(e) => this.onChangePaymentInputs(e.target.value, 'online-from-acc-no')}
-                                                        >
-                                                    </Form.Control>
-                                                </Form.Group>
-                                                
-                                                <Form.Group>
-                                                    <Form.Label>IFSC</Form.Label>
-                                                    <Form.Control
-                                                        type="text"
-                                                        value={this.state.formData.payment.online.fromAccount.ifscCode}
-                                                        onChange={(e) => this.onChangePaymentInputs(e.target.value, 'online-from-acc-ifsc')}
-                                                        >
-                                                    </Form.Control>
-                                                </Form.Group>
-                                                </>
+                                            {this.state.formData.payment.mode=='cheque' && 
+                                                <Row>
+                                                    <Col xs={6}>
+                                                        <Form.Group>
+                                                            <Form.Label>To</Form.Label>
+                                                            <Form.Control
+                                                                as="select"
+                                                                value={this.state.formData.payment.cheque.toAccountId}
+                                                                onChange={(e) => this.onChangePaymentInputs(e.target.value, 'cheque-to-acc')}
+                                                            >
+                                                                {this.getToAccountDropdown('cheque')}
+                                                            </Form.Control>
+                                                        </Form.Group>
+                                                    </Col>
+                                                </Row>
                                             }
-                                        </Col>
-                                    </Row>
-                                }
+
+                                            {this.state.formData.payment.mode=='online' && 
+                                                <Row>
+                                                    <Col xs={6}>
+                                                        <Form.Group>
+                                                            <Form.Label>To</Form.Label>
+                                                            <Form.Control
+                                                                as="select"
+                                                                value={this.state.formData.payment.online.toAccountId.toAccountId}
+                                                                onChange={(e) => this.onChangePaymentInputs(e.target.value, 'online-to-acc')}
+                                                            >
+                                                                {this.getToAccountDropdown('online')}
+                                                            </Form.Control>
+                                                        </Form.Group>
+                                                    </Col>
+                                                    <Col xs={6}>
+                                                        <Form.Group>
+                                                            <Form.Label>From</Form.Label>
+                                                            <Form.Control
+                                                                as="select"
+                                                                value={this.state.formData.payment.online.fromAccountId}
+                                                                onChange={(e) => this.onChangePaymentInputs(e.target.value, 'online-from-acc-platform')}
+                                                            >
+                                                                {this.getFromAccountDropdown('online')}
+                                                            </Form.Control>
+                                                        </Form.Group>
+                                                    </Col>
+                                                    <Col xs={12}>
+                                                        {this.state.formData.payment.online.fromAccount.fromAccountId == '19' &&
+                                                            <Form.Group>
+                                                                <Form.Label>{'UPI-ID'}</Form.Label>
+                                                                <Form.Control
+                                                                    type="text"
+                                                                    value={this.state.formData.payment.online.fromAccount.upiId}
+                                                                    onChange={(e) => this.onChangePaymentInputs(e.target.value, 'online-from-acc-upiid')}
+                                                                    >
+                                                                </Form.Control>
+                                                            </Form.Group>
+                                                        }
+
+                                                        {this.state.formData.payment.online.fromAccount.fromAccountId !== '19' &&
+                                                            <>
+                                                            <Form.Group>
+                                                                <Form.Label>Acc No</Form.Label>
+                                                                <Form.Control
+                                                                    type="text"
+                                                                    value={this.state.formData.payment.online.fromAccount.accNo}
+                                                                    onChange={(e) => this.onChangePaymentInputs(e.target.value, 'online-from-acc-no')}
+                                                                    >
+                                                                </Form.Control>
+                                                            </Form.Group>
+                                                            
+                                                            <Form.Group>
+                                                                <Form.Label>IFSC</Form.Label>
+                                                                <Form.Control
+                                                                    type="text"
+                                                                    value={this.state.formData.payment.online.fromAccount.ifscCode}
+                                                                    onChange={(e) => this.onChangePaymentInputs(e.target.value, 'online-from-acc-ifsc')}
+                                                                    >
+                                                                </Form.Control>
+                                                            </Form.Group>
+                                                            </>
+                                                        }
+                                                    </Col>
+                                                </Row>
+                                            }
+                                        </div>
+
+                                    </div>
+                                </Collapse>
                             </div>
 
+                            {/* <span className="payment-mode-selection-span" style={{marginBottom: '4px', display: 'inline-block'}}>Payment Method</span> */}
                         </Col>
                         <Col xs={{span: 6}} md={{span: 6}}>
                             <Row style={{paddingTop: '7px'}}>
@@ -713,8 +756,55 @@ class Redeem extends Component {
         } else {
             selectedBillData._picture.holder.imgSrc = 'images/default.jpg';
         }
-        selectedBillData._paymentMode = PAYMENT_MODE[selectedBillData.PaymentMode];
+        
+        selectedBillData._paymentMode = PAYMENT_MODE[selectedBillData.PaymentMode] || 'cash';
+
         return selectedBillData;
+    }
+
+    parsePaymentInfo(selectedBillData) {
+        let paymentModeAtBillCreation = PAYMENT_MODE[selectedBillData.PaymentMode];
+        let tt = {
+            mode: paymentModeAtBillCreation || 'cash',
+            cash: {toAccountId: ''},
+            cheque: {toAccountId: ''},
+            online: {
+                toAccountId: '',
+                fromAccount: {
+                    fromAccountId: '',
+                    accNo: '',
+                    upiId: '',
+                    ifscCode: ''
+                }
+            }
+        }
+        
+        if(selectedBillData.fundTransaction_account_id)
+            tt[tt.mode].toAccountId = selectedBillData.fundTransaction_account_id;
+        else {
+            tt.mode = 'cash';
+            tt.cash.toAccountId = this.getMyDefaultFundAcc()
+        }
+
+        let defaultFundAcc = this.getMyDefaultFundAcc();
+        let modes = ['cash', 'cheque', 'online'];
+        _.each(modes, (aMode, index) => {
+            if(aMode !== paymentModeAtBillCreation)
+                tt[aMode].toAccountId = defaultFundAcc;
+        });
+        
+        return tt;
+    }
+
+    getMyDefaultFundAcc() {
+        let accId = null;
+        if(this.state.accountsList) {
+            _.each(this.state.accountsList, (anAcc, index) => {
+                if(anAcc.is_default)
+                    accId = anAcc.id;
+            });
+        }
+        return accId;
     }
 
     calculateData(selectedBillData) {

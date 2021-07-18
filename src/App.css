@@ -189,6 +189,12 @@ html {
 .read-mode .gs-input-cell2:focus {
     border: none;
 }
+.gs-input-cell.compact {
+  padding: 0 4px;
+}
+.gs-input-cell.bordered {
+  border: 1px solid lightgray;
+}
 /*END: INPUT FIELD */
 
 
