@@ -5,7 +5,7 @@ import Barcode from "react-barcode";
 import { format } from 'currency-formatter';
 import convertor from 'rupees-to-words';
 import './LoanBillBodyTemplate.css';
-import { formatNumberLength } from '../../../utilities/utility';
+
 export default class LoanBillBodyTemplate extends Component {
     constructor(props) {
         super(props);
@@ -13,7 +13,6 @@ export default class LoanBillBodyTemplate extends Component {
             billContent: this.props.currBillContent || {},
             settings: this.props.settings || {},
         };
-        this._totalWt = 0;
     }
     componentWillReceiveProps(nextProps) {
         if(nextProps.currBillContent)
@@ -174,9 +173,9 @@ export default class LoanBillBodyTemplate extends Component {
         dom.push(
             <Row className={`orn-table-header`}>
                 <Col className="orn-table-th-cell font17" xs={{span: 1}} md={{span: 1}} style={{paddingLeft: '3px'}}><b>S.No</b></Col>
-                <Col className="orn-table-th-cell font17" xs={{span: 9}} md={{span: 9}} style={{paddingLeft: "20px"}}><b>Articles Pledged</b></Col>
-                <Col className="orn-table-th-cell font17" xs={{span: 2}} md={{span: 2}} style={{paddingLeft: '3px'}}>Pcs</Col>
-                {/* <Col className="orn-table-th-cell font17" xs={{span: 2}} md={{span: 2}} style={{paddingLeft: '3px'}}>WT</Col> */}
+                <Col className="orn-table-th-cell font17" xs={{span: 8}} md={{span: 8}} style={{paddingLeft: "20px"}}><b>Articles Pledged</b></Col>
+                <Col className="orn-table-th-cell font17" xs={{span: 1}} md={{span: 1}} style={{paddingLeft: '3px'}}>Pcs</Col>
+                <Col className="orn-table-th-cell font17" xs={{span: 2}} md={{span: 2}} style={{paddingLeft: '3px'}}>WT</Col>
             </Row>
         )
         if(this.state.billContent.orn && Object.keys(this.state.billContent.orn).length > 0) {
@@ -184,26 +183,27 @@ export default class LoanBillBodyTemplate extends Component {
             let totalOrnLength = Object.keys(this.state.billContent.orn).length;
             _.each(this.state.billContent.orn, (anOrn, index) => {
                 footer.count++;
+                console.log(footer.wt, anOrn.ornNWt, parseFloat(anOrn.ornNWt || 0));
                 footer.wt = parseFloat((footer.wt  + parseFloat(anOrn.ornNWt || 0)).toFixed(3));
                 footer.qty += parseInt(anOrn.ornNos) || 0;
-                this._totalWt = footer.wt;
+                
                 if(list.length >= 9) {
                     if(totalOrnLength > 10 && list.length == 9) {
                         list.push(
                             <Row>
                                 <Col xs={{span: 1}} md={{span: 1}} className="orn-table-body-cell nos">{index}</Col>
-                                <Col xs={{span: 9}} md={{span: 9}} className="orn-table-body-cell item">Others</Col>
-                                <Col xs={{span: 2}} md={{span: 2}} className="orn-table-body-cell nos"></Col>
-                                {/* <Col xs={{span: 2}} md={{span: 2}} className="orn-table-body-cell wt"></Col> */}
+                                <Col xs={{span: 8}} md={{span: 8}} className="orn-table-body-cell item">Others</Col>
+                                <Col xs={{span: 1}} md={{span: 1}} className="orn-table-body-cell nos"></Col>
+                                <Col xs={{span: 2}} md={{span: 2}} className="orn-table-body-cell wt"></Col>
                             </Row>
                         );
                     } else if(totalOrnLength <= 10) {
                         list.push(
                             <Row>
                                 <Col xs={{span: 1}} md={{span: 1}} className="orn-table-body-cell nos">{index}</Col>
-                                <Col xs={{span: 9}} md={{span: 9}} className="orn-table-body-cell item">{anOrn.ornItem}</Col>
-                                <Col xs={{span: 2}} md={{span: 2}} className="orn-table-body-cell nos">{anOrn.ornNos}</Col>
-                                {/* <Col xs={{span: 2}} md={{span: 2}} className="orn-table-body-cell wt">{anOrn.ornNWt}</Col> */}
+                                <Col xs={{span: 8}} md={{span: 8}} className="orn-table-body-cell item">{anOrn.ornItem}</Col>
+                                <Col xs={{span: 1}} md={{span: 1}} className="orn-table-body-cell nos">{anOrn.ornNos}</Col>
+                                <Col xs={{span: 2}} md={{span: 2}} className="orn-table-body-cell wt">{anOrn.ornNWt}</Col>
                             </Row>
                         );
                     }
@@ -211,9 +211,9 @@ export default class LoanBillBodyTemplate extends Component {
                     list.push(
                         <Row>
                             <Col xs={{span: 1}} md={{span: 1}} className="orn-table-body-cell nos">{index}</Col>
-                            <Col xs={{span: 9}} md={{span: 9}} className="orn-table-body-cell item">{anOrn.ornItem}</Col>
-                            <Col xs={{span: 2}} md={{span: 2}} className="orn-table-body-cell nos">{anOrn.ornNos}</Col>
-                            {/* <Col xs={{span: 2}} md={{span: 2}} className="orn-table-body-cell wt">{anOrn.ornNWt}</Col> */}
+                            <Col xs={{span: 8}} md={{span: 8}} className="orn-table-body-cell item">{anOrn.ornItem}</Col>
+                            <Col xs={{span: 1}} md={{span: 1}} className="orn-table-body-cell nos">{anOrn.ornNos}</Col>
+                            <Col xs={{span: 2}} md={{span: 2}} className="orn-table-body-cell wt">{anOrn.ornNWt}</Col>
                         </Row>
                     );
                 }
@@ -224,9 +224,9 @@ export default class LoanBillBodyTemplate extends Component {
                 list.push(
                     <Row>
                         <Col xs={{span: 1}} md={{span: 1}} className="orn-table-body-cell nos"></Col>
-                        <Col xs={{span: 9}} md={{span: 9}} className="orn-table-body-cell item"></Col>
-                        <Col xs={{span: 2}} md={{span: 2}} className="orn-table-body-cell nos"></Col>
-                        {/* <Col xs={{span: 2}} md={{span: 2}} className="orn-table-body-cell wt"></Col> */}
+                        <Col xs={{span: 8}} md={{span: 8}} className="orn-table-body-cell item"></Col>
+                        <Col xs={{span: 1}} md={{span: 1}} className="orn-table-body-cell nos"></Col>
+                        <Col xs={{span: 2}} md={{span: 2}} className="orn-table-body-cell wt"></Col>
                     </Row>
                 );
             }
@@ -239,9 +239,9 @@ export default class LoanBillBodyTemplate extends Component {
             )
             dom.push(
                 <Row className={`orn-list-footer`}>
-                    <Col xs={10} className="total-text">Total</Col>
-                    <Col xs={2} className="total-qty-val">{formatNumberLength(footer.qty, 2)}</Col>
-                    {/* <Col xs={2}>{footer.wt}</Col> */}
+                    <Col xs={9} className="total-text">Total</Col>
+                    <Col xs={1} className="total-qty-val">{footer.qty}</Col>
+                    <Col xs={2}>{footer.wt}</Col>
                 </Row>
             )
         }
@@ -251,50 +251,8 @@ export default class LoanBillBodyTemplate extends Component {
     getFourthSection() {
         return (
             <Row className="row-name-3">
-                <Col xs={{span: 9}} md={{span: 9}} className={`orn-info-col`}>
+                <Col xs={{span: 12}} md={{span: 12}} className={`orn-info-col`}>
                     {this.getOrnSecction()}
-                </Col>
-                <Col xs={{span: 3}} md={{span: 3}} className={`totals-gm-and-present-value`}>
-                    {this.getTotalWtDom()}
-                    {this.getPresentValDom()}
-                </Col>
-            </Row>
-        )
-    }
-
-    getTotalWtDom() {
-        let gm = this._totalWt;
-        let mg = '000';
-        if(this._totalWt) {
-            let wtVals = (''+this._totalWt).split('.');
-            gm = wtVals[0];
-            mg = formatNumberLength(wtVals[1], 3, 'suffix') || '000';
-        }
-        return (
-            <Row className="total-wt-section">
-                <Col xs={12} style={{textAlign: 'center'}}>
-                    <Row><Col xs={12} className="total-wt-header">Total Wt</Col></Row>
-                    <Row>
-                        <Col xs={6} md={6} className="total-wt-gm-header">Gm</Col>
-                        <Col xs={6} md={6} className="total-wt-mg-header">Mg</Col>
-                    </Row>
-                    <Row style={{height: '160px'}}>
-                        <Col xs={6} md={6} className="total-wt-gm-val">{gm}</Col>
-                        <Col xs={6} md={6} className="total-wt-mg-val">{mg}</Col>
-                    </Row>
-                </Col>
-            </Row>
-        )
-    }
-
-    getPresentValDom() {
-        return (
-            <Row style={{textAlign: 'center'}}>
-                <Col xs={12} className="present-value-header">
-                    Present Value
-                </Col>
-                <Col xs={12} className="present-value-col">
-                    {format(this.state.billContent.presentValue, {code: 'INR'})}
                 </Col>
             </Row>
         )

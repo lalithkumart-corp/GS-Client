@@ -151,3 +151,20 @@ export const isNull = (val) => {
 export const constructApiAssetUrl = (urlPath) => {
     return `${SERVER_ASSETS_URL_PATH}${urlPath}`;
 }
+
+export const formatNumberLength = (num, len, pos) => {
+    num = ''+num; // converting to string
+    if(num.length < len) {
+        let diff = len - num.length;
+        let fix = '';
+        while(diff > 0) {
+            fix += '0';
+            diff--;
+        }
+        if(pos == 'suffix')
+            num = num + fix;
+        else
+            num = fix + num;
+    }
+    return num;
+}

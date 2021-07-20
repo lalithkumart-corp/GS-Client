@@ -1,5 +1,5 @@
 .loan-bill-body-template1 {
-    margin: 50px 55px 0 55px;
+    margin: 50px 35px 0 35px;
     font-size: 20px;
 }
 .loan-bill-body-template1 .bill-no {
@@ -78,36 +78,6 @@
 }
 .loan-bill-body-template1 .orn-list-footer .total-qty-val {
     /* padding: 0; */
-    text-align: center;
-    font-size: 22px;
-}
-
-.loan-bill-body-template1 .total-wt-section .total-wt-header,
-.loan-bill-body-template1 .total-wt-section .total-wt-mg-header,
-.loan-bill-body-template1 .total-wt-section .total-wt-gm-header,
-.loan-bill-body-template1 .present-value-header {
-    background-color: whitesmoke;
-    border: 1px solid lightgrey;
-    font-weight: 700;
-    padding-top: 6px;
-    padding-bottom: 3px;
-}
-.loan-bill-body-template1 .total-wt-section .total-wt-gm-val,
-.loan-bill-body-template1 .total-wt-section .total-wt-mg-val {
-    padding-top: 10px;
-}
-.loan-bill-body-template1 .total-wt-section .total-wt-gm-val,
-.loan-bill-body-template1 .total-wt-section .total-wt-mg-val,
-.loan-bill-body-template1 .present-value-col {
-    border: 1px solid lightgrey;
-}
-
-.loan-bill-body-template1 .present-value-col {
-    height: 95px;
-    font-size: 25px;
-    font-weight: bold;
-    padding-top: 25px;
-    padding: 28px 0 0 0;
 }
 
 .loan-bill-body-template1 .interest-pay-mon {
@@ -128,7 +98,7 @@
 }
 @media print {
     .loan-bill-body-template1 {
-        margin: 50px 55px 0 55px;
+        margin: 50px 35px 0 35px;
         font-size: 20px;
     }
     .loan-bill-body-template1 .bill-no {
@@ -207,36 +177,7 @@
         border-right: 1px solid lightgray;
     }
     .loan-bill-body-template1 .orn-list-footer .total-qty-val {
-        text-align: center;
-        font-size: 22px;
-    }
-
-    .loan-bill-body-template1 .total-wt-section .total-wt-header,
-    .loan-bill-body-template1 .total-wt-section .total-wt-mg-header,
-    .loan-bill-body-template1 .total-wt-section .total-wt-gm-header,
-    .loan-bill-body-template1 .present-value-header {
-        background-color: whitesmoke;
-        border: 1px solid lightgrey;
-        font-weight: 700;
-        padding-top: 6px;
-        padding-bottom: 3px;
-    }
-    .loan-bill-body-template1 .total-wt-section .total-wt-gm-val,
-    .loan-bill-body-template1 .total-wt-section .total-wt-mg-val {
-        padding-top: 10px;
-    }
-    .loan-bill-body-template1 .total-wt-section .total-wt-gm-val,
-    .loan-bill-body-template1 .total-wt-section .total-wt-mg-val,
-    .loan-bill-body-template1 .present-value-col {
-        border: 1px solid lightgrey;
-    }
-
-    .loan-bill-body-template1 .present-value-col {
-        height: 95px;
-        font-size: 25px;
-        font-weight: bold;
-        padding-top: 25px;
-        padding: 28px 0 0 0;
+        /* padding: 0; */
     }
 
     .loan-bill-body-template1 .interest-pay-mon {

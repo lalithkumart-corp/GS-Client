@@ -123,6 +123,7 @@ class PledgebookModal extends Component {
     async onPrintClick() {
         let templateData = {
             amount: this.props.currentBillData.Amount,
+            presentValue: this.props.currentBillData.PresentValue,
             billNo: this.props.currentBillData.BillNo,
             date: this.props.currentBillData.Date,
             cname: this.props.currentBillData.Name,

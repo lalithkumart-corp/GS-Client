@@ -16,6 +16,7 @@ import ImageZoom from 'react-medium-image-zoom';
 
 const sampleBillContent = {
     amount: 10000,
+    presentValue: 10500,
     billSeries: 'A',
     billNo: 1425,
     date: '2021-01-10 11:11:37',
