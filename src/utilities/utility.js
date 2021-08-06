@@ -153,6 +153,8 @@ export const constructApiAssetUrl = (urlPath) => {
 }
 
 export const formatNumberLength = (num, len, pos) => {
+    if(!num)
+        num = 0;
     num = ''+num; // converting to string
     if(num.length < len) {
         let diff = len - num.length;

@@ -3,6 +3,7 @@ import { Container, Row, Col, Tabs, Tab } from 'react-bootstrap';
 import ItemManager from '../itemManager/ItemManager';
 import MetalManager from '../metalManager/MetalManager';
 import RateSetup from '../rateSetup/RateSetup';
+import BillingTemplateSetting from '../billingTemplateSetting/billTemplateSettings';
 import './StockSetup.css';
 
 export default class AddStock extends Component {
@@ -21,6 +22,9 @@ export default class AddStock extends Component {
                     </Tab>
                     <Tab eventKey="rate" title="Rate">
                         <RateSetup />
+                    </Tab>
+                    <Tab eventKey="templateSetup" title="Template Setup">
+                        <BillingTemplateSetting />
                     </Tab>
                 </Tabs>
             </Container>

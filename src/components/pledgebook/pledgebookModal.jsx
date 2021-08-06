@@ -14,15 +14,20 @@ import moment from 'moment';
 import ReactToPrint from 'react-to-print';
 import LoanBillMainTemplate from '../../templates/loanBill/LoanBillMainTemplate';
 import RedeemPreview from '../redeem/redeem-preview';
+import { FaPencilAlt, FaTrash, FaArrowLeft } from 'react-icons/fa';
+
 class PledgebookModal extends Component {
     constructor(props) {
         super(props);
         this.state = {
             editMode: false,
-            cancelMode: true
+            cancelMode: true,
+            mainScreen: true,
+            paymentScreen: false
         }
         this.canShowBtn = this.canShowBtn.bind(this);
         this.onPrintClick = this.onPrintClick.bind(this);
+        this.showMainScreen = this.showMainScreen.bind(this);
     }
 
     componentDidMount() {
@@ -120,6 +125,14 @@ class PledgebookModal extends Component {
             )     
     }
 
+    onAddPaymentClick() {
+        this.setState({mainScreen: false, paymentScreen: true});
+    }
+
+    showMainScreen() {
+        this.setState({mainScreen: true, paymentScreen: false});
+    }
+
     async onPrintClick() {
         let templateData = {
             amount: this.props.currentBillData.Amount,
@@ -172,6 +185,9 @@ class PledgebookModal extends Component {
                 if(!this.props.currentBillData.Status)
                     flag = true;
                 break;
+            case 'add-payment':
+                flag = false;
+                break;
         }
         return flag;
     }
@@ -201,67 +217,80 @@ class PledgebookModal extends Component {
     render() {        
         return (
             <div className="pledgebook-modal-container">
-                <Row>
-                    <Col xs={12} md={12} className='button-container'>
-                        <input 
-                            type="button"
-                            className={"gs-button bordered "}
-                            onClick={(e) => this.onPrintClick()}
-                            value='Print'
-                            disabled={this.canDisableBtn('print')}
-                            />
-                        <input 
-                            type="button"
-                            className={"gs-button bordered "}
-                            onClick={(e) => this.onReopenClick()}
-                            value='Re-Open'
-                            disabled={this.canDisableBtn('reopen')}
-                            />
-                        <input 
-                            type="button"
-                            className="gs-button bordered"
-                            onClick={(e) => this.onCalculateClick()}
-                            value='Calculate'
-                            disabled={this.canDisableBtn('calc')}
-                            />
-                        <input 
-                            type="button"
-                            className='gs-button bordered'
-                            onClick={(e) => this.onRedeemClick()}
-                            value='Redeem'
-                            disabled={this.canDisableBtn('redeem')}
-                            />
-                        <input 
-                            type="button"
-                            className={'gs-button bordered ' + this.getBtnVisibilityClass('edit')}
-                            onClick={(e) => this.onEdit()}
-                            value='Edit'
-                            disabled={this.canDisableBtn('edit')}
-                            />
-                        <input 
-                            type="button"
-                            className={'gs-button bordered ' + this.getBtnVisibilityClass('ignore')}
-                            onClick={(e) => this.onIgnore()}
-                            value='Discard'
-                            disabled={this.canDisableBtn('ignore')}
-                            />
-                    </Col>
-                </Row>
-                {/* {this.props.currentBillData.Status
-                ?<BillCreation loadedInPledgebook={true} billData={this.props.currentBillData}/>
-                :<BillClosedView />} */}
-                {!this.props.currentBillData.Status && 
-                    <RedeemPreview currentBillData={this.props.currentBillData} />
+                {this.state.mainScreen && 
+                    <div>
+                    <Row>
+                        <Col xs={12} md={12} className='button-container'>
+                            <input type="button"
+                                className={"gs-button bordered "}
+                                onClick={(e) => this.onAddPaymentClick()}
+                                value='Add Payment'
+                                disabled={this.canDisableBtn('add-payment')}
+                                />
+                            <input 
+                                type="button"
+                                className={"gs-button bordered "}
+                                onClick={(e) => this.onPrintClick()}
+                                value='Print'
+                                disabled={this.canDisableBtn('print')}
+                                />
+                            <input 
+                                type="button"
+                                className={"gs-button bordered "}
+                                onClick={(e) => this.onReopenClick()}
+                                value='Re-Open'
+                                disabled={this.canDisableBtn('reopen')}
+                                />
+                            <input 
+                                type="button"
+                                className="gs-button bordered"
+                                onClick={(e) => this.onCalculateClick()}
+                                value='Calculate'
+                                disabled={this.canDisableBtn('calc')}
+                                />
+                            <input 
+                                type="button"
+                                className='gs-button bordered'
+                                onClick={(e) => this.onRedeemClick()}
+                                value='Redeem'
+                                disabled={this.canDisableBtn('redeem')}
+                                />
+                            <input 
+                                type="button"
+                                className={'gs-button bordered ' + this.getBtnVisibilityClass('edit')}
+                                onClick={(e) => this.onEdit()}
+                                value='Edit'
+                                disabled={this.canDisableBtn('edit')}
+                                />
+                            <input 
+                                type="button"
+                                className={'gs-button bordered ' + this.getBtnVisibilityClass('ignore')}
+                                onClick={(e) => this.onIgnore()}
+                                value='Discard'
+                                disabled={this.canDisableBtn('ignore')}
+                                />
+                        </Col>
+                    </Row>
+                
+                    {!this.props.currentBillData.Status && 
+                        <RedeemPreview currentBillData={this.props.currentBillData} />
+                    }
+
+                    <BillCreation loadedInPledgebook={true} billData={this.props.currentBillData}/>
+
+                    <ReactToPrint
+                        ref={(domElm) => {this.printBtn = domElm}}
+                        trigger={() => <a href="#"></a>}
+                        content={() => this.componentRef}
+                        className="print-hidden-btn"
+                    />
+
+                    {<LoanBillMainTemplate ref={el => (this.componentRef = el)} currBillContent={this.state.printContent}/>}
+                    </div>
                 }
-                <BillCreation loadedInPledgebook={true} billData={this.props.currentBillData}/>
-                <ReactToPrint
-                    ref={(domElm) => {this.printBtn = domElm}}
-                    trigger={() => <a href="#"></a>}
-                    content={() => this.componentRef}
-                    className="print-hidden-btn"
-                />
-                {/* <BillTemplate ref={el => (this.componentRef = el)} data={this.state.printContent} /> */}
-                {<LoanBillMainTemplate ref={el => (this.componentRef = el)} currBillContent={this.state.printContent}/>}
+                {this.state.showPaymentScreen && 
+                    <AddPaymentScreen showMainScreen={this.showMainScreen}/>
+                }
             </div>
         )
     }
@@ -279,5 +308,28 @@ export default connect(mapStateToProps, {enableReadOnlyMode, disableReadOnlyMode
 function BillClosedView() {
     return (
         <>Hello</>
+    )
+}
+
+function AddPaymentScreen(props) {
+
+    const goBack = () => {
+        props.showMainScreen();
+    }
+
+    return (
+        <div>
+            <Row>
+                <Col xs={6} md={6}>
+                    <h4> 
+                        <span onClick={goBack}> <FaArrowLeft /> </span>
+                        <span> Add Payment </span> 
+                    </h4>
+                </Col>
+            </Row>
+            <Row>
+
+            </Row>
+        </div>
     )
 }

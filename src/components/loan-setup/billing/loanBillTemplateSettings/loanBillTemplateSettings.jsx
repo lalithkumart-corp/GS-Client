@@ -30,7 +30,7 @@ const sampleBillContent = {
     userPicture: {imageId: 1 , url: "http://localhost:3003/uploads/system/user-male.png"},
     ornPicture: {imageId: 1 , url: "http://localhost:3003/uploads/system/default-orn.webp"},
     orn: {
-        1: {ornItem: "G Ring", ornNWt: "2", ornNos: "1", ornSpec: ""},
+        1: {ornItem: "G Ring", ornNWt: "4.2", ornNos: "1", ornSpec: ""},
         // 2: {ornItem: "G Ring", ornNWt: "", ornNos: "1", ornSpec: ""},
         // 3: {ornItem: "G Ring", ornNWt: "", ornNos: "1", ornSpec: ""},
         // 4: {ornItem: "G Ring", ornNWt: "", ornNos: "1", ornSpec: ""},

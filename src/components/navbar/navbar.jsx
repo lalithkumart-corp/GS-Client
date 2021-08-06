@@ -85,10 +85,10 @@ class NavbarComp extends Component {
                     </Nav>
                     {this.state.enableStockModule && 
                         <Nav>
-                            <NavDropdown title="Stock" id="stock-dropdown">
-                                <NavDropdown.Item as={Link} to="/stock-add">Add Items</NavDropdown.Item>
-                                <NavDropdown.Item as={Link} to="/stock-view">View</NavDropdown.Item>
-                                <NavDropdown.Item as={Link} to="/sell-item">Sale</NavDropdown.Item>
+                            <NavDropdown title="Jewellery" id="stock-dropdown">
+                                <NavDropdown.Item as={Link} to="/stock-add">Add Stock</NavDropdown.Item>
+                                <NavDropdown.Item as={Link} to="/stock-view">View Stock</NavDropdown.Item>
+                                <NavDropdown.Item as={Link} to="/sell-item">Billing</NavDropdown.Item>
                                 <NavDropdown.Divider />
                                 <NavDropdown.Item as={Link} to="/stock-setup">Setup</NavDropdown.Item>
                                 <NavDropdown.Divider />
