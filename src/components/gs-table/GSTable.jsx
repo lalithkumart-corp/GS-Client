@@ -133,7 +133,7 @@ class GSTable extends Component {
         },
         serialNo: (column, colIndex, row, rowIndex) => {
             return (
-                <span>{rowIndex}</span>
+                <span className="gs-table-serial-no-col">{rowIndex+1}</span>
             )
         },
         checkBoxFormatter1: (column, colIndex, row, rowIndex) => {

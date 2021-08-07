@@ -282,20 +282,38 @@ class BillCreation extends Component {
         let list = await fetchMyAccountsList();
         let allBanksList = await fetchAllBanksList();
         if(list && list.length > 0) {
-            let defaultFundAcc = list.filter((aFundAcc)=> {
-                if(aFundAcc.is_default)
-                    return aFundAcc;
-            });
-            let defaultAcc = '';
+            // let defaultFundAcc = list.filter((aFundAcc)=> {
+            //     if(aFundAcc.is_default)
+            //         return aFundAcc;
+            // });
+            // let defaultAcc = '';
 
-            if(defaultFundAcc && defaultFundAcc.length > 0)
-                defaultAcc = defaultFundAcc[0].id;
+            // if(defaultFundAcc && defaultFundAcc.length > 0)
+            //     defaultAcc = defaultFundAcc[0].id;
             let newState = {...this.state};
-            newState.formData.payment.cash.fromAccountId = defaultAcc;
+            // newState.formData.payment.cash.fromAccountId = defaultAcc;
             newState.accountsList = list;
             newState.allBanksList = allBanksList;
+
+            let defaultFundAcc = this.getMyDefaultFundAcc(newState.accountsList);
+            let modes = ['cash', 'cheque', 'online'];
+            _.each(modes, (aMode, index) => {
+                newState.formData.payment[aMode].fromAccountId = defaultFundAcc;
+            });
+
             this.setState(newState);
         }
+    }
+
+    getMyDefaultFundAcc(accountsList) {
+        let accId = null;
+        if(accountsList) {
+            _.each(accountsList, (anAcc, index) => {
+                if(anAcc.is_default)
+                    accId = anAcc.id;
+            });
+        }
+        return accId;
     }
 
     /* START: "this" Binders */

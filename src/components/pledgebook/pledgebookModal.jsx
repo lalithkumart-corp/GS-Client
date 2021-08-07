@@ -1,11 +1,12 @@
-import React, { Component } from 'react';
+import React, { Component, useState } from 'react';
 import BillCreation from '../billcreate/billcreation';
 import {Row, Col, FormGroup, FormLabel, FormControl, HelpBlock, InputGroup, Button, Glyphicon } from 'react-bootstrap';
 import "./pledgebookModal.css";
 import { connect } from 'react-redux';
+import GSTable from '../gs-table/GSTable';
 import { enableReadOnlyMode, disableReadOnlyMode } from '../../actions/billCreation';
-import { REDEEM_PENDING_BILLS, REOPEN_CLOSED_BILL } from '../../core/sitemap';
-import { getInterestRate } from '../../utilities/utility';
+import { REDEEM_PENDING_BILLS, REOPEN_CLOSED_BILL, CASH_IN_FOR_BILL, GET_FUND_TRN_LIST_BY_BILL } from '../../core/sitemap';
+import { getInterestRate, convertToLocalTime } from '../../utilities/utility';
 import { getAccessToken } from '../../core/storage';
 import axios from 'axios';
 import { toast } from 'react-toastify';
@@ -15,6 +16,9 @@ import ReactToPrint from 'react-to-print';
 import LoanBillMainTemplate from '../../templates/loanBill/LoanBillMainTemplate';
 import RedeemPreview from '../redeem/redeem-preview';
 import { FaPencilAlt, FaTrash, FaArrowLeft } from 'react-icons/fa';
+import PaymentIn from '../payment/paymentIn';
+import { useEffect } from 'react';
+import axiosMiddleware from '../../core/axios';
 
 class PledgebookModal extends Component {
     constructor(props) {
@@ -125,12 +129,12 @@ class PledgebookModal extends Component {
             )     
     }
 
-    onAddPaymentClick() {
-        this.setState({mainScreen: false, paymentScreen: true});
+    onPaymentBtnClick() {
+        this.setState({mainScreen: false, showPaymentScreen: true});
     }
 
     showMainScreen() {
-        this.setState({mainScreen: true, paymentScreen: false});
+        this.setState({mainScreen: true, showPaymentScreen: false});
     }
 
     async onPrintClick() {
@@ -185,7 +189,7 @@ class PledgebookModal extends Component {
                 if(!this.props.currentBillData.Status)
                     flag = true;
                 break;
-            case 'add-payment':
+            case 'payment':
                 flag = false;
                 break;
         }
@@ -223,9 +227,9 @@ class PledgebookModal extends Component {
                         <Col xs={12} md={12} className='button-container'>
                             <input type="button"
                                 className={"gs-button bordered "}
-                                onClick={(e) => this.onAddPaymentClick()}
-                                value='Add Payment'
-                                disabled={this.canDisableBtn('add-payment')}
+                                onClick={(e) => this.onPaymentBtnClick()}
+                                value='Payment'
+                                disabled={this.canDisableBtn('payment')}
                                 />
                             <input 
                                 type="button"
@@ -289,7 +293,11 @@ class PledgebookModal extends Component {
                     </div>
                 }
                 {this.state.showPaymentScreen && 
-                    <AddPaymentScreen showMainScreen={this.showMainScreen}/>
+                    <Row>
+                        <Col xs={{span: 12}} md={{span: 12}}>
+                            <PaymentScreen showMainScreen={this.showMainScreen} currentBillData={this.props.currentBillData}/>
+                        </Col>
+                    </Row>
                 }
             </div>
         )
@@ -305,31 +313,118 @@ const mapStateToProps = (state) => {
 };
 export default connect(mapStateToProps, {enableReadOnlyMode, disableReadOnlyMode})(PledgebookModal);
 
-function BillClosedView() {
-    return (
-        <>Hello</>
-    )
-}
 
-function AddPaymentScreen(props) {
+function PaymentScreen(props) {
+    let [tableData, setTableData] = useState([]);
+
+    let columns = [
+        {
+            id: 'transaction_date',
+            displayText: 'Date',
+            width: '15%',
+            formatter: (column, columnIndex, row, rowIndex) => {
+                return (
+                    <div>{convertToLocalTime(row[column.id], {excludeTime: true})}</div>
+                )
+            }
+        },{
+            id: 'fund_house_name',
+            displayText: 'Account',
+            width: '5%'
+        },{
+            id: 'category',
+            displayText: 'Category',
+            width: '20%'
+        },{
+            id: 'remarks',
+            displayText: 'Remarks',
+            width: '15%',
+        },{
+            id: 'cash_in',
+            displayText: 'Cash In',
+            width: '8%',
+        },{
+            id: 'cash_out',
+            displayText: 'Cash Out',
+            width: '8%',
+        }
+    ];
+
+    useEffect(() => {
+        fetchPaymentsListByBill();
+    }, []);
+
+    const fetchPaymentsListByBill = async () => {
+        try {
+            let at = getAccessToken();
+            let resp = await axiosMiddleware.get(`${GET_FUND_TRN_LIST_BY_BILL}?access_token=${at}&loan_uid=${props.currentBillData.UniqueIdentifier}&closed_uid=${props.currentBillData.uid}`);
+            if(resp.data.STATUS == 'SUCCESS') {
+                setTableData(resp.data.RESP);
+            }
+            else {toast.error('Error! Could not fetch payment list for this bill')}
+        } catch(e) {
+            toast.error('Error');
+        }
+    }
+
+    const refreshPaymentList = () => {
+        fetchPaymentsListByBill();
+    }
 
     const goBack = () => {
         props.showMainScreen();
     }
 
-    return (
-        <div>
-            <Row>
-                <Col xs={6} md={6}>
-                    <h4> 
-                        <span onClick={goBack}> <FaArrowLeft /> </span>
-                        <span> Add Payment </span> 
-                    </h4>
-                </Col>
-            </Row>
-            <Row>
+    const addPaymentHandler = async (paymentData) => {
+        try {
+            console.log(paymentData);
+            let params = {
+                accessToken: getAccessToken(),
+                dateVal: paymentData.dateVal,
+                remarks: paymentData.remarks,
+                paymentDetails: paymentData.paymentDetails,
+                uniqueIdentifier: props.currentBillData.UniqueIdentifier
+            }
+            let resp = await axiosMiddleware.post(CASH_IN_FOR_BILL, params);
+            if(resp.data.STATUS == 'EXCEPTION') {
+                toast.error('Error!');
+            } else if(resp.data.STATUS == 'SUCCESS') {
+                toast.success('Added payment. Please comtact admin');
+                refreshPaymentList();
+            } else {
+                toast.error('Not updated. Please comtact admin');
+            }
+        } catch(e) {
+            console.log(e);
+            toast.error('Some Error occured. Please contact admin');
+        }
+    }
 
-            </Row>
+    return (
+        <div className="payment-screen">
+            <>
+                <Row>
+                    <Col xs={{span: 10, offset: 1}} md={{span: 10, offset: 1}}>
+                        <h4> 
+                            <span onClick={goBack}> <FaArrowLeft /> </span>
+                            <span> &nbsp; Payment </span>
+                        </h4>
+                    </Col>
+                </Row>
+                <Row>
+                    <Col xs={{span: 6, offset: 3}} md={{span: 6, offset: 3}} style={{marginTop: '30px', marginBottom: '30px'}}>
+                        <PaymentIn addPaymentHandler={addPaymentHandler}/>
+                    </Col>
+                </Row>
+                <Row>
+                    <Col xs={{span: 10, offset: 1}} md={{span: 10, offset: 1}} style={{marginBottom: '50px'}}>
+                        <GSTable 
+                            columns={columns}
+                            rowData={tableData}
+                        />
+                    </Col>
+                </Row>
+            </>
         </div>
     )
 }

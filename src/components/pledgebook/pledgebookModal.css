@@ -17,3 +17,10 @@
 .pledgebook-modal-container .gs-button .hidden {
     display: none;
 }
+.payment-screen {
+    min-height: 400px;
+}
+
+.payment-screen .gs-table .header.a-cell {
+    text-align: center;
+}

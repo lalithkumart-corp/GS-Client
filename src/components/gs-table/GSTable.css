@@ -54,3 +54,9 @@ span.gstable-checkbox-container{
 .gs-table tr.expandable-row:hover {
     cursor: pointer;
 }
+
+.gs-table-serial-no-col {
+    padding-top: 8px;
+    padding-left: 8px;
+    display: inline-block;
+}

@@ -1,0 +1,54 @@
+.payment-component {
+    border: 1px solid lightgray;
+
+    .payment-component-header {
+        border-bottom: 1px solid lightgray;
+        padding-left: 5px;
+        padding-top: 5px;
+        padding-bottom: 5px;
+        cursor: pointer;
+    }
+    .payment-component-body-content {
+        margin-top: 10px;
+        padding-left: 10px;
+        padding-right: 10px;
+    }
+    .payment-component-body .form-control {
+        padding: 0;
+        height: auto;
+    }
+    
+    .payment-component-body.false {
+        display: none;
+    }
+    
+    .payment-component-body.true {
+        display: block;
+    }
+    
+    .a-payment-item {
+        display: inline-block;
+        padding: 2px 8px;
+        border: 1px solid lightgray;
+        border-radius: 6px;
+        margin-right: 5px;
+        cursor: pointer;
+        font-size: 13px;
+    }
+
+    .a-payment-item.choosen,
+    .a-payment-item:focus {
+        background-color: #d3d3d382;
+    }
+}
+
+.payment-screen {
+    #cash-in-datepicker-comp {
+        margin-left: 10px;
+    }
+    .amount-input,
+    .amount-input:focus,
+    .amount-input:hover {
+        border: 1px solid lightgray;
+    }
+}
