@@ -414,7 +414,7 @@ function PaymentScreen(props) {
         <div className="payment-screen">
             <>
                 <Row>
-                    <Col xs={{span: 12}} md={{span: 12}}>
+                    <Col xs={{span: 12}} md={{span: 12}} style={{marginBottom: '15px'}}>
                         <h4> 
                             <span onClick={goBack}> <FaArrowLeft /> </span>
                             <span> &nbsp; Payment </span>
@@ -422,7 +422,7 @@ function PaymentScreen(props) {
                     </Col>
                 </Row>
                 <Row>
-                    <Col xs={{span: 3}} md={{span: 3}} style={{marginTop: '30px', marginBottom: '30px'}}>
+                    <Col xs={{span: 3}} md={{span: 3}}>
                         <CashIn addPaymentHandler={addPaymentHandler}/>
                     </Col>
                     <Col xs={{span: 9}} md={{span: 9}} style={{marginBottom: '50px'}}>

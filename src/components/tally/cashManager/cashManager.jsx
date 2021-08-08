@@ -20,7 +20,9 @@ export default class CashManager extends Component {
 
     bindMethods() {
         this.editTransaction = this.editTransaction.bind(this);
-        this.clearEditMode = this.clearEditMode.bind(this);
+        this.clearEditModeForCashIn = this.clearEditModeForCashIn.bind(this);
+        this.clearEditModeForCashOut = this.clearEditModeForCashOut.bind(this);
+        this.setRefreshFlag = this.setRefreshFlag.bind(this);
     }
     
     componentDidMount() {
@@ -54,11 +56,24 @@ export default class CashManager extends Component {
     }
 
     editTransaction(transactionData) {
-        this.setState({cashInEditMode: true, editContent: transactionData});
+        if(transactionData.cash_in)
+            this.setState({cashInEditMode: true, editContentForCashIn: transactionData});
+        else
+            this.setState({cashOutEditMode: true, editContentForCashOut: transactionData});
     }
 
-    clearEditMode() {
-        this.setState({cashInEditMode: false, editContent: undefined});
+    clearEditModeForCashIn(options) {
+        options = options || {};
+        this.setState({cashInEditMode: false, editContentForCashIn: undefined, refreshTable: options.refresh||false});
+    }
+
+    clearEditModeForCashOut(options) {
+        options = options || {};
+        this.setState({cashOutEditMode: false, editContentForCashOut: undefined, refreshTable: options.refresh||false});
+    }
+
+    setRefreshFlag(flag) {
+        this.setState({refreshTable: flag});
     }
 
     render() {
@@ -67,14 +82,14 @@ export default class CashManager extends Component {
                 <Row className="cash-manager">
                     <Col xs={3} md={3} sm={3}>
                         <Col xs={12} md={12} sm={12} className="gs-card">
-                            <CashIn editMode={this.state.cashInEditMode} editContent={this.state.editContent} clearEditMode={this.clearEditMode}/>
+                            <CashIn editMode={this.state.cashInEditMode} editContent={this.state.editContentForCashIn} clearEditMode={this.clearEditModeForCashIn} />
                         </Col>
                         <Col xs={12} md={12} sm={12} className="gs-card">
-                            <CashOut />
+                            <CashOut editMode={this.state.cashOutEditMode} editContent={this.state.editContentForCashOut} clearEditMode={this.clearEditModeForCashOut} />
                         </Col>
                     </Col>
                     <Col xs={{span: 9}} md={{span: 9}} sm={{span: 9}} className="middle-card gs-card">
-                        <CashBook editTransaction={this.editTransaction}/>
+                        <CashBook editTransaction={this.editTransaction} refreshFlag={this.state.refreshTable} setRefreshFlag={this.setRefreshFlag}/>
                     </Col>                    
                 </Row>
             </Container>

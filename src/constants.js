@@ -8,3 +8,5 @@ export const PAYMENT_MODE_KEY = {
     'cheque': 2,
     'online': 3
 }
+
+export const UPI_INDEX_ID = 19;

@@ -120,6 +120,7 @@ export const CASH_IN = `${config.proxy_protocol}://${config.proxy_api_host}:${co
 export const CASH_IN_FOR_BILL = `${config.proxy_protocol}://${config.proxy_api_host}:${config.proxy_api_port}/${config.restApiRoot}/FundTransactions/cash-in-for-bill`;
 export const CASH_OUT = `${config.proxy_protocol}://${config.proxy_api_host}:${config.proxy_api_port}/${config.restApiRoot}/FundTransactions/cash-out`;
 export const UPDATE_TRANSACTION_CASH_IN = `${config.proxy_protocol}://${config.proxy_api_host}:${config.proxy_api_port}/${config.restApiRoot}/FundTransactions/update-cash-in`;
+export const UPDATE_TRANSACTION_CASH_OUT = `${config.proxy_protocol}://${config.proxy_api_host}:${config.proxy_api_port}/${config.restApiRoot}/FundTransactions/update-cash-out`;
 export const GET_FUND_TRN_LIST = `${config.proxy_protocol}://${config.proxy_api_host}:${config.proxy_api_port}/${config.restApiRoot}/FundTransactions/fetch-transactions`;
 export const GET_FUND_TRN_LIST_BY_BILL = `${config.proxy_protocol}://${config.proxy_api_host}:${config.proxy_api_port}/${config.restApiRoot}/FundTransactions/fetch-transactions-by-bill`;
 export const DELETE_FUND_TRANSACTION = `${config.proxy_protocol}://${config.proxy_api_host}:${config.proxy_api_port}/${config.restApiRoot}/FundTransactions/delete-by-transactionid`;

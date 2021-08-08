@@ -201,7 +201,7 @@ export const CashIn = (props) => {
         else
             result = await triggerUpdateApi(params);
         if(result) clearInputs();
-        props.clearEditMode();
+        props.clearEditMode({refresh: true});
     }
 
     let cancelEditMode = () => {
@@ -217,12 +217,12 @@ export const CashIn = (props) => {
     }
 
     return (
-            <Row className="gs-card-content cash-in" style={{padding: "20px 0"}}>
-                <Col xs={12} md={12} sm={12}><h4>CASH IN</h4></Col>
+            <Row className="gs-card-content cash-in">
+                <Col xs={12} md={12} sm={12} className="cash-in-header"><h4>CASH IN</h4></Col>
                 <Col xs={12}>
                     <Row>
                         <Col xs={12} md={12} cm={12}>
-                            <Form.Group className="bill-date-picker">
+                            <Form.Group className="transaction-date-picker">
                                 <Form.Label>Date</Form.Label>
                                 <DatePicker
                                     id="cash-in-datepicker" 

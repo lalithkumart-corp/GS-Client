@@ -24,3 +24,15 @@
 .payment-screen .gs-table .header.a-cell {
     text-align: center;
 }
+
+.payment-screen .gs-card-content.cash-in {
+    border: 1px solid lightgray;
+    padding-top: 0;
+}
+.payment-screen .cash-in-header {
+    display: none;
+}
+.payment-screen .transaction-date-picker .react-datepicker-wrapper {
+    width: 80%;
+    padding-left: 11px;
+}

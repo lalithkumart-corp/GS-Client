@@ -17,9 +17,9 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 export default class CashBook extends Component {
     constructor(props) {
         super(props);
-        let past7daysStartDate = new Date();
-        past7daysStartDate.setDate(past7daysStartDate.getDate()-730);
-        past7daysStartDate.setHours(0,0,0,0);
+        let past1daysStartDate = new Date();
+        past1daysStartDate.setDate(past1daysStartDate.getDate()-1);
+        past1daysStartDate.setHours(0,0,0,0);
         let todaysEndDate = new Date();
         todaysEndDate.setHours(23,59,59,999);  
         this.state = {
@@ -27,7 +27,7 @@ export default class CashBook extends Component {
             totalTransactionsCount: 0,
             filters: {
                 date: {
-                    startDate: past7daysStartDate,
+                    startDate: past1daysStartDate,
                     endDate: todaysEndDate
                 },
                 selectedAccounts: [],
@@ -162,6 +162,13 @@ export default class CashBook extends Component {
     }
     componentDidMount() {
         this.fetchTransactions();
+    }
+
+    componentWillReceiveProps(nextProps) {
+        if(nextProps.refreshFlag) {
+            this.refresh();
+            this.props.setRefreshFlag(false);
+        }
     }
 
     refresh() {
