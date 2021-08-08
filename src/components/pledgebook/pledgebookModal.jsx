@@ -19,6 +19,7 @@ import { FaPencilAlt, FaTrash, FaArrowLeft } from 'react-icons/fa';
 import PaymentIn from '../payment/paymentIn';
 import { useEffect } from 'react';
 import axiosMiddleware from '../../core/axios';
+import { CashIn } from '../tally/cashManager/cashIn';
 
 class PledgebookModal extends Component {
     constructor(props) {
@@ -294,7 +295,7 @@ class PledgebookModal extends Component {
                 }
                 {this.state.showPaymentScreen && 
                     <Row>
-                        <Col xs={{span: 12}} md={{span: 12}}>
+                        <Col xs={{span: 12}} md={{span: 12}} style={{padding: '35px'}}>
                             <PaymentScreen showMainScreen={this.showMainScreen} currentBillData={this.props.currentBillData}/>
                         </Col>
                     </Row>
@@ -380,17 +381,25 @@ function PaymentScreen(props) {
             console.log(paymentData);
             let params = {
                 accessToken: getAccessToken(),
-                dateVal: paymentData.dateVal,
+                dateVal: paymentData.transactionDate,
+                category: paymentData.category,
                 remarks: paymentData.remarks,
-                paymentDetails: paymentData.paymentDetails,
+                paymentDetails: {
+                    value: paymentData.amount,
+                    mode: paymentData.paymentMode
+                },
                 uniqueIdentifier: props.currentBillData.UniqueIdentifier
             }
+
+            params.paymentDetails[paymentData.paymentMode] = {toAccountId: paymentData.fundHouse};
+
             let resp = await axiosMiddleware.post(CASH_IN_FOR_BILL, params);
             if(resp.data.STATUS == 'EXCEPTION') {
                 toast.error('Error!');
             } else if(resp.data.STATUS == 'SUCCESS') {
                 toast.success('Added payment. Please comtact admin');
                 refreshPaymentList();
+                return true;
             } else {
                 toast.error('Not updated. Please comtact admin');
             }
@@ -404,7 +413,7 @@ function PaymentScreen(props) {
         <div className="payment-screen">
             <>
                 <Row>
-                    <Col xs={{span: 10, offset: 1}} md={{span: 10, offset: 1}}>
+                    <Col xs={{span: 12}} md={{span: 12}}>
                         <h4> 
                             <span onClick={goBack}> <FaArrowLeft /> </span>
                             <span> &nbsp; Payment </span>
@@ -412,12 +421,10 @@ function PaymentScreen(props) {
                     </Col>
                 </Row>
                 <Row>
-                    <Col xs={{span: 6, offset: 3}} md={{span: 6, offset: 3}} style={{marginTop: '30px', marginBottom: '30px'}}>
-                        <PaymentIn addPaymentHandler={addPaymentHandler}/>
+                    <Col xs={{span: 3}} md={{span: 3}} style={{marginTop: '30px', marginBottom: '30px'}}>
+                        <CashIn addPaymentHandler={addPaymentHandler}/>
                     </Col>
-                </Row>
-                <Row>
-                    <Col xs={{span: 10, offset: 1}} md={{span: 10, offset: 1}} style={{marginBottom: '50px'}}>
+                    <Col xs={{span: 9}} md={{span: 9}} style={{marginBottom: '50px'}}>
                         <GSTable 
                             columns={columns}
                             rowData={tableData}

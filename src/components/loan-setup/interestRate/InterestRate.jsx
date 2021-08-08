@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { Row, Col, Form, InputGroup, FormControl } from 'react-bootstrap';
 import { GET_INTEREST_RATES, UPDATE_INTEREST_RATES, ADD_NEW_INTEREST_RATE, DELETE_INTEREST_RATE } from '../../../core/sitemap';
-import { getAccessToken } from '../../../core/storage';
+import { getAccessToken, clearInterestRates } from '../../../core/storage';
 import { getInterestRate } from '../../../utilities/utility';
 import axios from 'axios';
 import axiosMiddleware from '../../../core/axios';
@@ -74,6 +74,7 @@ class InterestRates extends Component {
             let resp = await axios.delete(DELETE_INTEREST_RATE, {data: apiParams});
             //let resp = await axiosMiddleware.delete(`${DELETE_INTEREST_RATE}?accessToken=${apiParams.accessToken}&id=${apiParams.id}`);
             this.fetchInterestRates();
+            clearInterestRates();
         } catch(e) {
             toast.error('Exception');
         }
@@ -89,6 +90,7 @@ class InterestRates extends Component {
             }
             let resp = await axiosMiddleware.post(ADD_NEW_INTEREST_RATE, apiParams);
             if(resp && resp.data && resp.data.STATUS == 'SUCCESS') {
+                clearInterestRates();
                 this.fetchInterestRates();
             } else {
                 toast.error('ERROR!');

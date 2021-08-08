@@ -11,6 +11,8 @@ const keys = {
     loanDate: 'loanDate',
     pledgebookFilters: 'pledgebookFilters',
     loanBillTemplate: 'loanBillTemplate',
+    myFundAccountsList: 'myFundAccountsList',
+    allFundList: 'allFundList'
 };
 
 const keyMaps = {
@@ -23,7 +25,9 @@ const keyMaps = {
         keys.ssoUserFlag,
         keys.loanDate,
         keys.pledgebookFilters,
-        keys.loanBillTemplate
+        keys.loanBillTemplate,
+        keys.myFundAccountsList,
+        keys.allFundList
     ],
     session: [
 
@@ -39,12 +43,18 @@ const _save = (key, dataObj, options) => {
     let storageType = _getStorageType(key);
     if(storageType === undefined)
         return false;
-    let storageVal = '';
     switch(storageType) {
         case 'local':
-            if(typeof dataObj === 'object')
-                dataObj = JSON.stringify(dataObj);
-            localStorage.setItem(key, dataObj);
+            let data = dataObj;
+            if(options && options.ttl) {
+                data = {
+                    expiry: new Date().getTime() + options.ttl,
+                    value: dataObj,
+                }
+            }
+            if(typeof data === 'object')
+                data = JSON.stringify(data);
+            localStorage.setItem(key, data);
             break;
         case 'session':
             sessionStorage.setItem(key, JSON.stringify(dataObj));
@@ -64,6 +74,22 @@ const _read = (key) => {
     switch(storageType) {
         case 'local':
             storageVal = localStorage.getItem(key) || null;
+            try {
+                storageVal = JSON.parse(storageVal);
+                if(storageVal && typeof storageVal === 'object') {
+                    if(storageVal.expiry) {
+                        const now = new Date();
+                        if(now.getTime() > storageVal.expiry) {
+                            _clear(key);
+                            storageVal = null;
+                        } else {
+                            storageVal = storageVal.value;
+                        }
+                    }
+                }
+            } catch(e) {
+                console.log(e);
+            }
             break;
         case 'session':
             storageVal = sessionStorage.getItem(key) || null;
@@ -119,7 +145,7 @@ const _getCookieOptions = (options = {}) => {
 export const getUserPreference = () => {
     let userPreferences = _read(keys.userPreferences);
     try {
-        return JSON.parse(userPreferences);
+        return userPreference;
     } catch(e) {
         return userPreferences;
     }
@@ -145,7 +171,7 @@ export const saveSession = (data) => {
 export const getSession = () => {
     let session = _read(keys.session);
     try {
-        return JSON.parse(session);
+        return session;
     } catch(e) {
         return session;
     }
@@ -180,11 +206,18 @@ export const clearSession = () => {
     clearUserPreference();
     clearInterestRates();
     clearSsoFlag();
+    clearRates();
+    clearStoreInfo();
+    clearPledgebookFilter();
+    clearLoanBillTemplateSettings();
+    clearLoanDate();
+    clearMyFundAccountsList();
+    clearAllBanksList();
     _clear(keys.session);
 }
 
 export const setInterestRates = (data) => {
-    _save(keys.interestRates, data);
+    _save(keys.interestRates, data, {ttl: 3600000});
 }
 
 export const getInterestRates = () => {
@@ -200,12 +233,11 @@ export const setRates = (data) => {
 }
 
 export const getRates = () => {
-    let ratesStr = _read(keys.rates);
-    try {
-        return JSON.parse(ratesStr);
-    } catch(e) {
-        return ratesStr;
-    }
+    return _read(keys.rates);
+}
+
+export const clearRates = () => {
+    _clear(keys.rates);
 }
 
 export const getStoreInfo = (data) => {
@@ -213,12 +245,11 @@ export const getStoreInfo = (data) => {
 }
 
 export const setStoreInfo = () => {
-    let storeStr = _read(keys.store);
-    try {
-        return JSON.parse(storeStr);
-    } catch(e) {
-        return storeStr;
-    }
+    return _read(keys.store);
+}
+
+export const clearStoreInfo = () => {
+    _clear(keys.store);
 }
 
 export const setLoanDate = (dateVal) => {
@@ -226,25 +257,23 @@ export const setLoanDate = (dateVal) => {
 }
 
 export const getLoanDate = () => {
-    let loanDate = _read(keys.loanDate);
-    try {
-        return JSON.parse(loanDate);
-    } catch(e) {
-        return loanDate;
-    }
+    return _read(keys.loanDate);
+}
+
+export const clearLoanDate = () => {
+    _clear(keys.loanDate);
+}
+
+export const getPledgebookFilters = () => {
+    return _read(keys.pledgebookFilters);
 }
 
 export const setPledgebookFilter = (filterObj) => {
     _save(keys.pledgebookFilters, filterObj);
 }
 
-export const getPledgebookFilters = () => {
-    let filters = _read(keys.pledgebookFilters);
-    try {
-        return JSON.parse(filters);
-    } catch(e) {
-        return filters;
-    }
+export const clearPledgebookFilter = (filterObj) => {
+    _clear(keys.pledgebookFilters);
 }
 
 export const saveLoanBillTemplateSettings = (data) => {
@@ -253,9 +282,34 @@ export const saveLoanBillTemplateSettings = (data) => {
 
 export const getLoanBillTemplateSettings = () => {
     let templateData = _read(keys.loanBillTemplate);
-    try {
-        return JSON.parse(templateData);
-    } catch(e) {
-        return templateData;
-    }
+    return templateData;
+}
+
+export const clearLoanBillTemplateSettings = () => {
+    _clear(keys.loanBillTemplate);
+}
+
+
+export const getMyFundAccountList = () => {
+    return _read(keys.myFundAccountsList);
+}
+
+export const saveMyFundAccountsList = (data) => {
+    _save(keys.myFundAccountsList, data, {ttl: 3600000}); // 1hr - in milliseconds
+}
+
+export const clearMyFundAccountsList = () => {
+    _clear(keys.myFundAccountsList);
+}
+
+export const getAllBanksList = () => {
+    return _read(keys.allFundList);
+}
+
+export const saveAllBanksList = (data) => {
+    _save(keys.allFundList, data, {ttl: 86400000}); // 1day - in milliseconds
+}
+
+export const clearAllBanksList = () => {
+    _clear(keys.allFundList);
 }

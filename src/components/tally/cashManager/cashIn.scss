@@ -1,0 +1,18 @@
+.gs-card-content.cash-in {
+    padding: 0;
+    .a-payment-mode {
+        display: inline-block;
+        padding: 2px 8px;
+        border: 1px solid lightgray;
+        border-radius: 6px;
+        margin-right: 5px;
+        cursor: pointer;
+        font-size: 13px;
+        margin-bottom: 15px;
+    }
+
+    .a-payment-mode.choosen,
+    .a-payment-mode:focus {
+        background-color: #d3d3d382;
+    }
+}

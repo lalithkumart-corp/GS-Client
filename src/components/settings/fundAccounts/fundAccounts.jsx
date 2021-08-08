@@ -2,7 +2,7 @@ import React, { Component} from 'react';
 import { Row, Col, Form} from 'react-bootstrap';
 import _ from 'lodash';
 import { ADD_NEW_FUND_ACCOUNT, FETCH_FUND_ACCOUNTS_LIST, UPDATE_FUND_ACCOUNT, DELETE_FUND_ACCOUNT } from '../../../core/sitemap';
-import { getAccessToken } from '../../../core/storage';
+import { getAccessToken, clearMyFundAccountsList } from '../../../core/storage';
 import axiosMiddleware from '../../../core/axios';
 import './fundAccounts.scss';
 import { FaPencilAlt, FaTrash, FaArrowLeft } from 'react-icons/fa';
@@ -75,6 +75,7 @@ export default class FundAccounts extends Component {
             }
             let resp = await axiosMiddleware.post(ADD_NEW_FUND_ACCOUNT, params);
             if(resp && resp.data.RESP && resp.data.STATUS == 'SUCCESS') {
+                clearMyFundAccountsList(); // On Localstorage
                 this.showBackAccountList();
                 this.fetchAccounts();
             } else {
