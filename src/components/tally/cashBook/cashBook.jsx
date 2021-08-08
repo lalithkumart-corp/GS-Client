@@ -12,6 +12,7 @@ import ReactPaginate from 'react-paginate';
 import './cashBook.scss';
 import MultiSelect from "react-multi-select-component";
 import { toast } from 'react-toastify';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 export default class CashBook extends Component {
     constructor(props) {
@@ -130,6 +131,23 @@ export default class CashBook extends Component {
                         <div>{this.getBalance(row, rowIndex)}</div>
                     )
                 } 
+            },
+            {
+                id: '',
+                displayText: '',
+                width: '8%',
+                formatter: (column, columnIndex, row, rowIndex) => {
+                    if(row.category == 'Girvi' || row.category == 'Redeem') {
+                        return (<></>)
+                    } else {
+                        return (
+                            <div>
+                                <span onClick={(e) => this.editTransaction(rowIndex, row)} style={{paddingLeft: '10px'}}><FontAwesomeIcon icon="edit"/></span>
+                                <span onClick={(e) => this.deleteTransaction(rowIndex, row)}><FontAwesomeIcon icon="backspace"/></span>
+                            </div>
+                        )
+                    }
+                } 
             }
         ];
         this.bindMethods();
@@ -139,6 +157,8 @@ export default class CashBook extends Component {
         this.handlePageClick = this.handlePageClick.bind(this);
         this.handleCheckboxChangeListener = this.handleCheckboxChangeListener.bind(this);
         this.handleGlobalCheckboxChange = this.handleGlobalCheckboxChange.bind(this);
+        this.editTransaction = this.editTransaction.bind(this);
+        this.deleteTransaction = this.deleteTransaction.bind(this);
     }
     componentDidMount() {
         this.fetchTransactions();
@@ -327,6 +347,16 @@ export default class CashBook extends Component {
         }
     }
 
+    editTransaction(rowIndex, rowData) {
+        this.props.editTransaction(rowData);
+    }
+
+    deleteTransaction(rowIndex, row) {
+        if(window.confirm('Sure to delete the transaction ?')) {
+            this.deleteTransactions([row.id]);
+        }
+    }
+
     render() {
         return (
             <Row className="gs-card-content cash-book-main-card">
@@ -397,6 +427,7 @@ export default class CashBook extends Component {
                         globalCheckBoxListener = {this.handleGlobalCheckboxChange}
                         selectedIndexes = {this.state.selectedIndexes}
                         selectedRowJson = {this.state.selectedRowJson}
+                        rowClickListener = {this.rowClickListener}
                     />
                 </Col>
             </Row>

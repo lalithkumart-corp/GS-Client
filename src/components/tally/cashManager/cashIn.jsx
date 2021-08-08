@@ -5,15 +5,15 @@ import DatePicker from 'react-datepicker';
 import axiosMiddleware from '../../../core/axios';
 import { fetchMyAccountsList, fetchCategorySuggestions } from '../../../utilities/apiUtils';
 import { toast } from 'react-toastify';
-import { CASH_IN } from '../../../core/sitemap';
+import { CASH_IN, UPDATE_TRANSACTION_CASH_IN } from '../../../core/sitemap';
 import { getDateInUTC } from '../../../utilities/utility';
 import './cashIn.scss';
 
 export const CashIn = (props) => {
-    let [amount, setAmount] = useState();
+    let [amount, setAmount] = useState('');
     let [remarks, setRemarks] = useState('');
     let [paymentMode, setPaymentMode] = useState('cash');
-    let [fundHouseVal, setFundHouseVal] = useState(null);
+    let [cashInAccountId, setCashInAccountId] = useState(null);
     let [category, setCategoryVal] = useState('');
     let [categoryList, setCategoryList] = useState([]);
     let [filteredCategoryList, setFilteredCategoryList] = useState([]);
@@ -34,6 +34,24 @@ export const CashIn = (props) => {
         fetchAccountsList();
         fetchCategorrySuggestions();
     }, []);
+
+    useEffect(() => {
+        if(props.editContent) {
+            setDates({dateVal: new Date(props.editContent.transaction_date),_dateVal: props.editContent.transaction_date});
+            setAmount(props.editContent.cash_in);
+            setPaymentMode(props.editContent.cash_in_mode || 'cash');
+            setCashInAccountId(props.editContent.account_id);
+            setCategoryVal(props.editContent.category);
+            setRemarks(props.editContent.remarks);
+        } else {
+            setDates(getDateValues());
+            setAmount('');
+            setPaymentMode('cash');
+            setCashInAccountId(null);
+            setCategoryVal('');
+            setRemarks('');
+        }
+    }, [props.editMode, props.editContent]);
 
     const fetchAccountsList = async () => {
         let list = await fetchMyAccountsList();
@@ -71,7 +89,7 @@ export const CashIn = (props) => {
     }
 
     let onChangeFundHouse = (val) => {
-        setFundHouseVal(val);
+        setCashInAccountId(val);
     }
 
     let onChangeRemarks = (val) => {
@@ -124,7 +142,7 @@ export const CashIn = (props) => {
         return {
             transactionDate: dates._dateVal,
             amount: amount,
-            fundHouse: fundHouseVal || myDefaultFundAccount,
+            fundHouse: cashInAccountId || myDefaultFundAccount,
             category: category,
             remarks: remarks,
             paymentMode: paymentMode
@@ -145,11 +163,49 @@ export const CashIn = (props) => {
         }
     }
 
+    let triggerUpdateApi = async (params) => {
+        try {
+            let resp = await axiosMiddleware.put(UPDATE_TRANSACTION_CASH_IN, params);
+            if(resp.data.STATUS == 'SUCCESS')
+                return true;
+        } catch(e) {
+            console.log(e);
+        }
+    }
+
     let clearInputs = () => {
         setAmount('');
         setRemarks('');
         setCategoryVal('');
         setPaymentMode('cash');
+    }
+
+    let constructApiParamsForUpdate = () => {
+        let params = {
+            transactionDate: dates._dateVal,
+            amount: amount,
+            accountId: cashInAccountId || myDefaultFundAccount,
+            category: category,
+            remarks: remarks,
+            paymentMode: paymentMode,
+            transactionId: props.editContent.id
+        }
+        return params;
+    }
+
+    let updatePaymentHandler = async () => {
+        let result = false;
+        let params = constructApiParamsForUpdate();
+        if(props.updatePaymentHandler)
+            result = await props.updatePaymentHandler(params);
+        else
+            result = await triggerUpdateApi(params);
+        if(result) clearInputs();
+        props.clearEditMode();
+    }
+
+    let cancelEditMode = () => {
+        props.clearEditMode();
     }
 
     let fetchAcccountListDropdown = () => {
@@ -215,7 +271,7 @@ export const CashIn = (props) => {
                                 <Form.Label>Account</Form.Label>
                                 <Form.Control
                                     as="select"
-                                    value={fundHouseVal}
+                                    value={cashInAccountId}
                                     onChange={(e) => onChangeFundHouse(e.target.value)}
                                 >
                                     {fetchAcccountListDropdown()}
@@ -254,7 +310,16 @@ export const CashIn = (props) => {
                     </Row>
                     <Row>
                         <Col xs={12} md={12} sm={12}>
-                            <input type="button" className="gs-button" value="Save" onClick={addPaymentHandler} />
+                            {!props.editMode &&
+                                <input type="button" className="gs-button" value="Save" onClick={addPaymentHandler} />
+                            }
+
+                            {props.editMode && 
+                            <>
+                                <input type="button" className="gs-button" value="Update" onClick={updatePaymentHandler} />
+                                <input type="button" className="gs-button" value="Cancel" onClick={cancelEditMode} />
+                            </>}
+
                         </Col>
                     </Row>
                 </Col>

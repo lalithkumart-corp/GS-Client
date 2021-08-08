@@ -57,6 +57,7 @@ export const getRequestParams = (billData, thatState) => {
     let anObj = {
         //pledgeBookID: billData.PledgeBookID,
         redeemUID: (+new Date()),
+        customerId: billData.CustomerId,
         pledgeBookUID: billData.UniqueIdentifier,
         billNo: billData.BillNo,
         pledgedDate: billData.Date.replace('T', ' ').slice(0,23),

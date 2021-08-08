@@ -36,6 +36,7 @@ class GSTable extends Component {
         newState.selectedIndexes = parsed.selectedIndexes || [];
         newState.showFooter = parsed.showFooter;
         newState.rowClassNameGetter = parsed.rowClassNameGetter;
+        newState.rowClickListener = parsed.rowClickListener || null;
         this.setState(newState);
     }
     parseInputCollection(props) {
@@ -116,6 +117,7 @@ class GSTable extends Component {
         parsedData.selectedIndexes = props.selectedIndexes || [];
         parsedData.showFooter = props.showFooter || false;
         parsedData.rowClassNameGetter = props.rowClassNameGetter || (()=>'');
+        parsedData.rowClickListener = props.rowClickListener || null;
         return parsedData;
     }
     defaults = {
@@ -340,8 +342,12 @@ class GSTable extends Component {
 
     rowClickHandler(row, rowIndex) {
         let newState = {...this.state};
-        newState.rowData[rowIndex]._expanded = !newState.rowData[rowIndex]._expanded;
-        this.setState(newState);
+        if(newState.expandRow) {
+            newState.rowData[rowIndex]._expanded = !newState.rowData[rowIndex]._expanded;
+            this.setState(newState);
+        }
+        if(newState.rowClickListener)
+            newState.rowClickListener(rowIndex, newState.rowData[rowIndex]);
     }
 
     canIncludeFilterSection() {

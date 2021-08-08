@@ -14,6 +14,13 @@ export default class CashManager extends Component {
             accountsList: [],
             defaultAccId: null,
         }
+
+        this.bindMethods();
+    }
+
+    bindMethods() {
+        this.editTransaction = this.editTransaction.bind(this);
+        this.clearEditMode = this.clearEditMode.bind(this);
     }
     
     componentDidMount() {
@@ -46,20 +53,28 @@ export default class CashManager extends Component {
 
     }
 
+    editTransaction(transactionData) {
+        this.setState({cashInEditMode: true, editContent: transactionData});
+    }
+
+    clearEditMode() {
+        this.setState({cashInEditMode: false, editContent: undefined});
+    }
+
     render() {
         return (
             <Container>
                 <Row className="cash-manager">
                     <Col xs={3} md={3} sm={3}>
                         <Col xs={12} md={12} sm={12} className="gs-card">
-                            <CashIn accountsList={this.state.accountsList} defaultAccId={this.state.defaultAccId} />
+                            <CashIn editMode={this.state.cashInEditMode} editContent={this.state.editContent} clearEditMode={this.clearEditMode}/>
                         </Col>
                         <Col xs={12} md={12} sm={12} className="gs-card">
-                            <CashOut accountsList={this.state.accountsList} defaultAccId={this.state.defaultAccId}/>
+                            <CashOut />
                         </Col>
                     </Col>
                     <Col xs={{span: 9}} md={{span: 9}} sm={{span: 9}} className="middle-card gs-card">
-                        <CashBook />
+                        <CashBook editTransaction={this.editTransaction}/>
                     </Col>                    
                 </Row>
             </Container>

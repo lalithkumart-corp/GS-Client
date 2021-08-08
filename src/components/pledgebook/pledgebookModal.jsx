@@ -253,13 +253,13 @@ class PledgebookModal extends Component {
                                 value='Calculate'
                                 disabled={this.canDisableBtn('calc')}
                                 />
-                            <input 
+                            {/* <input 
                                 type="button"
                                 className='gs-button bordered'
                                 onClick={(e) => this.onRedeemClick()}
                                 value='Redeem'
                                 disabled={this.canDisableBtn('redeem')}
-                                />
+                                /> */}
                             <input 
                                 type="button"
                                 className={'gs-button bordered ' + this.getBtnVisibilityClass('edit')}
@@ -388,7 +388,8 @@ function PaymentScreen(props) {
                     value: paymentData.amount,
                     mode: paymentData.paymentMode
                 },
-                uniqueIdentifier: props.currentBillData.UniqueIdentifier
+                uniqueIdentifier: props.currentBillData.UniqueIdentifier,
+                customerId: props.currentBillData.CustomerId
             }
 
             params.paymentDetails[paymentData.paymentMode] = {toAccountId: paymentData.fundHouse};
