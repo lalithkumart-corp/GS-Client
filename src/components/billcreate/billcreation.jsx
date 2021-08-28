@@ -296,6 +296,9 @@ class BillCreation extends Component {
             newState.allBanksList = allBanksList;
 
             let defaultFundAcc = this.getMyDefaultFundAcc(newState.accountsList);
+
+            newState._defaultFundAcc = defaultFundAcc;
+
             let modes = ['cash', 'cheque', 'online'];
             _.each(modes, (aMode, index) => {
                 newState.formData.payment[aMode].fromAccountId = defaultFundAcc;
