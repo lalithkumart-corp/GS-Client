@@ -78,7 +78,7 @@ export default class CashManager extends Component {
 
     render() {
         return (
-            <Container>
+            <Container style={{maxWidth: '98%'}}>
                 <Row className="cash-manager">
                     <Col xs={3} md={3} sm={3}>
                         <Col xs={12} md={12} sm={12} className="gs-card">
@@ -88,7 +88,7 @@ export default class CashManager extends Component {
                             <CashOut editMode={this.state.cashOutEditMode} editContent={this.state.editContentForCashOut} clearEditMode={this.clearEditModeForCashOut} />
                         </Col>
                     </Col>
-                    <Col xs={{span: 9}} md={{span: 9}} sm={{span: 9}} className="middle-card gs-card">
+                    <Col xs={{span: 9}} md={{span: 9}} sm={{span: 9}} className="middle-card gs-card" style={{padding: 0}}>
                         <CashBook editTransaction={this.editTransaction} refreshFlag={this.state.refreshTable} setRefreshFlag={this.setRefreshFlag}/>
                     </Col>                    
                 </Row>

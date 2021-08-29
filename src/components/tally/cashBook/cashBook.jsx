@@ -13,6 +13,7 @@ import './cashBook.scss';
 import MultiSelect from "react-multi-select-component";
 import { toast } from 'react-toastify';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { format } from 'currency-formatter';
 
 export default class CashBook extends Component {
     constructor(props) {
@@ -40,7 +41,7 @@ export default class CashBook extends Component {
             selectedIndexes: [],
             selectedRowJson: [],
             selectedPageIndex: 0,
-            pageLimit: 500,
+            pageLimit: 20,
             openingBalance: 0,
             totalCashIn: 0,
             totalCashOut: 0,
@@ -52,8 +53,9 @@ export default class CashBook extends Component {
                 displayText: 'S.No',
                 width: '3%',
                 formatter: (column, columnIndex, row, rowIndex) => {
+                    let lastPageRowNo = this.state.selectedPageIndex*this.state.pageLimit;
                     return (
-                        <div>{rowIndex+1}</div>
+                        <div>{lastPageRowNo+(rowIndex+1)}</div>
                     )
                 } 
             },{
@@ -83,6 +85,7 @@ export default class CashBook extends Component {
                                 onChange={this.filterCallbacks.account}
                                 labelledBy="Select"
                                 className="account-multiselect-dpd"
+                                ItemRenderer={this.customItemRenderer}
                             />
                         </div>
                     );
@@ -128,7 +131,7 @@ export default class CashBook extends Component {
                 width: '8%',
                 formatter: (column, columnIndex, row, rowIndex) => {
                     return (
-                        <div>{this.getBalance(row, rowIndex)}</div>
+                        <div>{row.avlBalance}</div>
                     )
                 } 
             },
@@ -179,6 +182,7 @@ export default class CashBook extends Component {
         try {
             let at = getAccessToken();
             let params = constructFetchApiParams(this.state);
+            params.fetchCollectionsAndTotals = true;
             let resp = await axiosMiddleware.get(`${GET_FUND_TRN_LIST}?access_token=${at}&params=${JSON.stringify(params)}`);
             if(resp && resp.data && resp.data.RESP) {
                 let newState = {...this.state};
@@ -193,6 +197,23 @@ export default class CashBook extends Component {
                 // newState.pageWiseOpeningBalance = resp.data.RESP.pageWiseOpeningBalance;
                 // this.pageWiseOpeningBalance = newState.pageWiseOpeningBalance;
                 // newState = this.reStructureTransactionData(newState);
+                newState = this.injectAvlBalanceOnTransactionItems(newState);
+                this.setState(newState);
+            }
+        } catch(e) {
+            console.log(e);
+        }
+    }
+
+    async fetchTransactionsByPage() {
+        try {
+            let at = getAccessToken();
+            let params = constructFetchApiParams(this.state);
+            let resp = await axiosMiddleware.get(`${GET_FUND_TRN_LIST}?access_token=${at}&params=${JSON.stringify(params)}`);
+            if(resp && resp.data && resp.data.RESP) {
+                let newState = {...this.state};
+                newState.transactions = resp.data.RESP.results;
+                newState = this.injectAvlBalanceOnTransactionItems(newState);
                 this.setState(newState);
             }
         } catch(e) {
@@ -236,13 +257,21 @@ export default class CashBook extends Component {
         // }
     }
 
-    getBalance(row, rowIndex) {
-        if(rowIndex == 0)
-            this.openingBalance = this.state.openingBalance;
+    injectAvlBalanceOnTransactionItems(newStateObj) {
+        _.each(newStateObj.transactions, (aTransaction, index) => {
+            aTransaction.avlBalance = this.getBalance(aTransaction, index, newStateObj);
+        });
+        return newStateObj;
+    }
+
+    getBalance(row, rowIndex, newStateObj) {
+        if(rowIndex == 0 && newStateObj.selectedPageIndex == 0)
+            this.openingBalance = newStateObj.openingBalance;
         let lastBal = this.openingBalance;
         let newBal = lastBal + row.cash_in - row.cash_out;
         this.openingBalance = newBal;
-        return newBal;
+        console.log(`${rowIndex} Last Balance: ${this.openingBalance}, New = (${row.cash_in}-${row.cash_out})=${row.cash_in - row.cash_out}`);
+        return format(newBal, {code: 'INR'});
     }
 
     filterCallbacks = {
@@ -269,7 +298,7 @@ export default class CashBook extends Component {
 
     async handlePageClick(selectedPage) {
         await this.setState({selectedPageIndex: selectedPage.selected});  
-        this.fetchTransactions();      
+        this.fetchTransactionsByPage();      
     }
 
     getPageCount() {
@@ -364,6 +393,27 @@ export default class CashBook extends Component {
         }
     }
 
+    //{
+    //     checked,
+    //     option,
+    //     onClick,
+    //     disabled,
+    //   }: IDefaultItemRendererProps
+    customItemRenderer(params) {
+        return (
+            <div className={`item-renderer ${params.disabled && "disabled"} gs-custom-multiselect-item`}>
+            <input
+                type="checkbox"
+                onChange={params.onClick}
+                checked={params.checked}
+                tabIndex={-1}
+                disabled={params.disabled}
+            />
+            <span>{params.option.label}</span>
+            </div>
+        );
+    };
+
     render() {
         return (
             <Row className="gs-card-content cash-book-main-card">
@@ -398,20 +448,20 @@ export default class CashBook extends Component {
                 <Col xs={6} md={6}>
                         <Col xs={12} md={12} className="fund-transaction-summary-card">
                             <Row>
-                                <Col xs={7}>Opening Balance: </Col> {this.state.openingBalance}
+                                <Col xs={7}>Opening Balance: </Col> {format(this.state.openingBalance, {code: 'INR'})}
                             </Row>
                             <Row>
-                                <Col xs={7}>Total CashIn: </Col> {this.state.totalCashIn}
+                                <Col xs={7}>Total CashIn: </Col> {format(this.state.totalCashIn, {code: 'INR'})}
                             </Row>
                             <Row>
-                                <Col xs={7}>Total CashOut: </Col> {this.state.totalCashOut}
+                                <Col xs={7}>Total CashOut: </Col> {format(this.state.totalCashOut, {code: 'INR'})}
                             </Row>
                             <Row>
-                                <Col xs={7}>Closing Balanse: </Col> {this.state.closingBalance}
+                                <Col xs={7}>Closing Balanse: </Col> {format(this.state.closingBalance, {code: 'INR'})}
                             </Row>
                         </Col>
                 </Col>
-                {/* <Col xs={6} md={6} sm={6} className='pagination-container'>
+                <Col xs={6} md={6} sm={6} className='pagination-container'>
                     <ReactPaginate previousLabel={"<"}
                         nextLabel={">"}
                         breakLabel={"..."}
@@ -424,7 +474,7 @@ export default class CashBook extends Component {
                         subContainerClassName={"pages pagination"}
                         activeClassName={"active"}
                         forcePage={this.state.selectedPageIndex} />
-                </Col> */}
+                </Col>
                 <Col xs={12} md={12} xs={12}>
                     <GSTable 
                         columns={this.columns}
