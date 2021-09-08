@@ -121,7 +121,7 @@ class Tag extends Component {
             height: '20px',
             display: this.props.showHallmark?'inline':'none',
             position: 'absolute',
-            marginTop: '4px'
+            marginTop: '1px'
         }
         const touchStyles = {
             width: this.props.showHallmark?'65px':'80px',
@@ -130,34 +130,35 @@ class Tag extends Component {
             position: 'absolute',
             paddingRight: this.props.showHallmark?'12px':'3px',
             paddingTop: '0px',
-            fontSize: '16px'
+            fontSize: '17px',
+            lineHeight: '21px'
         }
         return (
             <div style={{height: '55px', width: '425px', paddingLeft: '25px', paddingTop: '4px', fontFamily: 'monospace'}}>
                 <div style={{width: '272px', display: "inline-block", height: '50px', backgroundColor: 'lightgray'}}>
                     <div style={{width: '135px', display: "inline-block"}}>
                         <div style={{height: '20px', paddingLeft: '4px'}}>
-                            <span style={{width: '45px', display: 'inline-block', fontSize: '18px'}}>MJK</span>
+                            <span style={{width: '45px', display: 'inline-block', fontSize: '17px', lineHeight: '21px'}}>MJK</span>
                             <span style={touchStyles}>{this.props.touch}</span>
                             <span style={{marginLeft: '58px', height: '12px'}}><img style={imgStyles} src='/images/bis.jpg' /></span>
                         </div>
                         <div style={{height: '30px', paddingLeft: '4px'}}>
                             <span style={{fontWeight: 'bold'}}>
                                 <span style={{fontSize: '22px'}}>wt: </span>
-                                <span style={{fontSize: '24px', lineHeight: '10px'}}>{this.props.wtContent}</span>
+                                <span style={{fontSize: '24px', lineHeight: '10px', fontWeight: 'bold'}}>{this.props.wtContent}</span>
                             </span>
                         </div>
                     </div>
                     <div style={{width: '135px', display: "inline-block", height: '50px'}}>
                         <div style={{height: '20px', fontSize: '16px'}}>
-                            <span style={{width: '66px', display: 'inline-block', paddingLeft: '3px'}}>MC: {this.props.makingCharge}</span>
-                            <span style={{width: '34px', textAlign: 'center', display: 'inline-block'}}>{this.props.size}</span>
+                            <span style={{width: '66px', display: 'inline-block', paddingLeft: '3px'}}>MC:{this.props.makingCharge}</span>
+                            <span style={{width: '34px', textAlign: 'center', display: 'inline-block', fontWeight: 'bold'}}>{this.props.size}</span>
                             <span style={{width: '35px', textAlign: 'center', display: 'inline-block'}}>{this.props.wastage}</span>
                         </div>
                         <div style={{height: '30px'}}>
                             <span style={{fontWeight: 'bold', paddingLeft: '3px'}}>
                                 <span style={{fontSize: '22px'}}>wt: </span>
-                                <span style={{fontSize: '24px', lineHeight: '10px'}}>{this.props.wtContent}</span>
+                                <span style={{fontSize: '24px', lineHeight: '10px', fontWeight: 'bold'}}>{this.props.wtContent}</span>
                             </span>
                         </div>
                     </div>
