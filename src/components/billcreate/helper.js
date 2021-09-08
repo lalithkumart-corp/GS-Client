@@ -299,6 +299,11 @@ export const resetState = (nextProps, newState) => {
         }            
     });
     newState.formData.payment = JSON.parse(JSON.stringify(defaultPaymentObj));
+    let modes = ['cash', 'cheque', 'online'];
+    _.each(modes, (aMode, index) => {
+        newState.formData.payment[aMode].fromAccountId = newState._defaultFundAcc;
+    });
+        
     newState.selectedCustomer = {};
     newState.showMoreInputs = false; //!newState.showMoreInputs;
     newState.userPicture = JSON.parse(JSON.stringify(defaultPictureState));
