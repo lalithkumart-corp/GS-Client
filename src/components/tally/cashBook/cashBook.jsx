@@ -131,7 +131,7 @@ export default class CashBook extends Component {
                 width: '8%',
                 formatter: (column, columnIndex, row, rowIndex) => {
                     return (
-                        <div>{row.avlBalance}</div>
+                        <div>{row.afterBal}</div>
                     )
                 } 
             },
@@ -175,6 +175,7 @@ export default class CashBook extends Component {
     }
 
     refresh() {
+        this.setState({selectedPageIndex: 0});
         this.fetchTransactions();
     }
 
@@ -182,7 +183,7 @@ export default class CashBook extends Component {
         try {
             let at = getAccessToken();
             let params = constructFetchApiParams(this.state);
-            params.fetchCollectionsAndTotals = true;
+            params.fetchFundOverview = true;
             let resp = await axiosMiddleware.get(`${GET_FUND_TRN_LIST}?access_token=${at}&params=${JSON.stringify(params)}`);
             if(resp && resp.data && resp.data.RESP) {
                 let newState = {...this.state};
@@ -194,10 +195,12 @@ export default class CashBook extends Component {
                 newState.totalCashIn = resp.data.RESP.totalCashIn;
                 newState.totalCashOut = resp.data.RESP.totalCashOut;
                 this.openingBalance = resp.data.RESP.openingBalance;
+                
                 // newState.pageWiseOpeningBalance = resp.data.RESP.pageWiseOpeningBalance;
                 // this.pageWiseOpeningBalance = newState.pageWiseOpeningBalance;
                 // newState = this.reStructureTransactionData(newState);
-                newState = this.injectAvlBalanceOnTransactionItems(newState);
+
+                // newState = this.injectAvlBalanceOnTransactionItems(newState);
                 this.setState(newState);
             }
         } catch(e) {
@@ -213,6 +216,7 @@ export default class CashBook extends Component {
             if(resp && resp.data && resp.data.RESP) {
                 let newState = {...this.state};
                 newState.transactions = resp.data.RESP.results;
+                this.openingBalance = resp.data.RESP.pageWiseOpeningBal;
                 newState = this.injectAvlBalanceOnTransactionItems(newState);
                 this.setState(newState);
             }
@@ -270,7 +274,7 @@ export default class CashBook extends Component {
         let lastBal = this.openingBalance;
         let newBal = lastBal + row.cash_in - row.cash_out;
         this.openingBalance = newBal;
-        console.log(`${rowIndex} Last Balance: ${this.openingBalance}, New = (${row.cash_in}-${row.cash_out})=${row.cash_in - row.cash_out}`);
+        // console.log(`${rowIndex} Last Balance: ${this.openingBalance}, New = (${row.cash_in}-${row.cash_out})=${row.cash_in - row.cash_out}`);
         return format(newBal, {code: 'INR'});
     }
 
@@ -279,18 +283,21 @@ export default class CashBook extends Component {
             let newState = {...this.state};
             newState.filters.date.startDate = new Date(startDate);
             newState.filters.date.endDate = new Date(endDate);
+            newState.selectedPageIndex = 0;
             await this.setState(newState);
             this.fetchTransactions();
         },
         account: async (val) => {
             let newState = {...this.state};
             newState.filters.selectedAccounts = val;
+            newState.selectedPageIndex = 0;
             await this.setState(newState);
             this.fetchTransactions();
         },
         category: async (val) => {
             let newState = {...this.state};
             newState.filters.selectedCategories = val;
+            newState.selectedPageIndex = 0;
             await this.setState(newState);
             this.fetchTransactions();
         }
