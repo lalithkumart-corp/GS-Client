@@ -3,7 +3,7 @@ import {Tabs, Tab, Container, Row, Col, Dropdown} from 'react-bootstrap';
 import GSTable from '../../gs-table/GSTable';
 import axiosMiddleware from '../../../core/axios';
 import { convertToLocalTime } from '../../../utilities/utility';
-import { GET_FUND_TRN_LIST, DELETE_FUND_TRANSACTION } from '../../../core/sitemap';
+import { GET_FUND_TRN_LIST, GET_FUND_TRN_OVERVIEW, DELETE_FUND_TRANSACTION } from '../../../core/sitemap';
 import { getAccessToken } from '../../../core/storage';
 import moment from 'moment';
 import DateRangePicker from '../../dateRangePicker/dataRangePicker';
@@ -165,6 +165,7 @@ export default class CashBook extends Component {
     }
     componentDidMount() {
         this.fetchTransactions();
+        this.fetchTransOverview();
     }
 
     componentWillReceiveProps(nextProps) {
@@ -177,30 +178,38 @@ export default class CashBook extends Component {
     refresh() {
         this.setState({selectedPageIndex: 0});
         this.fetchTransactions();
+        this.fetchTransOverview();
     }
 
     async fetchTransactions() {
         try {
             let at = getAccessToken();
             let params = constructFetchApiParams(this.state);
-            params.fetchFundOverview = true;
+            params.fetchFilterCollections = true;
             let resp = await axiosMiddleware.get(`${GET_FUND_TRN_LIST}?access_token=${at}&params=${JSON.stringify(params)}`);
             if(resp && resp.data && resp.data.RESP) {
                 let newState = {...this.state};
                 newState.transactions = resp.data.RESP.results;
-                newState.totalTransactionsCount = resp.data.RESP.collections.count;
+                newState.totalTransactionsCount = resp.data.RESP.count;
                 newState.filters.collections = resp.data.RESP.collections;
+                this.setState(newState);
+            }
+        } catch(e) {
+            console.log(e);
+        }
+    }
+
+    async fetchTransOverview() {
+        try {
+            let at = getAccessToken();
+            let params = constructFetchApiParams(this.state);
+            let resp = await axiosMiddleware.get(`${GET_FUND_TRN_OVERVIEW}?access_token=${at}&params=${JSON.stringify(params)}`);
+            if(resp && resp.data && resp.data.RESP) {
+                let newState = {...this.state};
                 newState.openingBalance = resp.data.RESP.openingBalance;
                 newState.closingBalance = resp.data.RESP.closingBalance;
                 newState.totalCashIn = resp.data.RESP.totalCashIn;
                 newState.totalCashOut = resp.data.RESP.totalCashOut;
-                this.openingBalance = resp.data.RESP.openingBalance;
-                
-                // newState.pageWiseOpeningBalance = resp.data.RESP.pageWiseOpeningBalance;
-                // this.pageWiseOpeningBalance = newState.pageWiseOpeningBalance;
-                // newState = this.reStructureTransactionData(newState);
-
-                // newState = this.injectAvlBalanceOnTransactionItems(newState);
                 this.setState(newState);
             }
         } catch(e) {
@@ -217,7 +226,6 @@ export default class CashBook extends Component {
                 let newState = {...this.state};
                 newState.transactions = resp.data.RESP.results;
                 this.openingBalance = resp.data.RESP.pageWiseOpeningBal;
-                newState = this.injectAvlBalanceOnTransactionItems(newState);
                 this.setState(newState);
             }
         } catch(e) {
@@ -286,6 +294,7 @@ export default class CashBook extends Component {
             newState.selectedPageIndex = 0;
             await this.setState(newState);
             this.fetchTransactions();
+            this.fetchTransOverview();
         },
         account: async (val) => {
             let newState = {...this.state};
@@ -293,6 +302,7 @@ export default class CashBook extends Component {
             newState.selectedPageIndex = 0;
             await this.setState(newState);
             this.fetchTransactions();
+            this.fetchTransOverview();
         },
         category: async (val) => {
             let newState = {...this.state};
@@ -300,6 +310,7 @@ export default class CashBook extends Component {
             newState.selectedPageIndex = 0;
             await this.setState(newState);
             this.fetchTransactions();
+            this.fetchTransOverview();
         }
     }
 
