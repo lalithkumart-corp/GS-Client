@@ -30,3 +30,22 @@ export const getOffsets2 = (selectedPageIndex, pageLimit) => {
     let offsetEnd = offsetStart + parseInt(pageLimit);
     return [offsetStart, offsetEnd];
 }
+export const getFilterValFromLocalStorage = (key, dataSet) => {
+    let returnVal = null;
+    dataSet = dataSet || {};
+    if(dataSet) {
+        switch(key) {
+            case 'START_DATE':
+                returnVal = dataSet.date?dataSet.date.startDate:null;
+                if(returnVal)
+                    returnVal = new Date(returnVal);
+                break;
+            case 'END_DATE':
+                returnVal = dataSet.date?dataSet.date.endDate:null;
+                if(returnVal)
+                    returnVal = new Date(returnVal);
+                break;
+        }
+    }
+    return returnVal;
+}

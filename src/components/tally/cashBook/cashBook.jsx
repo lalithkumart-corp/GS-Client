@@ -4,10 +4,10 @@ import GSTable from '../../gs-table/GSTable';
 import axiosMiddleware from '../../../core/axios';
 import { convertToLocalTime } from '../../../utilities/utility';
 import { GET_FUND_TRN_LIST, GET_FUND_TRN_OVERVIEW, DELETE_FUND_TRANSACTION } from '../../../core/sitemap';
-import { getAccessToken } from '../../../core/storage';
+import { getAccessToken, getCashManagerFilters, setCashManagerFilter } from '../../../core/storage';
 import moment from 'moment';
 import DateRangePicker from '../../dateRangePicker/dataRangePicker';
-import { constructFetchApiParams } from './helper';
+import { constructFetchApiParams, getFilterValFromLocalStorage } from './helper';
 import ReactPaginate from 'react-paginate';
 import './cashBook.scss';
 import MultiSelect from "react-multi-select-component";
@@ -22,14 +22,17 @@ export default class CashBook extends Component {
         past1daysStartDate.setDate(past1daysStartDate.getDate()-1);
         past1daysStartDate.setHours(0,0,0,0);
         let todaysEndDate = new Date();
-        todaysEndDate.setHours(23,59,59,999);  
+        todaysEndDate.setHours(23,59,59,999); 
+
+        this.filtersFromLocal = getCashManagerFilters();
+
         this.state = {
             transactions: [],
             totalTransactionsCount: 0,
             filters: {
                 date: {
-                    startDate: past1daysStartDate,
-                    endDate: todaysEndDate
+                    startDate: getFilterValFromLocalStorage('START_DATE', this.filtersFromLocal) || past1daysStartDate,
+                    endDate: getFilterValFromLocalStorage('END_DATE', this.filtersFromLocal) || todaysEndDate
                 },
                 selectedAccounts: [],
                 selectedCategories: [],
@@ -292,6 +295,7 @@ export default class CashBook extends Component {
             newState.filters.date.startDate = new Date(startDate);
             newState.filters.date.endDate = new Date(endDate);
             newState.selectedPageIndex = 0;
+            setCashManagerFilter({...newState.filters});
             await this.setState(newState);
             this.fetchTransactions();
             this.fetchTransOverview();

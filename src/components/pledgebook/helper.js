@@ -78,10 +78,12 @@ export const getFilterValFromLocalStorage = (key, dataSet) => {
                 else returnVal = true;
                 break;
             case 'ORN_CATEG_SILVER':
-                if(dataSet.ornCategory) returnVal = dataSet.ornCategory.silver || false;
+                if(dataSet.ornCategory && typeof dataSet.ornCategory.silver !== 'undefined') returnVal = dataSet.ornCategory.silver || false;
+                else returnVal = true;
                 break;
             case 'ORN_CATEG_BRASS':
-                if(dataSet.ornCategory) returnVal = dataSet.ornCategory.brass || false;
+                if(dataSet.ornCategory && typeof dataSet.ornCategory.brass !== 'undefined') returnVal = dataSet.ornCategory.brass || false;
+                else returnVal = true;
                 break;
             case 'INCLUDE_ARCH':
                 returnVal = dataSet.includeArchived || false;

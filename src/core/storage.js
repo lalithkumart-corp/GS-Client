@@ -10,6 +10,7 @@ const keys = {
     ssoUserFlag: 'ssoUserFlag',
     loanDate: 'loanDate',
     pledgebookFilters: 'pledgebookFilters',
+    cashManagerFilters: 'cashManagerFilters',
     loanBillTemplate: 'loanBillTemplate',
     myFundAccountsList: 'myFundAccountsList',
     allFundList: 'allFundList'
@@ -25,6 +26,7 @@ const keyMaps = {
         keys.ssoUserFlag,
         keys.loanDate,
         keys.pledgebookFilters,
+        keys.cashManagerFilters,
         keys.loanBillTemplate,
         keys.myFundAccountsList,
         keys.allFundList
@@ -209,6 +211,7 @@ export const clearSession = () => {
     clearRates();
     clearStoreInfo();
     clearPledgebookFilter();
+    clearCashManagerFilter();
     clearLoanBillTemplateSettings();
     clearLoanDate();
     clearMyFundAccountsList();
@@ -272,8 +275,20 @@ export const setPledgebookFilter = (filterObj) => {
     _save(keys.pledgebookFilters, filterObj);
 }
 
-export const clearPledgebookFilter = (filterObj) => {
+export const clearPledgebookFilter = () => {
     _clear(keys.pledgebookFilters);
+}
+
+export const getCashManagerFilters = () => {
+    return _read(keys.cashManagerFilters);
+}
+
+export const setCashManagerFilter = (filterObj) => {
+    _save(keys.cashManagerFilters, filterObj);
+}
+
+export const clearCashManagerFilter = () => {
+    _clear(keys.cashManagerFilters);
 }
 
 export const saveLoanBillTemplateSettings = (data) => {

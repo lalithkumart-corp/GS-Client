@@ -107,7 +107,7 @@ class InterestRates extends Component {
                     <Col xs={{span: 2}}>
                         <Form.Group>
                             <Form.Label>Category</Form.Label>
-                            <Form.Control as="select" onChange={(e) => this.onDropdownChange(e, 'metal-create')} value={this.state.formData.metal.selected}>
+                            <Form.Control as="select" onChange={(e) => this.onChange(e, 'metal-create')} value={this.state.formData.metal.selected}>
                                 <option key={1} selected={this.state.formData.metal.selected == 'gold'}>GOLD</option>
                                 <option key={2} selected={this.state.formData.metal.selected == 'silver'}>SILVER</option>
                                 <option key={3} selected={this.state.formData.metal.selected == 'diamond'}>DIAMOND</option>
