@@ -9,6 +9,9 @@ import { CASH_IN, CASH_OUT, FETCH_CATEGORY_SUGGESTIONS, FETCH_FUND_ACCOUNTS_LIST
 import { getDateInUTC } from '../../../utilities/utility';
 import './cashOut.scss';
 import { UPI_INDEX_ID } from '../../../constants';
+import { MdPerson, MdEdit, MdClear } from 'react-icons/md';
+import CustomerPicker from '../../customerPanel/CustomerPicker';
+import CommonModal from '../../common-modal/commonModal';
 
 let DEFAULT_PAYMENT_DETAIL = {
     online: {
@@ -46,6 +49,8 @@ export const CashOut = (props) => {
     }
 
     let [dates, setDates] = useState(getDateValues());
+    let [customer, setCustomerObj] = useState({});
+    let [isCustomerSelectionModalOpen, setCustomerModalVisibility] = useState(false);
 
     useEffect(() => {
         fetchMyAccountsListFromDB();
@@ -71,6 +76,9 @@ export const CashOut = (props) => {
             
             setCategoryVal(props.editContent.category);
             setRemarks(props.editContent.remarks);
+
+            setCustomerObj({customerId: props.editContent.customer_id, cname: props.editContent.CustomerName});
+
         } else {
             setDates(getDateValues());
             setAmount('');
@@ -204,6 +212,7 @@ export const CashOut = (props) => {
             remarks: remarks,
             paymentMode: paymentMode,
             destinationAccountDetail: paymentDetail.online,
+            customerId: customer.customerId
         }
     }
 
@@ -216,7 +225,8 @@ export const CashOut = (props) => {
             remarks: remarks,
             paymentMode: paymentMode,
             destinationAccountDetail: paymentDetail.online,
-            transactionId: props.editContent.id
+            transactionId: props.editContent.id,
+            customerId: customer.customerId
         }
     }
 
@@ -281,6 +291,7 @@ export const CashOut = (props) => {
         setPaymentMode('cash');
         setMyAccountId(null);
         setPaymentDetail({...DEFAULT_PAYMENT_DETAIL});
+        setCustomerObj({});
     }
 
     let fetchAcccountListDropdown = () => {
@@ -297,6 +308,15 @@ export const CashOut = (props) => {
             theDom.push(<option key={`dest-acc-${index}`} value={anAcc.id}>{anAcc.name}</option>);
         });
         return theDom;
+    }
+
+    let onSelectCustomer = (selectedCustomer) => {
+        setCustomerObj(selectedCustomer);
+        closeCustomerModal();
+    }
+
+    let closeCustomerModal = () => {
+        setCustomerModalVisibility(false);
     }
 
     return (
@@ -323,7 +343,7 @@ export const CashOut = (props) => {
                         </Col>
                     </Row>
                     <Row>
-                        <Col xs={10} md={10} cm={10}>
+                        <Col xs={6} md={6} cm={6}>
                             <Form.Group>
                                 <Form.Label>Amount</Form.Label>
                                 <Form.Control
@@ -332,6 +352,31 @@ export const CashOut = (props) => {
                                     value={amount}
                                     onChange={(e) => onChangeAmount(e.target.value)}
                                 />
+                            </Form.Group>
+                        </Col>
+                        <Col xs={6} md={6} cm={6}>
+                            <Form.Group>
+                                <Form.Label>Customer</Form.Label>
+                                {customer.customerId ? 
+                                    (
+                                        <div>
+                                            {customer.cname}
+                                            <span className="cust-edit-icon"><MdEdit onClick={()=>setCustomerModalVisibility(true)}/></span>
+                                            <span className="cust-remove-icon"><MdClear onClick={()=>setCustomerObj({})}/></span>
+                                        </div>
+                                    ) :
+                                    (
+                                        <div>
+                                            {
+                                                <MdPerson onClick={()=> setCustomerModalVisibility(true)}/>
+                                            }
+                                        </div>
+                                    )
+                                }
+                                <CommonModal modalOpen={isCustomerSelectionModalOpen} handleClose={closeCustomerModal}>
+                                    <CustomerPicker onSelectCustomer={onSelectCustomer} handleClose={closeCustomerModal}/>
+                                </CommonModal>
+
                             </Form.Group>
                         </Col>
                     </Row>

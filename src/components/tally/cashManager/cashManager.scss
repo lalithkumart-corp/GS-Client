@@ -19,4 +19,10 @@
     .category-input-col input[type='text'] {
         padding-left: 3px;
     }
+
+    .cash-book-main-card {
+        .pagination-container {
+            z-index: 1;
+        }
+    }
 }

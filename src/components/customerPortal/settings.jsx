@@ -140,7 +140,7 @@ export default class Settings extends Component {
                 <Col xs={12} md={12}>
                     <div className='gs-card'>
                         <div className='gs-card-content'>
-                            <h4 style={{marginBottom: '40px'}}>Update Customer - Merging into other</h4>
+                            <h4 style={{marginBottom: '40px'}}>Merge this Customer with Other Customer</h4>
                             <Row>
                                 <Col xs={3} md={3}>
                                     <FormGroup>
@@ -152,10 +152,13 @@ export default class Settings extends Component {
                                         <FormControl.Feedback />
                                     </FormGroup>
                                 </Col>
+                                <Col xs={1} md={1} style={{padding: 0, lineHeight: '31px'}}>
+                                    ------{">"}
+                                </Col>
                                 <Col xs={3} md={3}>
                                     <FormGroup>
                                         <FormControl
-                                            placeholder="Enter Cust Id/Key where you merge this customer"
+                                            placeholder="Cust key - where you merge this customer"
                                             type="text"
                                             value={this.state.mergetoCustomerHashkey}
                                             onChange={(e) => this.onCustomerHashKeyChange(e)}

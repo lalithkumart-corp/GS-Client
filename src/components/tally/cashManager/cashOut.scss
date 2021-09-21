@@ -15,4 +15,18 @@
     .a-payment-mode:focus {
         background-color: #d3d3d382;
     }
+    .cust-edit-icon,
+    .cust-remove-icon{
+        padding-left: 3px;
+        padding-right: 5px;
+        cursor: pointer;
+    }
+}
+
+.cash-manager .cash-out .common-modal-content .body {
+    padding: 20px 20px 100px 20px;
+}
+
+.cash-manager .cash-out .common-modal-wrapper {
+    z-index: 3;
 }

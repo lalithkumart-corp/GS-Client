@@ -8,6 +8,9 @@ import { toast } from 'react-toastify';
 import { CASH_IN, UPDATE_TRANSACTION_CASH_IN } from '../../../core/sitemap';
 import { getDateInUTC } from '../../../utilities/utility';
 import './cashIn.scss';
+import { MdPerson, MdEdit, MdClear } from 'react-icons/md';
+import CustomerPicker from '../../customerPanel/CustomerPicker';
+import CommonModal from '../../common-modal/commonModal';
 
 export const CashIn = (props) => {
     let [amount, setAmount] = useState('');
@@ -19,6 +22,8 @@ export const CashIn = (props) => {
     let [filteredCategoryList, setFilteredCategoryList] = useState([]);
     let [myFundAccountsList, setMyFundAccountsList] = useState([]);
     let [myDefaultFundAccount, setMyDefaultFundAccId] = useState(null);
+    let [customer, setCustomerObj] = useState({});
+    let [isCustomerSelectionModalOpen, setCustomerModalVisibility] = useState(false);
 
     let datePickerRef = useRef(null);
     let getDateValues = () => {
@@ -43,6 +48,7 @@ export const CashIn = (props) => {
             setCashInAccountId(props.editContent.account_id);
             setCategoryVal(props.editContent.category);
             setRemarks(props.editContent.remarks);
+            setCustomerObj({customerId: props.editContent.customer_id, cname: props.editContent.CustomerName});
         } else {
             setDates(getDateValues());
             setAmount('');
@@ -145,7 +151,8 @@ export const CashIn = (props) => {
             fundHouse: cashInAccountId || myDefaultFundAccount,
             category: category,
             remarks: remarks,
-            paymentMode: paymentMode
+            paymentMode: paymentMode,
+            customerId: customer.customerId
         };
     }
 
@@ -178,6 +185,7 @@ export const CashIn = (props) => {
         setRemarks('');
         setCategoryVal('');
         setPaymentMode('cash');
+        setCustomerObj({});
     }
 
     let constructApiParamsForUpdate = () => {
@@ -188,7 +196,8 @@ export const CashIn = (props) => {
             category: category,
             remarks: remarks,
             paymentMode: paymentMode,
-            transactionId: props.editContent.id
+            transactionId: props.editContent.id,
+            customerId: customer.customerId
         }
         return params;
     }
@@ -216,6 +225,15 @@ export const CashIn = (props) => {
         return theDom;
     }
 
+    let onSelectCustomer = (selectedCustomer) => {
+        setCustomerObj(selectedCustomer);
+        closeCustomerModal();
+    }
+
+    let closeCustomerModal = () => {
+        setCustomerModalVisibility(false);
+    }
+
     return (
             <Row className="gs-card-content cash-in">
                 <Col xs={12} md={12} sm={12} className="cash-in-header"><h4>CASH IN</h4></Col>
@@ -240,7 +258,7 @@ export const CashIn = (props) => {
                         </Col>
                     </Row>
                     <Row>
-                        <Col xs={10} md={10} cm={10}>
+                        <Col xs={6} md={6} cm={6}>
                             <Form.Group>
                                 <Form.Label>Amount</Form.Label>
                                 <Form.Control
@@ -249,6 +267,31 @@ export const CashIn = (props) => {
                                     value={amount}
                                     onChange={(e) => onChangeAmount(e.target.value)}
                                 />
+                            </Form.Group>
+                        </Col>
+                        <Col xs={6} md={6} cm={6}>
+                            <Form.Group>
+                                <Form.Label>Customer</Form.Label>
+                                {customer.customerId ? 
+                                    (
+                                        <div>
+                                            {customer.cname}
+                                            <span className="cust-edit-icon"><MdEdit onClick={()=>setCustomerModalVisibility(true)}/></span>
+                                            <span className="cust-remove-icon"><MdClear onClick={()=>setCustomerObj({})}/></span>
+                                        </div>
+                                    ) :
+                                    (
+                                        <div>
+                                            {
+                                                <MdPerson onClick={()=> setCustomerModalVisibility(true)}/>
+                                            }
+                                        </div>
+                                    )
+                                }
+                                <CommonModal modalOpen={isCustomerSelectionModalOpen} handleClose={closeCustomerModal}>
+                                    <CustomerPicker onSelectCustomer={onSelectCustomer} handleClose={closeCustomerModal}/>
+                                </CommonModal>
+
                             </Form.Group>
                         </Col>
                     </Row>
