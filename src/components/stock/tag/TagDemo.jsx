@@ -134,18 +134,18 @@ class Tag extends Component {
             lineHeight: '21px'
         }
         return (
-            <div style={{height: '55px', width: '425px', paddingLeft: '25px', paddingTop: '4px', fontFamily: 'monospace'}}>
+            <div style={{height: '55px', width: '425px', paddingLeft: '25px', paddingTop: '2px', fontFamily: 'monospace'}}>
                 <div style={{width: '272px', display: "inline-block", height: '50px', backgroundColor: 'lightgray'}}>
                     <div style={{width: '135px', display: "inline-block"}}>
                         <div style={{height: '20px', paddingLeft: '4px'}}>
-                            <span style={{width: '45px', display: 'inline-block', fontSize: '17px', lineHeight: '21px'}}>MJK</span>
+                            <span style={{width: '45px', display: 'inline-block', fontSize: '20px', lineHeight: '21px', fontWeight: 'bold'}}>MJK</span>
                             <span style={touchStyles}>{this.props.touch}</span>
                             <span style={{marginLeft: '58px', height: '12px'}}><img style={imgStyles} src='/images/bis.jpg' /></span>
                         </div>
                         <div style={{height: '30px', paddingLeft: '4px'}}>
                             <span style={{fontWeight: 'bold'}}>
                                 <span style={{fontSize: '22px'}}>wt: </span>
-                                <span style={{fontSize: '24px', lineHeight: '10px', fontWeight: 'bold'}}>{this.props.wtContent}</span>
+                                <span style={{fontSize: '26px', lineHeight: '10px', fontWeight: 'bold'}}>{this.props.wtContent}</span>
                             </span>
                         </div>
                     </div>
@@ -158,7 +158,7 @@ class Tag extends Component {
                         <div style={{height: '30px'}}>
                             <span style={{fontWeight: 'bold', paddingLeft: '3px'}}>
                                 <span style={{fontSize: '22px'}}>wt: </span>
-                                <span style={{fontSize: '24px', lineHeight: '10px', fontWeight: 'bold'}}>{this.props.wtContent}</span>
+                                <span style={{fontSize: '26px', lineHeight: '10px', fontWeight: 'bold'}}>{this.props.wtContent}</span>
                             </span>
                         </div>
                     </div>
