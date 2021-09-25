@@ -7,13 +7,16 @@ import { GET_FUND_TRN_LIST, GET_FUND_TRN_OVERVIEW, DELETE_FUND_TRANSACTION } fro
 import { getAccessToken, getCashManagerFilters, setCashManagerFilter } from '../../../core/storage';
 import moment from 'moment';
 import DateRangePicker from '../../dateRangePicker/dataRangePicker';
-import { constructFetchApiParams, getFilterValFromLocalStorage } from './helper';
+import { constructFetchApiParams, getFilterValFromLocalStorage, getCreateAlertParams, getUpdateAlertParams, getDeleteAlertParams } from './helper';
 import ReactPaginate from 'react-paginate';
 import './cashBook.scss';
 import MultiSelect from "react-multi-select-component";
 import { toast } from 'react-toastify';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { format } from 'currency-formatter';
+import { MdNotifications, MdNotificationsActive, MdNotificationsNone, MdNotificationsOff, MdNotificationsPaused, MdBorderColor } from 'react-icons/md';
+import Popover, {ArrowContainer} from 'react-tiny-popover'
+import AlertComp from '../../alert/Alert';
 
 export default class CashBook extends Component {
     constructor(props) {
@@ -36,10 +39,12 @@ export default class CashBook extends Component {
                 },
                 selectedAccounts: [],
                 selectedCategories: [],
+                customerVal: '',
                 collections: {
                     fundAccounts: [],
                     categories: []
-                }
+                },
+                remarks: ''
             },
             selectedIndexes: [],
             selectedRowJson: [],
@@ -49,6 +54,7 @@ export default class CashBook extends Component {
             totalCashIn: 0,
             totalCashOut: 0,
             closingBalance: 0,
+            alertPopups: {},
         }
         this.columns = [
             {
@@ -64,7 +70,7 @@ export default class CashBook extends Component {
             },{
                 id: 'transaction_date',
                 displayText: 'Date',
-                width: '15%',
+                width: '10%',
                 formatter: (column, columnIndex, row, rowIndex) => {
                     return (
                         <div>{convertToLocalTime(row[column.id], {excludeTime: true})}</div>
@@ -93,10 +99,29 @@ export default class CashBook extends Component {
                         </div>
                     );
                 }
-            },{
+            },
+            {
+                id: 'CustomerName',
+                displayText: 'Customer',
+                width: '10%',
+                isFilterable: true,
+                filterFormatter: (column, colIndex) => {
+                    return (
+                        <div>
+                            <input 
+                                type="text"
+                                className="customer-filer-val"
+                                value={this.state.filters.customerVal}
+                                onChange={this.filterCallbacks.customerName}
+                            />
+                        </div>
+                    );
+                }
+            },
+            {
                 id: 'category',
                 displayText: 'Category',
-                width: '20%',
+                width: '10%',
                 isFilterable: true,
                 filterFormatter: (column, colIndex) => {
                     let options = [];
@@ -119,7 +144,20 @@ export default class CashBook extends Component {
             },{
                 id: 'remarks',
                 displayText: 'Remarks',
-                width: '15%',
+                width: '10%',
+                isFilterable: true,
+                filterFormatter: (column, colIndex) => {
+                    return (
+                        <div>
+                            <input 
+                                type="text"
+                                className="remarks-filer-val"
+                                value={this.state.filters.remarks}
+                                onChange={this.filterCallbacks.remarks}
+                            />
+                        </div>
+                    );
+                }
             },{
                 id: 'cash_in',
                 displayText: 'Cash In',
@@ -142,14 +180,46 @@ export default class CashBook extends Component {
                 id: '',
                 displayText: '',
                 width: '8%',
+                className: "actions-col",
                 formatter: (column, columnIndex, row, rowIndex) => {
+                    let alertComp = () => {
+                                    let isPopoverVisible = this.getAlertPopoverVisibility(rowIndex);
+                                    return (<span onClick={(e) => this.onClickAlertIcon(e, rowIndex)}>
+                                        <Popover
+                                            containerClassName="alert-popever"
+                                            padding={0}
+                                            isOpen={isPopoverVisible}
+                                            position={'left'} // preferred position
+                                            content={({ position, targetRect, popoverRect }) => {
+                                                return (
+                                                    <AlertComp 
+                                                        closePopover={this.closePopover}
+                                                        row={row} 
+                                                        refreshCallback={this.refresh}
+                                                        getCreateAlertParams = {getCreateAlertParams}
+                                                        getUpdateAlertParams = {getUpdateAlertParams}
+                                                        getDeleteAlertParams = {getDeleteAlertParams}
+                                                    />
+                                                )
+                                            }}
+                                            >
+                                            <span className="alert-icon">
+                                                {row.alertId && <MdNotifications/>}
+                                                {!row.alertId && <MdNotificationsNone/>}
+                                            </span>
+                                        </Popover>
+                                    </span>)};
+
                     if(row.category == 'Girvi' || row.category == 'Redeem') {
-                        return (<></>)
+                        return (<>
+                            {alertComp()}
+                        </>)
                     } else {
                         return (
                             <div>
-                                <span onClick={(e) => this.editTransaction(rowIndex, row)} style={{paddingLeft: '10px'}}><FontAwesomeIcon icon="edit"/></span>
-                                <span onClick={(e) => this.deleteTransaction(rowIndex, row)}><FontAwesomeIcon icon="backspace"/></span>
+                                <span onClick={(e) => this.editTransaction(rowIndex, row)} style={{paddingRight: '5px'}}><FontAwesomeIcon icon="edit"/></span>
+                                <span onClick={(e) => this.deleteTransaction(rowIndex, row)} style={{paddingRight: '5px'}}><FontAwesomeIcon icon="backspace"/></span>
+                                {alertComp()}
                             </div>
                         )
                     }
@@ -165,6 +235,9 @@ export default class CashBook extends Component {
         this.handleGlobalCheckboxChange = this.handleGlobalCheckboxChange.bind(this);
         this.editTransaction = this.editTransaction.bind(this);
         this.deleteTransaction = this.deleteTransaction.bind(this);
+        this.onClickAlertIcon = this.onClickAlertIcon.bind(this);
+        this.closePopover = this.closePopover.bind(this);
+        this.getAlertPopoverVisibility = this.getAlertPopoverVisibility.bind(this);
     }
     componentDidMount() {
         this.fetchTransactions();
@@ -315,6 +388,22 @@ export default class CashBook extends Component {
             await this.setState(newState);
             this.fetchTransactions();
             this.fetchTransOverview();
+        },
+        customerName: async (e) => {
+            let newState = {...this.state};
+            newState.filters.customerVal = e.target.value;
+            newState.selectedPageIndex = 0;
+            await this.setState(newState);
+            this.fetchTransactions();
+            this.fetchTransOverview();
+        },
+        remarks: async (e) => {
+            let newState = {...this.state};
+            newState.filters.remarks = e.target.value;
+            newState.selectedPageIndex = 0;
+            await this.setState(newState);
+            this.fetchTransactions();
+            this.fetchTransOverview();
         }
     }
 
@@ -413,6 +502,35 @@ export default class CashBook extends Component {
         if(window.confirm('Sure to delete the transaction ?')) {
             this.deleteTransactions([row.id]);
         }
+    }
+
+    closePopover(id) {
+        this.setState((prevProps, props) => {
+            if(prevProps.alertPopups && prevProps.alertPopups[id] && prevProps.alertPopups[id])
+                prevProps.alertPopups[id].isOpen = false;
+            return {
+                prevProps
+            }
+        });
+    }
+
+    onClickAlertIcon(e, rowIndex) {
+        let newState = {...this.state};
+        let id = rowIndex;
+        if(newState.alertPopups[id]) {
+            newState.alertPopups[id].isOpen = !newState.alertPopups[id].isOpen;
+        } else {
+            newState.alertPopups[id] = {};
+            newState.alertPopups[id].isOpen = true;
+        }
+        this.setState(newState);
+    }
+
+    getAlertPopoverVisibility(id) {
+        let flag = false;
+        if(this.state.alertPopups && this.state.alertPopups[id] && this.state.alertPopups[id].isOpen)
+            flag = true;
+        return flag;
     }
 
     //{

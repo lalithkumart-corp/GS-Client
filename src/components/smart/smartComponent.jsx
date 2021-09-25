@@ -39,6 +39,9 @@ import FontViewerPage from '../fontViewer/FontView';
 import { getStoreDetails } from '../../actions/storeDetails';
 import CustomLabel from '../stock/tag/CustomLabel';
 import Settings from '../settings/settings';
+import MyContacts from '../mycontacts/MyContactManager';
+import Udhaar from '../udhaar/Udhaar';
+
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'react-tippy/dist/tippy.css'
 // var config  = {
@@ -125,6 +128,8 @@ class SmartComponent extends Component {
                                 <Route path="/label-generator" component={CustomLabel} />
                                 <Route path= "/font-view" component={FontViewerPage} />
                                 <Route path="/settings" component={Settings} />
+                                <Route path= "/contact-manager" component={MyContacts} />
+                                <Route path="/udhaar-portal" component={Udhaar} />
                             </div>
                             {/* <div className="floating-right-side-bar"> */}
                             <div className={`floating-right-side-bar ${this.props.rightSideBar.visibility?'show':'hide'} `}>

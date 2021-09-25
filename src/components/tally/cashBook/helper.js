@@ -11,6 +11,12 @@ export const constructFetchApiParams = (stateObj) => {
         params.category = stateObj.filters.selectedCategories.map((aCateg)=> aCateg.value);
     }
 
+    if(stateObj.filters.customerVal.length > 0)
+        params.customerVal = stateObj.filters.customerVal;
+    
+    if(stateObj.filters.remarks.length > 0)
+        params.remarks = stateObj.filters.remarks;
+
     let offsets = getOffsets(stateObj);
     params.offsetStart = offsets[0] || 0;
     params.offsetEnd = offsets[1] || 10;
@@ -48,4 +54,43 @@ export const getFilterValFromLocalStorage = (key, dataSet) => {
         }
     }
     return returnVal;
+}
+
+export const getCreateAlertParams = (row, params1) => {
+    let anObj = {
+        triggerTime: params1.dates._dateVal,
+        code: row.code || 'FUND_TRANSACTION',
+        title: params1.title,
+        message: params1.msg,
+        extraCtx: {...row.alertExtraCtx, customerName: row.CustomerName || '', transactionDate: row.transaction_date},
+        hasRead: 0,
+        archived: 0,
+        module: 'fund_transaction',
+        link: {
+            to: 'fund_transaction',
+            id: row.id,
+        }
+    }
+    return anObj;
+}
+
+export const getUpdateAlertParams = (row, params1) => {
+    let anObj = {
+        alertId: row.alertId,
+        triggerTime: params1.dates._dateVal,
+        title: params1.title,
+        message: params1.msg
+    };
+    return anObj;
+}
+
+export const getDeleteAlertParams = (row) => {
+    let anObj = {
+        alertId: row.alertId,
+        link: {
+            to: 'fund_transaction',
+            id: row.id,
+        }
+    }
+    return anObj;
 }

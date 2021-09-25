@@ -135,3 +135,5 @@ export const ADD_NEW_FUND_ACCOUNT = `${config.proxy_protocol}://${config.proxy_a
 export const UPDATE_FUND_ACCOUNT = `${config.proxy_protocol}://${config.proxy_api_host}:${config.proxy_api_port}/${config.restApiRoot}/FundAccounts/update-account`;
 export const DELETE_FUND_ACCOUNT = `${config.proxy_protocol}://${config.proxy_api_host}:${config.proxy_api_port}/${config.restApiRoot}/FundAccounts/delete-account`;
 export const FETCH_ALL_BANK_LIST = `${config.proxy_protocol}://${config.proxy_api_host}:${config.proxy_api_port}/${config.restApiRoot}/Commons/fetch-bank-list`;
+
+export const FETCH_UDHAAR_LIST = `${config.proxy_protocol}://${config.proxy_api_host}:${config.proxy_api_port}/${config.restApiRoot}/FundTransactions/fetch-udhaar-list`;

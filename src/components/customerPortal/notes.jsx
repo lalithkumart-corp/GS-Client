@@ -16,7 +16,6 @@ class Notes extends Component {
     }
 
     async componentWillReceiveProps(nextProps, a, c) {
-        console.log(nextProps);
         this.setState({billHistory: nextProps.billHistory});
         if(this.state.custDetail.customerId !== nextProps.selectedCust.customerId) {
             await this.setState({custDetail: nextProps.selectedCust});
