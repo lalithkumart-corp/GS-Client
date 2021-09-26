@@ -136,4 +136,6 @@ export const UPDATE_FUND_ACCOUNT = `${config.proxy_protocol}://${config.proxy_ap
 export const DELETE_FUND_ACCOUNT = `${config.proxy_protocol}://${config.proxy_api_host}:${config.proxy_api_port}/${config.restApiRoot}/FundAccounts/delete-account`;
 export const FETCH_ALL_BANK_LIST = `${config.proxy_protocol}://${config.proxy_api_host}:${config.proxy_api_port}/${config.restApiRoot}/Commons/fetch-bank-list`;
 
-export const FETCH_UDHAAR_LIST = `${config.proxy_protocol}://${config.proxy_api_host}:${config.proxy_api_port}/${config.restApiRoot}/FundTransactions/fetch-udhaar-list`;
+export const CREATE_UDHAAR = `${config.proxy_protocol}://${config.proxy_api_host}:${config.proxy_api_port}/${config.restApiRoot}/Udhaars/create-udhaar`;
+export const FETCH_UDHAAR_LIST = `${config.proxy_protocol}://${config.proxy_api_host}:${config.proxy_api_port}/${config.restApiRoot}/Udhaars/fetch-udhaar-list`;
+export const GET_LAST_UDHAAR_SERIAL_NO = `${config.proxy_protocol}://${config.proxy_api_host}:${config.proxy_api_port}/${config.restApiRoot}/UdhaarSettings/get-next-serial-no`;

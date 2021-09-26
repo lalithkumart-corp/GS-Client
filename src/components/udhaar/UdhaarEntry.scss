@@ -1,0 +1,50 @@
+.udhaar-entry-container {
+    .entry-side-card {
+        border: 1px solid lightgrey;
+        box-shadow: 1px 0px 14px 2px rgba(165,156,156,0.75);
+        -webkit-box-shadow: 1px 0px 14px 2px rgba(165,156,156,0.75);
+        -moz-box-shadow: 1px 0px 14px 2px rgba(165,156,156,0.75);
+        // min-height: 300px;
+    }
+    .history-side-card {
+        border: 1px solid lightgrey;
+        box-shadow: 1px 0px 14px 2px rgba(165,156,156,0.75);
+        -webkit-box-shadow: 1px 0px 14px 2px rgba(165,156,156,0.75);
+        -moz-box-shadow: 1px 0px 14px 2px rgba(165,156,156,0.75);
+        min-height: 300px;
+    }
+    .customer-info-col {
+        padding-top: 25px;
+    }
+    .udhaar-input-data-col {
+        padding-top: 25px;
+    }
+    .udhaar-create-date-col {
+        .react-datepicker-wrapper{
+            border: 1px solid lightgray;
+        }
+    }
+    .common-modal-wrapper {
+        z-index: 3;
+    }
+    .common-modal-content .body {
+        padding: 20px 20px 100px 20px;
+    }
+    .cash-out-acc-picker {
+        padding-top: 10px;
+        border: 1px solid lightgray;
+        border-radius: 5px;
+        padding-left: 7px;
+        padding-right: 10px;
+        .form-control {
+            padding: 2px;
+            height: auto;
+        }
+    }
+    #cash-in-datepicker {
+        width: 100%;
+    }
+    .gs-input-cell2 {
+        padding-left: 3px;
+    }
+}

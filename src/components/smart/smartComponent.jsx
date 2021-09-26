@@ -40,7 +40,8 @@ import { getStoreDetails } from '../../actions/storeDetails';
 import CustomLabel from '../stock/tag/CustomLabel';
 import Settings from '../settings/settings';
 import MyContacts from '../mycontacts/MyContactManager';
-import Udhaar from '../udhaar/Udhaar';
+// import Udhaar from '../udhaar/Udhaar';
+import UdhaarEntry from '../udhaar/UdhaarEntry';
 
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'react-tippy/dist/tippy.css'
@@ -129,7 +130,7 @@ class SmartComponent extends Component {
                                 <Route path= "/font-view" component={FontViewerPage} />
                                 <Route path="/settings" component={Settings} />
                                 <Route path= "/contact-manager" component={MyContacts} />
-                                <Route path="/udhaar-portal" component={Udhaar} />
+                                <Route path="/udhaar-create" component={UdhaarEntry} />
                             </div>
                             {/* <div className="floating-right-side-bar"> */}
                             <div className={`floating-right-side-bar ${this.props.rightSideBar.visibility?'show':'hide'} `}>
