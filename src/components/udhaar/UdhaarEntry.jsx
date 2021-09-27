@@ -13,6 +13,7 @@ import { getAccessToken } from '../../core/storage';
 import axiosMiddleware from '../../core/axios';
 import { GET_LAST_UDHAAR_SERIAL_NO, CREATE_UDHAAR } from '../../core/sitemap';
 import { toast } from 'react-toastify';
+import UdhaarHistory from './UdhaarHistory';
 
 function UdhaarEntry() {
     let domElmns = {};
@@ -111,6 +112,13 @@ function UdhaarEntry() {
         return flag;
     }
 
+    let getCustomerId = () => {
+        let custId = null;
+        if(selectedCustomer && selectedCustomer.customerId)
+            custId = selectedCustomer.customerId;
+        return custId;
+    }
+
     let openCustomerModal = () => {
         setCustomerSelectionModalOpen(true);
     }
@@ -125,7 +133,7 @@ function UdhaarEntry() {
     }
 
     let changeCustomer = () => {
-
+        openCustomerModal();
     }
 
     let onChangeNotes = (val) => {
@@ -139,7 +147,8 @@ function UdhaarEntry() {
         }
 
         let params = {
-            billNo: _getBillNo(),
+            billSeries: billSeries,
+            billNo: billNo, //_getBillNo(),
             amount: amount,
             udhaarCreationDate: dates._dateVal,
             accountId: paymentDetail.myFundAccId || myDefaultFundAccount,
@@ -151,21 +160,12 @@ function UdhaarEntry() {
         triggerApi(params); 
     }
 
-    const _getBillNo = (state) => {
-        let theBillNo;
-        if(billSeries)
-            theBillNo = billSeries + '.' + billNo;
-        else
-            theBillNo = billNo;
-        return theBillNo;
-    }
-
     let triggerApi = async (params) => {
         try {
             let resp = await axiosMiddleware.post(CREATE_UDHAAR, params);
             if(resp && resp.data) {
                 if(resp.data.STATUS == 'SUCCESS') {
-                    // clearInputs();
+                    clearInputs();
                     toast.success('Success!');
                     return true;
                 }
@@ -174,6 +174,14 @@ function UdhaarEntry() {
             console.log(e);
             toast.error('Error occured while Creating new Udhaar.');
         }
+    }
+
+    let clearInputs = () => {
+        setBillNo(billNo+1);
+        setAmount(0);
+        setNotes(0);
+        setSelectedCustomer(null);
+        setPaymentDetail({mode: 'cash', myFundAccId: myDefaultFundAccount});
     }
 
     return (
@@ -188,7 +196,7 @@ function UdhaarEntry() {
                                 </CommonModal>
                                 { doesSelectedCustomerExist() ?
                                     <Row style={{margin: '14px 0 0 0'}}>
-                                        <span onClick={changeCustomer} style={{position: 'absolute', right: '15px'}}><FontAwesomeIcon icon="user-edit"/></span>
+                                        <span onClick={changeCustomer} style={{position: 'absolute', right: '15px', cursor: 'pointer', zIndex: 1}}><FontAwesomeIcon icon="user-edit"/></span>
                                         <Col xs={12}>
                                             <p style={{fontWeight: 'bold', fontSize: '14px'}}>{selectedCustomer.cname} c/o {selectedCustomer.gaurdianName}</p>
                                             <p>{selectedCustomer.address}</p>
@@ -303,8 +311,8 @@ function UdhaarEntry() {
                 </Col>
                 <Col xs={4} md={4} className="history-side-card">
                     <Row>
-                        <h5 style={{color: 'gray', textAlign: 'center'}}>Customer History</h5>
-
+                        <Col xs={12} md={12}><h5 style={{color: 'gray', textAlign: 'center'}}>Customer History</h5></Col>
+                        <Col xs={12} md={12}><UdhaarHistory customerId={getCustomerId()}/></Col>
                     </Row>
                 </Col>
             </Row>

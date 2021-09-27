@@ -101,7 +101,6 @@ class NavbarComp extends Component {
                     <Nav>
                         <NavDropdown title="Tally" id="">
                             <NavDropdown.Item as={Link} to="/cash-manager">Cash Manager</NavDropdown.Item>
-                            {/* <NavDropdown.Item as={Link} to="/udhaar-manager">Udhaar</NavDropdown.Item> */}
                             <NavDropdown.Divider />
                             <NavDropdown.Item as={Link} to="/tally">DayBook</NavDropdown.Item>
                         </NavDropdown>
@@ -112,12 +111,15 @@ class NavbarComp extends Component {
                         <Nav.Link as={Link} to="/users">User</Nav.Link>
                     </Nav>
                     }
+                    <Nav>
+                        <NavDropdown title="Udhaar" id="">
+                            <NavDropdown.Item as={Link} to="/udhaar-create">Create</NavDropdown.Item>
+                            <NavDropdown.Item as={Link} to="/udhaar-view">List</NavDropdown.Item>
+                        </NavDropdown>
+                    </Nav>
                     <Nav className="mr-auto">
                         <NavDropdown title="Others" id="customer-dropdown">
                             <NavDropdown.Item as={Link} to="/customer-portal">Customers</NavDropdown.Item>
-                            <NavDropdown.Divider />
-                            <NavDropdown.Item as={Link} to="/udhaar-create">Udhaar Create</NavDropdown.Item>
-                            <NavDropdown.Item as={Link} to="/udhaar-view">Udhaar View</NavDropdown.Item>
                             <NavDropdown.Divider />
                             <NavDropdown.Item as={Link} to="/contact-manager">My Contacts</NavDropdown.Item>
                             {/* <NavDropdown.Item as={Link} to="/picture">Webcam</NavDropdown.Item>
