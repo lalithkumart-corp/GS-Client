@@ -1,0 +1,13 @@
+.udhaar-list-table {
+    table-layout: fixed;
+
+    .udhaar-bill-filer-val,
+    .customer-filer-val,
+    .guardian-filer-val,
+    .address-filer-val,
+    .place-filer-val,
+    .mobile-filer-val {
+        width: 100%;
+        border: 1px solid lightgray;
+    }
+}

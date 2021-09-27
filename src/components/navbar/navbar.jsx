@@ -114,7 +114,7 @@ class NavbarComp extends Component {
                     <Nav>
                         <NavDropdown title="Udhaar" id="">
                             <NavDropdown.Item as={Link} to="/udhaar-create">Create</NavDropdown.Item>
-                            <NavDropdown.Item as={Link} to="/udhaar-view">List</NavDropdown.Item>
+                            <NavDropdown.Item as={Link} to="/udhaar-list">List</NavDropdown.Item>
                         </NavDropdown>
                     </Nav>
                     <Nav className="mr-auto">

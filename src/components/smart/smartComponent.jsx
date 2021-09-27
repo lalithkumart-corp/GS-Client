@@ -42,6 +42,7 @@ import Settings from '../settings/settings';
 import MyContacts from '../mycontacts/MyContactManager';
 // import Udhaar from '../udhaar/Udhaar';
 import UdhaarEntry from '../udhaar/UdhaarEntry';
+import UdhaarListComp from '../udhaar/UdhaarList';
 
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'react-tippy/dist/tippy.css'
@@ -131,6 +132,7 @@ class SmartComponent extends Component {
                                 <Route path="/settings" component={Settings} />
                                 <Route path= "/contact-manager" component={MyContacts} />
                                 <Route path="/udhaar-create" component={UdhaarEntry} />
+                                <Route path="/udhaar-list" component={UdhaarListComp} />
                             </div>
                             {/* <div className="floating-right-side-bar"> */}
                             <div className={`floating-right-side-bar ${this.props.rightSideBar.visibility?'show':'hide'} `}>

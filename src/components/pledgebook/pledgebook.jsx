@@ -856,7 +856,7 @@ class Pledgebook extends Component {
             } else {
 
             }
-        }, this.timeOut);        
+        }, this.timeOut);
     }
 
     doValidation() {
