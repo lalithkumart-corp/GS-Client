@@ -210,7 +210,7 @@ export default class CashBook extends Component {
                                         </Popover>
                                     </span>)};
 
-                    if(row.category == 'Girvi' || row.category == 'Redeem') {
+                    if(row.is_internal) {
                         return (<>
                             {alertComp()}
                         </>)

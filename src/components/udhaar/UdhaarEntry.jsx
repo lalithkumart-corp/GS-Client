@@ -32,7 +32,6 @@ function UdhaarEntry(props) {
 
     let [paymentDetail, setPaymentDetail] = useState({mode: 'cash', myFundAccId: myDefaultFundAccount});
 
-
     // For Edit
     let [udhaarUid, setUdhaarUid] = useState(null);
     let [readOnlyMode, setReadOnlyMode] = useState(false);

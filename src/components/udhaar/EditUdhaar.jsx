@@ -7,7 +7,7 @@ import { getAccessToken } from '../../core/storage';
 import { toast } from 'react-toastify';
 import { CashIn } from '../tally/cashManager/cashIn';
 import GSTable from '../gs-table/GSTable';
-import { FETCH_UDHAAR_DETAIL, CASH_IN_FOR_BILL, GET_FUND_TRN_LIST_BY_BILL } from '../../core/sitemap';
+import { FETCH_UDHAAR_DETAIL, CASH_IN_FOR_BILL, GET_FUND_TRN_LIST_BY_BILL, MARK_RESOLVED_BY_PAYMENT_CLEARANCE } from '../../core/sitemap';
 import { convertToLocalTime } from '../../utilities/utility';
 
 function EditUdhaar(props) {
@@ -26,19 +26,23 @@ function EditUdhaar(props) {
             setLoading(true);
             let at = getAccessToken();
             let resp = await axiosMiddleware.get(`${FETCH_UDHAAR_DETAIL}?access_token=${at}&uid=${props.content.udhaarUid}`);
+            setLoading(false);
             if(resp && resp.data && resp.data.RESP) {
                 setUdhaarDetail(resp.data.RESP.detail);
+                return resp.data.RESP.detail;
             }
-            setLoading(false);
+            return;
         } catch(e) {
             console.log(e);
             toast.error('Error while fetching udhaar detail');
             setLoading(false);
+            return;
         }
     }
 
-    let onClickPaymentBtn = () => {
-        setCurrentPanel('payment');
+    let paymentCallback = async () => {
+        let res = await axiosMiddleware.post(MARK_RESOLVED_BY_PAYMENT_CLEARANCE, {uid: props.content.udhaarUid});
+        // TODO: Go back to LIST page, with refreshed list
     }
 
     return (
@@ -52,7 +56,7 @@ function EditUdhaar(props) {
                 <UdhaarEntry mode={'edit'} udhaarDetail={udhaarDetail}/>
             </Row>
 
-            <PaymentCard udhaarDetail={udhaarDetail}/>    
+            <PaymentCard udhaarDetail={udhaarDetail} paymentCallback={paymentCallback}/>    
 
         </div>
     )
@@ -102,14 +106,17 @@ function PaymentCard(props) {
                 let resp = await axiosMiddleware.get(`${GET_FUND_TRN_LIST_BY_BILL}?access_token=${at}&uids=${JSON.stringify(uids)}`);
                 if(resp.data.STATUS == 'SUCCESS') {
                     setTableData(resp.data.RESP);
+                    return resp.data.RESP;
                 }
                 else {toast.error('Error! Could not fetch payment list for this bill')}
             } else {
-                console.log('udhaar')
+                console.log('udhaar detail is not found, so not making api call');
             }
+            return null;
         } catch(e) {
             console.log(e);
             toast.error('Error while fetching he payments list');
+            return null;
         }
     }
 
@@ -153,6 +160,7 @@ function PaymentCard(props) {
             } else if(resp.data.STATUS == 'SUCCESS') {
                 toast.success('Added payment. Please comtact admin');
                 refreshPaymentList();
+                props.paymentCallback();
                 return true;
             } else {
                 toast.error('Not updated. Please comtact admin');

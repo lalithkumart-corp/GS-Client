@@ -143,3 +143,4 @@ export const FETCH_UDHAAR_LIST = `${config.proxy_protocol}://${config.proxy_api_
 export const FETCH_UDHAAR_DETAIL = `${config.proxy_protocol}://${config.proxy_api_host}:${config.proxy_api_port}/${config.restApiRoot}/Udhaars/get-udhaar-detail`;
 export const FETCH_CUSTOMER_UDHAAR_HISTORY = `${config.proxy_protocol}://${config.proxy_api_host}:${config.proxy_api_port}/${config.restApiRoot}/Udhaars/fetch-customer-history`;
 export const GET_LAST_UDHAAR_SERIAL_NO = `${config.proxy_protocol}://${config.proxy_api_host}:${config.proxy_api_port}/${config.restApiRoot}/UdhaarSettings/get-next-serial-no`;
+export const MARK_RESOLVED_BY_PAYMENT_CLEARANCE = `${config.proxy_protocol}://${config.proxy_api_host}:${config.proxy_api_port}/${config.restApiRoot}/Udhaars/mark-resolved-by-payment-clearance`;
