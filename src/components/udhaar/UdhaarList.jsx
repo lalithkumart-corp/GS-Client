@@ -10,6 +10,7 @@ import ReactPaginate from 'react-paginate';
 import DateRangePicker from '../dateRangePicker/dataRangePicker';
 import { convertToLocalTime, dateFormatter } from '../../utilities/utility';
 import { debounce, DebouncedFunc } from 'lodash';
+import EditUdhaar from './EditUdhaar';
 
 function UdhaarListComp() {
 
@@ -35,6 +36,8 @@ function UdhaarListComp() {
     let [selectedIndexes, setSelectedIndexes] = useState([]);
     let [selectedRowJson, setSelectedRowJson] = useState([]);
 
+    let [editMode, setEditMode] = useState(false);
+    let [editContent, setEditContent] = useState(null);
     let timer;
 
     let columns = [
@@ -75,6 +78,15 @@ function UdhaarListComp() {
                         />
                     </div>
                 );
+            },
+            formatter: (column, columnIndex, row, rowIndex) => {
+                return (
+                    <div>
+                        <span className="udhaar-bill-no" onClick={(e) => onClickBillNo(column, columnIndex, row, rowIndex)}>
+                            {row[column.id]}
+                        </span>
+                    </div>
+                )
             }
         },
         {
@@ -271,11 +283,20 @@ function UdhaarListComp() {
     }
 
     let handlePageClick = (selectedPage) => {
-        setSelectedPageIndex(selectedPage);
+        setSelectedPageIndex(selectedPage.selected);
     }
 
     let handlePageCountChange = (e) => {
         setPageLimit(e.target.value);
+    }
+
+    let onClickBillNo = (column, columnIndex, row, rowIndex) => {
+        setEditMode(true);
+        setEditContent(row);
+    }
+
+    let showListMode = () => {
+        setEditMode(false);
     }
 
     let getOffsets = () => {        
@@ -287,7 +308,8 @@ function UdhaarListComp() {
     
 
     return (
-        <Container>
+        <Container className="udhaar-list-page">
+            {!editMode && <>
             <Row>
                 <Col xs={{span: 3, offset: 9}} style={{textAlign: 'right', marginBottom: '12px', fontWeight: 'bold'}}>
                     No. Of List: {listCount}
@@ -338,6 +360,11 @@ function UdhaarListComp() {
                 selectedIndexes = {selectedIndexes}
                 selectedRowJson = {selectedRowJson}
             />
+            </>
+            }
+            {editMode && <>
+                <EditUdhaar backToPrevious={showListMode} content={editContent}/>
+            </>}
         </Container>
     )
 }

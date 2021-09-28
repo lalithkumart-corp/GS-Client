@@ -1,7 +1,7 @@
-import axios from "axios";
 import _ from 'lodash';
-import { PLEDGEBOOK_METADATA, ORNAMENT_LIST } from '../../core/sitemap';
+import { PLEDGEBOOK_METADATA, ORNAMENT_LIST, FETCH_CUSTOMERS_BASIC_LIST } from '../../core/sitemap';
 import { getAccessToken } from '../../core/storage';
+import axiosMiddleware from '../../core/axios';
 
 export const defaultPictureState = {
     holder: {
@@ -331,7 +331,7 @@ export const validateFormValues = (formValues) => {
 export const fetchCustomerMetaData = () => {
     return new Promise( (resolve, reject) => {
         let accessToken = getAccessToken();
-        axios.get(PLEDGEBOOK_METADATA + `?access_token=${accessToken}&identifiers=["all", "otherDetails"]&filters=${JSON.stringify({onlyIsActive: true})}`)
+        axiosMiddleware.get(PLEDGEBOOK_METADATA + `?access_token=${accessToken}&identifiers=["all", "otherDetails"]&filters=${JSON.stringify({onlyIsActive: true})}`)
             .then(
                 (successResp) => {
                     //let newState = {...this.state};
@@ -363,10 +363,33 @@ export const fetchCustomerMetaData = () => {
     });
 }
 
+export const fetchCustomersList = () => {
+    return new Promise(async (resolve, reject) => {
+        try {
+            let at =  getAccessToken();
+            let resp = await axiosMiddleware.get(`${FETCH_CUSTOMERS_BASIC_LIST}?access_token=${at}&onlyIsActive=true`);
+            if(resp && resp.data && resp.data.RESP) {
+                let returnObj = {};
+                returnObj.cnameList = resp.data.RESP.list;
+                returnObj.gaurdianNameList = getGaurdianNameList(resp.data.RESP.list);
+                returnObj.addressList = getAddressList(resp.data.RESP.list);
+                returnObj.placeList = getPlaceList(resp.data.RESP.list);
+                returnObj.cityList = getCityList(resp.data.RESP.list);
+                returnObj.pincodeList = getPincodeList(resp.data.RESP.list);
+                returnObj.mobileList = getMobileList(resp.data.RESP.list);
+                return resolve(returnObj);
+            }
+        } catch(e) {
+            console.log(e);
+            return resolve(null);
+        }
+    });
+}
+
 export const fetchOrnList = () => {
     return new Promise( (resolve, reject) => {
         let accessToken = getAccessToken();
-        axios.get(ORNAMENT_LIST+ `?access_token=${accessToken}`)
+        axiosMiddleware.get(ORNAMENT_LIST+ `?access_token=${accessToken}`)
             .then(
                 (successResp) => {
                     //let newState = {...this.state};

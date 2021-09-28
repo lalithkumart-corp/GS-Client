@@ -43,8 +43,16 @@
     }
     #cash-in-datepicker {
         width: 100%;
+        padding-left: 4px;
+    }
+    .udhaar-create-date-col .react-datepicker-wrapper {
+        width: 100%;
     }
     .gs-input-cell2 {
         padding-left: 3px;
+    }
+    .udhaar-create-date-col,
+    .udhaar-create-amount-col {
+        padding-left: 0;
     }
 }

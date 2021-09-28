@@ -133,6 +133,7 @@ function CashOutAccPicker(props) {
                             placeholder="0.00"
                             value={myAccountId}
                             onChange={(e) => onChangeFundHouse(e.target.value)}
+                            readOnly={props.readOnlyMode}
                         >
                             {fetchAcccountListDropdown()}
                         </Form.Control>
@@ -148,6 +149,7 @@ function CashOutAccPicker(props) {
                                 placeholder="0.00"
                                 value={paymentDetail.online.toAccountId}
                                 onChange={(e) => onChangeDestAccount(e.target.value)}
+                                readOnly={props.readOnlyMode}
                             >
                                 {fetchToAccountListDropdown()}
                             </Form.Control>
@@ -164,6 +166,7 @@ function CashOutAccPicker(props) {
                                             type="text"
                                             value={paymentDetail.online.accNo}
                                             onChange={(e) => onChangeAccNo(e.target.value)}
+                                            readOnly={props.readOnlyMode}
                                             >
                                         </Form.Control>
                                     </Form.Group>
@@ -175,6 +178,7 @@ function CashOutAccPicker(props) {
                                             type="text"
                                             value={paymentDetail.online.ifscCode}
                                             onChange={(e) => onChangeIfscCode(e.target.value)}
+                                            readOnly={props.readOnlyMode}
                                             >
                                         </Form.Control>
                                     </Form.Group>
@@ -189,6 +193,7 @@ function CashOutAccPicker(props) {
                                             type="text"
                                             value={paymentDetail.online.upiId}
                                             onChange={(e) => onChangeUpiId(e.target.value)}
+                                            readOnly={props.readOnlyMode}
                                             >
                                         </Form.Control>
                                     </Form.Group>

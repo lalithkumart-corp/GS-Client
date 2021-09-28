@@ -9,7 +9,7 @@ import { CASH_IN, UPDATE_TRANSACTION_CASH_IN } from '../../../core/sitemap';
 import { getDateInUTC } from '../../../utilities/utility';
 import './cashIn.scss';
 import { MdPerson, MdEdit, MdClear } from 'react-icons/md';
-import CustomerPicker from '../../customerPanel/CustomerPicker';
+import CustomerPicker from '../../customerPanel/CustomerPickerModal';
 import CommonModal from '../../common-modal/commonModal';
 
 export const CashIn = (props) => {

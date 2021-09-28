@@ -358,7 +358,10 @@ function PaymentScreen(props) {
     const fetchPaymentsListByBill = async () => {
         try {
             let at = getAccessToken();
-            let resp = await axiosMiddleware.get(`${GET_FUND_TRN_LIST_BY_BILL}?access_token=${at}&loan_uid=${props.currentBillData.UniqueIdentifier}&closed_uid=${props.currentBillData.uid}`);
+            let uids = [props.currentBillData.UniqueIdentifier];
+            if(props.currentBillData.uid)
+                uids.push(props.currentBillData.uid);
+            let resp = await axiosMiddleware.get(`${GET_FUND_TRN_LIST_BY_BILL}?access_token=${at}&uids=${JSON.stringify(uids)}`);
             if(resp.data.STATUS == 'SUCCESS') {
                 setTableData(resp.data.RESP);
             }

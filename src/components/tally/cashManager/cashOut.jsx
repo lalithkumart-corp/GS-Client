@@ -10,7 +10,7 @@ import { getDateInUTC } from '../../../utilities/utility';
 import './cashOut.scss';
 import { UPI_INDEX_ID } from '../../../constants';
 import { MdPerson, MdEdit, MdClear } from 'react-icons/md';
-import CustomerPicker from '../../customerPanel/CustomerPicker';
+import CustomerPicker from '../../customerPanel/CustomerPickerModal';
 import CommonModal from '../../common-modal/commonModal';
 
 let DEFAULT_PAYMENT_DETAIL = {

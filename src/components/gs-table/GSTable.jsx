@@ -21,10 +21,16 @@ class GSTable extends Component {
                 expandByColumnOnly: false
             }            
         };
+        this.state = this.prepareStateObj(this.props);
         this.createBody = this.createBody.bind(this);
     }
     componentWillReceiveProps(nextProps) {
-        let parsed = this.parseInputCollection(nextProps);
+        let newState = this.prepareStateObj(nextProps);
+        this.setState(newState);
+    }
+
+    prepareStateObj(theProps) {
+        let parsed = this.parseInputCollection(theProps);
         let newState = {...this.state};
         newState.columns = parsed.columns;
         newState.rowData = parsed.rowData;
@@ -37,8 +43,9 @@ class GSTable extends Component {
         newState.showFooter = parsed.showFooter;
         newState.rowClassNameGetter = parsed.rowClassNameGetter;
         newState.rowClickListener = parsed.rowClickListener || null;
-        this.setState(newState);
+        return newState;
     }
+
     parseInputCollection(props) {
         let parsedData = {
             columns: [],

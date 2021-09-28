@@ -6,7 +6,7 @@ import * as ReactAutosuggest from 'react-autosuggest';
 import { FETCH_PROD_IDS, FETCH_STOCKS_BY_PRODID, SALE_ITEM } from '../../../core/sitemap';
 import axiosMiddleware from '../../../core/axios';
 import { getAccessToken } from '../../../core/storage';
-import CustomerPicker from '../../customerPanel/CustomerPicker';
+import CustomerPicker from '../../customerPanel/CustomerPickerModal';
 import CommonModal from '../../common-modal/commonModal';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import GSCheckbox from '../../ui/gs-checkbox/checkbox';

@@ -56,6 +56,7 @@ export const ADD_USER = `${config.proxy_protocol}://${config.proxy_api_host}:${c
 export const USERS_LIST = `${config.proxy_protocol}://${config.proxy_api_host}:${config.proxy_api_port}/${config.restApiRoot}/GsUsers/user-list`;
 export const UPDATE_USER_PREFERENCES = `${config.proxy_protocol}://${config.proxy_api_host}:${config.proxy_api_port}/${config.restApiRoot}/UserPreferences/update-user-preference`;
 export const PLEDGEBOOK_METADATA = `${config.proxy_protocol}://${config.proxy_api_host}:${config.proxy_api_port}/${config.restApiRoot}/Customers/metadata`;
+export const FETCH_CUSTOMERS_BASIC_LIST = `${config.proxy_protocol}://${config.proxy_api_host}:${config.proxy_api_port}/${config.restApiRoot}/Customers/customer-basic-list`;
 export const PLEDGEBOOK_ADD_RECORD = `${config.proxy_protocol}://${config.proxy_api_host}:${config.proxy_api_port}/${config.restApiRoot}/Pledgebooks/add-new-billrecord`;
 export const PLEDGEBOOK_UPDATE_RECORD = `${config.proxy_protocol}://${config.proxy_api_host}:${config.proxy_api_port}/${config.restApiRoot}/Pledgebooks/update-billrecord`;
 export const PLEDGEBOOK_FETCH_CUSTOMER_HISTORY = `${config.proxy_protocol}://${config.proxy_api_host}:${config.proxy_api_port}/${config.restApiRoot}/Pledgebooks/fetch-customer-history`;
@@ -137,6 +138,8 @@ export const DELETE_FUND_ACCOUNT = `${config.proxy_protocol}://${config.proxy_ap
 export const FETCH_ALL_BANK_LIST = `${config.proxy_protocol}://${config.proxy_api_host}:${config.proxy_api_port}/${config.restApiRoot}/Commons/fetch-bank-list`;
 
 export const CREATE_UDHAAR = `${config.proxy_protocol}://${config.proxy_api_host}:${config.proxy_api_port}/${config.restApiRoot}/Udhaars/create-udhaar`;
+export const UPDATE_UDHAAR = `${config.proxy_protocol}://${config.proxy_api_host}:${config.proxy_api_port}/${config.restApiRoot}/Udhaars/update-udhaar`;
 export const FETCH_UDHAAR_LIST = `${config.proxy_protocol}://${config.proxy_api_host}:${config.proxy_api_port}/${config.restApiRoot}/Udhaars/get-pending-udhaar-bills`;
+export const FETCH_UDHAAR_DETAIL = `${config.proxy_protocol}://${config.proxy_api_host}:${config.proxy_api_port}/${config.restApiRoot}/Udhaars/get-udhaar-detail`;
 export const FETCH_CUSTOMER_UDHAAR_HISTORY = `${config.proxy_protocol}://${config.proxy_api_host}:${config.proxy_api_port}/${config.restApiRoot}/Udhaars/fetch-customer-history`;
 export const GET_LAST_UDHAAR_SERIAL_NO = `${config.proxy_protocol}://${config.proxy_api_host}:${config.proxy_api_port}/${config.restApiRoot}/UdhaarSettings/get-next-serial-no`;

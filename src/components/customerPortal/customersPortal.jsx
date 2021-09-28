@@ -13,7 +13,7 @@ import ReactPaginate from 'react-paginate';
 import axiosMiddleware from '../../core/axios';
 import { toast } from 'react-toastify';
 import CommonModal from '../common-modal/commonModal';
-import CustomerPicker from '../customerPanel/CustomerPicker';
+import CustomerPicker from '../customerPanel/CustomerPickerModal';
 
 class CustomerPortal extends Component {
     constructor(props) {

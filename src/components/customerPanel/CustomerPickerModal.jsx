@@ -5,7 +5,7 @@ import axiosMiddleware from '../../core/axios';
 import { DoublyLinkedList } from '../../utilities/doublyLinkedList';
 import { fetchCustomerMetaData, fetchOrnList } from '../billcreate/helper';
 import { getLowerCase } from '../../utilities/utility';
-import { constructCreateCustParams } from './helper';
+import { constructCreateCustParams } from './CustomerPickerModelHelper';
 import { CREATE_NEW_CUSTOMER } from '../../core/sitemap';
 
 const ENTER_KEY = 13;
