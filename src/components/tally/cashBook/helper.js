@@ -103,11 +103,8 @@ export const deleteTransactions = async (transactionIds) => {
     try {
         let resp = await axiosMiddleware.delete(DELETE_FUND_TRANSACTION, {data:{transactionIds}});
         if(resp && resp.data && resp.data.STATUS=='SUCCESS') {
-            toast.success(`Deleted successfully!`);
             return true;
         } else {
-            if(!e._IsDeterminedError)
-                toast.error('Could not delete the Fund Transactions. Please Contact admin');
             return false;
         }
     } catch(e) {

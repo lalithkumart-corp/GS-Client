@@ -6,7 +6,7 @@ import { convertToLocalTime } from '../../../utilities/utility';
 import { GET_FUND_TRN_LIST, GET_FUND_TRN_OVERVIEW, DELETE_FUND_TRANSACTION } from '../../../core/sitemap';
 import { getAccessToken, getCashManagerFilters, setCashManagerFilter } from '../../../core/storage';
 import DateRangePicker from '../../dateRangePicker/dataRangePicker';
-import { constructFetchApiParams, getFilterValFromLocalStorage, getCreateAlertParams, getUpdateAlertParams, getDeleteAlertParams, deleteTransaction } from './helper';
+import { constructFetchApiParams, getFilterValFromLocalStorage, getCreateAlertParams, getUpdateAlertParams, getDeleteAlertParams, deleteTransactions } from './helper';
 import ReactPaginate from 'react-paginate';
 import './cashBook.scss';
 import MultiSelect from "react-multi-select-component";
@@ -484,7 +484,7 @@ export default class CashBook extends Component {
                 this.refresh();
             } else {
                 if(!e._IsDeterminedError)
-                toast.error('Could not delete the Fund Transactions. Please Contact admin');   
+                    toast.error('Could not delete the Fund Transactions. Please Contact admin');   
             }
         } catch(e) {
             console.log(e);

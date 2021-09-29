@@ -30,6 +30,7 @@ function UdhaarListComp() {
     let [addressFilter, setAddressFilter] = useState('');
     let [placeFilter, setPlaceFilter] = useState('');
     let [mobileFilter, setMobileFilter] = useState('');
+    let [statusFilter, setStatusFilter] = useState('pending');
     
     let [selectedPageIndex, setSelectedPageIndex] = useState(0);
     let [pageLimit, setPageLimit] = useState(10);
@@ -215,7 +216,8 @@ function UdhaarListComp() {
                 guardianName: guardianNameFilter,
                 address: addressFilter,
                 place: placeFilter,
-                mobile: mobileFilter
+                mobile: mobileFilter,
+                include: statusFilter
             },
             limit: pageLimit,
             offsetStart: offsetVal[0] || 0,

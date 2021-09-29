@@ -10,6 +10,7 @@ import GSTable from '../gs-table/GSTable';
 import { FETCH_UDHAAR_DETAIL, CASH_IN_FOR_BILL, GET_FUND_TRN_LIST_BY_BILL, MARK_RESOLVED_BY_PAYMENT_CLEARANCE } from '../../core/sitemap';
 import { convertToLocalTime } from '../../utilities/utility';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { deleteTransactions } from '../tally/cashBook/helper';
 
 function EditUdhaar(props) {
 
@@ -17,7 +18,7 @@ function EditUdhaar(props) {
     let [currentPanel, setCurrentPanel] = useState('edit');
     let [udhaarDetail, setUdhaarDetail] = useState(null);
     let [loading, setLoading] = useState(false);
-    let [modified, setModifiedFlag] = useState(false);
+    let [modified, setUdhaarModifiedFlag] = useState(false);
     let [canRefreshPaymentList, setRefreshPaymentList] = useState(false);
 
     useEffect(() => {
@@ -30,7 +31,7 @@ function EditUdhaar(props) {
             let at = getAccessToken();
             let resp = await axiosMiddleware.get(`${FETCH_UDHAAR_DETAIL}?access_token=${at}&uid=${props.content.udhaarUid}`);
             setLoading(false);
-            setModifiedFlag(false);
+            setUdhaarModifiedFlag(false);
             if(resp && resp.data && resp.data.RESP) {
                 setUdhaarDetail(resp.data.RESP.detail);
                 return resp.data.RESP.detail;
@@ -62,7 +63,7 @@ function EditUdhaar(props) {
 
     let updateModifiedFlag = (flag) => {
         console.log('EditCard - MODIFICATION FLAG:', flag);
-        setModifiedFlag(flag);
+        setUdhaarModifiedFlag(flag);
         setRefreshPaymentList(flag);
     }
 
@@ -79,10 +80,10 @@ function EditUdhaar(props) {
                 </Col>
             </Row>
             <Row>
-                <UdhaarEntry mode={'edit'} udhaarDetail={udhaarDetail} setModifiedFlag={updateModifiedFlag}/>
+                <UdhaarEntry mode={'edit'} udhaarDetail={udhaarDetail} setUdhaarModifiedFlag={updateModifiedFlag}/>
             </Row>
 
-            <PaymentCard udhaarDetail={udhaarDetail} paymentCallback={paymentCallback} refreshFlag={canRefreshPaymentList} setRefreshFlag={setRefreshFlagRegPaymentList}/>
+            <PaymentCard udhaarDetail={udhaarDetail} paymentCallback={paymentCallback} refreshFlag={canRefreshPaymentList} setRefreshFlag={setRefreshFlagRegPaymentList} setUdhaarModifiedFlag={updateModifiedFlag}/>
 
         </div>
     )
@@ -209,6 +210,7 @@ function PaymentCard(props) {
             } else if(resp.data.STATUS == 'SUCCESS') {
                 toast.success('Added payment. Please comtact admin');
                 refreshPaymentList();
+                props.setUdhaarModifiedFlag(true);
                 props.paymentCallback();
                 return true;
             } else {
@@ -223,6 +225,7 @@ function PaymentCard(props) {
     let editTransaction = (rowIndex, rowData) => {
         setEditContentForCashIn(rowData);
         setCashInEditMode(true);
+        props.paymentCallback();
     }
 
     let deleteTransaction = async (rowIndex, rowData) => {
@@ -232,6 +235,7 @@ function PaymentCard(props) {
                 if(yy == true) {
                     toast.success(`Deleted successfully!`);
                     refreshPaymentList();
+                    props.paymentCallback();
                 } else {
                     if(!e._IsDeterminedError)
                     toast.error('Could not delete the Fund Transactions. Please Contact admin');   
