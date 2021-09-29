@@ -436,7 +436,7 @@ class GeneralInfo extends Component {
                         <Row>
                             <Col xs={12} md={12}>
                                 <FormGroup>
-                                    <FormLabel>Guardian Name</FormLabel>
+                                    <FormLabel>Father/Husband/Guardian Name</FormLabel>
                                     <FormControl
                                         type="text"
                                         placeholder="Enter text"

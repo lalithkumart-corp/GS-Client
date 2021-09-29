@@ -180,14 +180,14 @@ class CustomerPortal extends Component {
     getPagination() {
         return (
             <Row>
-                <Col xs={12} md={12} style={{zIndex: 1}}>
+                <Col xs={12} md={12} style={{zIndex: 1, paddingBottom: '5px'}}>
                     <ReactPaginate previousLabel={"<"}
                         nextLabel={">"}
                         breakLabel={"..."}
                         breakClassName={"break-me"}
                         pageCount={this.getPageCount()}
-                        marginPagesDisplayed={2}
-                        pageRangeDisplayed={5}
+                        marginPagesDisplayed={1}
+                        pageRangeDisplayed={2}
                         onPageChange={this.handlePageClick}
                         containerClassName={"pledgebook pagination"}
                         subContainerClassName={"pages pagination"}
@@ -218,7 +218,7 @@ class CustomerPortal extends Component {
     addNewCustomerOption() {
         return (
             <Row>
-                <Col xs={12} md={12}>
+                <Col xs={12} md={12} style={{padding: '0 5px 0 5px'}}>
                     <input type="button" class="gs-button bordered" value="Add New Customer" style={{marginBottom: '10px'}} onClick={this.showAddNewCustomerScreen} />
                 </Col>
             </Row>
@@ -226,8 +226,8 @@ class CustomerPortal extends Component {
     }
     getSearchBox() {
         return (
-            <Row className='head-section'>
-                <Col xs={8} md={8} style={{padding: 0}}>
+            <Row className='head-section' style={{padding: '0 5px 0 5px'}}>
+                <Col xs={8} md={8} style={{padding: '0 4px 0 0'}}>
                     <FormGroup
                         className='cname-input-box'>
                         <FormControl
@@ -241,9 +241,9 @@ class CustomerPortal extends Component {
                         <FormControl.Feedback />
                     </FormGroup>
                 </Col>
-                <span>/</span>
                 {/* <Col xs={12} md={12} style={{textAlign: 'center', marginBottom: '10px', color: 'lightgrey', fontSize: '12px'}}><span>(OR)</span></Col> */}
-                <Col xs={3} md={3} style={{padding: 0}}>
+                <Col xs={4} md={4} style={{padding: 0}} className="cust-id-input-col">
+                    <div style={{display: 'inline-block'}}><span>/</span></div>
                     <FormGroup>
                         <FormControl
                             type="text"

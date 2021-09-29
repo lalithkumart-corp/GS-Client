@@ -7,6 +7,7 @@ import { fetchCustomerMetaData, fetchOrnList } from '../billcreate/helper';
 import { getLowerCase } from '../../utilities/utility';
 import { constructCreateCustParams } from './CustomerPickerModelHelper';
 import { CREATE_NEW_CUSTOMER } from '../../core/sitemap';
+import { toast } from 'react-toastify';
 
 const ENTER_KEY = 13;
 const SPACE_KEY = 32;
@@ -308,10 +309,14 @@ export default class Customer extends Component {
         try {
             let params = constructCreateCustParams(this.state);
             let resp = await axiosMiddleware.post(CREATE_NEW_CUSTOMER, params);
-            await this.setState({selectedCustomer: resp.data.CUSTOMER_ROW});
-            let rr = constructCreateCustParams(this.state);
-            this.props.onSelectCustomer(rr);
-            console.log(resp);
+            if(resp && resp.data && resp.data.STATUS == 'ERROR') {
+                toast.error('Error in creating new customer. Please contact admin');
+            } else {
+                await this.setState({selectedCustomer: resp.data.CUSTOMER_ROW});
+                let rr = constructCreateCustParams(this.state);
+                this.props.onSelectCustomer(rr);
+                console.log(resp);
+            }
         } catch(e) {
             console.log(e);
         }
@@ -407,7 +412,7 @@ export default class Customer extends Component {
                     </Col>
                     <Col xs={3}>
                         <Form.Group>
-                            <Form.Label>Guardian Name</Form.Label>
+                            <Form.Label>Father/Husband/Guardian Name</Form.Label>
                             <ReactAutosuggest 
                                 suggestions={this.state.formData.gaurdianName.limitedList}
                                 onSuggestionsFetchRequested={({value}) => this.reactAutosuggestControls.onSuggestionsFetchRequested({value}, 'gaurdianName')}

@@ -5,8 +5,13 @@
 }
 
 .customer-detail-container .autosuggestion-box{
-    width: 85%;
-    margin-left: 7%;
+    /* width: 85%;
+    margin-left: 7%; */
+}
+.customer-detail-container .cust-id-input-col .form-group {
+    padding-left: 6px;
+    width: 90%;
+    display: inline-block;
 }
 .customer-detail-container .cname-input-box {
     margin-bottom: 10px !important;
