@@ -21,6 +21,9 @@
         padding-right: 5px;
         cursor: pointer;
     }
+    .transaction-date-picker .react-datepicker-wrapper {
+        padding-left: 5px;
+    }
 }
 .cash-manager .cash-in .common-modal-content .body {
     padding: 20px 20px 100px 20px;

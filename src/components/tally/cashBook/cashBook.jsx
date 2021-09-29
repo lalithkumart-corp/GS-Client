@@ -16,6 +16,7 @@ import { format } from 'currency-formatter';
 import { MdNotifications, MdNotificationsActive, MdNotificationsNone, MdNotificationsOff, MdNotificationsPaused, MdBorderColor } from 'react-icons/md';
 import Popover, {ArrowContainer} from 'react-tiny-popover'
 import AlertComp from '../../alert/Alert';
+import { FaTrashAlt } from 'react-icons/fa';
 
 export default class CashBook extends Component {
     constructor(props) {
@@ -203,8 +204,8 @@ export default class CashBook extends Component {
                                             }}
                                             >
                                             <span className="alert-icon">
-                                                {row.alertId && <MdNotifications/>}
-                                                {!row.alertId && <MdNotificationsNone/>}
+                                                {row.alertId && <MdNotifications className="gs-icon"/>}
+                                                {!row.alertId && <MdNotificationsNone className="gs-icon"/>}
                                             </span>
                                         </Popover>
                                     </span>)};
@@ -216,8 +217,8 @@ export default class CashBook extends Component {
                     } else {
                         return (
                             <div>
-                                <span onClick={(e) => this.editTransaction(rowIndex, row)} style={{paddingRight: '5px'}}><FontAwesomeIcon icon="edit"/></span>
-                                <span onClick={(e) => this.deleteTransaction(rowIndex, row)} style={{paddingRight: '5px'}}><FontAwesomeIcon icon="backspace"/></span>
+                                <span onClick={(e) => this.editTransaction(rowIndex, row)} style={{paddingRight: '5px'}}><FontAwesomeIcon icon="edit" className="gs-icon"/></span>
+                                <span onClick={(e) => this.deleteTransaction(rowIndex, row)} style={{paddingRight: '5px'}}><FaTrashAlt className="gs-icon"/></span>
                                 {alertComp()}
                             </div>
                         )

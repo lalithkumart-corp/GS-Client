@@ -283,7 +283,7 @@ export const CashIn = (props) => {
                                     (
                                         <div>
                                             {
-                                                <MdPerson onClick={()=> setCustomerModalVisibility(true)}/>
+                                                <MdPerson onClick={()=> setCustomerModalVisibility(true)} className="gs-icon"/>
                                             }
                                         </div>
                                     )

@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Row, Col } from 'react-bootstrap';
 import UdhaarEntry from './UdhaarEntry';
-import { FaLock, FaLockOpen, FaArrowLeft } from 'react-icons/fa';
+import { FaLock, FaLockOpen, FaArrowLeft, FaTrashAlt } from 'react-icons/fa';
 import axiosMiddleware from '../../core/axios';
 import { getAccessToken } from '../../core/storage';
 import { toast } from 'react-toastify';
@@ -116,10 +116,26 @@ function PaymentCard(props) {
             id: 'cash_in',
             displayText: 'Cash In',
             width: '8%',
+            formatter: (column, columnIndex, row, rowIndex) => {
+                let clsName = 'credit-style';
+                if(!row[column.id])
+                    clsName = '';
+                return (
+                    <span className={clsName}>{row[column.id]}</span>
+                )
+            }
         },{
             id: 'cash_out',
             displayText: 'Cash Out',
             width: '8%',
+            formatter: (column, columnIndex, row, rowIndex) => {
+                let clsName = 'debit-style';
+                if(!row[column.id])
+                    clsName = '';
+                return (
+                    <span className={clsName}>{row[column.id]}</span>
+                )
+            }
         }, {
             id: '',
             displayText: '',
@@ -131,8 +147,8 @@ function PaymentCard(props) {
                 } else {
                     return (
                         <div>
-                            <span onClick={(e) => editTransaction(rowIndex, row)} style={{paddingRight: '5px'}}><FontAwesomeIcon icon="edit"/></span>
-                            <span onClick={(e) => deleteTransaction(rowIndex, row)} style={{paddingRight: '5px'}}><FontAwesomeIcon icon="backspace"/></span>
+                            <span onClick={(e) => editTransaction(rowIndex, row)} style={{paddingRight: '5px'}}><FontAwesomeIcon icon="edit" className="gs-icon"/></span>
+                            <span onClick={(e) => deleteTransaction(rowIndex, row)} style={{paddingRight: '5px'}}><FaTrashAlt className="gs-icon"/></span>
                         </div>
                     )
                 }
