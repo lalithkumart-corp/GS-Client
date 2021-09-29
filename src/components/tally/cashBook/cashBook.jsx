@@ -5,9 +5,8 @@ import axiosMiddleware from '../../../core/axios';
 import { convertToLocalTime } from '../../../utilities/utility';
 import { GET_FUND_TRN_LIST, GET_FUND_TRN_OVERVIEW, DELETE_FUND_TRANSACTION } from '../../../core/sitemap';
 import { getAccessToken, getCashManagerFilters, setCashManagerFilter } from '../../../core/storage';
-import moment from 'moment';
 import DateRangePicker from '../../dateRangePicker/dataRangePicker';
-import { constructFetchApiParams, getFilterValFromLocalStorage, getCreateAlertParams, getUpdateAlertParams, getDeleteAlertParams } from './helper';
+import { constructFetchApiParams, getFilterValFromLocalStorage, getCreateAlertParams, getUpdateAlertParams, getDeleteAlertParams, deleteTransaction } from './helper';
 import ReactPaginate from 'react-paginate';
 import './cashBook.scss';
 import MultiSelect from "react-multi-select-component";
@@ -472,20 +471,20 @@ export default class CashBook extends Component {
         switch(identifier) {
             case 'delete':
                 var transactionIds = this.state.selectedRowJson.map((a)=> a.id);
-                this.deleteTransactions(transactionIds);
+                this._deleteTransactions(transactionIds);
                 break;
         }
     }
     
-    async deleteTransactions(transactionIds) {
+     async _deleteTransactions(transactionIds) {
         try {
-            let resp = await axiosMiddleware.delete(DELETE_FUND_TRANSACTION, {data:{transactionIds}});
-            if(resp && resp.data && resp.data.STATUS=='SUCCESS') {
+            let yy = await deleteTransactions(transactionIds);
+            if(yy == true) {
                 toast.success(`Deleted successfully!`);
                 this.refresh();
             } else {
                 if(!e._IsDeterminedError)
-                    toast.error('Could not delete the Fund Transactions. Please Contact admin');
+                toast.error('Could not delete the Fund Transactions. Please Contact admin');   
             }
         } catch(e) {
             console.log(e);
@@ -500,7 +499,7 @@ export default class CashBook extends Component {
 
     deleteTransaction(rowIndex, row) {
         if(window.confirm('Sure to delete the transaction ?')) {
-            this.deleteTransactions([row.id]);
+            this._deleteTransactions([row.id]);
         }
     }
 

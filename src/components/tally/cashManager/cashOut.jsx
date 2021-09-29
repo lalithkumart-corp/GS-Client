@@ -320,7 +320,7 @@ export const CashOut = (props) => {
     }
 
     return (
-            <Row className="gs-card-content cash-out">
+            <Row className={`gs-card-content cash-out ${props.editMode?'edit-mode':''}`}>
                 <Col xs={12} md={12} sm={12}><h4>CASH OUT</h4></Col>
                 <Col xs={12}>
                     <Row>

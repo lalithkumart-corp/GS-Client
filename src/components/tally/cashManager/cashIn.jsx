@@ -235,7 +235,7 @@ export const CashIn = (props) => {
     }
 
     return (
-            <Row className="gs-card-content cash-in">
+            <Row className={`gs-card-content cash-in ${props.editMode?'edit-mode':''}`}>
                 <Col xs={12} md={12} sm={12} className="cash-in-header"><h4>CASH IN</h4></Col>
                 <Col xs={12}>
                     <Row>

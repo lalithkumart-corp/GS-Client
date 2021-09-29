@@ -295,8 +295,12 @@ function UdhaarListComp() {
         setEditContent(row);
     }
 
-    let showListMode = () => {
+    let showListMode = (options) => {
         setEditMode(false);
+        if(options) {
+            if(options.refresh)
+                refresh();
+        }
     }
 
     let getOffsets = () => {        

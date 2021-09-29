@@ -9,6 +9,7 @@ import { CashIn } from '../tally/cashManager/cashIn';
 import GSTable from '../gs-table/GSTable';
 import { FETCH_UDHAAR_DETAIL, CASH_IN_FOR_BILL, GET_FUND_TRN_LIST_BY_BILL, MARK_RESOLVED_BY_PAYMENT_CLEARANCE } from '../../core/sitemap';
 import { convertToLocalTime } from '../../utilities/utility';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 function EditUdhaar(props) {
 
@@ -16,6 +17,8 @@ function EditUdhaar(props) {
     let [currentPanel, setCurrentPanel] = useState('edit');
     let [udhaarDetail, setUdhaarDetail] = useState(null);
     let [loading, setLoading] = useState(false);
+    let [modified, setModifiedFlag] = useState(false);
+    let [canRefreshPaymentList, setRefreshPaymentList] = useState(false);
 
     useEffect(() => {
         fetchUdharDetail();
@@ -27,6 +30,7 @@ function EditUdhaar(props) {
             let at = getAccessToken();
             let resp = await axiosMiddleware.get(`${FETCH_UDHAAR_DETAIL}?access_token=${at}&uid=${props.content.udhaarUid}`);
             setLoading(false);
+            setModifiedFlag(false);
             if(resp && resp.data && resp.data.RESP) {
                 setUdhaarDetail(resp.data.RESP.detail);
                 return resp.data.RESP.detail;
@@ -42,21 +46,43 @@ function EditUdhaar(props) {
 
     let paymentCallback = async () => {
         let res = await axiosMiddleware.post(MARK_RESOLVED_BY_PAYMENT_CLEARANCE, {uid: props.content.udhaarUid});
-        // TODO: Go back to LIST page, with refreshed list
+        if(res && res.data && res.data.STATUS == 'SUCCESS') {
+            console.log('Marked the udhar bill status as Resolved in DB');
+        } else {
+            console.log('Could not able to mark the udhaar status as resolved in DB');
+        }
+    }
+
+    let backToPrevious = () => {
+        let options = {};
+        if(modified)
+            options.refresh = true;
+        props.backToPrevious(options);
+    }
+
+    let updateModifiedFlag = (flag) => {
+        console.log('EditCard - MODIFICATION FLAG:', flag);
+        setModifiedFlag(flag);
+        setRefreshPaymentList(flag);
+    }
+
+    let setRefreshFlagRegPaymentList = (flag) => {
+        console.log('EditCard - SettingRefreshPaymentList Flag:', flag);
+        setRefreshPaymentList(flag);
     }
 
     return (
         <div>
             <Row>
-                <Col xs={2} md={2} onClick={props.backToPrevious} style={{paddingRight: 0}}>
+                <Col xs={2} md={2} onClick={backToPrevious} style={{paddingRight: 0}}>
                     <h4> <FaArrowLeft /> Detail </h4>
                 </Col>
             </Row>
             <Row>
-                <UdhaarEntry mode={'edit'} udhaarDetail={udhaarDetail}/>
+                <UdhaarEntry mode={'edit'} udhaarDetail={udhaarDetail} setModifiedFlag={updateModifiedFlag}/>
             </Row>
 
-            <PaymentCard udhaarDetail={udhaarDetail} paymentCallback={paymentCallback}/>    
+            <PaymentCard udhaarDetail={udhaarDetail} paymentCallback={paymentCallback} refreshFlag={canRefreshPaymentList} setRefreshFlag={setRefreshFlagRegPaymentList}/>
 
         </div>
     )
@@ -64,6 +90,8 @@ function EditUdhaar(props) {
 
 function PaymentCard(props) {
     let [tableData, setTableData] = useState([]);
+    let [cashInEditMode, setCashInEditMode] = useState(false);
+    let [editContentForCashIn, setEditContentForCashIn] = useState(null);
 
     let columns = [
         {
@@ -91,12 +119,37 @@ function PaymentCard(props) {
             id: 'cash_out',
             displayText: 'Cash Out',
             width: '8%',
+        }, {
+            id: '',
+            displayText: '',
+            width: '8%',
+            className: "actions-col",
+            formatter: (column, columnIndex, row, rowIndex) => {
+                if(row.is_internal) {
+                    return (<></>);
+                } else {
+                    return (
+                        <div>
+                            <span onClick={(e) => editTransaction(rowIndex, row)} style={{paddingRight: '5px'}}><FontAwesomeIcon icon="edit"/></span>
+                            <span onClick={(e) => deleteTransaction(rowIndex, row)} style={{paddingRight: '5px'}}><FontAwesomeIcon icon="backspace"/></span>
+                        </div>
+                    )
+                }
+            } 
         }
     ];
 
     useEffect(() => {
         fetchPaymentsListByBill();
     }, [props.udhaarDetail]);
+
+    useEffect(() => {
+        console.log('Paymentcard - RefreshFlag Update:', props.refreshFlag);
+        if(props.refreshFlag) {
+            fetchPaymentsListByBill();
+            props.setRefreshFlag(false);
+        }
+    }, [props.refreshFlag]);
 
     const fetchPaymentsListByBill = async () => {
         try {
@@ -124,16 +177,12 @@ function PaymentCard(props) {
         fetchPaymentsListByBill();
     }
 
-    const goBack = () => {
-        props.showMainScreen();
-    }
-
     const getCustId = (paymentData) => {
         if(paymentData.customerId)
             return paymentData.customerId;
 
         if(props.udhaarDetail && props.udhaarDetail.customerInfo)
-            return props.udhaarDetail.customerId;
+            return props.udhaarDetail.customerInfo.customerId;
         return null;
     }
 
@@ -171,12 +220,41 @@ function PaymentCard(props) {
         }
     }
 
+    let editTransaction = (rowIndex, rowData) => {
+        setEditContentForCashIn(rowData);
+        setCashInEditMode(true);
+    }
+
+    let deleteTransaction = async (rowIndex, rowData) => {
+        try {
+            if(window.confirm('Sure to delete the transaction ?')) {
+                let yy = await deleteTransactions([rowData.id]);
+                if(yy == true) {
+                    toast.success(`Deleted successfully!`);
+                    refreshPaymentList();
+                } else {
+                    if(!e._IsDeterminedError)
+                    toast.error('Could not delete the Fund Transactions. Please Contact admin');   
+                }
+            }
+       } catch(e) {
+           console.log(e);
+           if(!e._IsDeterminedError)
+               toast.error('ERROR! Please Contact admin');
+       }
+    }
+
+    let clearEditModeForCashIn = () => {
+        setCashInEditMode(false);
+        setEditContentForCashIn(null);
+    }
+
     return (
         <div className="payment-card">
             <>
                 <Row style={{marginLeft: '15px', marginRight: '15px'}}>
                     <Col xs={{span: 3}} md={{span: 3}}>
-                        <CashIn addPaymentHandler={addPaymentHandler}/>
+                        <CashIn addPaymentHandler={addPaymentHandler} editMode={cashInEditMode} editContent={editContentForCashIn} clearEditMode={clearEditModeForCashIn}/>
                     </Col>
                     <Col xs={{span: 9}} md={{span: 9}} style={{marginBottom: '50px'}}>
                         <GSTable 

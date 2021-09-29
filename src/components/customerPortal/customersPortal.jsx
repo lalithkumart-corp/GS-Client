@@ -90,7 +90,7 @@ class CustomerPortal extends Component {
     }*/
 
     async initiateFetchPledgebookAPI(cb) {
-        let customers = await this._fetchCustomers();        
+        let customers = await this._fetchCustomers();     
         await this.setState({customerList: customers.list, customersCount: customers.count, rawCustomerList: customers.list});
         if(cb)
             cb();
@@ -162,8 +162,7 @@ class CustomerPortal extends Component {
     }
 
     async refreshCustomerList() {
-        let customerList = await this.initiateFetchPledgebookAPI();        
-        this.setState({customerList: customerList, rawCustomerList: customerList, selectedCust: null});        
+        await this.initiateFetchPledgebookAPI();        
     }
 
     afterUpdate() {

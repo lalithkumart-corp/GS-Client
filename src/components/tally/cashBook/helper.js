@@ -1,4 +1,7 @@
 import { getDateInUTC } from '../../../utilities/utility';
+import { DELETE_FUND_TRANSACTION } from '../../../core/sitemap';
+import axiosMiddleware from '../../../core/axios';
+import { toast } from 'react-toastify';
 
 export const constructFetchApiParams = (stateObj) => {
     let params = {
@@ -93,4 +96,23 @@ export const getDeleteAlertParams = (row) => {
         }
     }
     return anObj;
+}
+
+
+export const deleteTransactions = async (transactionIds) => {
+    try {
+        let resp = await axiosMiddleware.delete(DELETE_FUND_TRANSACTION, {data:{transactionIds}});
+        if(resp && resp.data && resp.data.STATUS=='SUCCESS') {
+            toast.success(`Deleted successfully!`);
+            return true;
+        } else {
+            if(!e._IsDeterminedError)
+                toast.error('Could not delete the Fund Transactions. Please Contact admin');
+            return false;
+        }
+    } catch(e) {
+        console.log(e);
+        if(!e._IsDeterminedError)
+            toast.error('ERROR! Please Contact admin');
+    }
 }

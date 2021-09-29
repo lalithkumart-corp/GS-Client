@@ -31,6 +31,7 @@ function UdhaarEntry(props) {
     let [myFundAccountsList, setMyFundAccountsList] = useState([]);
 
     let [paymentDetail, setPaymentDetail] = useState({mode: 'cash', myFundAccId: myDefaultFundAccount});
+    let [refreshHistory, setRefreshHistFlag] = useState(false);
 
     // For Edit
     let [udhaarUid, setUdhaarUid] = useState(null);
@@ -215,6 +216,8 @@ function UdhaarEntry(props) {
             udhaarUid: udhaarUid
         }
         triggerUpdateApi(params);
+        props.setModifiedFlag(true);
+        setRefreshHistFlag(true);
     }
 
     let triggerApi = async (params) => {
@@ -255,6 +258,10 @@ function UdhaarEntry(props) {
         setNotes(0);
         setSelectedCustomer(null);
         setPaymentDetail({mode: 'cash', myFundAccId: myDefaultFundAccount});
+    }
+
+    let setHistoryRefreshFlag = (flag) => {
+        setRefreshHistFlag(flag);
     }
 
     return (
@@ -386,7 +393,9 @@ function UdhaarEntry(props) {
                 <Col xs={4} md={4} className="history-side-card">
                     <Row>
                         <Col xs={12} md={12}><h5 style={{color: 'gray', textAlign: 'center'}}>Customer History</h5></Col>
-                        <Col xs={12} md={12}><UdhaarHistory customerId={getCustomerId()}/></Col>
+                        <Col xs={12} md={12}>
+                            <UdhaarHistory customerId={getCustomerId()} refresh={refreshHistory} setRefreshFlag={setHistoryRefreshFlag}/>
+                        </Col>
                     </Row>
                 </Col>
             </Row>

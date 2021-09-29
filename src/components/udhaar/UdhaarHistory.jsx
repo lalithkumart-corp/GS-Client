@@ -16,6 +16,11 @@ function UdhaarHistory(props) {
         if(props.customerId)
             fetchUdhaarHistory();
     }, [props.customerId]);
+
+    useEffect(()=> {
+        if(props.refresh && props.customerId)
+            fetchUdhaarHistory();
+    }, [props.refresh])
     
     let fetchUdhaarHistory = async () => {
         try {
