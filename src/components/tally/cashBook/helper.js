@@ -20,6 +20,9 @@ export const constructFetchApiParams = (stateObj) => {
     if(stateObj.filters.remarks.length > 0)
         params.remarks = stateObj.filters.remarks;
 
+    if(stateObj.filters.tagId)
+        params.tagId = stateObj.filters.tagId;
+
     let offsets = getOffsets(stateObj);
     params.offsetStart = offsets[0] || 0;
     params.offsetEnd = offsets[1] || 10;

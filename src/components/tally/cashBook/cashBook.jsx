@@ -17,6 +17,7 @@ import { MdNotifications, MdNotificationsActive, MdNotificationsNone, MdNotifica
 import Popover, {ArrowContainer} from 'react-tiny-popover'
 import AlertComp from '../../alert/Alert';
 import { FaTrashAlt } from 'react-icons/fa';
+import { BiFilterAlt } from 'react-icons/bi';
 import { TAGS } from '../../../constants';
 import {TagInputComp, TagDisplayComp} from '../../gs-tag/tag';
 
@@ -46,7 +47,11 @@ export default class CashBook extends Component {
                     fundAccounts: [],
                     categories: []
                 },
-                remarks: ''
+                remarks: '',
+                tagId: null
+            },
+            tempFilters: {
+                tagId: null,
             },
             selectedIndexes: [],
             selectedRowJson: [],
@@ -57,7 +62,8 @@ export default class CashBook extends Component {
             totalCashOut: 0,
             closingBalance: 0,
             alertPopups: {},
-            isCustomActionPopverVisible: 0
+            isCustomActionPopverVisible: false,
+            isFilterPopoverVisible: false
         }
         this.columns = [
             {
@@ -258,6 +264,11 @@ export default class CashBook extends Component {
         this.closePopover = this.closePopover.bind(this);
         this.getAlertPopoverVisibility = this.getAlertPopoverVisibility.bind(this);
         this.onClickTag = this.onClickTag.bind(this);
+        this.closeFilterPopover = this.closeFilterPopover.bind(this);
+        this.onClickTagForFilter = this.onClickTagForFilter.bind(this);
+        this.onExitFilerPopover = this.onExitFilerPopover.bind(this);
+        this.resetFilters = this.resetFilters.bind(this);
+        this.applyFilters = this.applyFilters.bind(this);
     }
     componentDidMount() {
         this.fetchTransactions();
@@ -607,15 +618,59 @@ export default class CashBook extends Component {
     closeCustomActionPopover() {
         this.setState({isCustomActionPopverVisible: false});
     }
+
+    closeFilterPopover() {
+        this.setState({isFilterPopoverVisible: false});
+    }
+
+    onClickTagForFilter(tag, id) {
+        let newState = {...this.state};
+        if(newState.tempFilters.tagId) {
+            if(id == newState.tempFilters.tagId) {
+                newState.tempFilters.tagId = null;
+                newState.filters.tagId = null;
+            }
+        } else if(newState.filters.tagId && id == newState.filters.tagId) {
+            newState.filters.tagId = null;
+        } else
+            newState.tempFilters.tagId = id;
+        this.setState(newState);
+    }
       
+    onExitFilerPopover() {
+        let newState = {...this.state};
+        newState.tempFilters.tagId = null;
+        this.setState(newState);
+    }
+
+    async resetFilters() {
+        let newState = {...this.state};
+        newState.filters.tagId = null;
+        newState.tempFilters.tagId = null;
+        this.setState(newState);
+    }
+
+    async applyFilters() {
+        let newState = {...this.state};
+        if(newState.tempFilters) {
+            if(newState.tempFilters.tagId) {
+                newState.filters.tagId = newState.tempFilters.tagId;
+                newState.tempFilters.tagId = null;
+            }
+        }
+        newState.isFilterPopoverVisible = false;
+        await this.setState(newState);
+        this.refresh();
+    }
+
     render() {
         return (
             <Row className="gs-card-content cash-book-main-card">
                 
-                <Col xs={6} md={6}>
+                <Col xs={7} md={7}>
                     <Row>
                         <Col xs={12} md={12} sm={12}><h4>CASH TRANSACTIONS</h4></Col>
-                        <Col xs={12} md={8} sm={8}>
+                        <Col xs={12} md={5} sm={5}>
                             <DateRangePicker 
                                 className = 'cash-book-date-filter'
                                 selectDateRange={this.filterCallbacks.date}
@@ -623,52 +678,84 @@ export default class CashBook extends Component {
                                 endDate={this.state.filters.date.endDate}
                             />
                         </Col>
-                        <Col xs={12} md={4} sm={4}>
-                            { this.state.selectedIndexes.length>0 &&
+                        <Col xs={12} md={7} sm={7}>
                             <Row>
-                                {/* <Col xs={3} md={3}>
-                                    <Dropdown className="more-actions-dropdown action-btn">
-                                        <Dropdown.Toggle id="dropdown-more-actions" disabled={!this.state.selectedIndexes.length}>
-                                            Actions 
-                                        </Dropdown.Toggle>
-                                        <Dropdown.Menu>
-                                            <Dropdown.Item disabled={this.canDisableThisMenu('delete')} onClick={(e) => this.onMoreActionsDpdClick(e, 'delete')}>Delete</Dropdown.Item>
-                                        </Dropdown.Menu>
-                                    </Dropdown>
-                                </Col> */}
-                                <Col xs={3} md={3}>
-                                        <Popover
-                                            containerClassName="cashbook-custom-action-popover"
-                                            padding={0}
-                                            isOpen={this.state.isCustomActionPopverVisible}
-                                            position={'left'} // preferred position
-                                            content={({ position, targetRect, popoverRect }) => {
-                                                return (
-                                                    <div className="gs-dropdown">
-                                                        <div className="gs-dropdown-item-div">
-                                                            <input type="button" className="gs-button dropdown-item" disabled={this.canDisableThisMenu('delete')} onClick={(e) => this.onMoreActionsDpdClick(e, 'delete')} value="Delete"/>
-                                                        </div>
-                                                        <hr></hr>
-                                                        <div className="gs-dropdown-item-custom-div" style={{paddingTop: '5px'}}>
-                                                            <TagInputComp onClickTag={this.onClickTag}/>
-                                                        </div>
-                                                        <hr></hr>
-                                                        <div className="gs-dropdown-item-div">
-                                                            <input type="button" className="gs-button dropdown-item" onClick={(e) => this.onMoreActionsDpdClick(e, 'remove-tag')} value="Remove Tags"/>
-                                                        </div>
-                                                    </div>
-                                                )
-                                            }}
+                                <Col xs={3} md={3} style={{textAlign: 'center'}}>
+                                    <Popover
+                                        containerClassName="cashbook-filter-popover"
+                                        padding={0}
+                                        isOpen={this.state.isFilterPopoverVisible}
+                                        position={'right'} // preferred position
+                                        content={({ position, targetRect, popoverRect }) => {
+                                            return (
+                                                <div style={{padding: '15px'}}>
+                                                    <h4>Choose Filter Options</h4>
+                                                    <Row style={{paddingBottom: '20px', paddingTop: '20px'}}>
+                                                        <Col xs={5}>
+                                                            <TagInputComp onClick={this.onClickTagForFilter} titleText="Select Tag" selected={this.state.tempFilters.tagId || this.state.filters.tagId}/>
+                                                        </Col>
+                                                        <Col xs={6}>
+
+                                                        </Col>
+                                                    </Row>
+                                                    <Row style={{marginTop: '10px'}}>
+                                                        <Col xs={4} md={4} style={{textAlign: 'center'}}>
+                                                            <input type="button" className="gs-button bordered" value="Exit" onClick={this.closeFilterPopover} />
+                                                        </Col>
+                                                        <Col xs={4} md={4} style={{textAlign: 'center'}}>
+                                                            <input type="button" className="gs-button bordered" value="Reset" onClick={this.resetFilters} />
+                                                        </Col>
+                                                        <Col xs={4} md={4} style={{textAlign: 'center'}}>
+                                                            <input type="button" className="gs-button bordered" value="Apply" onClick={this.applyFilters}/>
+                                                        </Col>
+                                                    </Row>
+                                                </div>
+                                            )
+                                        }}
+                                        >
+                                        <span 
+                                            className={`gs-icon`}
+                                            onClick={(e) => this.setState({isFilterPopoverVisible: !this.state.isFilterPopoverVisible})}
+                                            style={{lineHeight: '33px', fontSize: '20px'}}
                                             >
-                                            <input type='button' className='gs-button bordered' value="Actions" onClick={(e) => this.setState({isCustomActionPopverVisible: !this.state.isCustomActionPopverVisible})}/>
-                                        </Popover>
+                                                <BiFilterAlt />
+                                            </span>
+                                    </Popover>
                                 </Col>
+                                { this.state.selectedIndexes.length>0 &&
+                                    <Col xs={6} md={6}>
+                                            <Popover
+                                                containerClassName="cashbook-custom-action-popover"
+                                                padding={0}
+                                                isOpen={this.state.isCustomActionPopverVisible}
+                                                position={'bottom'} // preferred position
+                                                content={({ position, targetRect, popoverRect }) => {
+                                                    return (
+                                                        <div className="gs-dropdown">
+                                                            <div className="gs-dropdown-item-div">
+                                                                <input type="button" className="gs-button dropdown-item" disabled={this.canDisableThisMenu('delete')} onClick={(e) => this.onMoreActionsDpdClick(e, 'delete')} value="Delete"/>
+                                                            </div>
+                                                            <hr></hr>
+                                                            <div className="gs-dropdown-item-custom-div" style={{paddingTop: '5px'}}>
+                                                                <TagInputComp onClick={this.onClickTag}/>
+                                                            </div>
+                                                            <hr></hr>
+                                                            <div className="gs-dropdown-item-div">
+                                                                <input type="button" className="gs-button dropdown-item" onClick={(e) => this.onMoreActionsDpdClick(e, 'remove-tag')} value="Remove Tags"/>
+                                                            </div>
+                                                        </div>
+                                                    )
+                                                }}
+                                                >
+                                                <input type='button' className='gs-button bordered' value="Actions" onClick={(e) => this.setState({isCustomActionPopverVisible: !this.state.isCustomActionPopverVisible})}/>
+                                            </Popover>
+                                    </Col>
+                                }
                             </Row>
-                            }
                         </Col>
                     </Row>
                 </Col>
-                <Col xs={6} md={6}>
+                <Col xs={5} md={5}>
                         <Col xs={12} md={12} className="fund-transaction-summary-card">
                             <Row>
                                 <Col xs={7}>Opening Balance: </Col> <span>{format(this.state.openingBalance, {code: 'INR'})}</span>

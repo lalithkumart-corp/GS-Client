@@ -62,7 +62,7 @@
 
 .cashbook-custom-action-popover {
     background-color: white;
-    border: 1px solid white;
+    border: 1px solid lightgray;
     box-shadow: 1px 0px 14px 2px rgba(0, 0, 0, 0.2);
     width: 180px;
     padding: 3px 0;
@@ -89,4 +89,12 @@
             }
         }
     }
+}
+
+.cashbook-filter-popover {
+    border: 1px solid lightgray;
+    box-shadow: 1px 0px 14px 2px rgba(0, 0, 0, 0.2);
+    width: 440px;
+    background-color: white;
+    z-index: 1;   
 }

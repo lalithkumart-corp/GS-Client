@@ -6,8 +6,12 @@ import './tag.scss';
 export function TagInputComp(props) {
 
     let getTagItem = (aTag, index) => {
+        let clsName = `a-tag-item ${aTag}`;
+        if(props.selected && props.selected == index)
+            clsName += " selected-tag";
+
         return (
-            <span key={`tag-ui-${index}`} className={`a-tag-item ${aTag}`} onClick={(e)=>props.onClickTag(aTag, index)}>
+            <span key={`tag-ui-${index}`} className={clsName} onClick={(e)=>props.onClick(aTag, index)}>
                 {aTag=='doubletick' && <RiCheckDoubleLine />}
                 {aTag=='tick' && <RiCheckLine />}
                 {aTag=='cross'&& <AiOutlineCloseCircle />}
@@ -22,9 +26,15 @@ export function TagInputComp(props) {
                 getTagItem(aTag, index)
             );
         });
+        let titleTxt = '';
+        if(props.titleText == undefined) 
+            titleTxt = "Add a Tag";
+        else
+            titleTxt = props.titleText;
+
         return (
             <div className="dropdown-item-custom tags gs-tag-input-component">
-                <p style={{marginBottom: '3px'}}>Add a Tag</p>
+                <p style={{marginBottom: '3px'}}>{titleTxt}</p>
                 {tagsDom}
             </div>
         );
