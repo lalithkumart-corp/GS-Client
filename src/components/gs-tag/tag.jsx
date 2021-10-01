@@ -24,7 +24,7 @@ export function TagInputComp(props) {
         });
         return (
             <div className="dropdown-item-custom tags gs-tag-input-component">
-                <p style={{marginBottom: '3px'}}>Tags</p>
+                <p style={{marginBottom: '3px'}}>Add a Tag</p>
                 {tagsDom}
             </div>
         );

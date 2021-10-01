@@ -10,3 +10,13 @@ export const PAYMENT_MODE_KEY = {
 }
 
 export const UPI_INDEX_ID = 19;
+
+export const TAGS = {
+    1: 'blue',
+    2: 'red',
+    3: 'orange',
+    4: 'green',
+    5: 'cross',
+    6: 'tick',
+    7: 'doubletick'
+}

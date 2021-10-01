@@ -2,7 +2,7 @@ import React, { Component, useState, useRef, useEffect } from 'react';
 import {Tabs, Tab, Container, Row, Col, Dropdown} from 'react-bootstrap';
 import GSTable from '../../gs-table/GSTable';
 import axiosMiddleware from '../../../core/axios';
-import { convertToLocalTime } from '../../../utilities/utility';
+import { convertToLocalTime, currencyFormatter } from '../../../utilities/utility';
 import { GET_FUND_TRN_LIST, GET_FUND_TRN_OVERVIEW, ADD_TAGS, REMOVE_TAGS } from '../../../core/sitemap';
 import { getAccessToken, getCashManagerFilters, setCashManagerFilter } from '../../../core/storage';
 import DateRangePicker from '../../dateRangePicker/dataRangePicker';
@@ -73,7 +73,7 @@ export default class CashBook extends Component {
             },{
                 id: 'transaction_date',
                 displayText: 'Date',
-                width: '9%',
+                width: '10%',
                 formatter: (column, columnIndex, row, rowIndex) => {
                     let tagNo = row['tag_ui'];
                     return (
@@ -171,17 +171,27 @@ export default class CashBook extends Component {
                 id: 'cash_in',
                 displayText: 'Cash In',
                 width: '8%',
+                formatter: (column, columnIndex, row, rowIndex) => {
+                    return (
+                        <span className="credit-style">{currencyFormatter(row[column.id])}</span>
+                    )
+                } 
             },{
                 id: 'cash_out',
                 displayText: 'Cash Out',
                 width: '8%',
+                formatter: (column, columnIndex, row, rowIndex) => {
+                    return (
+                        <span className="debit-style">{currencyFormatter(row[column.id])}</span>
+                    )
+                }
             },{
                 id: '',
                 displayText: 'Balance',
                 width: '8%',
                 formatter: (column, columnIndex, row, rowIndex) => {
                     return (
-                        <div>{row.afterBal}</div>
+                        <div>{currencyFormatter(row.afterBal||0)}</div>
                     )
                 } 
             },
@@ -467,7 +477,8 @@ export default class CashBook extends Component {
         switch(menuIdentifier) {
             case 'delete':
                 let trns = this.state.selectedRowJson.filter((aRow, index) => {
-                    if(aRow.category == 'Girvi' || aRow.category == 'Redeem')
+                    // if(aRow.category == 'Girvi' || aRow.category == 'Redeem')
+                    if(aRow.is_internal)
                         return true;
                     else
                         return false;
@@ -604,7 +615,7 @@ export default class CashBook extends Component {
                 <Col xs={6} md={6}>
                     <Row>
                         <Col xs={12} md={12} sm={12}><h4>CASH TRANSACTIONS</h4></Col>
-                        <Col xs={12} md={6} sm={6}>
+                        <Col xs={12} md={8} sm={8}>
                             <DateRangePicker 
                                 className = 'cash-book-date-filter'
                                 selectDateRange={this.filterCallbacks.date}
@@ -612,8 +623,7 @@ export default class CashBook extends Component {
                                 endDate={this.state.filters.date.endDate}
                             />
                         </Col>
-                        <Col xs={12} md={6} sm={6}>
-                            
+                        <Col xs={12} md={4} sm={4}>
                             { this.state.selectedIndexes.length>0 &&
                             <Row>
                                 {/* <Col xs={3} md={3}>
@@ -661,16 +671,16 @@ export default class CashBook extends Component {
                 <Col xs={6} md={6}>
                         <Col xs={12} md={12} className="fund-transaction-summary-card">
                             <Row>
-                                <Col xs={7}>Opening Balance: </Col> {format(this.state.openingBalance, {code: 'INR'})}
+                                <Col xs={7}>Opening Balance: </Col> <span>{format(this.state.openingBalance, {code: 'INR'})}</span>
                             </Row>
                             <Row>
-                                <Col xs={7}>Total CashIn: </Col> {format(this.state.totalCashIn, {code: 'INR'})}
+                                <Col xs={7}>Total CashIn: </Col> <span className="credit-style">{format(this.state.totalCashIn, {code: 'INR'})}</span>
                             </Row>
                             <Row>
-                                <Col xs={7}>Total CashOut: </Col> {format(this.state.totalCashOut, {code: 'INR'})}
+                                <Col xs={7}>Total CashOut: </Col> <span className="debit-style">{format(this.state.totalCashOut, {code: 'INR'})}</span>
                             </Row>
                             <Row>
-                                <Col xs={7}>Closing Balanse: </Col> {format(this.state.closingBalance, {code: 'INR'})}
+                                <Col xs={7}>Closing Balanse: </Col> <span>{format(this.state.closingBalance, {code: 'INR'})}</span>
                             </Row>
                         </Col>
                 </Col>
