@@ -410,6 +410,10 @@ input[type=checkbox], input[type=radio] {
   color: #2296f3;
   cursor: pointer;
 }
+.gs-icon:hover,
+.gs-icon:focus {
+  color: #fba200;
+}
 
 .react-datepicker-popper {
   z-index: 3;
