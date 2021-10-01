@@ -81,11 +81,11 @@ export default class CashBook extends Component {
                 displayText: 'Date',
                 width: '10%',
                 formatter: (column, columnIndex, row, rowIndex) => {
-                    let tagNo = row['tag_ui'];
+                    let tagNo = row['tag_indicator'];
                     return (
                         <div>
                             <span>{convertToLocalTime(row[column.id], {excludeTime: true})}</span>
-                            {row['tag_ui'] && 
+                            {row['tag_indicator'] && 
                                 <TagDisplayComp tagNo={tagNo} tagVal={TAGS[tagNo]}/>
                             }
                         </div>
