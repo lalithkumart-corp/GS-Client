@@ -40,7 +40,7 @@ export function TagInputComp(props) {
 export function TagDisplayComp(props) {
     let getTagItem = (aTag, index) => {
         return (
-            <span key={`tag-ui-${index}`} className={`a-tag-item ${aTag}`} onClick={(e)=props.onClick()}>
+            <span key={`tag-ui-${index}`} className={`a-tag-item ${aTag}`}>
                 {aTag=='doubletick' && <RiCheckDoubleLine />}
                 {aTag=='tick' && <RiCheckLine />}
                 {aTag=='cross'&& <AiOutlineCloseCircle />}
