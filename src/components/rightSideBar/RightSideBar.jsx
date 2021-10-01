@@ -23,7 +23,7 @@ class RightSideBar extends Component {
         document.removeEventListener('mousedown', (e)=>this.handleClickOutside(e));
     }
     handleClickOutside(e) {
-        console.log('checking outside click logic');
+        // if(this.wrapperRef.contains(event.target))
         if (this.wrapperRef && this.wrapperRef.current && !this.wrapperRef.current.contains(event.target)) {
             if(this.props.rightSideBar.visibility)
                 this.props.closeSideBar();
@@ -31,6 +31,7 @@ class RightSideBar extends Component {
     }
     render() {
         return (
+            // <div className={`right-side-bar-container`} ref={node => this.wrapperRef = node}>
             <div className={`right-side-bar-container`} ref={this.wrapperRef}>
                 <Tabs defaultActiveKey="notifications" className="gs-tabs" variant="pills">
                     <Tab eventKey="today" title="Today">

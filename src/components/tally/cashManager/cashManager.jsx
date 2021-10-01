@@ -78,7 +78,7 @@ export default class CashManager extends Component {
 
     render() {
         return (
-            <Container style={{maxWidth: '98%'}}>
+            <Container style={{maxWidth: '100%'}}>
                 <Row className="cash-manager">
                     <Col xs={3} md={3} sm={3}>
                         <Col xs={12} md={12} sm={12} className="gs-card">

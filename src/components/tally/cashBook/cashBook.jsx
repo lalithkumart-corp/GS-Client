@@ -3,7 +3,7 @@ import {Tabs, Tab, Container, Row, Col, Dropdown} from 'react-bootstrap';
 import GSTable from '../../gs-table/GSTable';
 import axiosMiddleware from '../../../core/axios';
 import { convertToLocalTime } from '../../../utilities/utility';
-import { GET_FUND_TRN_LIST, GET_FUND_TRN_OVERVIEW, DELETE_FUND_TRANSACTION } from '../../../core/sitemap';
+import { GET_FUND_TRN_LIST, GET_FUND_TRN_OVERVIEW, ADD_TAGS, REMOVE_TAGS } from '../../../core/sitemap';
 import { getAccessToken, getCashManagerFilters, setCashManagerFilter } from '../../../core/storage';
 import DateRangePicker from '../../dateRangePicker/dataRangePicker';
 import { constructFetchApiParams, getFilterValFromLocalStorage, getCreateAlertParams, getUpdateAlertParams, getDeleteAlertParams, deleteTransactions } from './helper';
@@ -17,6 +17,8 @@ import { MdNotifications, MdNotificationsActive, MdNotificationsNone, MdNotifica
 import Popover, {ArrowContainer} from 'react-tiny-popover'
 import AlertComp from '../../alert/Alert';
 import { FaTrashAlt } from 'react-icons/fa';
+import { TAGS } from '../../../constants';
+import {TagInputComp, TagDisplayComp} from '../../gs-tag/tag';
 
 export default class CashBook extends Component {
     constructor(props) {
@@ -55,6 +57,7 @@ export default class CashBook extends Component {
             totalCashOut: 0,
             closingBalance: 0,
             alertPopups: {},
+            isCustomActionPopverVisible: 0
         }
         this.columns = [
             {
@@ -70,10 +73,16 @@ export default class CashBook extends Component {
             },{
                 id: 'transaction_date',
                 displayText: 'Date',
-                width: '10%',
+                width: '9%',
                 formatter: (column, columnIndex, row, rowIndex) => {
+                    let tagNo = row['tag_ui'];
                     return (
-                        <div>{convertToLocalTime(row[column.id], {excludeTime: true})}</div>
+                        <div>
+                            <span>{convertToLocalTime(row[column.id], {excludeTime: true})}</span>
+                            {row['tag_ui'] && 
+                                <TagDisplayComp tagNo={tagNo} tagVal={TAGS[tagNo]}/>
+                            }
+                        </div>
                     )
                 }
             },{
@@ -92,7 +101,7 @@ export default class CashBook extends Component {
                                 options={options}
                                 value={this.state.filters.selectedAccounts}
                                 onChange={this.filterCallbacks.account}
-                                labelledBy="Select"
+                                labelledBy=""
                                 className="account-multiselect-dpd"
                                 ItemRenderer={this.customItemRenderer}
                             />
@@ -121,7 +130,7 @@ export default class CashBook extends Component {
             {
                 id: 'category',
                 displayText: 'Category',
-                width: '10%',
+                width: '7%',
                 isFilterable: true,
                 filterFormatter: (column, colIndex) => {
                     let options = [];
@@ -135,7 +144,7 @@ export default class CashBook extends Component {
                                 options={options}
                                 value={this.state.filters.selectedCategories}
                                 onChange={this.filterCallbacks.category}
-                                labelledBy="Select"
+                                labelledBy=""
                                 className="category-multiselect-dpd"
                             />
                         </div>
@@ -238,6 +247,7 @@ export default class CashBook extends Component {
         this.onClickAlertIcon = this.onClickAlertIcon.bind(this);
         this.closePopover = this.closePopover.bind(this);
         this.getAlertPopoverVisibility = this.getAlertPopoverVisibility.bind(this);
+        this.onClickTag = this.onClickTag.bind(this);
     }
     componentDidMount() {
         this.fetchTransactions();
@@ -252,7 +262,7 @@ export default class CashBook extends Component {
     }
 
     refresh() {
-        this.setState({selectedPageIndex: 0});
+        this.setState({selectedPageIndex: 0, selectedRowJson: [], selectedIndexes: []});
         this.fetchTransactions();
         this.fetchTransOverview();
     }
@@ -474,6 +484,10 @@ export default class CashBook extends Component {
                 var transactionIds = this.state.selectedRowJson.map((a)=> a.id);
                 this._deleteTransactions(transactionIds);
                 break;
+            case 'remove-tag':
+                var transactionIds = this.state.selectedRowJson.map((a)=> a.id);
+                this.removeTags(transactionIds);
+                break;
         }
     }
     
@@ -501,6 +515,7 @@ export default class CashBook extends Component {
     deleteTransaction(rowIndex, row) {
         if(window.confirm('Sure to delete the transaction ?')) {
             this._deleteTransactions([row.id]);
+            this.closeCustomActionPopover();
         }
     }
 
@@ -533,27 +548,55 @@ export default class CashBook extends Component {
         return flag;
     }
 
-    //{
-    //     checked,
-    //     option,
-    //     onClick,
-    //     disabled,
-    //   }: IDefaultItemRendererProps
     customItemRenderer(params) {
         return (
             <div className={`item-renderer ${params.disabled && "disabled"} gs-custom-multiselect-item`}>
-            <input
-                type="checkbox"
-                onChange={params.onClick}
-                checked={params.checked}
-                tabIndex={-1}
-                disabled={params.disabled}
-            />
-            <span>{params.option.label}</span>
+                <input
+                    type="checkbox"
+                    onChange={params.onClick}
+                    checked={params.checked}
+                    tabIndex={-1}
+                    disabled={params.disabled}
+                />
+                <span>{params.option.label}</span>
             </div>
         );
     };
 
+    async onClickTag(tag, id) {
+        try {
+            this.closeCustomActionPopover();
+            var transactionIds = this.state.selectedRowJson.map((a)=> a.id);
+            let resp = await axiosMiddleware.post(ADD_TAGS, {identifier: 'fund_transaction', tagNumber: id, ids: transactionIds});
+            if(resp && resp.data && resp.data.STATUS == 'SUCCESS') {
+                toast.success('Tags Added successfully!');
+                this.refresh();
+            } else
+                toast.error('Could not add tags');
+        } catch(e) {
+            console.log(e);
+            toast.error('Erro! while adding tags');
+        }
+    }
+
+    async removeTags(transactionIds) {
+        try {
+            let resp = await axiosMiddleware.post(REMOVE_TAGS, {identifier: 'fund_transaction', ids: transactionIds});
+            if(resp && resp.data && resp.data.STATUS == 'SUCCESS') {
+                toast.success('Removed Tags successfully!');
+                this.refresh();
+            } else
+                toast.error('Could not remove tags');
+        } catch(e) {
+            console.log(e);
+            toast.error('Erro! while adding tags');
+        }
+    }
+
+    closeCustomActionPopover() {
+        this.setState({isCustomActionPopverVisible: false});
+    }
+      
     render() {
         return (
             <Row className="gs-card-content cash-book-main-card">
@@ -561,7 +604,7 @@ export default class CashBook extends Component {
                 <Col xs={6} md={6}>
                     <Row>
                         <Col xs={12} md={12} sm={12}><h4>CASH TRANSACTIONS</h4></Col>
-                        <Col xs={12} md={7} sm={7}>
+                        <Col xs={12} md={6} sm={6}>
                             <DateRangePicker 
                                 className = 'cash-book-date-filter'
                                 selectDateRange={this.filterCallbacks.date}
@@ -569,18 +612,48 @@ export default class CashBook extends Component {
                                 endDate={this.state.filters.date.endDate}
                             />
                         </Col>
-                        <Col xs={12} md={5} sm={5}>
+                        <Col xs={12} md={6} sm={6}>
+                            
                             { this.state.selectedIndexes.length>0 &&
-                            <>
-                                <Dropdown className="more-actions-dropdown action-btn">
-                                    <Dropdown.Toggle id="dropdown-more-actions" disabled={!this.state.selectedIndexes.length}>
-                                        More Actions 
-                                    </Dropdown.Toggle>
-                                    <Dropdown.Menu>
-                                        <Dropdown.Item disabled={this.canDisableThisMenu('delete')} onClick={(e) => this.onMoreActionsDpdClick(e, 'delete')}>Delete</Dropdown.Item>
-                                    </Dropdown.Menu>
-                                </Dropdown>
-                            </>
+                            <Row>
+                                {/* <Col xs={3} md={3}>
+                                    <Dropdown className="more-actions-dropdown action-btn">
+                                        <Dropdown.Toggle id="dropdown-more-actions" disabled={!this.state.selectedIndexes.length}>
+                                            Actions 
+                                        </Dropdown.Toggle>
+                                        <Dropdown.Menu>
+                                            <Dropdown.Item disabled={this.canDisableThisMenu('delete')} onClick={(e) => this.onMoreActionsDpdClick(e, 'delete')}>Delete</Dropdown.Item>
+                                        </Dropdown.Menu>
+                                    </Dropdown>
+                                </Col> */}
+                                <Col xs={3} md={3}>
+                                        <Popover
+                                            containerClassName="cashbook-custom-action-popover"
+                                            padding={0}
+                                            isOpen={this.state.isCustomActionPopverVisible}
+                                            position={'left'} // preferred position
+                                            content={({ position, targetRect, popoverRect }) => {
+                                                return (
+                                                    <div className="gs-dropdown">
+                                                        <div className="gs-dropdown-item-div">
+                                                            <input type="button" className="gs-button dropdown-item" disabled={this.canDisableThisMenu('delete')} onClick={(e) => this.onMoreActionsDpdClick(e, 'delete')} value="Delete"/>
+                                                        </div>
+                                                        <hr></hr>
+                                                        <div className="gs-dropdown-item-custom-div" style={{paddingTop: '5px'}}>
+                                                            <TagInputComp onClickTag={this.onClickTag}/>
+                                                        </div>
+                                                        <hr></hr>
+                                                        <div className="gs-dropdown-item-div">
+                                                            <input type="button" className="gs-button dropdown-item" onClick={(e) => this.onMoreActionsDpdClick(e, 'remove-tag')} value="Remove Tags"/>
+                                                        </div>
+                                                    </div>
+                                                )
+                                            }}
+                                            >
+                                            <input type='button' className='gs-button bordered' value="Actions" onClick={(e) => this.setState({isCustomActionPopverVisible: !this.state.isCustomActionPopverVisible})}/>
+                                        </Popover>
+                                </Col>
+                            </Row>
                             }
                         </Col>
                     </Row>

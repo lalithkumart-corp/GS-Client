@@ -15,13 +15,13 @@
         margin-right: 15px;
     }
     .category-multiselect-dpd {
-        max-width: 160px;
+        max-width: 80px;
         .dropdown-heading {
             height: 26px;
         }
     }
     .account-multiselect-dpd {
-        max-width: 100px;
+        max-width: 60px;
         .dropdown-heading {
             height: 26px;
         }
@@ -58,4 +58,35 @@
     border: 1px solid lightgray;
     padding: 3px;
     border-radius: 5px;
+}
+
+.cashbook-custom-action-popover {
+    background-color: white;
+    border: 1px solid white;
+    box-shadow: 1px 0px 14px 2px rgba(0, 0, 0, 0.2);
+    width: 180px;
+    padding: 3px 0;
+    z-index: 1;
+    .gs-dropdown {
+        padding-bottom: 10px;
+        padding-top: 10px;
+        hr {
+            margin: 3px;
+        }
+        .gs-dropdown-item-div {
+            cursor: pointer;
+            // border: 1px solid rgba(0,0,0,.15);
+            .dropdown-item {
+                padding: 5px 20px;
+            }
+        }
+        .gs-dropdown-item-div:focus {
+            background-color: #ededed;
+        }
+        .gs-dropdown-item-custom-div {
+            .dropdown-item-custom.tags {
+                padding: 0 15px;
+            }
+        }
+    }
 }

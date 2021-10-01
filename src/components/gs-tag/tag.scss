@@ -1,0 +1,57 @@
+.gs-tag-input-component,
+.gs-tag-view-component {
+    span.a-tag-item {
+        width: 12px;
+        height: 12px;
+        display: inline-block;
+        border-radius: 50%;
+        margin: 0 4px;
+        cursor: pointer;
+        vertical-align: middle;
+    }
+    span.a-tag-item.blue {
+        background-color: blue;
+    }
+    span.a-tag-item.red {
+        background-color: red;
+    }
+    span.a-tag-item.orange {
+        background-color: orange;
+    }
+    span.a-tag-item.brown {
+        background-color: brown;
+    }
+    span.a-tag-item.green {
+        background-color: #88eb88;
+    }
+    span.a-tag-item.grey {
+        background-color: grey;
+    }
+    span.a-tag-item.yellow {
+        background-color: yellow;
+    }
+    span.a-tag-item.cross,
+    span.a-tag-item.tick,
+    span.a-tag-item.doubletick {
+        text-align: center;
+        vertical-align: top;
+        line-height: 14px;
+        font-size: 15px;
+    }
+}
+
+.gs-tag-input-component {
+    span.a-tag-item {
+        width: 13px;
+        height: 13px;
+    }
+    span.a-tag-item:hover {
+        border: 2px solid yellow;
+        box-shadow: 0px -1px 9px 2px rgba(131, 89, 89, 0.2);
+    }
+    span.a-tag-item.cross:hover,
+    span.a-tag-item.tick:hover,
+    span.a-tag-item.doubletick:hover {
+        border: 0px;
+    }
+}
