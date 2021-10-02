@@ -43,6 +43,7 @@ import MyContacts from '../mycontacts/MyContactManager';
 // import Udhaar from '../udhaar/Udhaar';
 import UdhaarEntry from '../udhaar/UdhaarEntry';
 import UdhaarListComp from '../udhaar/UdhaarList';
+import ResetPassword from '../passwordReset/passwordReset';
 
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'react-tippy/dist/tippy.css'
@@ -133,6 +134,7 @@ class SmartComponent extends Component {
                                 <Route path= "/contact-manager" component={MyContacts} />
                                 <Route path="/udhaar-create" component={UdhaarEntry} />
                                 <Route path="/udhaar-list" component={UdhaarListComp} />
+                                <Route path="/reset-pwd" component={ResetPassword} />
                             </div>
                             {/* <div className="floating-right-side-bar"> */}
                             <div className={`floating-right-side-bar ${this.props.rightSideBar.visibility?'show':'hide'} `}>

@@ -46,6 +46,8 @@ export const SERVER_ASSETS_URL_PATH = `${config.proxy_protocol}://${config.proxy
 export const LOGIN = `${config.proxy_protocol}://${config.proxy_api_host}:${config.proxy_api_port}/${config.restApiRoot}/GsUsers/login-user`;
 export const SSO_LOGIN = `${config.proxy_protocol}://${config.proxy_api_host}:${config.proxy_api_port}/${config.restApiRoot}/GsUsers/sso-login`;
 export const CHECK_EMAIL_EXISTANCE = `${config.proxy_protocol}://${config.proxy_api_host}:${config.proxy_api_port}/${config.restApiRoot}/GsUsers/check-email-existance`;
+export const RESET_PWD = `${config.proxy_protocol}://${config.proxy_api_host}:${config.proxy_api_port}/${config.restApiRoot}/GsUsers/password-reset`;
+
 export const GET_APP_STATUS = `${config.proxy_protocol}://${config.proxy_api_host}:${config.proxy_api_port}/${config.restApiRoot}/AppManagers/get-status`;
 export const CHECK_USED_TRIAL_OFFER = `${config.proxy_protocol}://${config.proxy_api_host}:${config.proxy_api_port}/${config.restApiRoot}/AppManagers/check-used-trial-offer`;
 export const UPDATE_APP_STATUS = `${config.proxy_protocol}://${config.proxy_api_host}:${config.proxy_api_port}/${config.restApiRoot}/AppManagers/update-status`;

@@ -121,7 +121,7 @@ class NavbarComp extends Component {
                         <NavDropdown title="Others" id="customer-dropdown">
                             <NavDropdown.Item as={Link} to="/customer-portal">Customers</NavDropdown.Item>
                             <NavDropdown.Divider />
-                            <NavDropdown.Item as={Link} to="/contact-manager">My Contacts</NavDropdown.Item>
+                            {/* <NavDropdown.Item as={Link} to="/contact-manager">My Contacts</NavDropdown.Item> */}
                             {/* <NavDropdown.Item as={Link} to="/picture">Webcam</NavDropdown.Item>
                             <NavDropdown.Item as={Link} to="/uploadpicdemo">Upload Pic Demo</NavDropdown.Item>
                             <NavDropdown.Item as={Link} to="/demo">Demo</NavDropdown.Item> */}
@@ -131,6 +131,7 @@ class NavbarComp extends Component {
                     </Nav>
                     <Nav>
                         <NavDropdown title={this.getTitie()}>
+                            <NavDropdown.Item as={Link} to="/reset-pwd">Reset Password</NavDropdown.Item>
                             <NavDropdown.Item as={Link} to="/logout">Logout</NavDropdown.Item>
                         </NavDropdown>
                         <span className="right-side-trigger-icon"><FontAwesomeIcon icon="list-ul" onClick={this.onClickSideTrigger}/></span>
