@@ -1,5 +1,8 @@
 .gs-card-content.cash-out {
     padding: 0;
+    .cash-out-header {
+        padding-top: 5px;
+    }
     .a-payment-mode {
         display: inline-block;
         padding: 2px 8px;
@@ -20,6 +23,12 @@
         padding-left: 3px;
         padding-right: 5px;
         cursor: pointer;
+    }
+    .transaction-date-picker .react-datepicker-wrapper {
+        padding-left: 5px;
+        margin-left: 10px;
+        border: 1px solid lightgray;
+        border-radius: 5px;
     }
 }
 

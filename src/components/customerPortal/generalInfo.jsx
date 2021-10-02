@@ -74,7 +74,8 @@ class GeneralInfo extends Component {
             .then(
                 (successResp) => {
                     let newState = {...this.state};
-                    let results = successResp.data;                                                  
+                    let results = successResp.data;
+                    results.otherDetails = results.otherDetails || [];
                     newState.formData.moreDetails.list = results.otherDetails.map((anItem) => {return {key: anItem.key, value: anItem.displayText}});
                     this.setState(newState);
                 },

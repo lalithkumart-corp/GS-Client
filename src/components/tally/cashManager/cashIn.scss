@@ -1,5 +1,8 @@
 .gs-card-content.cash-in {
     padding: 20px 0;
+    .cash-in-header {
+        padding-top: 5px;
+    }
     .a-payment-mode {
         display: inline-block;
         padding: 2px 8px;
@@ -23,6 +26,9 @@
     }
     .transaction-date-picker .react-datepicker-wrapper {
         padding-left: 5px;
+        margin-left: 10px;
+        border: 1px solid lightgray;
+        border-radius: 5px;
     }
 }
 .cash-manager .cash-in .common-modal-content .body {

@@ -33,7 +33,7 @@ export const CashOut = (props) => {
     
     let [category, setCategoryVal] = useState('');
 
-    let [categoryList, setCategoryList] = useState([]);
+    let [categoryList, setCategoryList] = useState(['Udhaar', 'Expense']);
     let [filteredCategoryList, setFilteredCategoryList] = useState([]);
     let [myFundAccountsList, setMyFundAccountsList] = useState([]);
     let [allBanksList, setAllBanksList] = useState([]);
@@ -89,6 +89,7 @@ export const CashOut = (props) => {
 
             setCategoryVal('');
             setRemarks('');
+            setCustomerObj(null);
         }
     }, [props.editMode, props.editContent]);
 
@@ -197,6 +198,10 @@ export const CashOut = (props) => {
     let fetchCategorrySuggestions = async () => {
         try {
             let RESP = await fetchCategorySuggestions('cash-out');
+            if(RESP.indexOf('Udhaar') == -1)
+                RESP.push('Udhaar');
+            if(RESP.indexOf('Expense') == -1)
+                RESP.push('Expense');
             setCategoryList(RESP);
         } catch(e) {
             console.error(e);
@@ -204,30 +209,40 @@ export const CashOut = (props) => {
     }
 
     let constructApiParams = () => {
-        return {
+        let requestPayload = {
             transactionDate: dates._dateVal,
             amount: amount,
-            myFundAccountId: myAccountId || myDefaultFundAccount,
+            accountId: myAccountId || myDefaultFundAccount,
             category: category,
             remarks: remarks,
             paymentMode: paymentMode,
             destinationAccountDetail: paymentDetail.online,
-            customerId: customer.customerId
-        }
+            customerId: customer?customer.customerId:null
+        };
+
+        if(paymentMode == 'cash')
+            requestPayload.destinationAccountDetail = {};
+
+        return requestPayload;
     }
 
     let constructApiParamsForUpdate = () => {
-        return {
+        let requestPayload = {
             transactionDate: dates._dateVal,
             amount: amount,
-            myFundAccountId: myAccountId || myDefaultFundAccount,
+            accountId: myAccountId || myDefaultFundAccount,
             category: category,
             remarks: remarks,
             paymentMode: paymentMode,
             destinationAccountDetail: paymentDetail.online,
             transactionId: props.editContent.id,
-            customerId: customer.customerId
+            customerId: customer?customer.customerId:null
         }
+
+        if(paymentMode == 'cash')
+            requestPayload.destinationAccountDetail = {};
+
+        return requestPayload;
     }
 
     let addPaymentHandler = async () => {
@@ -291,7 +306,7 @@ export const CashOut = (props) => {
         setPaymentMode('cash');
         setMyAccountId(null);
         setPaymentDetail({...DEFAULT_PAYMENT_DETAIL});
-        setCustomerObj({});
+        setCustomerObj(null);
     }
 
     let fetchAcccountListDropdown = () => {
@@ -321,14 +336,14 @@ export const CashOut = (props) => {
 
     return (
             <Row className={`gs-card-content cash-out ${props.editMode?'edit-mode':''}`}>
-                <Col xs={12} md={12} sm={12}><h4>CASH OUT</h4></Col>
+                <Col xs={12} md={12} sm={12} className="cash-out-header debit-style"><h4>CASH OUT</h4></Col>
                 <Col xs={12}>
                     <Row>
                         <Col xs={12} md={12} cm={12}>
-                            <Form.Group className="bill-date-picker">
+                            <Form.Group className="transaction-date-picker">
                                 <Form.Label>Date</Form.Label>
                                 <DatePicker
-                                    id="cash-in-datepicker" 
+                                    id="cash-out-datepicker" 
                                     selected={dates.dateVal}
                                     onChange={(fullDateVal, dateVal) => {onChangeDate(null, fullDateVal)} }
                                     showMonthDropdown
@@ -357,7 +372,7 @@ export const CashOut = (props) => {
                         <Col xs={6} md={6} cm={6}>
                             <Form.Group>
                                 <Form.Label>Customer</Form.Label>
-                                {customer.customerId ? 
+                                {(customer && customer.customerId) ? 
                                     (
                                         <div>
                                             {customer.cname}

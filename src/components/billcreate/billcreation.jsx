@@ -1779,7 +1779,7 @@ class BillCreation extends Component {
                 {
                     (() => {
                         let rows = [];
-                        let moreDetails = this.getInputValFromCustomSources('moreDetails');                        
+                        let moreDetails = this.getInputValFromCustomSources('moreDetails') || [];
                         for(let i=0; i<moreDetails.length; i++) {
                             rows.push(
                                 <Row className="customer-info-display-row" key={i}>

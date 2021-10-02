@@ -18,11 +18,11 @@ export const CashIn = (props) => {
     let [paymentMode, setPaymentMode] = useState('cash');
     let [cashInAccountId, setCashInAccountId] = useState(null);
     let [category, setCategoryVal] = useState('');
-    let [categoryList, setCategoryList] = useState([]);
+    let [categoryList, setCategoryList] = useState(['Udhaar', 'Expense']);
     let [filteredCategoryList, setFilteredCategoryList] = useState([]);
     let [myFundAccountsList, setMyFundAccountsList] = useState([]);
     let [myDefaultFundAccount, setMyDefaultFundAccId] = useState(null);
-    let [customer, setCustomerObj] = useState({});
+    let [customer, setCustomerObj] = useState(null);
     let [isCustomerSelectionModalOpen, setCustomerModalVisibility] = useState(false);
 
     let datePickerRef = useRef(null);
@@ -56,6 +56,7 @@ export const CashIn = (props) => {
             setCashInAccountId(null);
             setCategoryVal('');
             setRemarks('');
+            setCustomerObj(null);
         }
     }, [props.editMode, props.editContent]);
 
@@ -127,12 +128,15 @@ export const CashIn = (props) => {
     let fetchCategorrySuggestions = async () => {
         try {
             let RESP = await fetchCategorySuggestions('cash-in');
+            if(RESP.indexOf('Udhaar') == -1)
+                RESP.push('Udhaar');
+            if(RESP.indexOf('Expense') == -1)
+                RESP.push('Expense');
             setCategoryList(RESP);
         } catch(e) {
             console.error(e);
         }
     }
-
 
     let addPaymentHandler = async () => {
         let result = false;
@@ -148,11 +152,11 @@ export const CashIn = (props) => {
         return {
             transactionDate: dates._dateVal,
             amount: amount,
-            fundHouse: cashInAccountId || myDefaultFundAccount,
+            accountId: cashInAccountId || myDefaultFundAccount,
             category: category,
             remarks: remarks,
             paymentMode: paymentMode,
-            customerId: customer.customerId
+            customerId: customer?customer.customerId:null
         };
     }
 
@@ -197,8 +201,9 @@ export const CashIn = (props) => {
             remarks: remarks,
             paymentMode: paymentMode,
             transactionId: props.editContent.id,
-            customerId: customer.customerId
+            customerId: customer?customer.customerId:null
         }
+
         return params;
     }
 
@@ -236,7 +241,7 @@ export const CashIn = (props) => {
 
     return (
             <Row className={`gs-card-content cash-in ${props.editMode?'edit-mode':''}`}>
-                <Col xs={12} md={12} sm={12} className="cash-in-header"><h4>CASH IN</h4></Col>
+                <Col xs={12} md={12} sm={12} className="cash-in-header credit-style"><h4>CASH IN</h4></Col>
                 <Col xs={12}>
                     <Row>
                         <Col xs={12} md={12} cm={12}>
@@ -272,7 +277,7 @@ export const CashIn = (props) => {
                         <Col xs={6} md={6} cm={6}>
                             <Form.Group>
                                 <Form.Label>Customer</Form.Label>
-                                {customer.customerId ? 
+                                {(customer && customer.customerId) ? 
                                     (
                                         <div>
                                             {customer.cname}
