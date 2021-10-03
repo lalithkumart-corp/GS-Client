@@ -43,6 +43,7 @@ class GSTable extends Component {
         newState.showFooter = parsed.showFooter;
         newState.rowClassNameGetter = parsed.rowClassNameGetter;
         newState.rowClickListener = parsed.rowClickListener || null;
+        newState.loading = parsed.loading || false;
         return newState;
     }
 
@@ -125,6 +126,7 @@ class GSTable extends Component {
         parsedData.showFooter = props.showFooter || false;
         parsedData.rowClassNameGetter = props.rowClassNameGetter || (()=>'');
         parsedData.rowClickListener = props.rowClickListener || null;
+        parsedData.loading = props.loading || false;
         return parsedData;
     }
     defaults = {
@@ -368,7 +370,7 @@ class GSTable extends Component {
 
     createTableContent() {
         return (
-            <table className={this.state.className + ' gs-table table table-hover table-bordered table-sm'}>
+            <table className={`${this.state.className} gs-table table table-hover table-bordered table-sm ${this.state.loading?'loading':''}`}>
                 {this.createColGroup()}
                 {this.createHeader()}
                 {this.createBody()}
@@ -535,6 +537,7 @@ class GSTable extends Component {
     render() {
         return (
             <div>
+                <div className="gs-table-loading-bar"></div>
                 {this.createTableContent()}
             </div>
         )

@@ -63,7 +63,8 @@ export default class CashBook extends Component {
             closingBalance: 0,
             alertPopups: {},
             isCustomActionPopverVisible: false,
-            isFilterPopoverVisible: false
+            isFilterPopoverVisible: false,
+            loadingList: false
         }
         this.columns = [
             {
@@ -290,6 +291,7 @@ export default class CashBook extends Component {
 
     async fetchTransactions() {
         try {
+            this.setState({loadingList: true});
             let at = getAccessToken();
             let params = constructFetchApiParams(this.state);
             params.fetchFilterCollections = true;
@@ -299,6 +301,7 @@ export default class CashBook extends Component {
                 newState.transactions = resp.data.RESP.results;
                 newState.totalTransactionsCount = resp.data.RESP.count;
                 newState.filters.collections = resp.data.RESP.collections;
+                newState.loadingList = false;
                 this.setState(newState);
             }
         } catch(e) {
@@ -795,6 +798,7 @@ export default class CashBook extends Component {
                         selectedIndexes = {this.state.selectedIndexes}
                         selectedRowJson = {this.state.selectedRowJson}
                         rowClickListener = {this.rowClickListener}
+                        loading={this.state.loadingList}
                     />
                 </Col>
             </Row>

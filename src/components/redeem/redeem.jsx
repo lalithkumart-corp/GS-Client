@@ -60,7 +60,8 @@ class Redeem extends Component {
                         }
                     }
                 }
-            }
+            },
+            loading: false
         };
         this.autuSuggestionControls.onChange = this.autuSuggestionControls.onChange.bind(this);
         this.reactAutosuggestControls.onSuggestionsFetchRequested = this.reactAutosuggestControls.onSuggestionsFetchRequested.bind(this);
@@ -154,22 +155,22 @@ class Redeem extends Component {
                         let selectedBillData = successResp.data.billDetails[0];
                         selectedBillData = this.parseResponse(selectedBillData);
                         let paymentInfo = this.parsePaymentInfo(selectedBillData);
-                        this.setState({selectedBillData: selectedBillData, billNotFound: false, formData: {...this.state.formData, payment: paymentInfo} });
+                        this.setState({loading: false, selectedBillData: selectedBillData, billNotFound: false, formData: {...this.state.formData, payment: paymentInfo} });
                         this.transferFocus(null, 'billInputBox');
                     }else{
-                        this.setState({selectedBillData: null, billNotFound: true});
+                        this.setState({loading: false, selectedBillData: null, billNotFound: true});
                         toast.error(`${billNo} Bill Data not found or might be redeemed already`);
                     }
                 },
                 (errResp) => {
-                    this.setState({selectedBillData: null, error: true});
+                    this.setState({loading: false, selectedBillData: null, error: true});
                     toast.error('Error in fetching the bill details');
                     console.log(errResp);
                 }
             )
             .catch(
                 (exception) => {
-                    this.setState({selectedBillData: null, error: true});
+                    this.setState({loading: false, selectedBillData: null, error: true});
                     toast.error('Exception occured in fetching the billDetails');
                     console.log(exception)
                 }
@@ -301,9 +302,12 @@ class Redeem extends Component {
         switch(options.currElmKey) {
             case 'billno':
                 let billNo = e.target.value;
-                this.setState({selectedBillNo: billNo});
-                if(billNo)
+                if(billNo) {
+                    this.setState({selectedBillNo: billNo, loading: true});
                     this.fetchBillData(billNo);
+                } else {
+                    this.setState({selectedBillNo: billNo});
+                }
                 canTransferFocus = false;
                 break;
         }
@@ -386,7 +390,9 @@ class Redeem extends Component {
 
     getDisplayDom() {
         let theDom = [];
-        if(this.state.selectedBillData)
+        if(this.state.loading)
+            theDom.push(this.getLoadingDiv());
+        else if(this.state.selectedBillData)
             theDom.push(this.getBillDataView());            
         else if(this.state.billNotFound)
             theDom.push(this.getBillNotFoundView());
@@ -395,6 +401,14 @@ class Redeem extends Component {
         else
             theDom.push(this.getEmptyView());
         return theDom;
+    }
+
+    getLoadingDiv() {
+        return (
+            <Col xs={12} md={12} className="spinner-display-div">
+                <div className="gs-loading" style={{minHeight: '100px'}}></div>
+            </Col>
+        )
     }
 
     getBillDataView() {

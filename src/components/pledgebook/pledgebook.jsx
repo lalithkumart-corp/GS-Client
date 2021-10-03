@@ -83,6 +83,7 @@ class Pledgebook extends Component {
             selectedRowJson: [],
             pageLimit: 10,
             pendingBillList :[],
+            loadingList: false,
             moreFilter: {
                 popoverOpen: false,
                 perGramRange: {
@@ -374,6 +375,7 @@ class Pledgebook extends Component {
         if(nextProps.pledgeBook && nextProps.pledgeBook.list && nextProps.pledgeBook.refreshTable) {
             this.props.setRefreshFlag(false);
             newState.pendingBillList = parseResponse(nextProps.pledgeBook.list);
+            newState.loadingList = false;
             newState.totalCount = nextProps.pledgeBook.totalCount;
             if(newState.currRowIndex)
                 newState.currentBillData = newState.pendingBillList[newState.currRowIndex];            
@@ -848,7 +850,7 @@ class Pledgebook extends Component {
     initiateFetchPledgebookAPI() {
         clearTimeout(this.timer);
         this.timer = setTimeout(() => {
-            this.resetSelections();
+            this.resetSelectionsAndSetLoading();
             let validation = this.doValidation();
             if(validation.status == 'success') {
                 let params = this.getAPIParams();
@@ -879,8 +881,8 @@ class Pledgebook extends Component {
         this.initiateFetchPledgebookAPI();
     }
 
-    resetSelections() {
-        this.setState({selectedIndexes: [], selectedRowJson: []});
+    resetSelectionsAndSetLoading() {
+        this.setState({selectedIndexes: [], selectedRowJson: [], loadingList: true});
     }
 
     shouldDisableCustomFilterApplyBtn() {
@@ -1255,6 +1257,7 @@ class Pledgebook extends Component {
                         selectedIndexes = {this.state.selectedIndexes}
                         selectedRowJson = {this.state.selectedRowJson}
                         rowClassNameGetter = {this.rowClassNameGetter}
+                        loading={this.state.loadingList}
                     />
                 </Row>
                 <CommonModal modalOpen={this.state.PBmodalIsOpen} handleClose={this.handleClose}>
