@@ -64,7 +64,11 @@ export default class CashBook extends Component {
             alertPopups: {},
             isCustomActionPopverVisible: false,
             isFilterPopoverVisible: false,
-            loadingList: false
+            loadingList: false,
+            localCalculations: {
+                totalCashIn: null,
+                totalCashOut: null
+            }
         }
         this.columns = [
             {
@@ -182,7 +186,9 @@ export default class CashBook extends Component {
                     return (
                         <span className="credit-style">{currencyFormatter(row[column.id])}</span>
                     )
-                } 
+                },
+                footerClassName: 'total-cash-in-footer-cell',
+                footerFormatter: () => <span>{currencyFormatter(this.state?this.state.localCalculations.totalCashIn:'')}</span>
             },{
                 id: 'cash_out',
                 displayText: 'Cash Out',
@@ -191,7 +197,9 @@ export default class CashBook extends Component {
                     return (
                         <span className="debit-style">{currencyFormatter(row[column.id])}</span>
                     )
-                }
+                },
+                footerClassName: 'total-cash-out-footer-cell',
+                footerFormatter: () => <span>{currencyFormatter(this.state?this.state.localCalculations.totalCashOut:'')}</span>
             },{
                 id: '',
                 displayText: 'Balance',
@@ -301,6 +309,7 @@ export default class CashBook extends Component {
                 newState.transactions = resp.data.RESP.results;
                 newState.totalTransactionsCount = resp.data.RESP.count;
                 newState.filters.collections = resp.data.RESP.collections;
+                newState.localCalculations = this.doLocalCalculations(resp.data.RESP.results);
                 newState.loadingList = false;
                 this.setState(newState);
             }
@@ -341,6 +350,19 @@ export default class CashBook extends Component {
         } catch(e) {
             console.log(e);
         }
+    }
+
+    doLocalCalculations(results) {
+        let cashInTotal = 0;
+        let cashOutTotal = 0;
+        _.each(results, (aRes, index) => {
+            cashInTotal += aRes.cash_in;
+            cashOutTotal += aRes.cash_out;
+        });
+        return {
+            totalCashIn: cashInTotal,
+            totalCashOut: cashOutTotal
+        };
     }
 
     reStructureTransactionData(newStateObj) {
@@ -632,6 +654,8 @@ export default class CashBook extends Component {
             if(id == newState.tempFilters.tagId) {
                 newState.tempFilters.tagId = null;
                 newState.filters.tagId = null;
+            } else {
+                newState.tempFilters.tagId = id;
             }
         } else if(newState.filters.tagId && id == newState.filters.tagId) {
             newState.filters.tagId = null;
@@ -809,6 +833,7 @@ export default class CashBook extends Component {
                         selectedRowJson = {this.state.selectedRowJson}
                         rowClickListener = {this.rowClickListener}
                         loading={this.state.loadingList}
+                        showFooter={true}
                     />
                 </Col>
             </Row>
