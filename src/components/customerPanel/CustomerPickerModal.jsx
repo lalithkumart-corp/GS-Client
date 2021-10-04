@@ -29,6 +29,7 @@ export default class Customer extends Component {
         this.domElmns = {};
         this.domOrders = domList;
         this.state = {
+            loading: false,
             formData: {
                 cname: {
                     inputVal: '',
@@ -90,6 +91,7 @@ export default class Customer extends Component {
     }
 
     fetchMetaData() {
+        this.setState({loading: true});
         fetchCustomerMetaData().then(
             (resp) => {
                 if(resp) {
@@ -101,6 +103,7 @@ export default class Customer extends Component {
                     newState.formData.city.list = resp.cityList;
                     newState.formData.pincode.list = resp.pincodeList;
                     newState.formData.mobile.list = resp.mobileList;
+                    newState.loading = false;
                     this.setState(newState);
                 }
             }
@@ -384,7 +387,12 @@ export default class Customer extends Component {
     
     render() {
         return (
-            <Container>
+            <div className={this.state.loading?'gs-loading':''}>
+                <Row>
+                    <Col xs={12} style={{textAlign: 'center', paddingBottom: '30px'}}>
+                        <h5>Select (or) Create Customer</h5>
+                    </Col>
+                </Row>
                 <Row>
                     <Col xs={3}>
                         <Form.Group
@@ -403,7 +411,7 @@ export default class Customer extends Component {
                                     onChange: (e, {newValue, method}) => this.reactAutosuggestControls.onChange(e, {newValue, method}, 'cname'),
                                     onKeyUp: (e) => this.reactAutosuggestControls.onKeyUp(e, {currElmKey: 'cname'}),
                                     className: ((this.state.selectedCustomer && this.state.selectedCustomer.name)?'existing-customer':'new-customer') + " react-autosuggest__input cust-name",
-                                    // readOnly: this.props.billCreation.loading,
+                                    readOnly: this.state.loading,
                                     autocomplete:"no"
                                 }}
                                 ref = {(domElm) => { this.domElmns.cname = domElm?domElm.input:domElm; }}
@@ -419,11 +427,12 @@ export default class Customer extends Component {
                                 getSuggestionValue={(suggestion, e) => this.getSuggestionValue(suggestion)}
                                 renderSuggestion={this.renderSuggestion}
                                 inputProps={{
-                                    placeholder: 'Type Guardian name',
+                                    placeholder: 'Type Father/Husband/Guardian name',
                                     value: this.getInputValFromCustomSources('gaurdianName'),
                                     onChange: (e, {newValue, method}) => this.reactAutosuggestControls.onChange(e, {newValue, method}, 'gaurdianName'),
                                     onKeyUp: (e) => this.reactAutosuggestControls.onKeyUp(e, {currElmKey: 'gaurdianName', isGuardianNameInput: true}),
                                     className: "react-autosuggest__input guardian-name",
+                                    readOnly: this.state.loading,
                                     autocomplete:"no"
                                 }}
                                 ref = {(domElm) => { this.domElmns.gaurdianName = domElm?domElm.input:domElm; }}
@@ -444,7 +453,7 @@ export default class Customer extends Component {
                                         onChange: (e, {newValue, method}) => this.reactAutosuggestControls.onChange(e, {newValue, method}, 'address'),
                                         onKeyUp: (e) => this.reactAutosuggestControls.onKeyUp(e, {currElmKey: 'address'}),
                                         className: "react-autosuggest__input address",
-                                        //readOnly: this.props.billCreation.loading,
+                                        readOnly: this.state.loading,
                                         autocomplete:"no"
                                     }}
                                     ref = {(domElm) => { this.domElmns.address = domElm?domElm.input:domElm; }}
@@ -465,7 +474,7 @@ export default class Customer extends Component {
                                     onChange: (e, {newValue, method}) => this.reactAutosuggestControls.onChange(e, {newValue, method}, 'place'),
                                     onKeyUp: (e) => this.reactAutosuggestControls.onKeyUp(e, {currElmKey: 'place'}),
                                     className: "react-autosuggest__input place",
-                                    //readOnly: this.props.billCreation.loading,
+                                    readOnly: this.state.loading,
                                     autocomplete:"no"
                                 }}
                                 ref = {(domElm) => { this.domElmns.place = domElm?domElm.input:domElm; }}
@@ -489,7 +498,7 @@ export default class Customer extends Component {
                                     onChange: (e, {newValue, method}) => this.reactAutosuggestControls.onChange(e, {newValue, method}, 'city'),
                                     onKeyUp: (e) => this.reactAutosuggestControls.onKeyUp(e, {currElmKey: 'city'}),
                                     className: "react-autosuggest__input city",
-                                    //readOnly: this.props.billCreation.loading,
+                                    readOnly: this.state.loading,
                                     autocomplete:"no"
                                 }}
                                 ref = {(domElm) => { this.domElmns.city = domElm?domElm.input:domElm; }}
@@ -510,7 +519,7 @@ export default class Customer extends Component {
                                     onChange: (e, {newValue, method}) => this.reactAutosuggestControls.onChange(e, {newValue, method}, 'pincode'),
                                     onKeyUp: (e) => this.reactAutosuggestControls.onKeyUp(e, {currElmKey: 'pincode'}),
                                     className: "react-autosuggest__input pincode",
-                                    //readOnly: this.props.billCreation.loading,
+                                    readOnly: this.state.loading,
                                     autocomplete:"no"
                                 }}
                                 ref = {(domElm) => { this.domElmns.pincode = domElm?domElm.input:domElm; }}
@@ -531,7 +540,7 @@ export default class Customer extends Component {
                                     onChange: (e, {newValue, method}) => this.reactAutosuggestControls.onChange(e, {newValue, method}, 'mobile'),
                                     onKeyUp: (e) => this.reactAutosuggestControls.onKeyUp(e, {currElmKey: 'mobile'}),
                                     className: "react-autosuggest__input mobile",
-                                    //readOnly: this.props.billCreation.loading
+                                    readOnly: this.state.loading,
                                 }}
                                 ref = {(domElm) => { this.domElmns.mobile = domElm?domElm.input:domElm; }}
                             />
@@ -548,7 +557,7 @@ export default class Customer extends Component {
                                             /> }
                     </Col>
                 </Row>
-            </Container>
+            </div>
         )
     }
 }

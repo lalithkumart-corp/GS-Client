@@ -666,6 +666,16 @@ export default class CashBook extends Component {
         this.refresh();
     }
 
+    haveAppliedFilters() {
+        let flag = false;
+        if(this.state.filters) {
+            let filterObj = this.state.filters;
+            if(filterObj.tagId)
+                flag = true;
+        }
+        return flag;
+    }
+
     render() {
         return (
             <Row className="gs-card-content cash-book-main-card">
@@ -717,7 +727,7 @@ export default class CashBook extends Component {
                                         }}
                                         >
                                         <span 
-                                            className={`gs-icon`}
+                                            className={`gs-icon ${this.haveAppliedFilters()?'active':''}`}
                                             onClick={(e) => this.setState({isFilterPopoverVisible: !this.state.isFilterPopoverVisible})}
                                             style={{lineHeight: '33px', fontSize: '20px'}}
                                             >
