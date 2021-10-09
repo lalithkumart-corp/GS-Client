@@ -53,6 +53,5 @@
     outline: none;
 }
 .create-customer-modal .body {
-    padding-bottom: 100px;
-    padding-top: 50px;
+    padding: 50px 20px 100px 20px;
 }

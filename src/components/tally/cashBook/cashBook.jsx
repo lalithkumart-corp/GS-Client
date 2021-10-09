@@ -114,7 +114,7 @@ export default class CashBook extends Component {
                                 onChange={this.filterCallbacks.account}
                                 labelledBy=""
                                 className="account-multiselect-dpd"
-                                ItemRenderer={this.customItemRenderer}
+                                ItemRenderer={(params) => this.customItemRenderer('fund_house', params)}
                             />
                         </div>
                     );
@@ -157,6 +157,7 @@ export default class CashBook extends Component {
                                 onChange={this.filterCallbacks.category}
                                 labelledBy=""
                                 className="category-multiselect-dpd"
+                                ItemRenderer={(params) => this.customItemRenderer('category', params)}
                             />
                         </div>
                     );
@@ -344,7 +345,8 @@ export default class CashBook extends Component {
             if(resp && resp.data && resp.data.RESP) {
                 let newState = {...this.state};
                 newState.transactions = resp.data.RESP.results;
-                this.openingBalance = resp.data.RESP.pageWiseOpeningBal;
+                // this.openingBalance = resp.data.RESP.pageWiseOpeningBal;
+                newState.localCalculations = this.doLocalCalculations(resp.data.RESP.results);
                 this.setState(newState);
             }
         } catch(e) {
@@ -401,22 +403,22 @@ export default class CashBook extends Component {
         // }
     }
 
-    injectAvlBalanceOnTransactionItems(newStateObj) {
-        _.each(newStateObj.transactions, (aTransaction, index) => {
-            aTransaction.avlBalance = this.getBalance(aTransaction, index, newStateObj);
-        });
-        return newStateObj;
-    }
+    // injectAvlBalanceOnTransactionItems(newStateObj) {
+    //     _.each(newStateObj.transactions, (aTransaction, index) => {
+    //         aTransaction.avlBalance = this.getBalance(aTransaction, index, newStateObj);
+    //     });
+    //     return newStateObj;
+    // }
 
-    getBalance(row, rowIndex, newStateObj) {
-        if(rowIndex == 0 && newStateObj.selectedPageIndex == 0)
-            this.openingBalance = newStateObj.openingBalance;
-        let lastBal = this.openingBalance;
-        let newBal = lastBal + row.cash_in - row.cash_out;
-        this.openingBalance = newBal;
-        // console.log(`${rowIndex} Last Balance: ${this.openingBalance}, New = (${row.cash_in}-${row.cash_out})=${row.cash_in - row.cash_out}`);
-        return format(newBal, {code: 'INR'});
-    }
+    // getBalance(row, rowIndex, newStateObj) {
+    //     if(rowIndex == 0 && newStateObj.selectedPageIndex == 0)
+    //         this.openingBalance = newStateObj.openingBalance;
+    //     let lastBal = this.openingBalance;
+    //     let newBal = lastBal + row.cash_in - row.cash_out;
+    //     this.openingBalance = newBal;
+    //     // console.log(`${rowIndex} Last Balance: ${this.openingBalance}, New = (${row.cash_in}-${row.cash_out})=${row.cash_in - row.cash_out}`);
+    //     return format(newBal, {code: 'INR'});
+    // }
 
     filterCallbacks = {
         date: async (startDate, endDate) => {
@@ -595,19 +597,39 @@ export default class CashBook extends Component {
         return flag;
     }
 
-    customItemRenderer(params) {
-        return (
-            <div className={`item-renderer ${params.disabled && "disabled"} gs-custom-multiselect-item`}>
-                <input
-                    type="checkbox"
-                    onChange={params.onClick}
-                    checked={params.checked}
-                    tabIndex={-1}
-                    disabled={params.disabled}
-                />
-                <span>{params.option.label}</span>
-            </div>
-        );
+    customItemRenderer(identifier, params) { // params = {checked, option={label, value}, onClick, disabled}
+        let theDom = [];
+        switch(identifier) {
+            case 'fund_house':
+                theDom.push(
+                    <div className={`item-renderer ${params.disabled && "disabled"} gs-custom-multiselect-item ${identifier}`}>
+                        <input
+                            type="checkbox"
+                            onChange={params.onClick}
+                            checked={params.checked}
+                            tabIndex={-1}
+                            disabled={params.disabled}
+                        />
+                        <span>{params.option.label}</span>
+                    </div>
+                );
+                break;
+            case 'category':
+                theDom.push(
+                    <div className={`item-renderer ${params.disabled && "disabled"} gs-custom-multiselect-item ${identifier}`}>
+                        <input
+                            type="checkbox"
+                            onChange={params.onClick}
+                            checked={params.checked}
+                            tabIndex={-1}
+                            disabled={params.disabled}
+                        />
+                        <span>{params.option.label}</span>
+                    </div>
+                );
+                break;
+        }
+        return theDom;
     };
 
     async onClickTag(tag, id) {

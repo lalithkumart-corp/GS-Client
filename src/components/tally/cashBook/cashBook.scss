@@ -19,12 +19,21 @@
         .dropdown-heading {
             height: 26px;
         }
+        .dropdown-content {
+            width: 200px;
+        }
     }
     .account-multiselect-dpd {
         max-width: 60px;
         .dropdown-heading {
             height: 26px;
         }
+        .dropdown-content {
+            width: 200px;
+        }
+    }
+    .customer-iem-renderer-cashbook {
+        color: red;
     }
     #dropdown-more-actions {
         color: #337ab7;
@@ -39,12 +48,17 @@
     }
 }
 /**  gs-custom-multiselect-item */
-.account-multiselect-dpd .search input[type="text"] {
+.gs-custom-multiselect-item.exclude{
+    color: red;
+}
+.account-multiselect-dpd .search input[type="text"],
+.category-multiselect-dpd .search input[type="text"]{
     padding: 3px;
     height: 29px;
 }
 
-.account-multiselect-dpd .select-item {
+.account-multiselect-dpd .select-item,
+.category-multiselect-dpd .select-item{
     padding: 6px 3px !important;
     margin-bottom: 0;
     font-size: 11px;

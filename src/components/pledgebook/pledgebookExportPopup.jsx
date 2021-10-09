@@ -76,7 +76,7 @@ export default class PledgebookExportPopup extends Component {
         }
         return {            
             offsetStart: 0,
-            offsetEnd: 10000,
+            offsetEnd: 40000,
             filters: filters,
             sortOrder : sortOrder
         }

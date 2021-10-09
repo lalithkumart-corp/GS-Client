@@ -3,7 +3,7 @@ import {Tabs, Tab, Container, Row, Col} from 'react-bootstrap';
 import GSTable from '../../gs-table/GSTable';
 import axiosMiddleware from '../../../core/axios';
 import { convertToLocalTime } from '../../../utilities/utility';
-import { GET_FUND_TRN_LIST } from '../../../core/sitemap';
+import { GET_FUND_TRN_LIST, GET_FUND_TRN_OVERVIEW } from '../../../core/sitemap';
 import { getAccessToken } from '../../../core/storage';
 import { getOffsets2 } from './helper';
 import ReactPaginate from 'react-paginate';
@@ -19,6 +19,7 @@ export default function CashBook(props) {
     useEffect(() => {
         if(props.refreshCashBookTable) {
             fetchTransactions();
+            fetchTransOverview();
             props.setRefreshCashBookTableFlag(false);
         }
     }, [props.refreshCashBookTable]);
@@ -78,16 +79,34 @@ export default function CashBook(props) {
             if(resp && resp.data.RESP) {
                 setTransactions(resp.data.RESP.results);
                 setTotalTransactionsCount(resp.data.RESP.collections.count);
-                if(resp.data.RESP.collections) {
-                    setTotals({cashIn: resp.data.RESP.collections.totalCashIn, cashOut: resp.data.RESP.collections.totalCashOut});
-                    props.updateCommonStore('cashTransactions', {totalCashIn: resp.data.RESP.collections.totalCashIn, totalCashOut: resp.data.RESP.collections.totalCashOut});
-                }
+                // if(resp.data.RESP.collections) {
+                //     setTotals({cashIn: resp.data.RESP.collections.totalCashIn, cashOut: resp.data.RESP.collections.totalCashOut});
+                //     props.updateCommonStore('cashTransactions', {totalCashIn: resp.data.RESP.collections.totalCashIn, totalCashOut: resp.data.RESP.collections.totalCashOut});
+                // }
                 console.log(resp.data);
             }
         } catch(e) {
             console.log(e);
         }
     };
+
+    const fetchTransOverview = async () => {
+        try {
+            let at = getAccessToken();
+            let params = {
+                startDate: props._startDateUTC,
+                endDate: props._endDateUTC,
+                fetchFilterCollections: true,
+            }
+            let resp = await axiosMiddleware.get(`${GET_FUND_TRN_OVERVIEW}?access_token=${at}&params=${JSON.stringify(params)}`);
+            if(resp && resp.data && resp.data.RESP) {
+                setTotals({cashIn: resp.data.RESP.totalCashIn, cashOut: resp.data.RESP.totalCashOut});
+                props.updateCommonStore('cashTransactions', {totalCashIn: resp.data.RESP.totalCashIn, totalCashOut: resp.data.RESP.totalCashOut});
+            }
+        } catch(e) {
+            console.log(e);
+        }
+    }
 
     const getPageCount = () => {
         let totalRecords = totalTransactionsCount;
@@ -96,7 +115,8 @@ export default function CashBook(props) {
 
     const handlePageClick = async (selectedPage) => {
         await setSelectedPageIndex(selectedPage.selected);
-        fetchTransactions();      
+        fetchTransactions();
+        fetchTransOverview();
     }
     
     return (
