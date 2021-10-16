@@ -26,7 +26,7 @@ class GSCheckbox extends Component {
     render() {        
         return (
             <label className={this.state.className +" gs-checkbox-container"}>{this.state.labelText}
-                <input type="checkbox" className={" gs-checkbox"} onChange={(e) => this.state.onChangeListener(e, this.state.optionalArgs)} checked={this.state.checked}/>
+                <input type="checkbox" className={" gs-checkbox"} onChange={(e) => this.state.onChangeListener(e, this.state.optionalArgs)} checked={this.state.checked} disabled={this.state.isDisabled}/>
                 <span className="checkmark"></span>
             </label>
         )

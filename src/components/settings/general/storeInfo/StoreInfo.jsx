@@ -1,9 +1,6 @@
 import React, { Component } from 'react';
-import { Container, Row, Col, Form, FormGroup, FormControl } from 'react-bootstrap';
+import { Row, Col, Form, FormGroup, FormControl } from 'react-bootstrap';
 import { connect } from 'react-redux';
-import axiosMiddleware from '../../../../core/axios';
-import { UPDATE_STORE_INFO } from '../../../../core/sitemap';
-import { toast } from 'react-toastify';
 import { updateStoreDetails } from '../../../../actions/storeDetails';
 
 class StoreInfo extends Component {

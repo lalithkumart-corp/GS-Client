@@ -1,0 +1,181 @@
+.jewellery-gst-bill-paper {
+    font-size: 20px;
+    width: 830px;
+    margin-top: 40px;
+    padding-left: 15px;
+    padding-right: 15px;
+    border: none;
+    left: 0;
+    .inner-section {
+        border: 1px solid;
+        margin-left: 20px;
+        margin-right: 20px;
+    }
+    .gs-checkbox-container {
+        display: inline-block;
+    }
+    .store-detail-content {
+        .store-detail-content-col1 {
+            border-bottom: 1px solid grey;
+            padding-top: 10px;
+            padding-bottom: 10px;
+            .row {
+                padding-top: 7px;
+                padding-bottom: 7px;
+            }
+            .jewellery-bill-header-logo1-div {
+                position: absolute;
+                height: 65px;
+                left: 25px;
+                top: 33px;
+            }
+            .jewellery-bill-header-logo2-div {
+                height: 80px;
+                position: absolute;
+                right: 40px;
+                top: 29px;
+            }
+            .store-name-col {
+                font-size: 31px;
+                letter-spacing: 2px;
+            }
+            .store-name-col,
+            .address-col,
+            .place-city-col {
+                font-weight: bold;
+                text-align: center;
+            }
+        }
+    }
+    .bill-content {
+        .bill-content-col1 {
+            border-top: 1px solid grey;
+            .row {
+                padding-top: 7px;
+                padding-bottom: 7px;
+            }
+            .customer-info-col {
+                .the-label {
+                    font-weight: bold;
+                    width: 110px;
+                    display: inline-block;
+                    padding-top: 5px;
+                }
+                .the-val {
+                    padding-left: 5px;
+                }
+            }
+            .ornament-section {
+                min-height: 300px;
+                padding: 0;
+                .an-ornament-header {
+                    padding: 3px 15px;
+                    border-bottom: 1px solid;
+                    border-top: 1px solid;
+                    .an-orn-cell {
+                        display: inline-block;
+                    }
+                }
+                .ornament-body {
+                    padding-left: 15px;
+                    padding-right: 15px;
+                    .an-ornament {
+                        padding-top: 5px;
+                        padding-bottom: 5px;
+                        .an-orn-cell {
+                            display: inline-block;
+                        }
+                    }
+                }
+                .an-orn-cell.title {
+                    width: 400px;
+                }
+                .an-orn-cell.qty {
+                    width: 50px;
+                }
+                .an-orn-cell.nwt {
+                    width: 80px;
+                }
+                .an-orn-cell.gwt {
+                    width: 80px;
+                }
+                .an-orn-cell.price {
+                    width: 100px;
+                }
+            }
+            .rupee-extras-section {
+                border-top: 1px solid;
+                border-bottom: 1px solid;
+                padding: 0;
+                .rupee-in-words {
+                    width: 400px;
+                    display: inline-block;
+                    vertical-align: top;
+                    padding: 10px;
+                }
+                .extras-detail {
+                    border-left: 1px solid;
+                    display: inline-block;
+                    width: 357px;
+                    .making-charge-div,
+                    .cgst-div,
+                    .sgst-div,
+                    .grand-total-div {
+                        padding-left: 15px;
+                        border-bottom: 1px solid;
+                        .the-label {
+                            display: inline-block;
+                            border-right: 1px solid;
+                            width: 220px;
+                            padding-top: 3px;
+                            padding-bottom: 3px;
+                        }
+                        .the-val {
+                            padding-left: 10px;
+                        }
+                    }
+                    .grand-total-div {
+                        border-bottom: none;
+                    }
+                }
+            }
+            .footer-detail {
+                .signature-col {
+                    color: red;
+                    .store-name {
+                        font-weight: bold;
+                        padding-left: 10px;
+                    }
+                }
+            }
+        }
+    }
+}
+
+@media print {
+    .jewellery-gst-bill-template1 {
+        width: 830px;
+        max-width: 830px;
+        margin-left: 5px;
+        margin-top: 40px;
+        padding-left: 15px;
+        padding-right: 15px;
+        left: 0;
+        // .store-detail-content {
+        //     .store-detail-content-col1 {
+        //         border-bottom: 1px solid grey;
+        //         .store-name-col,
+        //         .address-col,
+        //         .place-city-col {
+        //             font-weight: bold;
+        //             text-align: center;
+        //         }
+        //     }
+        // }
+        // .bill-content {
+        //     .bill-content-col1 {
+        //         border-top: 1px solid grey;
+        //     }
+        // }
+    }
+}

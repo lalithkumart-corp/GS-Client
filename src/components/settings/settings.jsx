@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import FundAccounts from './fundAccounts/fundAccounts';
 import Locker from './locker/locker';
+import GeneralSetup from './general/GeneralSetup';
 import { Tabs, Tab, Row, Col, Nav } from 'react-bootstrap';
 import './settings.scss';
 
@@ -20,10 +21,13 @@ export default class Settings extends Component {
                     </Tab>
                 </Tabs> */}
                 <h4 className="settings-header-text">Settings</h4>
-                <Tab.Container id="left-tabs-example" defaultActiveKey="fundaccounts">
+                <Tab.Container id="left-tabs-example" defaultActiveKey="general">
                     <Row>
                         <Col sm={2} xs={3} className={"settings-left-panel"}>
                             <Nav className="flex-column">
+                                <Nav.Item>
+                                    <Nav.Link eventKey="general">General</Nav.Link>
+                                </Nav.Item>
                                 <Nav.Item>
                                     <Nav.Link eventKey="fundaccounts">Accounts</Nav.Link>
                                 </Nav.Item>
@@ -34,6 +38,9 @@ export default class Settings extends Component {
                         </Col>
                         <Col sm={10} xs={9}>
                             <Tab.Content>
+                                <Tab.Pane eventKey="general">
+                                    <GeneralSetup {...this.state} />
+                                </Tab.Pane>
                                 <Tab.Pane eventKey="fundaccounts">
                                     <FundAccounts {...this.state} />
                                 </Tab.Pane>
