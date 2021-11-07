@@ -27,12 +27,17 @@ if(window.location.protocol == "https:")
 else
     port = 80;
 // port = window.location.port || process.env.REACT_APP_API_PORT;
-if(process.env.REACT_APP_ENV == 'development')
+
+let hostName = process.env.REACT_APP_API_HOST;
+
+if(process.env.REACT_APP_ENV == 'development') {
     port = process.env.REACT_APP_API_PORT;
+    hostName = window.location.hostname;// process.env.REACT_APP_API_HOST
+}
 const protocol = window.location.protocol.substring(0, window.location.protocol.indexOf(':')) || process.env.REACT_APP_API_PROTOCOL;
 
 export let config = {
-    "proxy_api_host": process.env.REACT_APP_API_HOST,
+    "proxy_api_host": hostName,
     "proxy_api_port": port,
     "proxy_protocol": protocol,
     "restApiRoot": process.env.REACT_APP_API_ROOT,
@@ -136,6 +141,10 @@ export const REMOVE_TAGS = `${config.proxy_protocol}://${config.proxy_api_host}:
 export const GET_LOAN_BILL_TEMPLATE_SETTINGS = `${config.proxy_protocol}://${config.proxy_api_host}:${config.proxy_api_port}/${config.restApiRoot}/LoanBillTemplates/get-settings`;
 export const UPDATE_LOAN_BILL_TEMPLATE = `${config.proxy_protocol}://${config.proxy_api_host}:${config.proxy_api_port}/${config.restApiRoot}/LoanBillTemplates/update-settings`;
 export const FETCH_AVL_LOAN_BILL_TEMPLATES = `${config.proxy_protocol}://${config.proxy_api_host}:${config.proxy_api_port}/${config.restApiRoot}/LoanBillTemplates/fetch-avl-loan-bill-templates`;
+
+export const GET_JEWELLERY_BILL_SETTINGS = `${config.proxy_protocol}://${config.proxy_api_host}:${config.proxy_api_port}/${config.restApiRoot}/JewelleryBillSettings/get-settings`;
+export const UPDATE_JEWELLERY_BILL_SETTINGS = `${config.proxy_protocol}://${config.proxy_api_host}:${config.proxy_api_port}/${config.restApiRoot}/JewelleryBillSettings/update-settings`;
+export const FETCH_AVL_JEWELLERY_BILL_TEMPLATES = `${config.proxy_protocol}://${config.proxy_api_host}:${config.proxy_api_port}/${config.restApiRoot}/JewelleryBillSettings/fetch-avl-jewellery-bill-templates`;
 
 export const FETCH_FUND_ACCOUNTS_LIST = `${config.proxy_protocol}://${config.proxy_api_host}:${config.proxy_api_port}/${config.restApiRoot}/FundAccounts/get-list`;
 export const ADD_NEW_FUND_ACCOUNT = `${config.proxy_protocol}://${config.proxy_api_host}:${config.proxy_api_port}/${config.restApiRoot}/FundAccounts/insert-account`;

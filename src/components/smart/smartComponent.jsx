@@ -44,6 +44,7 @@ import MyContacts from '../mycontacts/MyContactManager';
 import UdhaarEntry from '../udhaar/UdhaarEntry';
 import UdhaarListComp from '../udhaar/UdhaarList';
 import ResetPassword from '../passwordReset/passwordReset';
+import GstBillingDemo from '../jewellery/billing/gstbillingDemo';
 
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'react-tippy/dist/tippy.css'
@@ -135,6 +136,7 @@ class SmartComponent extends Component {
                                 <Route path="/udhaar-create" component={UdhaarEntry} />
                                 <Route path="/udhaar-list" component={UdhaarListComp} />
                                 <Route path="/reset-pwd" component={ResetPassword} />
+                                <Route path="/gst-bill-generator" component={GstBillingDemo} />
                             </div>
                             {/* <div className="floating-right-side-bar"> */}
                             <div className={`floating-right-side-bar ${this.props.rightSideBar.visibility?'show':'hide'} `}>

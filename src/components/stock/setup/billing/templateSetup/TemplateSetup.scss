@@ -1,5 +1,17 @@
-.jewellery-bill-template-preview-modal {
-    .body {
-        padding-bottom: 50px;
+.jewellery-template-setup-container {
+    .screenshot-prview-container {
+        height: 250px;
+        .template-image-viewer {
+            height: 100%;
+        }
+    }
+    .screenshot-radio-btn-label {
+        text-align: center;
+        margin-top: 17px;
+    }
+    .jewellery-bill-template-preview-modal {
+        .body {
+            padding-bottom: 50px;
+        }
     }
 }

@@ -8,6 +8,7 @@ let defaultState = {
     pincode: '',
     mobile: '',
     email: '',
+    gstNo: '',
     loanLicenseName: '',
     loanBillAddressLine1: '',
     loanBillAddressLine2: ''
@@ -25,6 +26,7 @@ export default function storeInfoReducer(state=defaultState, action) {
                 newState.pincode = data.pincode;
                 newState.mobile = data.mobile;
                 newState.email = data.email;
+                newState.gstNo = data.gstNo;
                 newState.loanLicenseName = data.loanLicenseName;
                 newState.loanBillAddressLine1 = data.loanBillAddrLine1;
                 newState.loanBillAddressLine2 = data.loanBillAddrLine2;

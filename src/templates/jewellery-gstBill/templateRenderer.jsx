@@ -30,10 +30,10 @@ export default class TemplateRenderer extends Component {
         let theDom = [];
         switch(this.props.templateId) {
             case '1':
-                theDom.push(<Template1 {...this.props.content}/>);
+                theDom.push(<Template1 printContent={this.props.content}/>);
                 break;
             default:
-                theDom.push(<Template1 {...this.props.content}/>);
+                theDom.push(<Template1 printContent={this.props.content}/>);
         }
         return theDom;
     }

@@ -94,6 +94,7 @@ class NavbarComp extends Component {
                                 <NavDropdown.Divider />
                                 <NavDropdown.Item as={Link} to="/tag-demo">Tag Generator</NavDropdown.Item>
                                 <NavDropdown.Item as={Link} to="/label-generator">Label Generator</NavDropdown.Item>
+                                <NavDropdown.Item as={Link} to="/gst-bill-generator">GST BILL Generator</NavDropdown.Item>
                             </NavDropdown>
                         </Nav>
                     }

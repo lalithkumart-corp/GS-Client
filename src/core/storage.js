@@ -12,6 +12,7 @@ const keys = {
     pledgebookFilters: 'pledgebookFilters',
     cashManagerFilters: 'cashManagerFilters',
     loanBillTemplate: 'loanBillTemplate',
+    jewelleryGstBillTemplateData: 'jewelleryGstBillTemplateData',
     myFundAccountsList: 'myFundAccountsList',
     allFundList: 'allFundList'
 };
@@ -28,6 +29,7 @@ const keyMaps = {
         keys.pledgebookFilters,
         keys.cashManagerFilters,
         keys.loanBillTemplate,
+        keys.jewelleryGstBillTemplateData,
         keys.myFundAccountsList,
         keys.allFundList
     ],
@@ -304,6 +306,18 @@ export const clearLoanBillTemplateSettings = () => {
     _clear(keys.loanBillTemplate);
 }
 
+export const saveJewelleryGstBillTemplateSettings = () => {
+    _save(keys.jewelleryGstBillTemplateData, data);
+}
+
+export const getJewelleryGstBillTemplateSettings = () => {
+    let templateData = _read(keys.jewelleryGstBillTemplateData);
+    return templateData;
+}
+
+export const clearJewelleryGstBillTemplateSettings = () => {
+    _clear(keys.jewelleryGstBillTemplateData);
+}
 
 export const getMyFundAccountList = () => {
     return _read(keys.myFundAccountsList);

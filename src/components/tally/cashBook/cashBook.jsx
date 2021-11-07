@@ -9,7 +9,7 @@ import DateRangePicker from '../../dateRangePicker/dataRangePicker';
 import { constructFetchApiParams, getFilterValFromLocalStorage, getCreateAlertParams, getUpdateAlertParams, getDeleteAlertParams, deleteTransactions } from './helper';
 import ReactPaginate from 'react-paginate';
 import './cashBook.scss';
-import MultiSelect from "react-multi-select-component";
+import {MultiSelect} from "react-multi-select-component";
 import { toast } from 'react-toastify';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { format } from 'currency-formatter';

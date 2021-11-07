@@ -25,6 +25,7 @@ export const doAuthentication = (params) => {
                 saveSession(data.RESP.session);
                 saveUserPreferences(data.RESP.userPreferences);
                 saveLoanBillTemplateSettings(data.RESP.loanBillTemplateSettings);
+                saveJewelleryGstBillTemplateSettings(data.RESP.jewelleryGstBillTemplateSettings);
                 // history.push('/billcreate'); // TIP: Enable this line, if want to land directly on 'billCreation' page after successfull Login
                 dispatch({
                     type: 'AUTH_SUCCESS',

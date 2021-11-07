@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import { Row, Col, Form, FormGroup, FormControl } from 'react-bootstrap';
 import { connect } from 'react-redux';
 import { updateStoreDetails } from '../../../../actions/storeDetails';
+import './StoreInfo.scss';
 
 class StoreInfo extends Component {
     constructor(props) {
@@ -28,6 +29,9 @@ class StoreInfo extends Component {
             email: {
                 inputVal: this.props.storeDetail.email
             },
+            gstNo: {
+                inputVal: this.props.storeDetail.gstNo
+            },
             loanLicenseName: {
                 inputVal: this.props.storeDetail.loanLicenseName
             },
@@ -51,6 +55,7 @@ class StoreInfo extends Component {
             newState.pincode.inputVal = nextProps.storeDetail.pincode;
             newState.mobile.inputVal = nextProps.storeDetail.mobile;
             newState.email.inputVal = nextProps.storeDetail.email;
+            newState.gstNo.inputVal = nextProps.storeDetail.gstNo;
             newState.loanLicenseName.inputVal = nextProps.storeDetail.loanLicenseName;
             newState.loanBillAddressLine1.inputVal = nextProps.storeDetail.loanBillAddressLine1;
             newState.loanBillAddressLine2.inputVal = nextProps.storeDetail.loanBillAddressLine2;
@@ -73,6 +78,7 @@ class StoreInfo extends Component {
             case 'pincode':
             case 'mobile':
             case 'email':
+            case 'gstNo':
             case 'loanLicenseName':
             case 'loanBillAddressLine1':
             case 'loanBillAddressLine2':
@@ -97,6 +103,7 @@ class StoreInfo extends Component {
             pincode: this.state.pincode.inputVal,
             mobile: this.state.mobile.inputVal,
             email: this.state.email.inputVal,
+            gstNo: this.state.gstNo.inputVal,
             loanLicenseName: this.state.loanLicenseName.inputVal,
             loanBillAddrLine1: this.state.loanBillAddressLine1.inputVal,
             loanBillAddrLine2: this.state.loanBillAddressLine2.inputVal
@@ -105,7 +112,7 @@ class StoreInfo extends Component {
 
     render() {
         return (
-            <Row xs={12} className='store-info-setup-container'>
+            <Row className='store-info-setup-container'>
                 <Col xs={12} className='gs-card'>
                     <Row xs={12} className='gs-card-content'>
                         <Col>
@@ -131,7 +138,7 @@ class StoreInfo extends Component {
                             </Col>
                         </Row>
                         <Row>
-                            <Col xs={{span: 4}} md={{span: 4}}>
+                            <Col xs={{span: 6}} md={{span: 6}}>
                                 <Form>
                                     <FormGroup>
                                         <Form.Label>Address</Form.Label>
@@ -145,7 +152,7 @@ class StoreInfo extends Component {
                                     </FormGroup>
                                 </Form>
                             </Col>
-                            <Col xs={{span: 4}} md={{span: 4}}>
+                            <Col xs={{span: 3}} md={{span: 3}}>
                                 <Form>
                                     <FormGroup>
                                         <Form.Label>Place</Form.Label>
@@ -159,7 +166,7 @@ class StoreInfo extends Component {
                                     </FormGroup>
                                 </Form>
                             </Col>
-                            <Col xs={{span: 4}} md={{span: 4}}>
+                            <Col xs={{span: 3}} md={{span: 3}}>
                                 <Form>
                                     <FormGroup>
                                         <Form.Label>City</Form.Label>
@@ -175,7 +182,7 @@ class StoreInfo extends Component {
                             </Col>
                         </Row>
                         <Row>
-                            <Col xs={{span: 4}} md={{span: 4}}>
+                            <Col xs={{span: 3}} md={{span: 3}}>
                                 <Form>
                                     <FormGroup>
                                         <Form.Label>PinCode</Form.Label>
@@ -189,7 +196,7 @@ class StoreInfo extends Component {
                                     </FormGroup>
                                 </Form>
                             </Col>
-                            <Col xs={{span: 4}} md={{span: 4}}>
+                            <Col xs={{span: 3}} md={{span: 3}}>
                                 <Form>
                                     <FormGroup>
                                         <Form.Label>E-Mail</Form.Label>
@@ -204,7 +211,7 @@ class StoreInfo extends Component {
                                     </FormGroup>
                                 </Form>
                             </Col>
-                            <Col xs={{span: 4}} md={{span: 4}}>
+                            <Col xs={{span: 3}} md={{span: 3}}>
                                 <Form>
                                     <FormGroup>
                                         <Form.Label>Mobile</Form.Label>
@@ -213,6 +220,20 @@ class StoreInfo extends Component {
                                             type="text"
                                             value={this.state.mobile.inputVal}
                                             onChange={(e) => this.onChange(e, 'mobile')}
+                                        />
+                                        <FormControl.Feedback />
+                                    </FormGroup>
+                                </Form>
+                            </Col>
+                            <Col xs={{span: 3}} md={{span: 3}}>
+                                <Form>
+                                    <FormGroup>
+                                        <Form.Label>GST</Form.Label>
+                                        <FormControl
+                                            placeholder="GST NO"
+                                            type="text"
+                                            value={this.state.gstNo.inputVal}
+                                            onChange={(e) => this.onChange(e, 'gstNo')}
                                         />
                                         <FormControl.Feedback />
                                     </FormGroup>
