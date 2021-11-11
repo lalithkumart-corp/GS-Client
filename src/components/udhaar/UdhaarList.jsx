@@ -258,9 +258,7 @@ function UdhaarListComp() {
             setUdhaarBillFilter(e.target.value);
         },
         customerName: (e) => {
-            // debounce((e)=> {
-                setCustNameFilter(e.target.value);
-            // }, 1000);
+            setCustNameFilter(e.target.value);
         },
         guardianName: (e) => {
             setGuardianNameFilter(e.target.value);

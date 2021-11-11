@@ -306,7 +306,7 @@ export const clearLoanBillTemplateSettings = () => {
     _clear(keys.loanBillTemplate);
 }
 
-export const saveJewelleryGstBillTemplateSettings = () => {
+export const saveJewelleryGstBillTemplateSettings = (data) => {
     _save(keys.jewelleryGstBillTemplateData, data);
 }
 

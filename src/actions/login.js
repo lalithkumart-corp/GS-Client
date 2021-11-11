@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { getAccessToken, saveSession, clearSession, saveUserPreferences, setSsoUserFlag, storeAccessToken, saveLoanBillTemplateSettings } from '../core/storage';
+import { getAccessToken, saveSession, clearSession, saveUserPreferences, setSsoUserFlag, storeAccessToken, saveLoanBillTemplateSettings, saveJewelleryGstBillTemplateSettings } from '../core/storage';
 import { LOGIN, LOGOUT, GET_APP_STATUS, CHECK_EMAIL_EXISTANCE, SSO_LOGIN } from '../core/sitemap';
 import { toast } from 'react-toastify';
 import history from '../history';
