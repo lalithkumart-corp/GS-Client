@@ -1,5 +1,6 @@
 import { Component } from 'react';
 import Template1 from './template1/Template1';
+import Template2 from './template2/Template2';
 
 // export default function TemplateRenderer(props) {
     
@@ -29,8 +30,11 @@ export default class TemplateRenderer extends Component {
     getTemplateById() {
         let theDom = [];
         switch(this.props.templateId) {
-            case '1':
+            case 1:
                 theDom.push(<Template1 printContent={this.props.content}/>);
+                break;
+            case 2:
+                theDom.push(<Template2 printContent={this.props.content}/>);
                 break;
             default:
                 theDom.push(<Template1 printContent={this.props.content}/>);

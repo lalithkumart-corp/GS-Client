@@ -11,7 +11,7 @@ import CommonModal from '../../common-modal/commonModal';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import GSCheckbox from '../../ui/gs-checkbox/checkbox';
 import './SellItem.css';
-import {calcPurchaseTotals, calculateExchangeTotals, calculatePaymentFormData, validate, constructApiParams, resetPageState, defaultExchangeItemFormData } from './helper';
+import {calcPurchaseTotals, calculateExchangeTotals, calculatePaymentFormData, validate, constructApiParams, resetPageState, defaultExchangeItemFormData, constructPrintContent } from './helper';
 import { toast } from 'react-toastify';
 import { DoublyLinkedList } from '../../../utilities/doublyLinkedList';
 
@@ -365,12 +365,13 @@ class SellItem extends Component {
         let grossWt = this.state.exchangeItemFormData[EX_GROSS_WT];
         let netWt = this.state.exchangeItemFormData[EX_NET_WT];
         let wastage = this.state.exchangeItemFormData[EX_WASTAGE];
+        let wastageVal = (this.state.exchangeItemFormData[EX_NET_WT]*this.state.exchangeItemFormData[EX_WASTAGE])/100;
         let oldRate = this.state.exchangeItemFormData[EX_OLD_RATE];
         let price = this.state.exchangeItemFormData[EX_PRICE];
         let newState = {...this.state};
         let key = Object.keys(newState.exchangeItems) + 1;
         newState.exchangeItems[key] = {
-            metal, grossWt, netWt, wastage, oldRate, price, 
+            metal, grossWt, netWt, wastage, wastageVal, oldRate, price, 
         };
         newState.exchangeItemFormData = JSON.parse(JSON.stringify(defaultExchangeItemFormData));
         newState.exchangeItemsTotals = calculateExchangeTotals(newState.exchangeItems);
@@ -384,8 +385,18 @@ class SellItem extends Component {
         if(validation.flag) {
             try {
                 let apiParams = constructApiParams(this.state, this.props);
+
+                //TEMP
+                let tt = constructPrintContent(this.state, this.props);
+                console.log(tt);
+                return;
+                //TEMP END
+
                 let resp = await axiosMiddleware.post(SALE_ITEM, {apiParams});
                 if(resp.data && resp.data.STATUS == "SUCCESS") {
+                    let printContent = constructPrintContent(this.state, this.props);
+                    console.log(printContent);
+                    this.triggerPrint(printContent);
                     toast.success('Success!');
                     let newState = {...this.state};
                     newState = resetPageState(newState);
@@ -532,18 +543,33 @@ class SellItem extends Component {
                 let wt = this.state.currSelectedItem.formData.netWt || this.state.currSelectedItem.net_wt; //wtPerQty*qty;
                 
                 let wastage = this.state.currSelectedItem.formData.wastage || 0;
+                let wastageVal = ( wt* (wastage/100) );
                 let labour = this.state.currSelectedItem.formData.labour || 0;
                 let discount = this.state.currSelectedItem.formData.discount || 0;
-                let price =( ( ( wt + ( wt* (wastage/100) ) ) * retailPrice) + labour );
+                let priceActual = ( ( ( wt + wastageVal ) * retailPrice) + labour );
+                let price = priceActual;
 
                 let cgstPercent = this.state.currSelectedItem.formData.cgstPercent || 0;
                 let sgstPercent = this.state.currSelectedItem.formData.sgstPercent || 0;
                 let percents = cgstPercent + sgstPercent;
-                if(percents > 0)
-                    price = price + (price * (percents/100));
+                
+                let cgstVal = 0;
+                let sgstVal = 0;
+                let taxVal = 0;
+
+                if(percents > 0) {
+                    if(cgstPercent) cgstVal = parseFloat((price * (cgstPercent/100)).toFixed(2));
+                    if(sgstPercent) sgstVal = parseFloat((price * (sgstPercent/100)).toFixed(2));
+                    taxVal = cgstVal + sgstVal; // (price * (percents/100));
+                    price = price + taxVal;
+                }
                 
                 price =  price - discount;
-                
+
+                newState.currSelectedItem.formData.wastageVal = wastageVal;
+                newState.currSelectedItem.formData.cgstVal = cgstVal;
+                newState.currSelectedItem.formData.sgstVal = sgstVal;
+                newState.currSelectedItem.formData.priceActual = parseFloat(priceActual.toFixed(3));
                 newState.currSelectedItem.formData.price = parseFloat(price.toFixed(3));
     
                 // newState.totalSellingPrice = price; //for multiple selling items
@@ -569,6 +595,14 @@ class SellItem extends Component {
         }
     }
    
+    triggerPrint(printContent) {
+        try {
+
+        } catch(e) {
+            
+        }
+    }
+
     getInputBox() {
         return (
             <Row style={{marginTop: "25px"}}>

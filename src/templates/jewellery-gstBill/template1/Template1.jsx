@@ -195,26 +195,4 @@ function GstBillTemplate1(props) {
     )
 }
 
-// class GstBillTemplate1 extends Component {
-//     constructor(props) {
-//         super(props);
-//     }
-//     render() {
-//         return (
-//             <div className="jewellery-gst-bill-paper">
-//                 <Row className="store-detail-content">
-//                     <Col xs={12}>
-//                         {this.props.storeName}
-//                     </Col>
-//                 </Row>
-//                 <Row className="bill-content">
-//                     <Col xs={12}>
-//                         {this.props.customerName}
-//                     </Col>
-//                 </Row>
-//             </div>
-//         )
-//     }
-// }
-
 export default GstBillTemplate1;

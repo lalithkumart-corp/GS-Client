@@ -41,22 +41,31 @@ export const calcPurchaseTotals = (billPreviewList) => {
         netWt: 0,
         wastage: 0,
         labour: 0,
+        actualPrice: 0, // price without tax, without discount (only with Wastage, labour)
         cgstPercent: 0,
         sgstPercent: 0,
         discount: 0,
         price: 0
     };
     _.each(billPreviewList, (anItem, index) => {
+        
+        let wastagePercentAvg = calcualteAvgWastagePercent(billPreviewList);
+        let cgstPercentAvg = calculateAvgCgstPercent(billPreviewList);
+        let sgstPercentAvg = calculateAvgSgstPercent(billPreviewList);
+
         totals.qty += anItem.formData.qty;
         totals.grossWt += anItem.formData.grossWt;
         totals.netWt += anItem.formData.netWt;
-        totals.wastage = calcualteAvgWastagePercent(billPreviewList);
-        totals.cgstPercent = calculateAvgCgstPercent(billPreviewList);
-        totals.sgstPercent = calculateAvgSgstPercent(billPreviewList);
+        totals.wastageVal += anItem.formData.wastageVal;
+        totals.wastage = wastagePercentAvg;
+        totals.cgstPercent = cgstPercentAvg;
+        totals.sgstPercent = sgstPercentAvg;
         totals.labour += anItem.formData.labour;
         totals.discount += anItem.formData.discount;
+        totals.actualPrice += anItem.formData.priceActual;
         totals.price += anItem.formData.price;
     });
+    
     totals.price = formatLongToShortInt(totals.price);
     return totals;
 }
@@ -65,14 +74,21 @@ export const calculateExchangeTotals = (exchangeItemList) => {
     let totals = {
         grossWt: 0,
         netWt: 0,
-        price: 0
+        price: 0,
+        wastageVal: 0
     };
+    let oldRateSum = 0;
+    let oldRateCount = 0;
     _.each(exchangeItemList, (anItem, index) => {
         totals.grossWt += anItem.grossWt;
         totals.netWt += anItem.netWt;
+        totals.wastageVal += anItem.wastageVal || 0;
         totals.price += anItem.price;
+        oldRateSum += anItem.oldRate;
+        oldRateCount++;
     });
     totals.price = formatLongToShortInt(totals.price);
+    totals.oldRateAvg = oldRateSum/oldRateCount;
     return totals;
 }
 
@@ -97,21 +113,55 @@ export const getPriceOfExchangeItem = (stateObj) => {
 
 export const calculatePaymentFormData = (stateObj) => {
     let paymentFormData = {
-        totalPurchasePrice: stateObj.totalPurchasePrice || 0,
-        totalExchangePrice: stateObj.totalExchangePrice || 0,
+        totalActualPrice: 0, // Wastage + Labour (No tax, No discount)
+        totalPurchasePrice: 0, //stateObj.totalPurchasePrice || 0,
+        totalExchangePrice: 0, //stateObj.totalExchangePrice || 0,
         sum: stateObj.paymentFormData.sum || 0,
         paymentMode: stateObj.paymentFormData.paymentMode || 'CASH',
         paymentDetails: stateObj.paymentFormData.paymentDetails || {},
         paid: stateObj.paymentFormData.paid || "",
         balance: stateObj.paymentFormData.balance || 0
     };
+    if(typeof stateObj.purchaseTotals.actualPrice !== 'undefined')
+        paymentFormData.totalActualPrice = stateObj.purchaseTotals.actualPrice;
     if(typeof stateObj.purchaseTotals.price !== "undefined")
         paymentFormData.totalPurchasePrice = stateObj.purchaseTotals.price;
     if(typeof stateObj.exchangeItemsTotals.price !== "undefined")
         paymentFormData.totalExchangePrice = stateObj.exchangeItemsTotals.price;
+    
     paymentFormData.sum = paymentFormData.totalPurchasePrice - paymentFormData.totalExchangePrice;
 
     paymentFormData.balance = paymentFormData.sum - (paymentFormData.paid || 0);
+
+    //the below calc is done for passing to print template
+    let labourTotal = 0;
+    let cgstPercentSum = 0;
+    let sgstPercentSum = 0;
+    let cgstPercentAvg = 0;
+    let sgstPercentAvg = 0;
+    let cgstValTotal = 0;
+    let sgstValTotal = 0;
+    let discountTotal = 0;
+    _.each(stateObj.purchaseItemPreview, (anItem, index) => {
+        labourTotal += anItem.formData.labour || 0;
+        cgstPercentSum += anItem.formData.cgstPercent || 0;
+        sgstPercentSum += anItem.formData.sgstPercent || 0;
+        cgstValTotal += anItem.formData.cgstVal || 0;
+        sgstValTotal += anItem.formData.sgstVal || 0;
+        discountTotal += anItem.formData.discount || 0;
+    });
+    let totalNewItems = Object.keys(stateObj.purchaseItemPreview).length;
+        cgstPercentAvg = cgstPercentSum/totalNewItems;
+        sgstPercentAvg = sgstPercentSum/totalNewItems;
+
+    paymentFormData._labourTotal = labourTotal;
+    paymentFormData._discountTotal = discountTotal;
+    paymentFormData._cgstPercentAvg = cgstPercentAvg;
+    paymentFormData._sgstPercentAvg = sgstPercentAvg;
+    paymentFormData._cgstValTotal = cgstValTotal;
+    paymentFormData._sgstValTotal = sgstValTotal;
+    // paymentFormData._totalPurchasePriceWithoutTax = paymentFormData.totalActualPrice;
+
     return paymentFormData;
 }
 
@@ -136,10 +186,10 @@ export const validate = (stateObj, propObj) => {
             flag = false;
             msg.push('Give retail price.');
         }
-        if(!propObj.rate.metalRate.gold) {
-            flag = false;
-            msg.push('Set the MetalRate in Stock-Setup page.');
-        }
+        // if(!propObj.rate.metalRate.gold) {
+        //     flag = false;
+        //     msg.push('Set the MetalRate in Stock-Setup page.');
+        // }
     }
     return {flag, msg};
 }
@@ -157,9 +207,13 @@ export const constructApiParams = (stateObj, propObj) => {
             wastage: anItem.formData.wastage,
             labour: anItem.formData.labour,
             cgstPercent: anItem.formData.cgstPercent,
+            cgstVal: anItem.formData.cgstVal || 0,
             sgstPercent: anItem.formData.sgstPercent,
+            sgstVal: anItem.formData.sgstVal || 0,
             discount: anItem.formData.discount,
-            price: anItem.formData.price
+            amountWithTax: parseFloat((anItem.formData.priceActual + anItem.formData.cgstVal + anItem.formData.sgstVal).toFixed(2)),
+            amountWithTaxAndDiscount: parseFloat((anItem.formData.priceActual + anItem.formData.cgstVal + anItem.formData.sgstVal - anItem.formData.discount).toFixed(2)),
+            price: anItem.formData.price // same as "amountWithTaxAndDiscount"
         });
     });
     let exchangeProds = [];
@@ -189,6 +243,70 @@ export const constructApiParams = (stateObj, propObj) => {
         newProds,
         exchangeProds,
         paymentFormData
+    }
+}
+
+export const constructPrintContent = (stateObj, propObj) => {
+    let newProds = [];
+    _.each(stateObj.purchaseItemPreview, (anItem, index) => {
+        newProds.push({
+            title: anItem.item_name,
+            qty: anItem.formData.qty,
+            grossWt: anItem.formData.grossWt,
+            netWt: anItem.formData.netWt,
+            division: anItem.touch_name,
+            wastagePercent: anItem.formData.wastage,
+            pricePerGm: stateObj.retailPrice,
+            wastageVal: (anItem.formData.netWt * anItem.formData.wastage)/100,
+            makingCharge: anItem.formData.labour,
+            priceActual: anItem.formData.priceActual, // price with Wastage + labourCharge
+            cgstPercent: anItem.formData.cgstPercent || 0,
+            cgstVal: anItem.formData.cgstVal || 0,
+            sgstPercent: anItem.formData.sgstPercent || 0,
+            sgstVal: anItem.formData.sgstVal || 0,
+            discount: anItem.formData.discount,
+            amountWithTax: parseFloat((anItem.formData.priceActual + anItem.formData.cgstVal + anItem.formData.sgstVal).toFixed(2)),
+            amountWithTaxAndDiscount: parseFloat((anItem.formData.priceActual + anItem.formData.cgstVal + anItem.formData.sgstVal - anItem.formData.discount).toFixed(2)),
+        });
+    });
+
+    let oldOrnaments = {};
+    oldOrnaments.grossWt = stateObj.exchangeItemsTotals.grossWt;
+    oldOrnaments.lessWt = stateObj.exchangeItemsTotals.wastageVal;
+    oldOrnaments.netWt = stateObj.exchangeItemsTotals.netWt;
+    oldOrnaments.pricePerGram = stateObj.exchangeItemsTotals.oldRateAvg;
+    oldOrnaments.netAmount = stateObj.exchangeItemsTotals.price;
+
+    return {
+        gstNumber: '',
+        itemType: '',
+        storeName: '',
+        address: '',
+        place: '',
+        city: '',
+        pinCode: '',
+        storeMobile1: '',
+        storeMobile2: '',
+        hsCode: 7113,
+        goldRatePerGm: '',
+        silverRatePerGm: '',
+        billNo: 'A: 1',
+        dateVal: '23-09-2021',
+        ornaments: newProds,
+        oldOrnaments,
+        calculations: {
+            totalMakingCharge: stateObj.paymentFormData._labourTotal,
+            totalNetAmount: stateObj.paymentFormData.totalActualPrice,
+            cgstAvgPercent: stateObj.paymentFormData._cgstPercentAvg,
+            sgstAvgPercent: stateObj.paymentFormData._sgstPercentAvg,
+            totalCgstVal: stateObj.paymentFormData._cgstValTotal,
+            totalSgstVal: stateObj.paymentFormData._sgstValTotal,
+            totalNetAmountWithTax: (stateObj.paymentFormData._cgstValTotal + stateObj.paymentFormData._sgstValTotal),
+            totalDiscount: stateObj.paymentFormData._discountTotal,
+            // totalPurchaseNetAmountWithTaxAndDiscount: stateObj.paymentFormData.totalPurchasePrice,
+            oldNetAmt: stateObj.paymentFormData.totalExchangePrice,
+            grandTotal: stateObj.paymentFormData.sum,
+        }
     }
 }
 

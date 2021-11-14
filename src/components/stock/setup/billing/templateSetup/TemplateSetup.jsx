@@ -11,6 +11,7 @@ import ImageZoom from 'react-medium-image-zoom';
 
 import TemplateRenderer from '../../../../../templates/jewellery-gstBill/templateRenderer';
 import './TemplateSetup.scss';
+import { template1, template2 } from './sampleTemplateContent';
 
 export default function TemplateSetup(props) {
     let componentRef = useRef();
@@ -21,38 +22,7 @@ export default function TemplateSetup(props) {
     let [selectedTemplateId, setSelectedTemplateId] = useState(props.gstBillSettings.selectedTemplate);
 
     let [previewVisibility, setPreviewVisibility] = useState(false);
-    let [templateContent, setTemplateContent] = useState({
-        gstNumber: '33EUAPS4639K1Z9',
-        itemType: 'gold',
-        storeName: 'MALAKSHMI JEWELLERS',
-
-        dateVal: '23-09-2021',
-        address: '2/34 POONAMALLE HIGH ROAD',
-        place: 'KATTUPAKKAM',
-        city: 'CHENNAI',
-        pinCode: '600056',
-        customerName: 'Raj Kumar',
-        pricePerGm: 4387,
-        ornaments: [
-            {
-                title: 'Gold White Stone Ring',
-                quanity: 1,
-                grossWt: 1.078,
-                netWt: 0.980,
-                amount: 4730,
-                wastagePercent: 0,
-                wastageVal: 0,
-            }
-        ],
-        calculations: {
-            totalMakingCharge: 125,
-            // cgst: 1.5,
-            // sgst: 1.5,
-            totalCgstVal: 72.825,
-            totalSgstVal: 72.825,
-            grandTotal: 5000.65
-        }
-    });
+    let [templateContent, setTemplateContent] = useState(template2);
 
     useEffect(() => {
         // fetchSettings();
@@ -147,7 +117,7 @@ export default function TemplateSetup(props) {
                                     content={() => componentRef}
                                 />
                                 <input type="button" className="gs-button" value="Print" onClick={onClickPrint} />
-                                <TemplateRenderer ref={(el) => (componentRef = el)} templateId={1} content={templateContent}/>
+                                <TemplateRenderer ref={(el) => (componentRef = el)} templateId={props.gstBillSettings.selectedTemplate} content={templateContent}/>
                             </CommonModal>
                         </Col>
                     </Row>

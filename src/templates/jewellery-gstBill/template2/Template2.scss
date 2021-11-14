@@ -1,0 +1,16 @@
+.jewellery-gst-bill-paper.template2 {
+    font-size: 19px;
+    width: 1050px;
+}
+
+.jewellery-gst-bill-paper.template2.has-preview {
+    transform: scale(0.7);
+    margin-top: -70px;
+}
+
+@media print {
+    .jewellery-gst-bill-paper.template2.has-preview {
+        transform: none;
+        margin-top: 40px;
+    }
+}
