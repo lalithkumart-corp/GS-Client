@@ -2,13 +2,13 @@
     max-width: calc(100% - 20px);
 }
 .sell-item-container .customer-selection-parent-row {
-    height: 50px;
+    /* height: 50px; */
 }
 .sell-item-container .customer-selection-panel {
     border: 1px solid lightGray;
 }
 .sell-item-container .gold-rate-container {
-    border: 1px solid lightGray;
+    /* border: 1px solid lightGray; */
 }
 .sell-item-container .second-card {
     min-height: 500px;

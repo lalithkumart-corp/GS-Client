@@ -1,4 +1,3 @@
-import axios from 'axios';
 import { PLEDGEBOOK_ADD_RECORD, GET_LAST_BILL_NO, PLEDGEBOOK_UPDATE_RECORD } from '../core/sitemap';
 import { toast } from 'react-toastify';
 import { getAccessToken } from '../core/storage';

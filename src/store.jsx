@@ -10,6 +10,8 @@ import rateReducer from './reducers/rate/reducer';
 import storeReducer from './reducers/storeDetail/reducer';
 import rightSideBarReducer from './reducers/rightSideBar/reducer';
 import storeInfoReducer from './reducers/storeDetail/reducer';
+import invoiceReducer from './reducers/invoice/invoice-reducer';
+
 export const getStore = () => {
 
     const theReducers = combineReducers({
@@ -21,6 +23,7 @@ export const getStore = () => {
         storeDetail: storeReducer,
         rightSideBar: rightSideBarReducer,
         storeInfoReducer: storeInfoReducer,
+        invoice: invoiceReducer,
     });
 
     const middleware = applyMiddleware(reduxThunk, logger);

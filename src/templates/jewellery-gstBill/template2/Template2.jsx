@@ -5,12 +5,32 @@ import GSCheckbox from '../../../components/ui/gs-checkbox/checkbox';
 import _ from 'lodash';
 import './Template2.scss';
 
+const DEFAULT_TEMPLATE_STRUC = {
+    ornaments: [],
+    oldOrnaments: {},
+    calculations: {
+        totalMakingCharge: 0,
+        totalNetAmount: 0,
+        cgstAvgPercent: 0,
+        sgstAvgPercent: 0,
+        totalCgstVal: 0,
+        totalSgstVal: 0,
+        totalNetAmountWithTax: 0,
+        totalDiscount: 0,
+        totalPurchaseNetAmountWithTaxAndDiscount: 0,
+        totalPurchasePrice: 0,
+        oldNetAmt: 0,
+        grandTotal: 0
+    }
+}
+
 function GstBillTemplate2(props) {
 
-    let [printContent, setPrintContent] = useState(props.printContent);
+    let [printContent, setPrintContent] = useState(props.printContent || DEFAULT_TEMPLATE_STRUC);
 
     useEffect(() => {
-        setPrintContent(props.printContent);
+        if(props.printContent && Object.keys(props.printContent).length)
+            setPrintContent(props.printContent);
     }, [props.printContent]);
 
     const constructHeader = () => {
@@ -101,12 +121,12 @@ function GstBillTemplate2(props) {
 
     const _constructOrnBody = () => {
         let spans = {
-            itemName: 7,
-            pcs: 2,
-            division: 3,
+            itemName: 8,
+            division: 4,
             netWt: 2,
             wastage: 2,
             rate: 2,
+            makingCharge: 2,
             amt: 2,
             discount: 2,
             netAmt: 2
@@ -116,20 +136,17 @@ function GstBillTemplate2(props) {
         let ornTableHeader = 
             <>
                 <Row  style={{fontWeight: 'bold', borderBottom: '1px solid grey'}}>
-                    <Col xs={4}>
+                    <Col xs={6}>
                         <Row>
                             <Col xs={spans.itemName} className="no-padding">
                                 Item Name
-                            </Col>
-                            <Col xs={spans.pcs} className="no-padding">
-                                Pcs
                             </Col>
                             <Col xs={spans.division} className="no-padding">
                                 Division
                             </Col>
                         </Row>
                     </Col>
-                    <Col xs={8}>
+                    <Col xs={6}>
                         <Row>
                             <Col xs={spans.netWt} className="no-padding">
                                 Net Wt
@@ -140,12 +157,15 @@ function GstBillTemplate2(props) {
                             <Col xs={spans.rate} className="no-padding">
                                 Rate
                             </Col>
-                            <Col xs={spans.amt} className="no-padding">
+                            <Col xs={spans.makingCharge} className="no-padding">
+                                Making Charge
+                            </Col>
+                            {/* <Col xs={spans.amt} className="no-padding">
                                 Amt
                             </Col>
                             <Col xs={spans.discount} className="no-padding">
                                 Discount
-                            </Col>
+                            </Col> */}
                             <Col xs={spans.netAmt} className="no-padding">
                                 Net Amt
                             </Col>
@@ -158,20 +178,20 @@ function GstBillTemplate2(props) {
             totalNetWt += anOrn.netWt;
             ornBody.push(<>
                 <Row>
-                    <Col xs={4}>
+                    <Col xs={6}>
                         <Row>
                             <Col xs={spans.itemName} className="no-padding" style={{fontSize: '16px', fontWeight: 'bold'}}>
                                 {anOrn.title}
                             </Col>
-                            <Col xs={spans.pcs} className="no-padding">
+                            {/* <Col xs={spans.pcs} className="no-padding">
                                 {anOrn.quanity}
-                            </Col>
+                            </Col> */}
                             <Col xs={spans.division} className="no-padding">
                                 {anOrn.division}
                             </Col>
                         </Row>
                     </Col>
-                    <Col xs={8}>
+                    <Col xs={6}>
                         <Row>
                             <Col xs={spans.netWt} className="no-padding">
                                 {anOrn.netWt}
@@ -182,14 +202,17 @@ function GstBillTemplate2(props) {
                             <Col xs={spans.rate} className="no-padding">
                                 {anOrn.pricePerGm}
                             </Col>
-                            <Col xs={spans.amt} className="no-padding">
+                            <Col xs={spans.makingCharge} className="no-padding">
+                                {anOrn.makingCharge}
+                            </Col>
+                            {/* <Col xs={spans.amt} className="no-padding">
                                 {anOrn.amount}
                             </Col>
                             <Col xs={spans.discount} className="no-padding">
                                 {anOrn.discount}
-                            </Col>
+                            </Col> */}
                             <Col xs={spans.netAmt} className="no-padding">
-                                {anOrn.netAmount}
+                                {anOrn.priceOfOrn}
                             </Col>
                         </Row>
                     </Col>
@@ -291,6 +314,18 @@ function GstBillTemplate2(props) {
                         {printContent.calculations.oldNetAmt}
                     </Col>
                 </Row>
+                {printContent.calculations.totalDiscount && 
+                <Row>
+                    <Col xs={{span: 6}} className="no-padding">
+                        (-) Less:
+                    </Col>
+                    <Col xs={2}>
+                        ₹:
+                    </Col>
+                    <Col xs={{span: 4}} className="no-padding">
+                        {printContent.calculations.totalDiscount}
+                    </Col>
+                </Row>}
                 <Row>
                     <Col xs={{span: 6}} className="no-padding">
                         Grand Total
@@ -446,7 +481,7 @@ function GstBillTemplate2(props) {
     }
 
     return (
-        <div className={`jewellery-gst-bill-paper template2 ${printContent?'has-preview':''}`}>
+        <div className={`jewellery-gst-bill-paper template2`}>
             <Row className="inner-section">
                 <Col xs={12}>
                     {getDom()}

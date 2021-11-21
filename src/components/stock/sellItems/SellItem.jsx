@@ -1,8 +1,11 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import { Container, Row, Col, Form } from 'react-bootstrap';
+import { Container, Row, Col, Form, FormControl, InputGroup } from 'react-bootstrap';
 import * as ReactAutosuggest from 'react-autosuggest';
-// import Popover, {ArrowContainer} from 'react-tiny-popover'
+import DatePicker from 'react-datepicker';
+import 'react-datepicker/dist/react-datepicker.css';
+
+import { getBillNoFromDB, storeSellingDataInDb, setClearEntriesFlag } from '../../../actions/invoice';
 import { FETCH_PROD_IDS, FETCH_STOCKS_BY_PRODID, SALE_ITEM } from '../../../core/sitemap';
 import axiosMiddleware from '../../../core/axios';
 import { getAccessToken } from '../../../core/storage';
@@ -14,6 +17,9 @@ import './SellItem.css';
 import {calcPurchaseTotals, calculateExchangeTotals, calculatePaymentFormData, validate, constructApiParams, resetPageState, defaultExchangeItemFormData, constructPrintContent } from './helper';
 import { toast } from 'react-toastify';
 import { DoublyLinkedList } from '../../../utilities/doublyLinkedList';
+import { getDateInUTC } from '../../../utilities/utility';
+import ReactToPrint from 'react-to-print';
+import TemplateRenderer from '../../../templates/jewellery-gstBill/templateRenderer';
 
 const TAGID = 'tagid';
 const SELL_QTY = 'qty';
@@ -69,6 +75,12 @@ class SellItem extends Component {
             retailPrice: this.props.rate.retailRate.gold,
             customerSelectionModalOpen: false,
             selectedCustomer: null,
+            invoiceSeries: props.invoice.gstInvoiceSeries,
+            invoiceNo: props.invoice.gstInvoiceNo,
+            date: {
+                inputVal: new Date(), //moment().format('DD-MM-YYYY'),
+                _inputVal: new Date().toISOString()
+            },
             prodId: {
                 inputVal: '',
                 prodIdList: [],
@@ -108,7 +120,20 @@ class SellItem extends Component {
         this.deleteItemFromPurchaseItemPreview = this.deleteItemFromPurchaseItemPreview.bind(this);
     }
     componentDidMount() {
+        this.props.getBillNoFromDB();
         this.fetchProdIds();
+    }
+    componentWillReceiveProps(nextProps) {
+        if(nextProps.invoice.gstInvoiceNo !== this.state.invoiceNo) {
+            this.state.invoiceSeries = nextProps.invoice.gstInvoiceSeries;
+            this.state.invoiceNo = nextProps.invoice.gstInvoiceNo;
+        }
+        if(nextProps.invoice.clearEntries) {
+            let newState = {...this.state};
+            newState = resetPageState(newState);
+            this.state = newState;
+            this.props.setClearEntriesFlag(false);
+        }
     }
     async fetchProdIds() {
         try {
@@ -136,7 +161,8 @@ class SellItem extends Component {
                 labour: "",
                 cgstPercent: "",
                 sgstPercent: "",
-                discount: ""
+                discount: "",
+                itemType: newState.currSelectedItem.metal
             };
             this.setState(newState);
             this.calculateSellingPrice();
@@ -386,26 +412,37 @@ class SellItem extends Component {
             try {
                 let apiParams = constructApiParams(this.state, this.props);
 
-                //TEMP
-                let tt = constructPrintContent(this.state, this.props);
-                console.log(tt);
-                return;
-                //TEMP END
+                // //TEMP
+                // let tt = constructPrintContent(this.state, this.props);
+                // console.log(tt);
+                // this.setState({printContent: tt});
+                // setTimeout(() => {
+                //     this.printBtn.handlePrint();
+                // }, 300);
 
-                let resp = await axiosMiddleware.post(SALE_ITEM, {apiParams});
-                if(resp.data && resp.data.STATUS == "SUCCESS") {
+                // return;
+                //TEMP END
+                console.log(apiParams);
+                this.props.storeSellingDataInDb(apiParams);
+
                     let printContent = constructPrintContent(this.state, this.props);
                     console.log(printContent);
                     this.triggerPrint(printContent);
-                    toast.success('Success!');
-                    let newState = {...this.state};
-                    newState = resetPageState(newState);
-                    this.setState(newState);
-                    //TODO: reset the UI form data
-                } else {
-                    let msg = resp.data.ERROR || 'ERROR';
-                    toast.error(msg);
-                }
+
+                // let resp = await axiosMiddleware.post(SALE_ITEM, {apiParams});
+                // if(resp.data && resp.data.STATUS == "SUCCESS") {
+                //     let printContent = constructPrintContent(this.state, this.props);
+                //     console.log(printContent);
+                //     this.triggerPrint(printContent);
+                //     toast.success('Success!');
+                //     let newState = {...this.state};
+                //     newState = resetPageState(newState);
+                //     this.setState(newState);
+                //     //TODO: reset the UI form data
+                // } else {
+                //     let msg = resp.data.ERROR || 'ERROR';
+                //     toast.error(msg);
+                // }
 
             } catch(e) {
                 console.log(e);
@@ -546,8 +583,8 @@ class SellItem extends Component {
                 let wastageVal = ( wt* (wastage/100) );
                 let labour = this.state.currSelectedItem.formData.labour || 0;
                 let discount = this.state.currSelectedItem.formData.discount || 0;
-                let priceActual = ( ( ( wt + wastageVal ) * retailPrice) + labour );
-                let price = priceActual;
+                let priceOfOrn = ( ( ( wt + wastageVal ) * retailPrice) + labour );
+                let price = priceOfOrn;
 
                 let cgstPercent = this.state.currSelectedItem.formData.cgstPercent || 0;
                 let sgstPercent = this.state.currSelectedItem.formData.sgstPercent || 0;
@@ -569,7 +606,7 @@ class SellItem extends Component {
                 newState.currSelectedItem.formData.wastageVal = wastageVal;
                 newState.currSelectedItem.formData.cgstVal = cgstVal;
                 newState.currSelectedItem.formData.sgstVal = sgstVal;
-                newState.currSelectedItem.formData.priceActual = parseFloat(priceActual.toFixed(3));
+                newState.currSelectedItem.formData.priceOfOrn = parseFloat(priceOfOrn.toFixed(3));
                 newState.currSelectedItem.formData.price = parseFloat(price.toFixed(3));
     
                 // newState.totalSellingPrice = price; //for multiple selling items
@@ -597,10 +634,24 @@ class SellItem extends Component {
    
     triggerPrint(printContent) {
         try {
-
+            this.setState({printContent: printContent});
+            setTimeout(() => {
+                this.printBtn.handlePrint();
+            }, 300);
         } catch(e) {
-            
+            console.log(e);
         }
+    }
+
+    onInvoiceNumberChange(val) {
+        this.setState({invoiceNo: val});
+    }
+
+    onChangeDate(val) {
+        let newState = {...this.state};
+        newState.date.inputVal = val;
+        newState.date._inputVal = getDateInUTC(val);
+        this.setState(newState);
     }
 
     getInputBox() {
@@ -1280,14 +1331,73 @@ class SellItem extends Component {
                                     </Row>
                                 }
                             </Col>
-                            <Col xs={9} className="gold-rate-container">
-                                <div style={{marginTop: '8px'}}>Retail Rate: 
-                                    <input type="number" 
-                                        value={this.state.retailPrice} 
-                                        onChange={(e) => this.onInputValChange(e, 'retailPrice')}
-                                        ref = {(domElm) => { this.domElmns.retailPrice = domElm?domElm.input:domElm; }}
-                                        />
-                                </div>
+                            <Col xs={9} style={{border: '1px solid lightGray'}}>
+                                <Row>
+                                    <Col xs={3} className="invoice-number-col">
+                                        <Form.Group>
+                                            <Form.Label>Invoice No</Form.Label>
+                                            <InputGroup>
+                                                <InputGroup.Prepend>
+                                                    <InputGroup.Text id="invoice-no-addon">{this.state.invoiceSeries}</InputGroup.Text>
+                                                </InputGroup.Prepend>
+                                                <FormControl
+                                                    type="text"
+                                                    value={this.state.invoiceNo}
+                                                    placeholder=""
+                                                    className="invoice-number-field"
+                                                    onChange={(e) => this.onInvoiceNumberChange(e.target.value)}
+                                                />
+                                                <FormControl.Feedback />
+                                            </InputGroup>
+                                        </Form.Group>
+                                    </Col>
+                                    <Col xs={3}>
+                                        <Form.Group
+                                            // validationState= {this.state.date.hasError ? "error" :null}
+                                            >
+                                            <Form.Label>Date</Form.Label>
+                                            <DatePicker
+                                                popperClassName="invoice-datepicker" 
+                                                // value={this.state.date.inputVal} 
+                                                selected={this.state.date.inputVal}
+                                                onChange={(fullDateVal, dateVal) => {this.onChangeDate(fullDateVal)} }
+                                                showMonthDropdown
+                                                timeInputLabel="Time:"
+                                                showTimeInput
+                                                dateFormat="dd/MM/yyyy h:mm aa"
+                                                
+                                                // showTimeSelect
+                                                showYearDropdown
+                                                className='gs-input-cell bordered'
+                                                />
+                                        </Form.Group>
+                                    </Col>
+                                    <Col xs={3} className="gold-rate-container">
+                                        <Form.Group>
+                                            <Form.Label>Retail Rate</Form.Label>
+                                            <InputGroup>
+                                                <InputGroup.Prepend>
+                                                    <InputGroup.Text id="rupee-no-addon">₹</InputGroup.Text>
+                                                </InputGroup.Prepend>
+                                                <FormControl
+                                                    type="number"
+                                                    value={this.state.retailPrice}
+                                                    placeholder=""
+                                                    className="reatil-price-field"
+                                                    onChange={(e) => this.onInputValChange(e, 'retailPrice')}
+                                                />
+                                                <FormControl.Feedback />
+                                            </InputGroup>
+                                        </Form.Group>
+                                        {/* <div style={{marginTop: '8px'}}>Retail Rate: 
+                                            <input type="number" 
+                                                value={this.state.retailPrice} 
+                                                onChange={(e) => this.onInputValChange(e, 'retailPrice')}
+                                                ref = {(domElm) => { this.domElmns.retailPrice = domElm?domElm.input:domElm; }}
+                                                />
+                                        </div> */}
+                                    </Col>
+                                </Row>
                             </Col>
                         </Row>
                         <Row className="second-card">
@@ -1326,6 +1436,15 @@ class SellItem extends Component {
                         </Row>
                     </Col>
                 </Row>
+                <Row>
+                    <ReactToPrint
+                        ref={(domElm) => {this.printBtn = domElm}}
+                        trigger={() => <a href="#"></a>}
+                        content={() => this.componentRef}
+                        className="print-hidden-btn"
+                    />
+                    <TemplateRenderer ref={(el) => (this.componentRef = el)} templateId={2} content={this.state.printContent}/>
+                </Row>
             </Container>
         )
     }
@@ -1333,8 +1452,10 @@ class SellItem extends Component {
 
 const mapStateToProps = (state) => { 
     return {
-        rate: state.rate
+        rate: state.rate,
+        storeDetail: state.storeDetail,
+        invoice: state.invoice
     };
 };
 
-export default connect(mapStateToProps, {})(SellItem);
+export default connect(mapStateToProps, {getBillNoFromDB, storeSellingDataInDb, setClearEntriesFlag})(SellItem);
