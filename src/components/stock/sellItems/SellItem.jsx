@@ -423,11 +423,12 @@ class SellItem extends Component {
                 // return;
                 //TEMP END
                 console.log(apiParams);
+                let printContent = constructPrintContent(this.state, this.props);
+                apiParams.invoiceData = printContent;
                 this.props.storeSellingDataInDb(apiParams);
 
-                    let printContent = constructPrintContent(this.state, this.props);
-                    console.log(printContent);
-                    this.triggerPrint(printContent);
+                console.log(printContent);
+                this.triggerPrint(printContent);
 
                 // let resp = await axiosMiddleware.post(SALE_ITEM, {apiParams});
                 // if(resp.data && resp.data.STATUS == "SUCCESS") {

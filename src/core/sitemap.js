@@ -146,6 +146,9 @@ export const GET_JEWELLERY_BILL_SETTINGS = `${config.proxy_protocol}://${config.
 export const UPDATE_JEWELLERY_BILL_SETTINGS = `${config.proxy_protocol}://${config.proxy_api_host}:${config.proxy_api_port}/${config.restApiRoot}/JewelleryBillSettings/update-settings`;
 export const FETCH_AVL_JEWELLERY_BILL_TEMPLATES = `${config.proxy_protocol}://${config.proxy_api_host}:${config.proxy_api_port}/${config.restApiRoot}/JewelleryBillSettings/fetch-avl-jewellery-bill-templates`;
 
+export const SAVE_INVOICE_DATA = `${config.proxy_protocol}://${config.proxy_api_host}:${config.proxy_api_port}/${config.restApiRoot}/JewelleryInvoices/save-invoice`;
+export const FETCH_INVOICE_DATA = `${config.proxy_protocol}://${config.proxy_api_host}:${config.proxy_api_port}/${config.restApiRoot}/JewelleryInvoices/get-invoice-data`;
+
 export const FETCH_FUND_ACCOUNTS_LIST = `${config.proxy_protocol}://${config.proxy_api_host}:${config.proxy_api_port}/${config.restApiRoot}/FundAccounts/get-list`;
 export const ADD_NEW_FUND_ACCOUNT = `${config.proxy_protocol}://${config.proxy_api_host}:${config.proxy_api_port}/${config.restApiRoot}/FundAccounts/insert-account`;
 export const UPDATE_FUND_ACCOUNT = `${config.proxy_protocol}://${config.proxy_api_host}:${config.proxy_api_port}/${config.restApiRoot}/FundAccounts/update-account`;

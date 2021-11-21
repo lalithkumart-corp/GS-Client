@@ -11,7 +11,7 @@ import ImageZoom from 'react-medium-image-zoom';
 
 import TemplateRenderer from '../../../../../templates/jewellery-gstBill/templateRenderer';
 import './TemplateSetup.scss';
-import { template1, template2 } from './sampleTemplateContent';
+import { template1, template2, template3 } from './sampleTemplateContent';
 
 export default function TemplateSetup(props) {
     let componentRef = useRef();
@@ -22,7 +22,7 @@ export default function TemplateSetup(props) {
     let [selectedTemplateId, setSelectedTemplateId] = useState(props.gstBillSettings.selectedTemplate);
 
     let [previewVisibility, setPreviewVisibility] = useState(false);
-    let [templateContent, setTemplateContent] = useState(template2);
+    let [templateContent, setTemplateContent] = useState(template3);
 
     useEffect(() => {
         // fetchSettings();

@@ -1,14 +1,19 @@
 import React, { Component } from 'react';
+// import { connect } from 'react-redux';
 import { Container, Row, Col } from 'react-bootstrap';
 import axios from '../../../core/axios';
-import { getAccessToken } from '../../../core/storage';
+import { getAccessToken, getJewelleryGstBillTemplateSettings } from '../../../core/storage';
 import { toast } from 'react-toastify';
-import { FETCH_STOCK_SOLD_ITEM_TOTALS, FETCH_STOCK_SOLD_OUT_LIST } from '../../../core/sitemap';
+import { FETCH_STOCK_SOLD_ITEM_TOTALS, FETCH_STOCK_SOLD_OUT_LIST, FETCH_INVOICE_DATA } from '../../../core/sitemap';
 import GSTable from '../../gs-table/GSTable';
 import { convertToLocalTime, dateFormatter } from '../../../utilities/utility';
 import DateRangePicker from '../../dateRangePicker/dataRangePicker';
 import './SoldOutListPanel.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import {Tooltip} from 'react-tippy';
+import CommonModal from '../../common-modal/commonModal';
+import ReactToPrint from 'react-to-print';
+import TemplateRenderer from '../../../templates/jewellery-gstBill/templateRenderer';
 
 export default class SoldItems extends Component {
     constructor(props) {
@@ -20,6 +25,8 @@ export default class SoldItems extends Component {
         let todaysEndDate = new Date();
         todaysEndDate.setHours(23,59,59,999);
         this.state = {
+            gstTemplateSettings: {},
+            previewVisibility: false,
             timeOut: 400,
             pageLimit: 10,
             selectedPageIndex: 0,
@@ -173,6 +180,23 @@ export default class SoldItems extends Component {
                         )
                     },
                     width: '7%'
+                },
+                {
+                    id: '',
+                    displayText: '',
+                    className: 'actions-col',
+                    formatter: (column, columnIndex, row, rowIndex) => {
+                        return (
+                            <span className='actions-cell'>
+                                <Tooltip title="Invoice"
+                                        position="top"
+                                        trigger="mouseenter">
+                                    <span className="invoice-btn gs-icon"><FontAwesomeIcon icon={['fas', 'file-pdf']} onClick={(e) => this.onInvoiceClick(e, row)}/></span>
+                                </Tooltip>
+                            </span>
+                        )
+                    },
+                    width: '3%'
                 }
             ],
             filters: {
@@ -191,6 +215,7 @@ export default class SoldItems extends Component {
     componentDidMount() {
         this.fetchTotals();
         this.fetchRowsPerPage();
+        this.setTemplateId();
     }
     bindMethods() {
         this.handleCheckboxChangeListener = this.handleCheckboxChangeListener.bind(this);
@@ -201,6 +226,7 @@ export default class SoldItems extends Component {
         this.filterCallbacks.itemName = this.filterCallbacks.itemName.bind(this);
         this.filterCallbacks.itemCategory = this.filterCallbacks.itemCategory.bind(this);
         this.filterCallbacks.itemSubCategory = this.filterCallbacks.itemSubCategory.bind(this);
+        this.handlePreviewClose = this.handlePreviewClose.bind(this);
     }
     async fetchTotals() {
         try {
@@ -238,6 +264,17 @@ export default class SoldItems extends Component {
             if(!options.fetchOnlyRows)
                 this.fetchTotals();
         }, this.timeOut);
+    }
+    setTemplateId() {
+        let allSettings = getJewelleryGstBillTemplateSettings();
+        let gstSettingsObj = null;
+        _.each(allSettings, (aSetting, index) => {
+            if(aSetting.category == 'gst')
+                gstSettingsObj = aSetting;
+        });
+        if(!gstSettingsObj)
+            toast.error('GST Template Settings not found');
+        this.setState({gstTemplateSettings: gstSettingsObj});
     }
     getFilterParams() {
         let endDate = new Date(this.state.filters.date.endDate);
@@ -300,6 +337,25 @@ export default class SoldItems extends Component {
             await this.setState(newState);
             this.refresh({fetchOnlyRows: true});
         },
+    }
+    async onInvoiceClick(e, row) {
+        e.stopPropagation();
+        console.log(row);
+        try {
+            let at = getAccessToken();
+            let resp = await axios.get(`${FETCH_INVOICE_DATA}?access_token=${at}&invoice_key=${row.InvoiceRef}`);
+            if(resp && resp.data && resp.data.STATUS == 'SUCCESS') {
+                this.setState({printContent: JSON.parse(resp.data.RESP), previewVisibility: true});
+            }
+        } catch(e) {
+            console.log(e);
+        }
+    }
+    handlePreviewClose() {
+        this.setState({printContent: null, previewVisibility: false});
+    }
+    onClickPrint() {
+        this.printBtn.handlePrint();
     }
     handleCheckboxChangeListener(params) {
         let newState = {...this.state};
@@ -377,7 +433,29 @@ export default class SoldItems extends Component {
                         />
                     </Col>
                 </Row>
+                <Row>
+                    <CommonModal modalOpen={this.state.previewVisibility} handleClose={this.handlePreviewClose} secClass="jewellery-bill-template-preview-modal">
+                        <ReactToPrint
+                            ref={(domElm) => {this.printBtn = domElm}}
+                            trigger={() => <a href="#"></a>}
+                            content={() => this.componentRef}
+                            className="print-hidden-btn"
+                        />
+                        <input type="button" className="gs-button" value="Print" onClick={this.onClickPrint} />
+                        <TemplateRenderer ref={(el) => (this.componentRef = el)} templateId={this.state.gstTemplateSettings.selectedTemplate} content={this.state.printContent}/>
+                    </CommonModal>
+                </Row>
             </Container>
         )
     }
 }
+
+// const mapStateToProps = (state) => { 
+//     return {
+//         rate: state.rate,
+//         storeDetail: state.storeDetail,
+//         invoice: state.invoice
+//     };
+// };
+
+// export default connect(mapStateToProps, {})(SoldItems);

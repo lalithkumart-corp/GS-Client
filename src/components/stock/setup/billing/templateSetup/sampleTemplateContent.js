@@ -113,3 +113,61 @@ export const template2 = {
         cash: 4000
     }
 };
+
+export const template3 = {
+	"gstNumber": "112a",
+	"storeName": "MAHALAKSHMI JEWELLERS",
+	"address": "2/34 MAIN ROAD",
+	"place": "KATTUPAKKAM",
+	"city": "CHENNAI",
+	"pinCode": "600056",
+	"storeMobile1": "8148588004",
+	"storeMobile2": "",
+	"hsCode": 7113,
+	"goldRatePerGm": "",
+	"silverRatePerGm": "",
+	"billNo": "A: 1",
+	"customerName": "DANIEPHILP",
+	"customerMobile": "8148616456",
+	"dateVal": "23-09-2021",
+	"ornaments": [{
+		"title": "Ring",
+		"qty": 1,
+		"grossWt": 2.07,
+		"netWt": 2.07,
+		"division": "916",
+		"wastagePercent": 10,
+		"pricePerGm": 4622,
+		"wastageVal": 0.207,
+		"makingCharge": 100,
+		"priceOfOrn": 10624.294,
+		"cgstPercent": 1.5,
+		"cgstVal": 159.36,
+		"sgstPercent": 1.5,
+		"sgstVal": 159.36,
+		"discount": 943.014,
+		"amountWithTax": 10943.01,
+		"amountWithTaxAndDiscount": 10000
+	}],
+	"oldOrnaments": {
+		"itemType": "G",
+		"grossWt": 1,
+		"lessWt": 0.15,
+		"netWt": 1,
+		"pricePerGram": 4522,
+		"netAmount": 3843.7
+	},
+	"calculations": {
+		"totalMakingCharge": 100,
+		"totalNetAmount": 10624.294,
+		"cgstAvgPercent": 1.5,
+		"sgstAvgPercent": 1.5,
+		"totalCgstVal": 159.36,
+		"totalSgstVal": 159.36,
+		"totalNetAmountWithTax": 10943.014000000001,
+		"totalDiscount": 943.014,
+		"totalPurchasePrice": 10000,
+		"oldNetAmt": 3843.7,
+		"grandTotal": 6156.3
+	}
+};

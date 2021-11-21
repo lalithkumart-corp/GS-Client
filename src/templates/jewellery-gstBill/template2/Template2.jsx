@@ -126,10 +126,10 @@ function GstBillTemplate2(props) {
             netWt: 2,
             wastage: 2,
             rate: 2,
-            makingCharge: 2,
+            makingCharge: 3,
             amt: 2,
             discount: 2,
-            netAmt: 2
+            netAmt: 3
         }
 
         let totalNetWt = 0;
@@ -158,7 +158,7 @@ function GstBillTemplate2(props) {
                                 Rate
                             </Col>
                             <Col xs={spans.makingCharge} className="no-padding">
-                                Making Charge
+                                M.Charge
                             </Col>
                             {/* <Col xs={spans.amt} className="no-padding">
                                 Amt
