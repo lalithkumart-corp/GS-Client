@@ -404,7 +404,7 @@ function GstBillTemplate2(props) {
                 <Col xs={6}>{printContent.goldRatePerGm}</Col>
             </Row>
             <Row>
-                <Col xs={6}>Gold Rate</Col>
+                <Col xs={6}>Silver Rate</Col>
                 <Col xs={6}>{printContent.silverRatePerGm}</Col>
             </Row>
             <Row>
