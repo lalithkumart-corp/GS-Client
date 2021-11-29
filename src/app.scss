@@ -71,3 +71,7 @@ body {
     background-size: 50px 50px;
     content: "";
 }
+
+.form-control.simple:focus{
+    box-shadow: none;
+}
