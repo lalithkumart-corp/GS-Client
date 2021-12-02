@@ -1,10 +1,21 @@
+@import '../../../app';
+
 .tools.card {
     padding: 15px;
-    box-shadow: -4px -2px 18px -8px rgba(0,0,0,0.74);
-    -webkit-box-shadow: -4px -2px 18px -8px rgba(0,0,0,0.74);
-    -moz-box-shadow: -4px -2px 18px -8px rgba(0,0,0,0.74);
+    // box-shadow: -4px -2px 18px -8px rgba(0,0,0,0.74);
+    // -webkit-box-shadow: -4px -2px 18px -8px rgba(0,0,0,0.74);
+    // -moz-box-shadow: -4px -2px 18px -8px rgba(0,0,0,0.74);
+    border-radius: 10px;
+}
+.tools {
+    .gs-input-cell {
+        @include gs-input-cell-style1;
+        width: calc(100% - 30px);
+        padding-right: 0;
+    }
 }
 .calc.operator{
     line-height: 70px;
-    font-size: 30px;
+    font-size: 20px;
+    color: #696969;
 }

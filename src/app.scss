@@ -17,7 +17,11 @@
     border-color: lightgrey;
     outline: none;
     border-style: solid;
-} 
+}
+@mixin gs-input-cell-style1 {
+    display: inline-block;
+    border-bottom: 1px solid lightgray;
+}
 .react-tiny-popover-container {
     @include popover-base-style;
 }

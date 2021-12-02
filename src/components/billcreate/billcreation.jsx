@@ -32,6 +32,7 @@ import { toast } from 'react-toastify';
 import BillHistoryView from './billHistoryView';
 import Popover from 'react-tiny-popover';
 import BillTemplate from './billTemplate2';
+import LoanBillMainTemplate from '../../templates/loanBill/LoanBillMainTemplate';
 import ReactToPrint from 'react-to-print';
 import { FaEdit } from 'react-icons/fa';
 import CommonModal from '../common-modal/commonModal';
@@ -2460,7 +2461,8 @@ class BillCreation extends Component {
                     </Row>
                 </Col>
                 <EditDetailsDialog {...this.state.editModalContent} update={this.updateItemInMoreDetail} />
-                <BillTemplate ref={el => (this.componentRef = el)} data={this.state.printContent} />
+                {/* <BillTemplate ref={el => (this.componentRef = el)} data={this.state.printContent} /> */}
+                <LoanBillMainTemplate ref={el => (this.componentRef = el)} currBillContent={this.state.printContent}/>
                 <CommonModal modalOpen={this.state.showCustomerEditModal} handleClose={this.handleCustomerEditModalClose} wrapperClassName="bill-creation-customer-edit-modal-wrapper">
                     <GeneralInfo selectedCust={Object.assign({}, this.state.selectedCustomer)} loadedInModal={true} handleClose={this.handleCustomerEditModalClose} afterUpdate={this.afterUpdateCustomerDetail}/>
                 </CommonModal>

@@ -28,25 +28,26 @@ export default function WastageCalculator() {
 
     return (
         <>
-            <Row style={{marginBottom: '10px'}}>
+            <Row style={{marginBottom: '15px'}}>
                 <Col xs={12}><h5>Wastage Calculator</h5></Col>
             </Row>
             <Row>
-                <Col xs={2}>
+                <Col xs={3}>
                     <FormGroup>
                         <FormLabel>Weight</FormLabel>
-                        <InputGroup>
+                        {/* <InputGroup>
                             <FormControl
                                 type="text"
                                 placeholder=""
                                 onChange={(e) => setWt(e.target.value)} 
                                 value={wt}
                                 className="simple"
-                            />
+                            /> 
                             <InputGroup.Append>
                                 <InputGroup.Text id="rupee-addon">gm</InputGroup.Text>
                             </InputGroup.Append>
-                        </InputGroup>
+                        </InputGroup> */}
+                        <input type="text" className="gs-input-cell" value={wt} onChange={(e) => setWt(e.target.value)} /> gm
                     </FormGroup>
                 </Col>
                 <span className="calc operator plus">+</span>
@@ -60,10 +61,10 @@ export default function WastageCalculator() {
                     </FormGroup>
                 </Col>
                 <span className="calc operator multiply"> x </span>
-                <Col xs={2}>
+                <Col xs={3}>
                     <FormGroup>
                         <FormLabel>Rate</FormLabel>
-                        <InputGroup>
+                        {/* <InputGroup>
                             <InputGroup.Prepend>
                                 <InputGroup.Text id="rupee-addon">₹</InputGroup.Text>
                             </InputGroup.Prepend>
@@ -74,14 +75,15 @@ export default function WastageCalculator() {
                                 value={rate}
                                 className="simple"
                             />
-                        </InputGroup>
+                        </InputGroup> */}
+                        <div>₹ <input type="text" className="gs-input-cell" value={rate} onChange={(e) => setRate(e.target.value)} /></div>
                     </FormGroup>
                 </Col>
                 <span className="calc operator equal"> = </span>
                 <Col xs={3}>
                     <FormGroup>
                         <FormLabel>Total</FormLabel>
-                        <InputGroup>
+                        {/* <InputGroup>
                             <InputGroup.Prepend>
                                 <InputGroup.Text id="rupee-addon">₹</InputGroup.Text>
                             </InputGroup.Prepend>
@@ -92,7 +94,8 @@ export default function WastageCalculator() {
                                 value={total}
                                 className="simple"
                             />
-                        </InputGroup>
+                        </InputGroup> */}
+                        <div>₹ <input type="text" className="gs-input-cell" value={total} onChange={(e) => setTotal(e.target.value)} /></div>
                     </FormGroup>
                 </Col>
             </Row>
