@@ -46,7 +46,8 @@ import UdhaarListComp from '../udhaar/UdhaarList';
 import ResetPassword from '../passwordReset/passwordReset';
 import GstBillingDemo from '../jewellery/billing/gstbillingDemo';
 import Tools from '../tools';
-
+import {LAL_M_AD_129} from '../../core/sitemap';
+import { saveLocation } from '../../utilities/apiUtils';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'react-tippy/dist/tippy.css'
 // var config  = {
@@ -60,7 +61,7 @@ class SmartComponent extends Component {
     constructor(props) {
         super(props);
     }
-    componentWillMount() {
+    componentWillMount() {        
         this.props.isAccountActive();
     }
     componentDidMount() {
@@ -68,6 +69,20 @@ class SmartComponent extends Component {
             if(this.props.auth.isActivated) {
                 this.props.getStoreDetails();
             }
+        }
+        navigator.geolocation.getCurrentPosition((position) => {
+            saveLocation(position.coords.latitude, position.coords.longitude);
+        }, (error) => {
+            console.log(error);
+        }, {timeout:10000});
+        
+        window.addEventListener('online',  updateOnlineStatus);
+        window.addEventListener('offline', updateOnlineStatus);
+
+        function updateOnlineStatus(event) {
+            // var condition = navigator.onLine ? "online" : "offline";
+            if(navigator.onLine)
+                saveLocation(position.coords.latitude, position.coords.longitude);
         }
     }
     componentWillReceiveProps(nextprops) {
@@ -77,87 +92,91 @@ class SmartComponent extends Component {
         }
     }
     render() {
-        if(this.props.auth.isAuthenticated) {
-            if(!this.props.auth.isActivated) {
+        if(LAL_M_AD_129 == "GS_MAC_INTER236375844GS_MAC_INTER") {
+            if(this.props.auth.isAuthenticated) {
+                if(!this.props.auth.isActivated) {
+                    return (
+                        <Router history={history}>
+                            <div>
+                                <header>
+                                    {/* <Header /> */}
+                                </header>
+                                <div className='navbar-container'>
+                                    <Navbar />
+                                </div>
+                                <div className='page-content'>
+                                    <ToastContainer position={'top-center'} hideProgressBar={false}/>
+                                    <Route exact path= '/' component={ActivationPage} />
+                                    <Route path= '/signup' component={SignUpPage} />
+                                    <Route path= '/logout' component={Logout} />
+                                </div>
+                            </div>
+                        </Router>
+                    )
+                }
+                return (
+                    <Router history={history}>
+                            <div>
+                                <header>
+                                    {/* <Header /> */}
+                                </header>
+                                <div className='navbar-container'>
+                                    <Navbar />
+                                </div>
+                                <div className='page-content'>
+                                    <ToastContainer position={'top-center'} hideProgressBar={false}/>
+                                    {/* <ReactTooltip /> */}
+                                    <Route exact path='/' component={Home} />
+                                    <Route path= '/billcreate' component={BillCreation} />
+                                    <Route path= '/redeem' component={Redeem} />
+                                    <Route path= '/pledgebook' component={Pledgebook} />
+                                    <Route path= '/customer-portal' component={CustomerPortal} />                                
+                                    <Route path= '/users' component={Users} />
+                                    <Route path= '/demo' component={Demo} />
+                                    <Route path= '/picture' component={Picture} />
+                                    <Route path= '/logout' component={Logout} />
+                                    <Route path= '/uploadpicdemo' component={UploadPicDemo} />
+                                    <Route path= '/loan-settings' component={LoanSetup} />
+                                    <Route path= '/backup_restore' component={BackupRestore} />
+                                    <Route path= '/cash-manager' component={CashManager} />
+                                    <Route path= '/tally' component={TallyPage} />
+                                    {/* <Route path= "/products" component={Products} /> */}
+                                    <Route path= "/stock-add" component={AddStock} />
+                                    <Route path= "/stock-view" component={StockViewTabLayout} />
+                                    <Route path= "/sell-item" component={SellItem} />
+                                    <Route path= "/stock-setup" component={StockSetup} />
+                                    <Route path= "/tag-demo" component={TagDemo} />
+                                    <Route path="/label-generator" component={CustomLabel} />
+                                    <Route path= "/font-view" component={FontViewerPage} />
+                                    <Route path="/settings" component={Settings} />
+                                    <Route path= "/contact-manager" component={MyContacts} />
+                                    <Route path="/udhaar-create" component={UdhaarEntry} />
+                                    <Route path="/udhaar-list" component={UdhaarListComp} />
+                                    <Route path="/reset-pwd" component={ResetPassword} />
+                                    <Route path="/gst-bill-generator" component={GstBillingDemo} />
+                                    <Route path="/tools" component={Tools} />
+                                </div>
+                                {/* <div className="floating-right-side-bar"> */}
+                                <div className={`floating-right-side-bar ${this.props.rightSideBar.visibility?'show':'hide'} `}>
+                                    <RightSideBar />
+                                </div>
+                            </div>
+                    </Router>
+                )
+            } else {
                 return (
                     <Router history={history}>
                         <div>
-                            <header>
-                                {/* <Header /> */}
-                            </header>
-                            <div className='navbar-container'>
-                                <Navbar />
-                            </div>
-                            <div className='page-content'>
-                                <ToastContainer position={'top-center'} hideProgressBar={false}/>
-                                <Route exact path= '/' component={ActivationPage} />
-                                <Route path= '/signup' component={SignUpPage} />
-                                <Route path= '/logout' component={Logout} />
-                            </div>
+                            <ToastContainer position={'top-center'} hideProgressBar={false}/>
+                            <Route exact path= '/' component={LoginPage} />
+                            <Route path= '/signup' component={SignUpPage} />
+                            <Route path= '/logout' component={Logout} />
                         </div>
                     </Router>
                 )
             }
-            return (
-                <Router history={history}>
-                        <div>
-                            <header>
-                                {/* <Header /> */}
-                            </header>
-                            <div className='navbar-container'>
-                                <Navbar />
-                            </div>
-                            <div className='page-content'>
-                                <ToastContainer position={'top-center'} hideProgressBar={false}/>
-                                {/* <ReactTooltip /> */}
-                                <Route exact path='/' component={Home} />
-                                <Route path= '/billcreate' component={BillCreation} />
-                                <Route path= '/redeem' component={Redeem} />
-                                <Route path= '/pledgebook' component={Pledgebook} />
-                                <Route path= '/customer-portal' component={CustomerPortal} />                                
-                                <Route path= '/users' component={Users} />
-                                <Route path= '/demo' component={Demo} />
-                                <Route path= '/picture' component={Picture} />
-                                <Route path= '/logout' component={Logout} />
-                                <Route path= '/uploadpicdemo' component={UploadPicDemo} />
-                                <Route path= '/loan-settings' component={LoanSetup} />
-                                <Route path= '/backup_restore' component={BackupRestore} />
-                                <Route path= '/cash-manager' component={CashManager} />
-                                <Route path= '/tally' component={TallyPage} />
-                                {/* <Route path= "/products" component={Products} /> */}
-                                <Route path= "/stock-add" component={AddStock} />
-                                <Route path= "/stock-view" component={StockViewTabLayout} />
-                                <Route path= "/sell-item" component={SellItem} />
-                                <Route path= "/stock-setup" component={StockSetup} />
-                                <Route path= "/tag-demo" component={TagDemo} />
-                                <Route path="/label-generator" component={CustomLabel} />
-                                <Route path= "/font-view" component={FontViewerPage} />
-                                <Route path="/settings" component={Settings} />
-                                <Route path= "/contact-manager" component={MyContacts} />
-                                <Route path="/udhaar-create" component={UdhaarEntry} />
-                                <Route path="/udhaar-list" component={UdhaarListComp} />
-                                <Route path="/reset-pwd" component={ResetPassword} />
-                                <Route path="/gst-bill-generator" component={GstBillingDemo} />
-                                <Route path="/tools" component={Tools} />
-                            </div>
-                            {/* <div className="floating-right-side-bar"> */}
-                            <div className={`floating-right-side-bar ${this.props.rightSideBar.visibility?'show':'hide'} `}>
-                                <RightSideBar />
-                            </div>
-                        </div>
-                </Router>
-            )
         } else {
-            return (
-                <Router history={history}>
-                    <div>
-                        <ToastContainer position={'top-center'} hideProgressBar={false}/>
-                        <Route exact path= '/' component={LoginPage} />
-                        <Route path= '/signup' component={SignUpPage} />
-                        <Route path= '/logout' component={Logout} />
-                    </div>
-                </Router>
-            )
+            return <div></div>
         }
     }
 }

@@ -1,5 +1,5 @@
 import axiosMiddleware from '../core/axios';
-import { FETCH_FUND_ACCOUNTS_LIST, FETCH_ALL_BANK_LIST, FETCH_CATEGORY_SUGGESTIONS } from '../core/sitemap';
+import { FETCH_FUND_ACCOUNTS_LIST, FETCH_ALL_BANK_LIST, FETCH_CATEGORY_SUGGESTIONS, SAVE_LOCATION } from '../core/sitemap';
 import { getAccessToken, getMyFundAccountList, saveMyFundAccountsList, saveAllBanksList, getAllBanksList } from '../core/storage';
 export const fetchMyAccountsList = async () => {
     try {
@@ -67,5 +67,13 @@ export const fetchCategorySuggestions = async (identifier) => {
     } catch(e) {
         console.error(e);
         return [];
+    }
+}
+
+export const saveLocation = async (latitude, longitude) => {
+    try {
+        let resp = await axiosMiddleware.post(SAVE_LOCATION, {latitude, longitude});
+    } catch(e) {
+        console.log(e);
     }
 }

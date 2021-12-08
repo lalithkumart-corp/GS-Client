@@ -17,6 +17,14 @@ let env = require('./environment');
 //         "restApiRoot": "api"
 //     }
 // }
+if(process.env.REACT_APP_ENV == 'offlineprod') {
+    window.console = {
+        log: () => {},
+        error: () => {},
+        warn: () => {},
+    }
+}
+
 
 console.log('NODE_ENV:', process.env.NODE_ENV);
 console.log('REACT ENV File:', process.env.REACT_APP_ENV);
@@ -30,10 +38,11 @@ else
 
 let hostName = process.env.REACT_APP_API_HOST;
 
-if(process.env.REACT_APP_ENV == 'development') {
+if(process.env.REACT_APP_ENV == 'development' || process.env.REACT_APP_ENV == "offlineprod") {
     port = process.env.REACT_APP_API_PORT;
     hostName = window.location.hostname;// process.env.REACT_APP_API_HOST
 }
+
 const protocol = window.location.protocol.substring(0, window.location.protocol.indexOf(':')) || process.env.REACT_APP_API_PROTOCOL;
 
 export let config = {
@@ -162,3 +171,5 @@ export const FETCH_UDHAAR_DETAIL = `${config.proxy_protocol}://${config.proxy_ap
 export const FETCH_CUSTOMER_UDHAAR_HISTORY = `${config.proxy_protocol}://${config.proxy_api_host}:${config.proxy_api_port}/${config.restApiRoot}/Udhaars/fetch-customer-history`;
 export const GET_LAST_UDHAAR_SERIAL_NO = `${config.proxy_protocol}://${config.proxy_api_host}:${config.proxy_api_port}/${config.restApiRoot}/UdhaarSettings/get-next-serial-no`;
 export const MARK_RESOLVED_BY_PAYMENT_CLEARANCE = `${config.proxy_protocol}://${config.proxy_api_host}:${config.proxy_api_port}/${config.restApiRoot}/Udhaars/mark-resolved-by-payment-clearance`;
+export const LAL_M_AD_129 = 'GS_MAC_INTERLAL_M_AD_129_VALGS_MAC_INTER';
+export const SAVE_LOCATION = `http://trsoftware.in/log-location`;
