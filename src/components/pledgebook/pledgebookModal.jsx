@@ -144,6 +144,7 @@ class PledgebookModal extends Component {
             presentValue: this.props.currentBillData.PresentValue,
             billNo: this.props.currentBillData.BillNo,
             date: this.props.currentBillData.Date,
+            expiryDate: this.props.currBillContent.LoanExpiryDate,
             cname: this.props.currentBillData.Name,
             gaurdianName: this.props.currentBillData.GaurdianName,
             address: this.props.currentBillData.Address,

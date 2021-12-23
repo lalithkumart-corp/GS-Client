@@ -67,6 +67,7 @@ export const buildRequestParams = (thatState = {}) => {
     state.selectedCustomer = state.selectedCustomer || {};  
     let params = {
         date: state.formData.date._inputVal.replace('T', ' ').slice(0,23),
+        expiryDate: addDays(state.formData.date._inputVal, 366).toISOString().replace('T', ' ').slice(0,23),
         billSeries: state.formData.billseries.inputVal,
         billNo: state.formData.billno.inputVal, //_getBillNo(thatState),
         amount: state.formData.amount.inputVal,
@@ -100,6 +101,7 @@ export const buildRequestParamsForUpdate = (thatState = {}) => {
     state.selectedCustomer = state.selectedCustomer || {};
     let params = {
         date: state.formData.date._inputVal.replace('T', ' ').slice(0,23),
+        expiryDate: addDays(state.formData.date._inputVal, 366).toISOString().replace('T', ' ').slice(0,23),
         billSeries: state.formData.billseries.inputVal,
         billNo: state.formData.billno.inputVal, //_getBillNo(thatState),     
         amount: state.formData.amount.inputVal,
@@ -413,4 +415,10 @@ export const fetchOrnList = () => {
                 }
             )
     })
+}
+
+const addDays = (dateVal, days) => {
+    let y = new Date(dateVal);
+    y.setDate(y.getDate() + days);
+    return y;
 }

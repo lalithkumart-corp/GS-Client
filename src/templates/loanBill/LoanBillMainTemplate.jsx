@@ -145,28 +145,30 @@ export default class LoanBillMainTemplate extends Component {
             fontSize: this.getSecondLineFontSize() + 'px',
             letterSpacing: this.getSecondLineLetterSpacing() + 'px',
             fontWeight: 'bold',
-            "-webkit-text-stroke": 'medium'
+            "-webkit-text-stroke": 'medium',
+            fontFamily: 'auto',
+            lineHeight: '35px'
         };
 
         let leftImgStyles = {
-            height: '65px',
-            left: 25,
-            top: '62px',
+            height: '70px',
+            left: 46,
+            top: '63px',
         }
 
         let rightImgStyles = {
-            height: '80px',
-            right: 30,
+            height: '90px',
+            right: 65,
             top: '52px',
         }
 
         return (
             <div>
                 <Row>
-                    <Col xs={4} md={4} style={{textAlign: 'left'}}>
+                    <Col xs={5} md={5} style={{textAlign: 'left'}}>
                         <span style={{paddingLeft: '9px'}}>{this.getFirstLineLeftText()}</span>
                     </Col>
-                    <Col xs={3} md={3} style={{textAlign: 'center'}}>
+                    <Col xs={2} md={2} style={{textAlign: 'center'}}>
                         <span>{this.getFirstLineCenterText()}</span>
                     </Col>
                     <Col xs={5} md={5} style={{textAlign: 'right'}}>
@@ -174,7 +176,7 @@ export default class LoanBillMainTemplate extends Component {
                     </Col>
                 </Row>
                 <Row>
-                    <Col xs={12} style={{textAlign: 'center'}}>
+                    <Col xs={12} style={{textAlign: 'center', marginTop: '35px'}}>
                         <span style={secondLineStyle}>{this.getSecondLineText()}</span>
                     </Col>
                 </Row>

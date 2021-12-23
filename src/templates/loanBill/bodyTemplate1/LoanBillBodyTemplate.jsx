@@ -5,7 +5,7 @@ import Barcode from "react-barcode";
 import { format } from 'currency-formatter';
 import convertor from 'rupees-to-words';
 import './LoanBillBodyTemplate.css';
-import { formatNumberLength } from '../../../utilities/utility';
+import { formatNumberLength, currencyFormatter } from '../../../utilities/utility';
 export default class LoanBillBodyTemplate extends Component {
     constructor(props) {
         super(props);
@@ -34,7 +34,7 @@ export default class LoanBillBodyTemplate extends Component {
                 <Col xs={3}>
 
                 </Col>
-                <Col xs={{span: 4}} md={{span: 4}}>
+                <Col xs={{span: 4}} md={{span: 4}} style={{textAlign: 'right'}}>
                     <span style={{lineHeight: '45px', paddingRight: '15px'}}>
                         <span style={{verticalAlign: 'top', paddingRight: '5px'}}>Date:</span>
                         <span className="font23 date-val">{this.getDate()}</span></span>
@@ -47,6 +47,13 @@ export default class LoanBillBodyTemplate extends Component {
         let date = ''
         if(this.state.billContent.date)
             date = moment(this.state.billContent.date).format('DD-MM-YYYY');
+        return date;
+    }
+
+    getExpiryDate() {
+        let date = '';
+        if(this.state.billContent.expiryDate)
+            date = moment(this.state.billContent.expiryDate).format('DD-MM-YYYY');
         return date;
     }
 
@@ -75,40 +82,43 @@ export default class LoanBillBodyTemplate extends Component {
             <Row>
                 <Col xs={{span: colSpanVal}} md={{span: colSpanVal}} className={`cust-info-col`}>
                     <div>
-                        <Row>
+                        <Row style={{paddingTop: '3px'}}>
                             <Col xs={2} md={2}>
-                                <span className={`field-names font17`}><b>Name:</b></span>
+                                <span className={`field-names font17`}>NAME:</span>
                             </Col>
                             <Col xs={10} md={10}>
-                                <p className="cust-name-section font19">
+                                <span className="cust-name-section">
                                     <span style={{textTransform: "uppercase"}}>{this.state.billContent.cname}</span>
                                     &nbsp; 
                                     <span className="font12">c/o</span> 
                                     &nbsp; 
                                     <span style={{textTransform: "uppercase"}}>{this.state.billContent.gaurdianName}</span>
-                                </p>
+                                </span>
                             </Col>
                         </Row>
                         <Row style={{paddingTop: '5px'}}>
                             <Col xs={2} md={2}>
-                                <span className={`field-names font17`}><b>Address:</b></span>
+                                <span className={`field-names font17`}>ADDRESS:</span>
                             </Col>
                             <Col xs={10} md={10} className="addr-field" style={{maxHeight: "110px", minHeight: "110px"}}>
                                 <div>{this.state.billContent.address}</div>
                                 {this.state.billContent.place}, 
-                                {this.state.billContent.city}-{this.state.billContent.pinCode}
+                                &nbsp; {this.state.billContent.city}-{this.state.billContent.pinCode}
                             </Col>
                         </Row>
                     </div>
-                    <Row>
+                    <Row style={{paddingBottom: '3px'}}>
                         <Col xs={2}>
-                            <span className={`field-names font17`}><b>Amount:</b></span>
+                            <span className={`field-names font17`}>AMOUNT:</span>
                         </Col>
                         <Col xs={4} className="">
-                            <span>{format(this.state.billContent.amount, {code: "INR"})}</span>
+                            <span>
+                                ₹ {currencyFormatter(this.state.billContent.amount)}/-
+                                {/* {format(this.state.billContent.amount, {code: "INR", decimalDigits: 1, spaceBetweenAmountAndSymbol: true})}/- */}
+                            </span>
                         </Col>
                         <Col xs={2}>
-                            <span className={`field-names font17`}><b>Mobile:</b></span>
+                            <span className={`field-names font17`}>MOBILE:</span>
                         </Col>
                         <Col xs={4} className="mobile-no-val">
                             <span>{this.state.billContent.mobile}</span>
@@ -116,7 +126,7 @@ export default class LoanBillBodyTemplate extends Component {
                     </Row>
                     <Row>
                         <Col xs={2} md={2} className="" style={{paddingRight: 0}}>
-                            <span className={`field-names font16`}><b>₹ words:</b></span>
+                            <span className={`field-names font16`}><b>₹ WORDS:</b></span>
                         </Col>
                         <Col xs={10} md={10}>
                             {this.getRupeesInWords(this.state.billContent.amount)}
@@ -136,13 +146,14 @@ export default class LoanBillBodyTemplate extends Component {
         let amt = this.state.billContent.amount;
         if(amt)
             words = convertor(amt);
-        return words;
+        return words + ' Only.';
     }
 
     getAmountValWithWords() {
         return (
             <span className="amount1">
-                {format(this.state.billContent.amount, {code: "INR"})}
+                {/* {format(this.state.billContent.amount, {code: "INR"})} */}
+                ₹ {currencyFormatter(this.state.billContent.amount)}/-
                 &nbsp; &nbsp;
                 {this.getRupeesInWords(this.state.billContent.amount)}
             </span>
@@ -175,7 +186,7 @@ export default class LoanBillBodyTemplate extends Component {
             <Row className={`orn-table-header`}>
                 <Col className="orn-table-th-cell font17" xs={{span: 1}} md={{span: 1}} style={{paddingLeft: '3px'}}><b>S.No</b></Col>
                 <Col className="orn-table-th-cell font17" xs={{span: 9}} md={{span: 9}} style={{paddingLeft: "20px"}}><b>Articles Pledged</b></Col>
-                <Col className="orn-table-th-cell font17" xs={{span: 2}} md={{span: 2}} style={{paddingLeft: '3px'}}>Pcs</Col>
+                <Col className="orn-table-th-cell font17" xs={{span: 2}} md={{span: 2}} style={{paddingLeft: '3px'}}><b>Pcs</b></Col>
                 {/* <Col className="orn-table-th-cell font17" xs={{span: 2}} md={{span: 2}} style={{paddingLeft: '3px'}}>WT</Col> */}
             </Row>
         )
@@ -291,10 +302,11 @@ export default class LoanBillBodyTemplate extends Component {
         return (
             <Row style={{textAlign: 'center'}}>
                 <Col xs={12} className="present-value-header">
-                    Present Value
+                    Loan Amt
                 </Col>
                 <Col xs={12} className="present-value-col">
-                    {format(this.state.billContent.presentValue, {code: 'INR'})}
+                    {/* {format(this.state.billContent.amount, {code: 'INR', decimalDigits: 0})}/- */}
+                    ₹ {currencyFormatter(this.state.billContent.amount)}/-
                 </Col>
             </Row>
         )
@@ -309,7 +321,7 @@ export default class LoanBillBodyTemplate extends Component {
                 <Col xs={10} md={10} style={{paddingLeft: '30px'}}>
                     <p className="interest-pay-mon no-margin">Interest Should be paid in every 3 months</p>
                     <p className="no-margin">I declare that the above articles are my own.</p>
-                    <p>Date of consent to recover jewellry ______________</p>
+                    <p>Date of consent to recover jewellry <span style={{color: 'red', fontWeight: 'bold'}}>{this.getExpiryDate()}</span></p>
                 </Col>
             </Row>
         )

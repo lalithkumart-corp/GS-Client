@@ -1,5 +1,5 @@
 .loan-bill-body-template1 {
-    margin: 50px 55px 0 55px;
+    margin: 25px 40px 10px 45px;
     font-size: 20px;
 }
 .loan-bill-body-template1 .bill-no {
@@ -21,7 +21,7 @@
     padding-bottom: 10px;
 }
 .loan-bill-body-template1 .cust-info-col .cust-name-section {
-    padding-top: 2px;
+    /* padding-top: 2px; */
     font-size: 22px;
 }
 .loan-bill-body-template1 .image-col.user {
@@ -150,7 +150,7 @@
         padding-bottom: 10px;
     }
     .loan-bill-body-template1 .cust-info-col .cust-name-section {
-        padding-top: 2px;
+        /* padding-top: 2px; */
         font-size: 22px;
     }
     .loan-bill-body-template1 .image-col.user {

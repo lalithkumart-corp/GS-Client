@@ -53,6 +53,13 @@
             }
         }
     }
+    .bill-template-preview-modal {
+        .template-main-card {
+            display: block;
+            transform: scale(0.7);
+            margin-top: -140px;
+        }
+    }
 }
 .bill-template-preview-modal .body {
     min-height: 1200px;

@@ -227,6 +227,7 @@ export default class SoldItems extends Component {
         this.filterCallbacks.itemCategory = this.filterCallbacks.itemCategory.bind(this);
         this.filterCallbacks.itemSubCategory = this.filterCallbacks.itemSubCategory.bind(this);
         this.handlePreviewClose = this.handlePreviewClose.bind(this);
+        this.onClickPrint = this.onClickPrint.bind(this);
     }
     async fetchTotals() {
         try {

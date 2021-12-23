@@ -212,7 +212,7 @@ function GstBillTemplate2(props) {
                                 {anOrn.discount}
                             </Col> */}
                             <Col xs={spans.netAmt} className="no-padding">
-                                {anOrn.priceOfOrn}
+                                ₹: {anOrn.priceOfOrn}
                             </Col>
                         </Row>
                     </Col>
@@ -224,20 +224,20 @@ function GstBillTemplate2(props) {
         ornFooter.push(
             <>
                 <Row style={{fontWeight: 'bold', borderTop: '1px solid lightgray'}}>
-                    <Col xs={4}>
+                    <Col xs={6}>
                         <Row>
                             <Col xs={spans.itemName} className="no-padding">
                                 Total: {printContent.ornaments.length} item(s)
                             </Col>
                         </Row>
                     </Col>
-                    <Col xs={8}>
+                    <Col xs={6}>
                         <Row>
                             <Col xs={{span: spans.netWt}} className="no-padding">
                                 {totalNetWt.toFixed(3)}
                             </Col>
-                            <Col xs={{span: spans.netAmt, offset: 8}} className="no-padding">
-                                {printContent.calculations.totalNetAmount}
+                            <Col xs={{span: spans.netAmt, offset: 7}} className="no-padding">
+                                ₹: {printContent.calculations.totalNetAmount}
                             </Col>
                         </Row>
                     </Col>
@@ -254,7 +254,7 @@ function GstBillTemplate2(props) {
 
     const _constructOldPurchaseDom = () => {
         return <Row>
-                    {Object.keys(printContent.oldOrnaments).length && 
+                    {Object.keys(printContent.oldOrnaments).length ?
                     <div style={{paddingLeft: '10px', paddingRight: '10px', width: '90%', margin: '0 auto'}}>
                         <Col xs={12}>
                             <Row>
@@ -275,12 +275,13 @@ function GstBillTemplate2(props) {
                                 <Col xs={3} className="no-padding">{printContent.oldOrnaments.netAmount}</Col>
                             </Row>
                         </Col>
-                    </div>}
+                    </div>
+                    : <></>}
                 </Row>
     }
 
     const _constructPricingDom = () => {
-        return <>
+        return <div style={{fontSize: '17px'}}>
             <Row>
                     <Col xs={{span: 6}} className="no-padding">
                         SGST 1.5%
@@ -314,7 +315,7 @@ function GstBillTemplate2(props) {
                         {printContent.calculations.oldNetAmt}
                     </Col>
                 </Row>
-                {printContent.calculations.totalDiscount && 
+                {printContent.calculations.totalDiscount ? 
                 <Row>
                     <Col xs={{span: 6}} className="no-padding">
                         (-) Less:
@@ -325,8 +326,9 @@ function GstBillTemplate2(props) {
                     <Col xs={{span: 4}} className="no-padding">
                         {printContent.calculations.totalDiscount}
                     </Col>
-                </Row>}
-                <Row>
+                </Row>
+                : <></>}
+                <Row style={{fontSize: '18px', fontWeight: 'bold'}}>
                     <Col xs={{span: 6}} className="no-padding">
                         Grand Total
                     </Col>
@@ -367,24 +369,10 @@ function GstBillTemplate2(props) {
                         </Col>
                     </Row>
                 } */}
-            </>
+            </div>
     }
 
     const constructBody = () => {
-        let custInfo = <>
-            <Row>
-                <Col xs={6}>Invoice No: </Col>
-                <Col xs={6}>{printContent.billNo}</Col>
-            </Row>
-            <Row>
-                <Col xs={6}>CustomerName: </Col>
-                <Col xs={6}>{printContent.customerName}</Col>
-            </Row>
-            <Row>
-                <Col xs={6}>Mobile: </Col>
-                <Col xs={6}>{printContent.customerMobile}</Col>
-            </Row>
-        </>
         let barCode = <>
             <Row>
                 <Col xs={12} style={{textAlign: 'center'}}>
@@ -394,19 +382,38 @@ function GstBillTemplate2(props) {
                 </Col>
             </Row>
         </>
+        let custInfo = <>
+            <Row>
+                <Col xs={3}>Invoice No: </Col>
+                <Col xs={9}>
+                    {printContent.billNo} 
+                    <span style={{width: '50px', position: 'absolute'}}>
+                        <Barcode value={printContent.billNo} width={1} fontSize={20} height={25} displayValue={false}/>
+                    </span>
+                </Col>
+            </Row>
+            <Row>
+                <Col xs={3}>CustomerName: </Col>
+                <Col xs={9}>{printContent.customerName}</Col>
+            </Row>
+            <Row>
+                <Col xs={3}>Mobile: </Col>
+                <Col xs={9}>{printContent.customerMobile}</Col>
+            </Row>
+        </>
         let rateAndDate = <>
             <Row>
                 <Col xs={6}>Date</Col>
                 <Col xs={6}>{printContent.dateVal}</Col>
             </Row>
             <Row>
-                <Col xs={6}>Gold Rate</Col>
-                <Col xs={6}>{printContent.goldRatePerGm}</Col>
+                <Col xs={6}>Gold/Silver Rate</Col>
+                <Col xs={6}>{printContent.goldRatePerGm}/{printContent.silverRatePerGm}</Col>
             </Row>
-            <Row>
+            {/* <Row>
                 <Col xs={6}>Silver Rate</Col>
                 <Col xs={6}>{printContent.silverRatePerGm}</Col>
-            </Row>
+            </Row> */}
             <Row>
                 <Col xs={6}>HSN No</Col>
                 <Col xs={6}>{printContent.hsCode}</Col>
@@ -418,12 +425,12 @@ function GstBillTemplate2(props) {
         let pricingDetailDom = _constructPricingDom();
         return <Col xs={12}>
                     <Row>
-                        <Col xs={4}>
+                        <Col xs={8}>
                             {custInfo}
                         </Col>
-                        <Col xs={4}>
-                            {barCode}
-                        </Col>
+                        {/* <Col xs={4}>
+                            
+                        </Col> */}
                         <Col xs={4}>
                             {rateAndDate}
                         </Col>
@@ -474,7 +481,7 @@ function GstBillTemplate2(props) {
         let bodyDom = constructBody();
         let footerDom = constructFooter();
         return <> 
-                <Row>{headerDom}</Row>
+                <Row style={{fontSize: '19px'}}>{headerDom}</Row>
                 <Row style={{marginTop: '30px'}}>{bodyDom}</Row>
                 <Row>{footerDom}</Row>
             </>;
