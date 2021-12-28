@@ -144,7 +144,7 @@ class PledgebookModal extends Component {
             presentValue: this.props.currentBillData.PresentValue,
             billNo: this.props.currentBillData.BillNo,
             date: this.props.currentBillData.Date,
-            expiryDate: this.props.currBillContent.LoanExpiryDate,
+            expiryDate: this.props.currentBillData.LoanExpiryDate,
             cname: this.props.currentBillData.Name,
             gaurdianName: this.props.currentBillData.GaurdianName,
             address: this.props.currentBillData.Address,
@@ -158,6 +158,7 @@ class PledgebookModal extends Component {
             storeName: this.props.storeDetail.loanLicenseName,
             addressLine1: this.props.storeDetail.loanBillAddressLine1,
             addressLine2: this.props.storeDetail.loanBillAddressLine2,
+            showBarcode: false,
             printModel: this.getPrintModel()
         }
         await this.setState({printContent: templateData});

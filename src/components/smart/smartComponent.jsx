@@ -92,7 +92,7 @@ class SmartComponent extends Component {
         }
     }
     render() {
-        if(LAL_M_AD_129 == "GS_MAC_INTER236375844GS_MAC_INTER") {
+        // if(LAL_M_AD_129 == "GS_MAC_INTER236375844GS_MAC_INTER") {
             if(this.props.auth.isAuthenticated) {
                 if(!this.props.auth.isActivated) {
                     return (
@@ -175,9 +175,9 @@ class SmartComponent extends Component {
                     </Router>
                 )
             }
-        } else {
-            return <div></div>
-        }
+        // } else {
+        //     return <div></div>
+        // }
     }
 }
 

@@ -20,6 +20,7 @@ const sampleBillContent = {
     billSeries: 'A',
     billNo: 1425,
     date: '2021-01-10 11:11:37',
+    expiryDate: '2022-01-11 11:11:37',
     cname: 'RAJ KUMAR',
     gaurdianName: 'GOVINDRAJ',
     address: "3/3 K.K NGR 2ND CROSS STREET",
@@ -27,8 +28,8 @@ const sampleBillContent = {
     city: "CHENNAI",
     pinCode: "600056",
     mobile: '8148588004',
-    userPicture: {imageId: 1 , url: "http://localhost:3003/uploads/system/user-male.png"},
-    ornPicture: {imageId: 1 , url: "http://localhost:3003/uploads/system/default-orn.webp"},
+    userPicture: {imageId: 1 , url: "http://trsoftware.in:80/uploads/system/user-male.png"},
+    ornPicture: {imageId: 1 , url: "http://trsoftware.in:80/uploads/system/default-orn.webp"},
     orn: {
         1: {ornItem: "G Ring", ornNWt: "4.2", ornNos: "1", ornSpec: ""},
         // 2: {ornItem: "G Ring", ornNWt: "", ornNos: "1", ornSpec: ""},
@@ -337,7 +338,7 @@ export default class LoanBillTemplateSettings extends Component {
                             </Row>
                             <Row>
                                 <Col xs={12} className="first-line-header">
-                                    <h5>FIRST LINE</h5>
+                                    <h5 style={{textAlign: 'center'}}>FIRST LINE</h5>
                                 </Col>
                                 <Col xs={4}>
                                     <Form.Group>
@@ -421,7 +422,7 @@ export default class LoanBillTemplateSettings extends Component {
                             </Row> */}
                             <Row className="second-line-row">
                                 <Col xs={12} className="second-line-header">
-                                    <h5>SECOND LINE</h5>
+                                    <h5 style={{textAlign: 'center'}}>SECOND LINE</h5>
                                 </Col>
                                 <Col xs={4} md={4}>
                                     <Form.Group>
@@ -463,7 +464,7 @@ export default class LoanBillTemplateSettings extends Component {
                             </Row>
                             <Row className="third-line-row">
                                 <Col xs={12} className="third-line-header">
-                                    <h5>THIRD LINE</h5>
+                                    <h5 style={{textAlign: 'center'}}>THIRD LINE</h5>
                                 </Col>
                                 <Col xs={4} md={4}>
                                     <Form.Group>
@@ -494,7 +495,7 @@ export default class LoanBillTemplateSettings extends Component {
                             </Row>
                             <Row className="fourth-line-row">
                                 <Col xs={12} className="fourth-line-header">
-                                    <h5>FOURTH LINE</h5>
+                                    <h5 style={{textAlign: 'center'}}>FOURTH LINE</h5>
                                 </Col>
                                 <Col xs={4} md={4}>
                                     <Form.Group>
@@ -525,7 +526,7 @@ export default class LoanBillTemplateSettings extends Component {
                             </Row>
                             <Row className="fifth-line-row">
                                 <Col xs={12} className="fifth-line-header">
-                                    <h5>FIFTH LINE</h5>
+                                    <h5 style={{textAlign: 'center'}}>FIFTH LINE</h5>
                                 </Col>
                                 <Col xs={4} md={4}>
                                     <Form.Group>
@@ -556,7 +557,7 @@ export default class LoanBillTemplateSettings extends Component {
                             </Row>
                             <Row>
                                 <Col xs={12} md={12} className="template-list-col">
-                                    <h5>Content Template</h5>
+                                    <h5 style={{textAlign: 'center'}}>Content Template</h5>
                                     {this.getTemplateListSelectionContainer()}
                                 </Col>
                             </Row>

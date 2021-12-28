@@ -1,5 +1,5 @@
 .loan-bill-body-template1 {
-    margin: 25px 40px 10px 45px;
+    margin: 15px 40px 10px 45px;
     font-size: 20px;
 }
 .loan-bill-body-template1 .bill-no {
@@ -7,7 +7,7 @@
 }
 .loan-bill-body-template1 .bill-no-val {
     font-size: 30px;
-    vertical-align: middle;
+    /* vertical-align: middle; */
 }
 .loan-bill-body-template1 .date-val {
     font-size: 24px;
@@ -15,7 +15,7 @@
 }
 
 .loan-bill-body-template1 .cust-info-col {
-    margin-top: 20px;
+    margin-top: 10px;
     border: 1px solid lightgray;
     border-radius: 7px;
     padding-bottom: 10px;
@@ -25,7 +25,7 @@
     font-size: 22px;
 }
 .loan-bill-body-template1 .image-col.user {
-    margin-top: 20px;
+    margin-top: 10px;
     padding: 30px;
 }
 .loan-bill-body-template1 .image-col.orn {
@@ -128,7 +128,7 @@
 }
 @media print {
     .loan-bill-body-template1 {
-        margin: 50px 55px 0 55px;
+        margin: 15px 55px 0 55px;
         font-size: 20px;
     }
     .loan-bill-body-template1 .bill-no {
@@ -136,7 +136,7 @@
     }
     .loan-bill-body-template1 .bill-no-val {
         font-size: 30px;
-        vertical-align: middle;
+        /* vertical-align: middle; */
     }
     .loan-bill-body-template1 .date-val {
         font-size: 24px;
@@ -144,7 +144,7 @@
     }
     
     .loan-bill-body-template1 .cust-info-col {
-        margin-top: 20px;
+        margin-top: 10px;
         border: 1px solid lightgray;
         border-radius: 7px;
         padding-bottom: 10px;
@@ -154,7 +154,7 @@
         font-size: 22px;
     }
     .loan-bill-body-template1 .image-col.user {
-        margin-top: 20px;
+        margin-top: 10px;
         padding: 30px;
     }
     .loan-bill-body-template1 .image-col.orn {

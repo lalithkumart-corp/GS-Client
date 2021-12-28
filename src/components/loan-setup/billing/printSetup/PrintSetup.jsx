@@ -58,7 +58,7 @@ class PrintSetup extends Component {
                 <Col xs={12} className='gs-card'>
                     <Row xs={12} className='gs-card-content'>
                         <Col xs={{span: 12}} md={{span: 12}}>
-                            <h3 style={{marginBottom: '30px'}}>Bill Receipt - Print setup</h3>
+                            <h3 style={{marginBottom: '30px'}}>Loan Bill - Print setup</h3>
                         </Col>
                         <Col xs={{span: 6}} md={{span: 6}}>
                             <Form>

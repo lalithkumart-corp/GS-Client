@@ -26,17 +26,19 @@ export default class LoanBillBodyTemplate extends Component {
         return (
             <Row className="bill-no-date font16">
                 <Col className="bill-no" xs={{span: 5}} md={{span: 5}}>
+                    <span style={{paddingRight: '5px'}}>BILL NO:</span>
                     <span className="bill-no-val">{this.getBillNo()}</span>
-                    <span style={{width: '50px'}}>
+                    {this.state.billContent.showBarcode && 
+                    <span style={{width: '50px', position: 'absolute'}}>
                         <Barcode value={this.getBillNo()} width={1} fontSize={20} height={25} displayValue={false}/>
-                    </span>
+                    </span>}
                 </Col>
                 <Col xs={3}>
-
+                    <img style={{width: '50px'}} src="/images/swastik.png" />
                 </Col>
                 <Col xs={{span: 4}} md={{span: 4}} style={{textAlign: 'right'}}>
                     <span style={{lineHeight: '45px', paddingRight: '15px'}}>
-                        <span style={{verticalAlign: 'top', paddingRight: '5px'}}>Date:</span>
+                        <span style={{paddingRight: '5px'}}>DATE:</span>
                         <span className="font23 date-val">{this.getDate()}</span></span>
                 </Col>
             </Row>
@@ -165,7 +167,7 @@ export default class LoanBillBodyTemplate extends Component {
         switch(id) {
             case 'user':
                 if(this.state.billContent.userPicture && this.state.billContent.userPicture.url)
-                    dom.push(<Row><img src={this.state.billContent.userPicture.url}/></Row>);
+                    dom.push(<Row><img src={this.state.billContent.userPicture.url} style={{maxHeight: '100px'}}/></Row>);
                 break;
             case 'orn':
                 if(this.state.billContent.ornPicture && this.state.billContent.ornPicture.url)
@@ -198,6 +200,7 @@ export default class LoanBillBodyTemplate extends Component {
                 footer.wt = parseFloat((footer.wt  + parseFloat(anOrn.ornNWt || 0)).toFixed(3));
                 footer.qty += parseInt(anOrn.ornNos) || 0;
                 this._totalWt = footer.wt;
+                if(anOrn.ornSpec && anOrn.ornSpec.length > 0) anOrn.ornSpec = `(${anOrn.ornSpec.trim()})`;
                 if(list.length >= 9) {
                     if(totalOrnLength > 10 && list.length == 9) {
                         list.push(
@@ -212,7 +215,7 @@ export default class LoanBillBodyTemplate extends Component {
                         list.push(
                             <Row>
                                 <Col xs={{span: 1}} md={{span: 1}} className="orn-table-body-cell nos">{index}</Col>
-                                <Col xs={{span: 9}} md={{span: 9}} className="orn-table-body-cell item">{anOrn.ornItem}</Col>
+                                <Col xs={{span: 9}} md={{span: 9}} className="orn-table-body-cell item">{anOrn.ornItem} &nbsp; {anOrn.ornSpec}</Col>
                                 <Col xs={{span: 2}} md={{span: 2}} className="orn-table-body-cell nos">{anOrn.ornNos}</Col>
                                 {/* <Col xs={{span: 2}} md={{span: 2}} className="orn-table-body-cell wt">{anOrn.ornNWt}</Col> */}
                             </Row>
@@ -222,7 +225,7 @@ export default class LoanBillBodyTemplate extends Component {
                     list.push(
                         <Row>
                             <Col xs={{span: 1}} md={{span: 1}} className="orn-table-body-cell nos">{index}</Col>
-                            <Col xs={{span: 9}} md={{span: 9}} className="orn-table-body-cell item">{anOrn.ornItem}</Col>
+                            <Col xs={{span: 9}} md={{span: 9}} className="orn-table-body-cell item">{anOrn.ornItem} &nbsp; {anOrn.ornSpec}</Col>
                             <Col xs={{span: 2}} md={{span: 2}} className="orn-table-body-cell nos">{anOrn.ornNos}</Col>
                             {/* <Col xs={{span: 2}} md={{span: 2}} className="orn-table-body-cell wt">{anOrn.ornNWt}</Col> */}
                         </Row>
@@ -321,7 +324,7 @@ export default class LoanBillBodyTemplate extends Component {
                 <Col xs={10} md={10} style={{paddingLeft: '30px'}}>
                     <p className="interest-pay-mon no-margin">Interest Should be paid in every 3 months</p>
                     <p className="no-margin">I declare that the above articles are my own.</p>
-                    <p>Date of consent to recover jewellry <span style={{color: 'red', fontWeight: 'bold'}}>{this.getExpiryDate()}</span></p>
+                    <p>Date of consent to recover jewellery <span style={{color: 'red', fontWeight: 'bold'}}>{this.getExpiryDate()}</span></p>
                 </Col>
             </Row>
         )
