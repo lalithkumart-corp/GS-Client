@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { Container, Row, Col, Form, InputGroup, FormGroup, FormLabel, FormControl, HelpBlock, ButtonToolbar, Button } from 'react-bootstrap';
 import { updateRates } from '../../../actions/rate';
+import { toast } from 'react-toastify';
 
 const METAL_RATE_GOLD = "metalRateGold";
 const METAL_RATE_SILVER = "metalRateSilver";
@@ -54,6 +55,7 @@ class RateSetup extends Component {
                 silver: this.state.retailRate.silver
             }
         });
+        toast.success('Rates updated Successfully!');
     }
     render() {
         return (
@@ -89,7 +91,7 @@ class RateSetup extends Component {
                             </Col>
                             <Col xs={3}>
                                 <Form.Group>
-                                    <Form.Label>GOLD Retail Rate (1 gm)</Form.Label>
+                                    <Form.Label>GOLD Retail Rate (22K, 1gm)</Form.Label>
                                     <InputGroup>
                                         <FormControl
                                             type="text"

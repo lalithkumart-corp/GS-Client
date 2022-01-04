@@ -25,16 +25,16 @@ export default class LoanBillBodyTemplate extends Component {
     getSecondRow() {
         return (
             <Row className="bill-no-date font16">
-                <Col className="bill-no" xs={{span: 5}} md={{span: 5}}>
-                    <span style={{paddingRight: '5px'}}>BILL NO:</span>
+                <Col className="bill-no" xs={{span: 4}} md={{span: 4}}>
+                    <span style={{paddingRight: '5px'}}>BILL NO: &nbsp;</span>
                     <span className="bill-no-val">{this.getBillNo()}</span>
                     {this.state.billContent.showBarcode && 
                     <span style={{width: '50px', position: 'absolute'}}>
                         <Barcode value={this.getBillNo()} width={1} fontSize={20} height={25} displayValue={false}/>
                     </span>}
                 </Col>
-                <Col xs={3}>
-                    <img style={{width: '50px'}} src="/images/swastik.png" />
+                <Col xs={4} style={{textAlign: "center"}}>
+                    <img style={{width: '40px'}} src="/images/swastik.png" />
                 </Col>
                 <Col xs={{span: 4}} md={{span: 4}} style={{textAlign: 'right'}}>
                     <span style={{lineHeight: '45px', paddingRight: '15px'}}>
@@ -119,16 +119,14 @@ export default class LoanBillBodyTemplate extends Component {
                                 {/* {format(this.state.billContent.amount, {code: "INR", decimalDigits: 1, spaceBetweenAmountAndSymbol: true})}/- */}
                             </span>
                         </Col>
-                        <Col xs={2}>
-                            <span className={`field-names font17`}>MOBILE:</span>
-                        </Col>
-                        <Col xs={4} className="mobile-no-val">
+                        <Col xs={6}>
+                            <span className={`field-names font17`}>MOBILE:</span> &nbsp;
                             <span>{this.state.billContent.mobile}</span>
                         </Col>
                     </Row>
                     <Row>
                         <Col xs={2} md={2} className="" style={{paddingRight: 0}}>
-                            <span className={`field-names font16`}><b>₹ WORDS:</b></span>
+                            <span className={`field-names font16`}> <span style={{fontSize: '19px'}}>₹</span> WORDS:</span>
                         </Col>
                         <Col xs={10} md={10}>
                             {this.getRupeesInWords(this.state.billContent.amount)}
@@ -333,14 +331,14 @@ export default class LoanBillBodyTemplate extends Component {
     getSignatureRow() {
         return (
             <Row className="signature-row">
-                <Col xs={{span: 4}} md={{span: 4}} className="no-padding">
+                <Col xs={{span: 5}} md={{span: 5}} className="no-padding">
                     <div className="signature1-space"></div>
-                    <div className="signature1-text">
+                    <div className="signature1-text" style={{paddingLeft: '15px'}}>
                         Signature of P.B or his Agent
                     </div>
                 </Col>
-                <Col xs={4}>
-                    
+                <Col xs={3} style={{textAlign: "center"}}>
+                    <img src="/images/hand-symbol-right.svg" style={{width: '50px'}}/>
                 </Col>
                 <Col xs={{span: 4}} md={{span: 4}} className="no-padding">
                     <div className="signature2-space"></div>
@@ -352,6 +350,16 @@ export default class LoanBillBodyTemplate extends Component {
         )
     }
 
+    getLastRow() {
+        return (
+            <Row>
+                <Col xs={12} md={12} style={{textAlign: 'center', paddingTop: '7px'}}>
+                    <span className="last-row-tamil-text">அடகு பொருட்களுக்கு கடைசி தவணை 1 வருடம் 7 நாட்கள் மட்டுமே</span>
+                </Col>
+            </Row>
+        )
+    }
+
     render() {
         return (
             <div className="loan-bill-body-template1">
@@ -360,6 +368,7 @@ export default class LoanBillBodyTemplate extends Component {
                 {this.getFourthSection()}
                 {this.getDeclarationRow()}
                 {this.getSignatureRow()}
+                {this.getLastRow()}
             </div>
         )
     }

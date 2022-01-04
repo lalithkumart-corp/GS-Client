@@ -8,6 +8,7 @@ import LoanBillBodyTemplate from './bodyTemplate1/LoanBillBodyTemplate';
 import LoanBillBodyTemplate2 from './bodyTemplate2/LoanBillBodyTemplate';
 
 const DEFAULTS = {
+    COLOR: 'inherit',
     FIRSTLINE_LEFT: 'Form-F',
     FIRSTLINE_CENTER: 'PAWN TICKET',
     FIRSTLINE_RIGHT: 'PBL-No',
@@ -95,6 +96,13 @@ export default class LoanBillMainTemplate extends Component {
             return DEFAULTS.SECONDLINE_LETTER_SPACING;
     }
 
+    getSecondLineColor() {
+        if(this.state.settings && this.state.settings.header && this.state.settings.header.secondLine)
+            return this.state.settings.header.secondLine.styles.color;
+        else
+            return DEFAULTS.COLOR;
+    }
+
     getThirdLineText() {
         if(this.state.settings && this.state.settings.header && this.state.settings.header.thirdLine)
             return this.state.settings.header.thirdLine.text;
@@ -147,7 +155,8 @@ export default class LoanBillMainTemplate extends Component {
             fontWeight: 'bold',
             "-webkit-text-stroke": 'medium',
             fontFamily: 'auto',
-            lineHeight: '35px'
+            lineHeight: '35px',
+            color: this.getSecondLineColor()
         };
 
         let leftImgStyles = {
@@ -162,8 +171,12 @@ export default class LoanBillMainTemplate extends Component {
             top: '42px',
         }
 
+        let templateId = DEFAULTS.BODY_TEMPLATE_ID;;
+        if(this.state.settings && this.state.settings.bodyTemplate)
+            templateId = this.state.settings.bodyTemplate;
+
         return (
-            <div>
+            <div className={"bill-header-section_"+templateId}>
                 <Row>
                     <Col xs={5} md={5} style={{textAlign: 'left'}}>
                         <span style={{paddingLeft: '9px'}}>{this.getFirstLineLeftText()}</span>

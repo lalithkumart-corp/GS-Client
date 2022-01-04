@@ -75,7 +75,7 @@ export default function TemplateSetup(props) {
             if(props.gstBillSettings.selectedTemplate && aTemplate.template_id == props.gstBillSettings.selectedTemplate)
                 checked = true;
 
-            let theUrl = constructApiAssetUrl(aTemplate.screenshot_url);
+            let theUrl = aTemplate.screenshot_url;
 
             templatesContainer.push(
                 <Col xs={3} md={3}>

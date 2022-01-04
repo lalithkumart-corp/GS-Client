@@ -71,6 +71,8 @@ function GstBillTemplate2(props) {
         let storeNameStyles = {
             fontSize: "31px",
             letterSpacing: "2px",
+            fontWeight: "bold",
+            fontFamily: 'initial'
         }
         let addressLineStyle = {
 
@@ -384,30 +386,30 @@ function GstBillTemplate2(props) {
         </>
         let custInfo = <>
             <Row>
-                <Col xs={3}>Invoice No: </Col>
+                <Col xs={3}>INVOICE NO: </Col>
                 <Col xs={9}>
                     {printContent.billNo} 
-                    <span style={{width: '50px', position: 'absolute'}}>
+                    <span style={{width: '50px', position: 'absolute', top: '-8px'}}>
                         <Barcode value={printContent.billNo} width={1} fontSize={20} height={25} displayValue={false}/>
                     </span>
                 </Col>
             </Row>
             <Row>
-                <Col xs={3}>CustomerName: </Col>
+                <Col xs={3}>CUSTOMER: </Col>
                 <Col xs={9}>{printContent.customerName}</Col>
             </Row>
             <Row>
-                <Col xs={3}>Mobile: </Col>
+                <Col xs={3}>MOBILE: </Col>
                 <Col xs={9}>{printContent.customerMobile}</Col>
             </Row>
         </>
         let rateAndDate = <>
             <Row>
-                <Col xs={6}>Date</Col>
+                <Col xs={6} style={{paddingLeft: 0}}>DATE:</Col>
                 <Col xs={6}>{printContent.dateVal}</Col>
             </Row>
             <Row>
-                <Col xs={6}>Gold/Silver Rate</Col>
+                <Col xs={6} style={{paddingLeft: 0, paddingRight: 0}}>GOLD/SILVER Rate:</Col>
                 <Col xs={6}>{printContent.goldRatePerGm}/{printContent.silverRatePerGm}</Col>
             </Row>
             {/* <Row>
@@ -415,7 +417,7 @@ function GstBillTemplate2(props) {
                 <Col xs={6}>{printContent.silverRatePerGm}</Col>
             </Row> */}
             <Row>
-                <Col xs={6}>HSN No</Col>
+                <Col xs={6} style={{paddingLeft: 0}}>HSN NO:</Col>
                 <Col xs={6}>{printContent.hsCode}</Col>
             </Row>
         </>

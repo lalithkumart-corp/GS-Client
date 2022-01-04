@@ -71,7 +71,7 @@ export const logout = (accessToken) => {
     let theAccessToken = getAccessToken();
     return (dispatch) => {
         if(theAccessToken) {
-            axios.post(LOGOUT+`?access_token=${theAccessToken}`)
+            axiosMiddleware.post(LOGOUT)
             .then(
                 (successResp) => {
                     clearSession(theAccessToken);

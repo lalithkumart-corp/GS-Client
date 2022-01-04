@@ -71,7 +71,8 @@ export default class LoanBillTemplateSettings extends Component {
                 text: '',
                 styles: {
                     fontSize: null,
-                    letterSpacing: null
+                    letterSpacing: null,
+                    color: null
                 }
             },
             thirdLine: {
@@ -286,7 +287,7 @@ export default class LoanBillTemplateSettings extends Component {
             if(aTemplate.template_id == this.state.bodyTemplateId)
                 checked = true;
 
-            let theUrl = constructApiAssetUrl(aTemplate.screenshot_url);
+            let theUrl = aTemplate.screenshot_url;
 
             templatesContainer.push(
                 <Col xs={3} md={3}>
@@ -342,10 +343,10 @@ export default class LoanBillTemplateSettings extends Component {
                                 </Col>
                                 <Col xs={4}>
                                     <Form.Group>
-                                        <Form.Label>Left</Form.Label>
+                                        <Form.Label>Left <span className="normal-font">(Ex: Form F (Sec. 7 - Rule8))</span></Form.Label>
                                         <Form.Control
                                             type="text"
-                                            placeholder="Form F (Sec. 7 - Rule8)"
+                                            placeholder=""
                                             value={this.state.firstLine.left.text}
                                             onChange={(e) => this.onChangeFirstLine(e.target.value, 'left')}
                                         />
@@ -353,10 +354,10 @@ export default class LoanBillTemplateSettings extends Component {
                                 </Col>
                                 <Col xs={4}>
                                     <Form.Group>
-                                        <Form.Label>Center</Form.Label>
+                                        <Form.Label>Center <span className="normal-font">(Ex: PAWN TICKET)</span></Form.Label>
                                         <Form.Control
                                             type="text"
-                                            placeholder="PAWN TICKET"
+                                            placeholder=""
                                             value={this.state.firstLine.center.text}
                                             onChange={(e) => this.onChangeFirstLine(e.target.value, 'center')}
                                         />
@@ -364,10 +365,10 @@ export default class LoanBillTemplateSettings extends Component {
                                 </Col>
                                 <Col xs={4}>
                                     <Form.Group>
-                                        <Form.Label>Right</Form.Label>
+                                        <Form.Label>Right <span className="normal-font">(Ex: PBL No. 1234/5678/90/12)</span></Form.Label>
                                         <Form.Control
                                             type="text"
-                                            placeholder="PBL No. 1234/5678/90/12"
+                                            placeholder=""
                                             value={this.state.firstLine.right.text}
                                             onChange={(e) => this.onChangeFirstLine(e.target.value, 'right')}
                                         />
@@ -426,10 +427,10 @@ export default class LoanBillTemplateSettings extends Component {
                                 </Col>
                                 <Col xs={4} md={4}>
                                     <Form.Group>
-                                        <Form.Label>Text</Form.Label>
+                                        <Form.Label>Enter Your Store Name</Form.Label>
                                         <Form.Control
                                             type="text"
-                                            placeholder="MY STORE NAME"
+                                            placeholder=""
                                             value={this.state.secondLine.text}
                                             onChange={(e) => this.onChangeSecondLine(e.target.value)}
                                         />
@@ -439,23 +440,34 @@ export default class LoanBillTemplateSettings extends Component {
                                     <Row>
                                         <Col xs={3} md={3}>
                                             <Form.Group>
-                                                <Form.Label>Font Size</Form.Label>
+                                                <Form.Label>Font Size <span className="normal-font">(Ex: 20)</span></Form.Label>
                                                 <Form.Control
                                                     type="number"
-                                                    placeholder="20"
+                                                    placeholder=""
                                                     value={this.state.secondLine.styles.fontSize}
                                                     onChange={(e) => this.onChangeSecondLineStyles(e.target.value, 'fontSize')}
                                                 />
                                             </Form.Group>
                                         </Col>
-                                        <Col xs={3} md={3}>
+                                        <Col xs={4} md={4}>
                                             <Form.Group>
-                                                <Form.Label>Letter Spacing</Form.Label>
+                                                <Form.Label>Letter Spacing <span className="normal-font">(Ex: 1)</span></Form.Label>
                                                 <Form.Control
                                                     type="number"
-                                                    placeholder="1"
+                                                    placeholder=""
                                                     value={this.state.secondLine.styles.letterSpacing}
                                                     onChange={(e) => this.onChangeSecondLineStyles(e.target.value, 'letterSpacing')}
+                                                />
+                                            </Form.Group>
+                                        </Col>
+                                        <Col xs={3} md={3}>
+                                            <Form.Group>
+                                                <Form.Label>Color <span className="normal-font">(Ex: red)</span></Form.Label>
+                                                <Form.Control
+                                                    type="text"
+                                                    placeholder=""
+                                                    value={this.state.secondLine.styles.color}
+                                                    onChange={(e) => this.onChangeSecondLineStyles(e.target.value, 'color')}
                                                 />
                                             </Form.Group>
                                         </Col>
@@ -468,7 +480,7 @@ export default class LoanBillTemplateSettings extends Component {
                                 </Col>
                                 <Col xs={4} md={4}>
                                     <Form.Group>
-                                        <Form.Label>Text</Form.Label>
+                                        <Form.Label>Enter Second Line Address <span className="normal-font">(Ex: PAWN BROKER)</span></Form.Label>
                                         <Form.Control
                                             type="text"
                                             placeholder="PAWN BROKER"
@@ -499,10 +511,10 @@ export default class LoanBillTemplateSettings extends Component {
                                 </Col>
                                 <Col xs={4} md={4}>
                                     <Form.Group>
-                                        <Form.Label>Text</Form.Label>
+                                        <Form.Label>Enter AddressLine 1 <span className="normal-font"> (Ex: 2/3 Main Road)</span></Form.Label>
                                         <Form.Control
                                             type="text"
-                                            placeholder="ADDRESS LINE 1"
+                                            placeholder=""
                                             value={this.state.fourthLine.text}
                                             onChange={(e) => this.onChangeFourthLine(e.target.value)}
                                         />
@@ -512,10 +524,10 @@ export default class LoanBillTemplateSettings extends Component {
                                     <Row>
                                         <Col xs={3} md={3}>
                                             <Form.Group>
-                                                <Form.Label>Font Size</Form.Label>
+                                                <Form.Label>Font Size <span className="normal-font">(Ex: 20)</span></Form.Label>
                                                 <Form.Control
                                                     type="number"
-                                                    placeholder="20"
+                                                    placeholder=""
                                                     value={this.state.fourthLine.styles.fontSize}
                                                     onChange={(e) => this.onChangeFourthLineStyles(e.target.value, 'fontSize')}
                                                 />
@@ -530,7 +542,7 @@ export default class LoanBillTemplateSettings extends Component {
                                 </Col>
                                 <Col xs={4} md={4}>
                                     <Form.Group>
-                                        <Form.Label>Text</Form.Label>
+                                        <Form.Label>Enter AddressLine 2  <span className="normal-font">(Ex: Kattupakkam, Ch-600056)</span></Form.Label>
                                         <Form.Control
                                             type="text"
                                             placeholder="ADDRESS LINE 2"
@@ -543,10 +555,10 @@ export default class LoanBillTemplateSettings extends Component {
                                     <Row>
                                         <Col xs={3} md={3}>
                                             <Form.Group>
-                                                <Form.Label>Font Size</Form.Label>
+                                                <Form.Label>Font Size <span className="normal-font">(Ex: 20)</span></Form.Label>
                                                 <Form.Control
                                                     type="number"
-                                                    placeholder="20"
+                                                    placeholder=""
                                                     value={this.state.fifthLine.styles.fontSize}
                                                     onChange={(e) => this.onChangeFifthLineStyles(e.target.value, 'fontSize')}
                                                 />
