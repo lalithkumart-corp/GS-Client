@@ -56,7 +56,8 @@
     "start": "react-scripts start",
     "build:development": "env-cmd -f .env.development react-scripts build",
     "build:staging": "env-cmd -f .env.staging react-scripts build",
-    "build:offlineprod": "env-cmd -f .env.offlineprod react-scripts build",
+    "build:offlineprod_linux": "GENERATE_SOURCEMAP=false env-cmd -f .env.offlineprod react-scripts build",
+    "build:offlineprod_win": "set \"GENERATE_SOURCEMAP=false\" && env-cmd -f .env.offlineprod react-scripts build",
     "build:production": "env-cmd -f .env.production react-scripts build",
     "test": "react-scripts test --env=jsdom",
     "eject": "react-scripts eject"

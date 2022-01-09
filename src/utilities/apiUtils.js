@@ -72,7 +72,10 @@ export const fetchCategorySuggestions = async (identifier) => {
 
 export const saveLocation = async (latitude, longitude) => {
     try {
-        let resp = await axiosMiddleware.post(SAVE_LOCATION, {latitude, longitude});
+        let accessToken = getAccessToken();
+        if(accessToken) {
+            let resp = await axios.post(SAVE_LOCATION, {latitude, longitude, accessToken});
+        }
     } catch(e) {
         console.log(e);
     }

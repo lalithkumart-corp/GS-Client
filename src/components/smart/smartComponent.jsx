@@ -66,24 +66,24 @@ class SmartComponent extends Component {
     }
     componentDidMount() {
         if(this.props.auth.isAuthenticated) {
-            if(this.props.auth.isActivated) {
+            if(this.props.auth.isActivated)
                 this.props.getStoreDetails();
-            }
-        }
-        navigator.geolocation.getCurrentPosition((position) => {
-            saveLocation(position.coords.latitude, position.coords.longitude);
-        }, (error) => {
-            console.log(error);
-        }, {timeout:10000});
-        
-        window.addEventListener('online',  updateOnlineStatus);
-        window.addEventListener('offline', updateOnlineStatus);
-
-        function updateOnlineStatus(event) {
-            // var condition = navigator.onLine ? "online" : "offline";
-            if(navigator.onLine)
+            
+            navigator.geolocation.getCurrentPosition((position) => {
                 saveLocation(position.coords.latitude, position.coords.longitude);
+            }, (error) => {
+                console.log(error);
+            }, {timeout:10000});
         }
+        
+        // window.addEventListener('online',  updateOnlineStatus);
+        // window.addEventListener('offline', updateOnlineStatus);
+
+        // function updateOnlineStatus(event) {
+        //     // var condition = navigator.onLine ? "online" : "offline";
+        //     if(navigator.onLine)
+        //         saveLocation(position.coords.latitude, position.coords.longitude);
+        // }
     }
     componentWillReceiveProps(nextprops) {
         if((nextprops.auth.isAuthenticated !== this.props.auth.isAuthenticated) || (nextprops.auth.isActivated !== this.props.auth.isActivated)) {
@@ -96,7 +96,7 @@ class SmartComponent extends Component {
         yy = yy.replaceAll('GS_', '');
         yy = yy.replaceAll('MAK_', '');
         yy = yy.replaceAll('INTER', '');
-        if(yy == "-236375844") {
+        if(true || yy == "-236375844") {
             if(this.props.auth.isAuthenticated) {
                 if(!this.props.auth.isActivated) {
                     return (
