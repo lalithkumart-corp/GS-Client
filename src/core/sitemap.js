@@ -17,6 +17,7 @@ let env = require('./environment');
 //         "restApiRoot": "api"
 //     }
 // }
+
 if(process.env.REACT_APP_ENV == 'offlineprod') {
     window.console = {
         log: () => {},
@@ -57,6 +58,7 @@ console.log(config);
 
 export const SERVER_URL = `${config.proxy_protocol}://${config.proxy_api_host}:${config.proxy_api_port}`;
 export const SERVER_ASSETS_URL_PATH = `${config.proxy_protocol}://${config.proxy_api_host}:${config.proxy_api_port}${config.assetsRoot}`;
+export const SERVER_STATUS_CHECKER = `${config.proxy_protocol}://${config.proxy_api_host}:${config.proxy_api_port}/ping`;
 export const LOGIN = `${config.proxy_protocol}://${config.proxy_api_host}:${config.proxy_api_port}/${config.restApiRoot}/GsUsers/login-user`;
 export const SSO_LOGIN = `${config.proxy_protocol}://${config.proxy_api_host}:${config.proxy_api_port}/${config.restApiRoot}/GsUsers/sso-login`;
 export const CHECK_EMAIL_EXISTANCE = `${config.proxy_protocol}://${config.proxy_api_host}:${config.proxy_api_port}/${config.restApiRoot}/GsUsers/check-email-existance`;

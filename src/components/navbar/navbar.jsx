@@ -5,6 +5,7 @@ import { getSession } from '../../core/storage';
 import { Link } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { openSideBar } from '../../actions/rightSidebar';
+import { serverStatusChecker } from '../../actions/common';
 import { FaGalacticSenate } from 'react-icons/fa';
 import './navbar.scss';
 
@@ -40,6 +41,11 @@ class NavbarComp extends Component {
                 enableBackupModule = false;
             this.setState({enablePledgebookModule: girvi, enableStockModule: jewellery, enableTallyModule, enableUserModule, enableBackupModule});
         }
+    }
+    componentDidMount() {
+        setInterval(() => {
+            this.props.serverStatusChecker();
+        }, 5000);
     }
     getTitie() {
         let title = 'Welcome';
@@ -132,6 +138,11 @@ class NavbarComp extends Component {
                         </NavDropdown>
                     </Nav>
                     <Nav>
+                        <span style={{lineHeight: '31px'}}>Status :  {this.props.common.isServerStable?
+                            <span> <img src="/images/online-green.png" style={{height: '16px', width: '22px', marginTop: '-3px'}}/></span>:
+                            <span title="Please Restart the 'server'"> <img src="/images/offline-red.jfif" style={{height: '16px', marginTop: '-3px'}}/></span>}
+                            &nbsp; &nbsp; &nbsp;
+                        </span>
                         <NavDropdown title={this.getTitie()}>
                             <NavDropdown.Item as={Link} to="/reset-pwd">Reset Password</NavDropdown.Item>
                             <NavDropdown.Item as={Link} to="/logout">Logout</NavDropdown.Item>
@@ -160,8 +171,9 @@ class NavbarComp extends Component {
 const mapStateToProps = (state) => {     
     return {        
         auth: state.auth,
-        rightSideBar: state.rightSideBar
+        rightSideBar: state.rightSideBar,
+        common: state.common
     };
 };
 
-export default connect(mapStateToProps, {openSideBar})(NavbarComp);
+export default connect(mapStateToProps, {openSideBar, serverStatusChecker})(NavbarComp);

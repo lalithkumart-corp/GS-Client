@@ -70,8 +70,8 @@ export const buildRequestParams = (thatState = {}) => {
         expiryDate: addDays(state.formData.date._inputVal, 366).toISOString().replace('T', ' ').slice(0,23),
         billSeries: state.formData.billseries.inputVal,
         billNo: state.formData.billno.inputVal, //_getBillNo(thatState),
-        amount: state.formData.amount.inputVal,
-        presentValue: thatState.formData.presentValue.inputVal,
+        amount: state.formData.amount.inputVal || 0,
+        presentValue: thatState.formData.presentValue.inputVal || 0,
         cname: state.selectedCustomer.name || state.formData.cname.inputVal,
         gaurdianName: state.selectedCustomer.gaurdianName || state.formData.gaurdianName.inputVal,
         address: state.selectedCustomer.address || state.formData.address.inputVal,
@@ -104,8 +104,8 @@ export const buildRequestParamsForUpdate = (thatState = {}) => {
         expiryDate: addDays(state.formData.date._inputVal, 366).toISOString().replace('T', ' ').slice(0,23),
         billSeries: state.formData.billseries.inputVal,
         billNo: state.formData.billno.inputVal, //_getBillNo(thatState),     
-        amount: state.formData.amount.inputVal,
-        presentValue: state.formData.presentValue.inputVal,
+        amount: state.formData.amount.inputVal || 0,
+        presentValue: state.formData.presentValue.inputVal || 0,
         cname: state.selectedCustomer.name || state.formData.cname.inputVal,
         gaurdianName: state.selectedCustomer.gaurdianName || state.formData.gaurdianName.inputVal,
         address: state.selectedCustomer.address || state.formData.address.inputVal,
@@ -324,7 +324,8 @@ export const validateFormValues = (formValues) => {
         errors.push('Amount Value could not be empty');
     if(!formValues.cname)
         errors.push('Customer Name could not be empty');
-
+    if(!formValues.presentValue)
+        errors.push('Present value could not be empty');
     return {
         errors: errors
     };

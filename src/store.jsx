@@ -11,6 +11,7 @@ import storeReducer from './reducers/storeDetail/reducer';
 import rightSideBarReducer from './reducers/rightSideBar/reducer';
 import storeInfoReducer from './reducers/storeDetail/reducer';
 import invoiceReducer from './reducers/invoice/invoice-reducer';
+import commonReducer from './reducers/common/common-reducer';
 
 export const getStore = () => {
 
@@ -24,6 +25,7 @@ export const getStore = () => {
         rightSideBar: rightSideBarReducer,
         storeInfoReducer: storeInfoReducer,
         invoice: invoiceReducer,
+        common: commonReducer
     });
 
     const middleware = applyMiddleware(reduxThunk, logger);
