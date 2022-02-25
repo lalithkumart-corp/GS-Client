@@ -5,7 +5,7 @@
     padding-bottom: 10px;
 }
 .loan-bill-body-template1 {
-    margin: 0 25px 10px 25px;
+    margin: 0 25px 0px 25px;
     font-size: 20px;
     border: 1px solid;
     padding: 15px 15px;
@@ -137,7 +137,7 @@
 }
 
 .loan-bill-body-template1 .interest-pay-mon {
-    font-size: 20px;
+    /* font-size: 20px; */
     font-weight: bold;
 }
 
@@ -156,9 +156,14 @@
     font-size: 17px;
     border: 1px solid red;
     color: red;
+    margin-top: 20px;
+    /* margin-bottom: 15px; */
     padding-left: 10px;
     padding-right: 10px;
-    padding-bottom: 3px;
+    /* padding-bottom: 3px; */
+}
+.bill-footer-text {
+    /* margin-bottom: 20px !important; */
 }
 @media print {
     .bill-header-section_1 {
@@ -168,7 +173,7 @@
         padding-bottom: 10px;
     }
     .loan-bill-body-template1 {
-        margin: 0 25px 10 25px;
+        margin: 0 25px 0 25px;
         font-size: 20px;
         border: 1px solid;
         padding: 15px 15px;
@@ -301,7 +306,7 @@
     }
 
     .loan-bill-body-template1 .interest-pay-mon {
-        font-size: 20px;
+        /* font-size: 20px; */
         font-weight: bold;
     }
     .loan-bill-body-template1 .signature1-space,
@@ -319,8 +324,13 @@
         font-size: 17px;
         border: 1px solid red;
         color: red;
+        margin-top: 20px;
+        /* margin-bottom: 15px; */
         padding-left: 10px;
         padding-right: 10px;
-        padding-bottom: 3px;
+        /* padding-bottom: 3px; */
+    }
+    .bill-footer-text {
+        /* margin-bottom: 20px !important; */
     }
 }

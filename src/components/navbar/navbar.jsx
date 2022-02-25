@@ -45,7 +45,7 @@ class NavbarComp extends Component {
     componentDidMount() {
         setInterval(() => {
             this.props.serverStatusChecker();
-        }, 5000);
+        }, 15000);
     }
     getTitie() {
         let title = 'Welcome';

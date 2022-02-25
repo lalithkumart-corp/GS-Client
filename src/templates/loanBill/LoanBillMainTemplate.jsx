@@ -167,7 +167,7 @@ export default class LoanBillMainTemplate extends Component {
 
         let rightImgStyles = {
             height: '90px',
-            right: 65,
+            right: 70,
             top: '42px',
         }
 
@@ -190,7 +190,7 @@ export default class LoanBillMainTemplate extends Component {
                 </Row>
                 <Row>
                     <Col xs={12} style={{textAlign: 'center', marginTop: '35px'}}>
-                        <span style={secondLineStyle}>{this.getSecondLineText()}</span>
+                        <span style={secondLineStyle} className={`${secondLineStyle.color}-color-imp`}>{this.getSecondLineText()}</span>
                     </Col>
                 </Row>
                 <Row>

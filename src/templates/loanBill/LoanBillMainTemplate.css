@@ -1,9 +1,10 @@
 .template-main-card {
     display: none;
-    width: 830px;
+    width: 830px !important;
+    /* height: 1400px !important; */
     margin-left: 5px;
     position: absolute;
-    margin-top: 40px;
+    margin-top: 30px;
     left: 12%;
     border: 1px solid grey;
 }
@@ -50,4 +51,7 @@
 }
 .font30 {
     font-size: 30px;
+}
+.red-color-imp {
+    color: red !important;
 }

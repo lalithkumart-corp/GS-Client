@@ -6,6 +6,7 @@ import { format } from 'currency-formatter';
 import convertor from 'rupees-to-words';
 import './LoanBillBodyTemplate.css';
 import { formatNumberLength, currencyFormatter } from '../../../utilities/utility';
+import { FaRegHandPointRight } from 'react-icons/fa';
 export default class LoanBillBodyTemplate extends Component {
     constructor(props) {
         super(props);
@@ -175,6 +176,16 @@ export default class LoanBillBodyTemplate extends Component {
         return dom;
     }
 
+    enhanceOrnItemName(itemName) {
+        let categoryMap = new Map();
+        categoryMap.set('G', 'Gold');
+        categoryMap.set('S', 'Silver');
+        categoryMap.set('B', 'Brass');
+        let enhancedCategoryName = categoryMap.get(itemName.charAt(0));
+        itemName = itemName.substring(0, 0) + enhancedCategoryName + itemName.substring(0 + 1);
+        return itemName;
+    }
+
     getOrnSecction() {
         let dom = [];
         let footer = {
@@ -213,7 +224,7 @@ export default class LoanBillBodyTemplate extends Component {
                         list.push(
                             <Row>
                                 <Col xs={{span: 1}} md={{span: 1}} className="orn-table-body-cell nos">{index}</Col>
-                                <Col xs={{span: 9}} md={{span: 9}} className="orn-table-body-cell item">{anOrn.ornItem} &nbsp; {anOrn.ornSpec}</Col>
+                                <Col xs={{span: 9}} md={{span: 9}} className="orn-table-body-cell item">{this.enhanceOrnItemName(anOrn.ornItem)} &nbsp; {anOrn.ornSpec?`(${anOrn.ornSpec})`:''}</Col>
                                 <Col xs={{span: 2}} md={{span: 2}} className="orn-table-body-cell nos">{anOrn.ornNos}</Col>
                                 {/* <Col xs={{span: 2}} md={{span: 2}} className="orn-table-body-cell wt">{anOrn.ornNWt}</Col> */}
                             </Row>
@@ -223,7 +234,7 @@ export default class LoanBillBodyTemplate extends Component {
                     list.push(
                         <Row>
                             <Col xs={{span: 1}} md={{span: 1}} className="orn-table-body-cell nos">{index}</Col>
-                            <Col xs={{span: 9}} md={{span: 9}} className="orn-table-body-cell item">{anOrn.ornItem} &nbsp; {anOrn.ornSpec}</Col>
+                            <Col xs={{span: 9}} md={{span: 9}} className="orn-table-body-cell item">{this.enhanceOrnItemName(anOrn.ornItem)} &nbsp; {anOrn.ornSpec?`(${anOrn.ornSpec})`:''}</Col>
                             <Col xs={{span: 2}} md={{span: 2}} className="orn-table-body-cell nos">{anOrn.ornNos}</Col>
                             {/* <Col xs={{span: 2}} md={{span: 2}} className="orn-table-body-cell wt">{anOrn.ornNWt}</Col> */}
                         </Row>
@@ -307,7 +318,7 @@ export default class LoanBillBodyTemplate extends Component {
                 </Col>
                 <Col xs={12} className="present-value-col">
                     {/* {format(this.state.billContent.amount, {code: 'INR', decimalDigits: 0})}/- */}
-                    ₹ {currencyFormatter(this.state.billContent.amount)}/-
+                    <span className="red-color-imp" style={{fontSize: '40px'}}>₹</span> {currencyFormatter(this.state.billContent.amount)}/-
                 </Col>
             </Row>
         )
@@ -319,10 +330,10 @@ export default class LoanBillBodyTemplate extends Component {
                 <Col xs={{span: 2}} md={{span: 2}} className="image-col orn">
                     {this.getImageSection('orn')}
                 </Col>
-                <Col xs={10} md={10} style={{paddingLeft: '30px'}}>
+                <Col xs={10} md={10} style={{paddingLeft: '30px', fontSize: '17px'}}>
                     <p className="interest-pay-mon no-margin">Interest Should be paid in every 3 months</p>
                     <p className="no-margin">I declare that the above articles are my own.</p>
-                    <p>Date of consent to recover jewellery <span style={{color: 'red', fontWeight: 'bold'}}>{this.getExpiryDate()}</span></p>
+                    <p>Date of consent to recover jewellery <span style={{fontWeight: 'bold'}} className="red-color-imp">{this.getExpiryDate()}</span></p>
                 </Col>
             </Row>
         )
@@ -330,19 +341,22 @@ export default class LoanBillBodyTemplate extends Component {
 
     getSignatureRow() {
         return (
-            <Row className="signature-row">
+            <Row className="signature-row" style={{marginTop: '45px'}}>
                 <Col xs={{span: 5}} md={{span: 5}} className="no-padding">
                     <div className="signature1-space"></div>
-                    <div className="signature1-text" style={{paddingLeft: '15px'}}>
+                    <div className="signature1-text" style={{paddingLeft: '15px', letterSpacing: '3px'}}>
                         Signature of P.B or his Agent
                     </div>
                 </Col>
-                <Col xs={3} style={{textAlign: "center"}}>
-                    <img src="/images/hand-symbol-right.svg" style={{width: '50px'}}/>
+                <Col xs={3} style={{textAlign: "left", padding: 0}}>
+                    <img src="/images/right-hand-symbol.jpg" style={{width: '100px'}}/>
+                    {/* <span>
+                        <FaRegHandPointRight />
+                    </span> */}
                 </Col>
                 <Col xs={{span: 4}} md={{span: 4}} className="no-padding">
                     <div className="signature2-space"></div>
-                    <div className="signature2-text">
+                    <div className="signature2-text" style={{letterSpacing: '3px'}}>
                         Signature of LTI of Pawner
                     </div>
                 </Col>
@@ -352,9 +366,9 @@ export default class LoanBillBodyTemplate extends Component {
 
     getLastRow() {
         return (
-            <Row>
-                <Col xs={12} md={12} style={{textAlign: 'center', paddingTop: '7px'}}>
-                    <span className="last-row-tamil-text">அடகு பொருட்களுக்கு கடைசி தவணை 1 வருடம் 7 நாட்கள் மட்டுமே</span>
+            <Row className="bill-footer-text">
+                <Col xs={12} md={12} style={{textAlign: 'center', paddingTop: '20px'}}>
+                    <span className="last-row-tamil-text red-color-imp">அடகு பொருட்களுக்கு கடைசி தவணை 1 வருடம் 7 நாட்கள் மட்டுமே</span>
                 </Col>
             </Row>
         )

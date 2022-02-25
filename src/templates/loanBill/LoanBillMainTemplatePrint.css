@@ -1,9 +1,9 @@
 @media print {
     .template-main-card {
         display: block;
-        width: 830px;
+        width: 830px !important;
         margin-left: 5px;
-        margin-top: 40px;
+        margin-top: 30px;
         border: none;
         left: 0;
     }
@@ -45,5 +45,8 @@
     }
     .font30 {
         font-size: 30px;
+    }
+    .red-color-imp {
+        color: red !important;
     }
 }
