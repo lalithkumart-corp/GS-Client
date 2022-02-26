@@ -139,8 +139,9 @@
 }
 
 .loan-bill-body-template1 .interest-pay-mon {
-    /* font-size: 20px; */
+    font-size: 20px;
     font-weight: bold;
+    letter-spacing: 1px;
 }
 
 .loan-bill-body-template1 .signature1-space,
@@ -310,8 +311,9 @@
     }
 
     .loan-bill-body-template1 .interest-pay-mon {
-        /* font-size: 20px; */
+        font-size: 20px;
         font-weight: bold;
+        letter-spacing: 1px;
     }
     .loan-bill-body-template1 .signature1-space,
     .loan-bill-body-template1 .signature2-space {

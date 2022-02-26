@@ -195,7 +195,7 @@ export default class LoanBillMainTemplate extends Component {
                 </Row>
                 <Row>
                     <Col xs={12} style={{textAlign: 'center', paddingTop: '4px'}}>
-                        <span style={{fontSize: thirdLineFontSize}}>{this.getThirdLineText()}</span>
+                        <span style={{fontSize: thirdLineFontSize, letterSpacing: '2px'}}>{this.getThirdLineText()}</span>
                     </Col>
                 </Row>
                 <Row>

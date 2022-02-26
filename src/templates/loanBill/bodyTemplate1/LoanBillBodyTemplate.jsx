@@ -331,7 +331,7 @@ export default class LoanBillBodyTemplate extends Component {
                     {this.getImageSection('orn')}
                 </Col>
                 <Col xs={10} md={10} style={{paddingLeft: '30px', fontSize: '17px'}}>
-                    <p className="interest-pay-mon no-margin">Interest Should be paid in every 3 months</p>
+                    <p className="interest-pay-mon no-margin">Interest Should be paid in every 3 month</p>
                     <p className="no-margin">I declare that the above articles are my own.</p>
                     <p>Date of consent to recover jewellery <span style={{fontWeight: 'bold'}} className="red-color-imp">{this.getExpiryDate()}</span></p>
                 </Col>
