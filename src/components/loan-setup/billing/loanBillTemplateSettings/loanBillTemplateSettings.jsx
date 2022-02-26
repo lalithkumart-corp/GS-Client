@@ -28,8 +28,8 @@ const sampleBillContent = {
     city: "CHENNAI",
     pinCode: "600056",
     mobile: '8148588004',
-    userPicture: {imageId: 1 , url: "http://trsoftware.in:80/uploads/system/user-male.png"},
-    ornPicture: {imageId: 1 , url: "http://trsoftware.in:80/uploads/system/default-orn.webp"},
+    userPicture: {imageId: 1 , url: "http://localhost:3003/uploads/system/user-male.png"},
+    ornPicture: {imageId: 1 , url: "http://localhost:3003/uploads/system/default-orn.webp"},
     orn: {
         1: {ornItem: "G Ring", ornNWt: "4.2", ornNos: "1", ornSpec: ""},
         // 2: {ornItem: "G Ring", ornNWt: "", ornNos: "1", ornSpec: ""},

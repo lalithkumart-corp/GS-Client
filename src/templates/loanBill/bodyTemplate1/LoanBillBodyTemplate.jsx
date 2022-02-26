@@ -166,11 +166,11 @@ export default class LoanBillBodyTemplate extends Component {
         switch(id) {
             case 'user':
                 if(this.state.billContent.userPicture && this.state.billContent.userPicture.url)
-                    dom.push(<Row><img src={this.state.billContent.userPicture.url} style={{maxHeight: '100px'}}/></Row>);
+                    dom.push(<Row><img className="img-grayscale" src={this.state.billContent.userPicture.url} style={{maxHeight: '100px'}}/></Row>);
                 break;
             case 'orn':
                 if(this.state.billContent.ornPicture && this.state.billContent.ornPicture.url)
-                    dom.push(<Row><img src={this.state.billContent.ornPicture.url}/></Row>);
+                    dom.push(<Row><img className="img-grayscale" src={this.state.billContent.ornPicture.url}/></Row>);
                 break;
         }
         return dom;
@@ -341,7 +341,7 @@ export default class LoanBillBodyTemplate extends Component {
 
     getSignatureRow() {
         return (
-            <Row className="signature-row" style={{marginTop: '45px'}}>
+            <Row className="signature-row" style={{marginTop: '35px'}}>
                 <Col xs={{span: 5}} md={{span: 5}} className="no-padding">
                     <div className="signature1-space"></div>
                     <div className="signature1-text" style={{paddingLeft: '15px', letterSpacing: '3px'}}>

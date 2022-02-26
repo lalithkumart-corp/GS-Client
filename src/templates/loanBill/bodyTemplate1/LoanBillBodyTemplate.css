@@ -38,6 +38,8 @@
 }
 .loan-bill-body-template1 .image-col.orn {
     padding: 0 0 0 30px;
+    min-height: 84px;
+    max-height: 84px;
 }
 .loan-bill-body-template1 .image-col.orn img {
     width: 120px;
@@ -206,6 +208,8 @@
     }
     .loan-bill-body-template1 .image-col.orn {
         padding: 0 0 0 30px;
+        min-height: 84px;
+        max-height: 84px;
     }
     .loan-bill-body-template1 .image-col.orn img {
         width: 120px;

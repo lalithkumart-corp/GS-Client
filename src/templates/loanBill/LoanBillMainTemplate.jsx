@@ -189,12 +189,12 @@ export default class LoanBillMainTemplate extends Component {
                     </Col>
                 </Row>
                 <Row>
-                    <Col xs={12} style={{textAlign: 'center', marginTop: '35px'}}>
+                    <Col xs={12} style={{textAlign: 'center', marginTop: '27px'}}>
                         <span style={secondLineStyle} className={`${secondLineStyle.color}-color-imp`}>{this.getSecondLineText()}</span>
                     </Col>
                 </Row>
                 <Row>
-                    <Col xs={12} style={{textAlign: 'center'}}>
+                    <Col xs={12} style={{textAlign: 'center', paddingTop: '4px'}}>
                         <span style={{fontSize: thirdLineFontSize}}>{this.getThirdLineText()}</span>
                     </Col>
                 </Row>

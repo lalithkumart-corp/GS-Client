@@ -55,3 +55,6 @@
 .red-color-imp {
     color: red !important;
 }
+.img-grayscale {
+    filter: grayscale(1);
+}
