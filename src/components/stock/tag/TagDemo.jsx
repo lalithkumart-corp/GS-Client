@@ -8,6 +8,7 @@ export default class TagDemo extends Component {
     constructor(props) {
         super(props);
         this.state = {
+            storeName: 'MJK',
             wtContent: "0.000",
             storeSuffix: "",
             touch: "916KDM",
@@ -16,7 +17,21 @@ export default class TagDemo extends Component {
             wastage: 0,
             size: '',
             itemName: '',
+            inspectElements: false,
             form: {
+                storeNameDiv: {
+                    styles: {
+                        display: 'inline-block'
+                    }
+                },
+                storeName: {
+                    expand: false,
+                    styles: {
+                        width: 45,
+                        fontSize: 20,
+                        fontWeight: 'bold'
+                    }
+                },
                 hallmarkLogo: {
                     expand: false,
                     styles: {
@@ -54,11 +69,17 @@ export default class TagDemo extends Component {
                     }
                 },
                 mc: {
+                    label: 'MC:',
                     expand: false,
                     styles: {
                         width: 33,
                         fontWeight: 'normal',
                         fontSize: 16,
+                    },
+                    labelStyles: {
+                        width: 33,
+                        fontWeight: 'normal',
+                        fontSize: 16
                     }
                 },
                 wstDiv: {
@@ -103,6 +124,9 @@ export default class TagDemo extends Component {
         onChange: (e, val, identifier) => {
             let newState = {...this.state};
             switch(identifier) {
+                case 'storeName':
+                    newState.storeName = val;
+                    break;
                 case 'wtContent':
                     newState.wtContent = val;
                     break;
@@ -120,6 +144,9 @@ export default class TagDemo extends Component {
                     break;
                 case 'itemName':
                     newState.itemName = val;
+                    break;
+                case 'makingChargeLabel':
+                    newState.form.mc.label = val;
                     break;
             }
             this.setState(newState);
@@ -151,12 +178,44 @@ export default class TagDemo extends Component {
         newState.form[identifier].styles[key] = val;
         this.setState(newState);
     }
+
+    updateLabelStyles(identifier, key, val) {
+        let newState = {...this.state};
+        newState.form[identifier].labelStyles[key] = val;
+        this.setState(newState);
+    }
     render() {
         return (
             <Container className="tag-demo-container">
                 <Row className="gs-card">
                     <Col className="gs-card-content" xs={12}>
                         <Row>
+                            <Col xs={3}>
+                                <Row className="an-input-small-card">
+                                    <Col xs={12}>
+                                        StoreName: <input type="text" className="tag-input-field" value={this.state.storeName} onChange={ (e) => this.inputControls.onChange(null, e.target.value, 'storeName')} />    
+                                        {this.state.form.storeName.expand
+                                            ? <AiOutlineCaretUp onClick={() => this.toggleStyle('storeName')}/>
+                                            : <AiOutlineCaretDown onClick={() => this.toggleStyle('storeName')}/>
+                                        }
+                                        <span style={{float: 'right'}}>
+                                            {this.state.form.storeNameDiv.styles.display == 'none' ?
+                                                <AiOutlineEyeInvisible onClick={(e)=>this.toggleVisibility('storeNameDiv')}/>
+                                                :<AiOutlineEye onClick={(e)=>this.toggleVisibility('storeNameDiv')}/>
+                                            }
+                                        </span>
+                                    </Col>
+                                    <Col xs={12}>
+                                        <Collapse isOpened={this.state.form.storeName.expand}>
+                                            <div className="collapsible-content-div">
+                                                <div>Width: <input type="number" value={this.state.form.storeName.styles.width} onChange={(e) => this.updateStyles('storeName', 'width', e.target.value)} /></div>
+                                                <div>Font-Size: <input type="number" value={this.state.form.storeName.styles.fontSize} onChange={(e) => this.updateStyles('storeName', 'fontSize', e.target.value)} /></div>
+                                                <div>Font-Weight: <input type="text" value={this.state.form.storeName.styles.fontWeight} onChange={(e) => this.updateStyles('storeName', 'fontWeight', e.target.value)} /></div>
+                                            </div>
+                                        </Collapse>
+                                    </Col>
+                                </Row>
+                            </Col>
                             <Col xs={3}>
                                 <Row className="an-input-small-card">
                                     <Col xs={12}>
@@ -179,6 +238,9 @@ export default class TagDemo extends Component {
                                     </Col>
                                 </Row>
                             </Col>
+                        </Row>
+
+                        <Row>
                             <Col xs={3}>
                                 <Row className="an-input-small-card">
                                     <Col xs={12}>
@@ -207,7 +269,8 @@ export default class TagDemo extends Component {
                             <Col xs={3}>
                                 <Row className="an-input-small-card">
                                     <Col xs={12}>
-                                        MC: <input type="text" className="tag-input-field" value={this.state.makingCharge} onChange={ (e) => this.inputControls.onChange(null, e.target.value, 'makingCharge')} />
+                                        <input type="text" className="tag-input-field" value={this.state.form.mc.label} onChange={ (e) => this.inputControls.onChange(null, e.target.value, 'makingChargeLabel')} />
+                                        <input type="text" className="tag-input-field" value={this.state.makingCharge} onChange={ (e) => this.inputControls.onChange(null, e.target.value, 'makingCharge')} />
                                         {this.state.form.hallmarkLogo.expand
                                             ? <AiOutlineCaretUp onClick={() => this.toggleStyle('mc')}/>
                                             : <AiOutlineCaretDown onClick={() => this.toggleStyle('mc')}/>
@@ -221,10 +284,17 @@ export default class TagDemo extends Component {
                                     </Col>
                                     <Col xs={12}>
                                         <Collapse isOpened={this.state.form.mc.expand}>
-                                            <div className="collapsible-content-div">
-                                                <div>Width: <input type="number" value={this.state.form.mc.styles.width} onChange={(e) => this.updateStyles('mc', 'width', e.target.value)} /></div>
-                                                <div>Font-Size: <input type="number" value={this.state.form.mc.styles.fontSize} onChange={(e) => this.updateStyles('mc', 'fontSize', e.target.value)} /></div>
-                                                <div>Font-Weight: <input type="text" value={this.state.form.mc.styles.fontWeight} onChange={(e) => this.updateStyles('mc', 'fontWeight', e.target.value)} /></div>
+                                            <div className="collapsible-content-div" style={{flexDirection: 'column'}}>
+                                                <div style={{display: 'flex', flexDirection: 'row'}}>
+                                                    <div>Width: <input type="number" value={this.state.form.mc.labelStyles.width} onChange={(e) => this.updateLabelStyles('mc', 'width', e.target.value)} /></div>
+                                                    <div>Font-Size: <input type="number" value={this.state.form.mc.labelStyles.fontSize} onChange={(e) => this.updateLabelStyles('mc', 'fontSize', e.target.value)} /></div>
+                                                    <div>Font-Weight: <input type="text" value={this.state.form.mc.labelStyles.fontWeight} onChange={(e) => this.updateLabelStyles('mc', 'fontWeight', e.target.value)} /></div>
+                                                </div>
+                                                <div style={{display: 'flex', flexDirection: 'row'}}>
+                                                    <div>Width: <input type="number" value={this.state.form.mc.styles.width} onChange={(e) => this.updateStyles('mc', 'width', e.target.value)} /></div>
+                                                    <div>Font-Size: <input type="number" value={this.state.form.mc.styles.fontSize} onChange={(e) => this.updateStyles('mc', 'fontSize', e.target.value)} /></div>
+                                                    <div>Font-Weight: <input type="text" value={this.state.form.mc.styles.fontWeight} onChange={(e) => this.updateStyles('mc', 'fontWeight', e.target.value)} /></div>
+                                                </div>
                                             </div>
                                         </Collapse>
                                     </Col>
@@ -347,6 +417,7 @@ export default class TagDemo extends Component {
                 <Row className="gs-card">
                     <Col className="gs-card-content">
                         <Tag ref={el => (this.componentRef = el)} 
+                            storeName={this.state.storeName}
                             wtContent={this.state.wtContent} 
                             makingCharge={this.state.makingCharge} 
                             touch={this.state.touch} 
@@ -355,6 +426,7 @@ export default class TagDemo extends Component {
                             size={this.state.size}
                             itemName={this.state.itemName}
                             form= {this.state.form}
+                            inspectElements={this.state.inspectElements}
                         />
                     </Col>
                 </Row>
@@ -392,11 +464,19 @@ class Tag extends Component {
     //     )
     // }
     render() {
+        const storeNameStyles = {
+            width: this.props.form.storeName.styles.width + 'px',
+            display: this.props.form.storeNameDiv.styles.display,
+            fontSize: this.props.form.storeName.styles.fontSize + 'px',
+            lineHeight: '21px',
+            fontWeight: this.props.form.storeName.styles.fontWeight
+        }
         const imgStyles= {
             height: this.props.form.hallmarkLogo.styles.size + 'px',
             display: this.props.showHallmark?'inline':'none',
             position: 'absolute',
-            marginTop: '1px'
+            marginTop: '1px',
+            outline: this.props.inspectElements?'1px solid':'none'
         }
         const touchStyles = {
             width: this.props.showHallmark?'65px':'80px',
@@ -407,49 +487,60 @@ class Tag extends Component {
             paddingTop: '0px',
             fontSize: this.props.form.touch.styles.fontSize + 'px',
             fontWeight: this.props.form.touch.styles.fontWeight,
-            lineHeight: '21px'
+            lineHeight: '21px',
+            outline: this.props.inspectElements?'1px solid':'none'
         }
         const itemSizeStyles = {
             width: this.props.form.size.styles.width+'px',
             textAlign: 'center',
-            display: 'inline-block',
+            display: this.props.form.sizeDiv.styles.display,
             fontWeight: this.props.form.size.styles.fontWeight,
-            fontSize: this.props.form.size.styles.fontSize+'px'
+            fontSize: this.props.form.size.styles.fontSize+'px',
+            outline: this.props.inspectElements?'1px solid':'none'
         }
         const mcDivStyles = {
             display: this.props.form.mcDiv.styles.display, 
             paddingLeft: '3px',
         }
+        const mcLabelStyles = {
+            width: this.props.form.mc.labelStyles.width + 'px',
+            fontSize: this.props.form.mc.labelStyles.fontSize + 'px',
+            fontWeight: this.props.form.mc.labelStyles.fontWeight
+        }
         const mcStyles = {
             width: this.props.form.mc.styles.width+'px',
             fontWeight: this.props.form.mc.styles.fontWeight,
             fontSize: this.props.form.mc.styles.fontSize + 'px',
+            outline: this.props.inspectElements?'1px solid':'none'
         }
         const wstStyles = {
             width: this.props.form.wst.styles.width+'px',
             fontWeight: this.props.form.wst.styles.fontWeight,
             fontSize: this.props.form.wst.styles.fontSize + 'px',
             textAlign: 'center',
-            display: this.props.form.wstDiv.styles.display
+            display: this.props.form.wstDiv.styles.display,
+            outline: this.props.inspectElements?'1px solid':'none'
         }
         const itemNameStyles = {
             width: this.props.form.itemName.styles.width+'px',
             fontWeight: this.props.form.itemName.styles.fontWeight,
             fontSize: this.props.form.itemName.styles.fontSize + 'px',
             textAlign: 'center',
-            display: this.props.form.itemNameDiv.styles.display
+            display: this.props.form.itemNameDiv.styles.display,
+            outline: this.props.inspectElements?'1px solid':'none'
         }
         const weightStyles = {
             fontSize: this.props.form.wt.styles.fontSize + 'px',
             fontWeight: this.props.form.wt.styles.fontWeight,
             lineHeight: '10px',
+            outline: this.props.inspectElements?'1px solid':'none'
         }
         return (
             <div style={{height: '55px', width: '425px', paddingLeft: '25px', paddingTop: '2px', fontFamily: 'monospace'}}>
                 <div style={{width: '272px', display: "inline-block", height: '50px', backgroundColor: 'lightgray'}}>
                     <div style={{width: '135px', display: "inline-block"}}>
                         <div style={{height: '20px', paddingLeft: '4px'}}>
-                            <span style={{width: '45px', display: 'inline-block', fontSize: '20px', lineHeight: '21px', fontWeight: 'bold'}}>MJK</span>
+                            <span style={storeNameStyles}>{this.props.storeName}</span>
                             <span style={touchStyles}>{this.props.touch}</span>
                             <span style={{marginLeft: '58px', height: '12px'}}><img style={imgStyles} src='/images/bis.jpg' /></span>
                         </div>
@@ -463,7 +554,7 @@ class Tag extends Component {
                     <div style={{width: '135px', display: "inline-block", height: '50px'}}>
                         <div style={{height: '20px', fontSize: '16px'}}>
                             <span style={mcDivStyles}>
-                                <span style={{width: '33px'}}>MC:</span>
+                                <span style={mcLabelStyles}>{this.props.form.mc.label}</span>
                                 <span style={mcStyles}>{this.props.makingCharge}</span>
                             </span>
                             <span style={itemSizeStyles}>{this.props.size}</span>
