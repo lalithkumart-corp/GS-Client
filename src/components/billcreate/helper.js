@@ -177,16 +177,17 @@ const _getBillRemarks = (thatState) => {
     return thatState.formData.moreDetails.billRemarks;
 }
 
-export const getPicData = (thatState) => {    
-    let picData = null;
-    if(thatState.userPicture) {        
+export const getPicData = (thatState) => {
+    let picData = {};
+    if(thatState.userPicture && (thatState.userPicture.id || thatState.userPicture.url) ) {
         picData = {imageId: thatState.userPicture.id, url: thatState.userPicture.url}
-    } else if(thatState.selectedCustomer && thatState.selectedCustomer.image && thatState.selectedCustomer.image.id) {        
-        picData = {
-            imageId: thatState.selectedCustomer.image.id,
-            url: thatState.selectedCustomer.image.url
-        };        
     }
+    // else if(thatState.selectedCustomer && thatState.selectedCustomer.userImagePath) {        
+    //     picData = {
+    //         // imageId: thatState.selectedCustomer.image.id,
+    //         url: thatState.selectedCustomer.userImagePath
+    //     };
+    // }
     return picData;
 }
 

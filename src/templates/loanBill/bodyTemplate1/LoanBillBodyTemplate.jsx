@@ -7,6 +7,7 @@ import convertor from 'rupees-to-words';
 import './LoanBillBodyTemplate.css';
 import { formatNumberLength, currencyFormatter } from '../../../utilities/utility';
 import { FaRegHandPointRight } from 'react-icons/fa';
+import nosWordMap from '../../numberWordMap.json'; 
 export default class LoanBillBodyTemplate extends Component {
     constructor(props) {
         super(props);
@@ -176,13 +177,26 @@ export default class LoanBillBodyTemplate extends Component {
         return dom;
     }
 
-    enhanceOrnItemName(itemName) {
+    enhanceOrnItemName(itemName, nos) {
         let categoryMap = new Map();
         categoryMap.set('G', 'Gold');
         categoryMap.set('S', 'Silver');
         categoryMap.set('B', 'Brass');
         let enhancedCategoryName = categoryMap.get(itemName.charAt(0));
         itemName = itemName.substring(0, 0) + enhancedCategoryName + itemName.substring(0 + 1);
+
+        let newNos = nos;
+
+        if(itemName.toLowerCase().indexOf('pair') != -1) {
+            itemName = itemName.replace('Pair', '').replace('pair', '').replace('PAIR', '');
+            newNos = nos/2;
+            let nosWord = nosWordMap[newNos]; 
+            if(nosWordMap) itemName = nosWord + ' Pair ' + itemName;
+        } else {
+            let nosWord = nosWordMap[newNos]; 
+            if(nosWordMap) itemName = nosWord + ' ' + itemName;
+        }
+        
         return itemName;
     }
 
@@ -209,7 +223,7 @@ export default class LoanBillBodyTemplate extends Component {
                 footer.wt = parseFloat((footer.wt  + parseFloat(anOrn.ornNWt || 0)).toFixed(3));
                 footer.qty += parseInt(anOrn.ornNos) || 0;
                 this._totalWt = footer.wt;
-                if(anOrn.ornSpec && anOrn.ornSpec.length > 0) anOrn.ornSpec = `(${anOrn.ornSpec.trim()})`;
+                if(anOrn.ornSpec && anOrn.ornSpec.length > 0) anOrn.ornSpec = `${anOrn.ornSpec.trim()}`;
                 if(list.length >= 9) {
                     if(totalOrnLength > 10 && list.length == 9) {
                         list.push(
@@ -224,7 +238,7 @@ export default class LoanBillBodyTemplate extends Component {
                         list.push(
                             <Row>
                                 <Col xs={{span: 1}} md={{span: 1}} className="orn-table-body-cell nos">{index}</Col>
-                                <Col xs={{span: 9}} md={{span: 9}} className="orn-table-body-cell item">{this.enhanceOrnItemName(anOrn.ornItem)} &nbsp; {anOrn.ornSpec?`(${anOrn.ornSpec})`:''}</Col>
+                                <Col xs={{span: 9}} md={{span: 9}} className="orn-table-body-cell item">{this.enhanceOrnItemName(anOrn.ornItem, anOrn.ornNos)} {`${anOrn.ornSpec?(anOrn.ornSpec):''}`} </Col>
                                 <Col xs={{span: 2}} md={{span: 2}} className="orn-table-body-cell nos">{anOrn.ornNos}</Col>
                                 {/* <Col xs={{span: 2}} md={{span: 2}} className="orn-table-body-cell wt">{anOrn.ornNWt}</Col> */}
                             </Row>
@@ -234,7 +248,7 @@ export default class LoanBillBodyTemplate extends Component {
                     list.push(
                         <Row>
                             <Col xs={{span: 1}} md={{span: 1}} className="orn-table-body-cell nos">{index}</Col>
-                            <Col xs={{span: 9}} md={{span: 9}} className="orn-table-body-cell item">{this.enhanceOrnItemName(anOrn.ornItem)} &nbsp; {anOrn.ornSpec?`(${anOrn.ornSpec})`:''}</Col>
+                            <Col xs={{span: 9}} md={{span: 9}} className="orn-table-body-cell item">{this.enhanceOrnItemName(anOrn.ornItem, anOrn.ornNos)} {anOrn.ornSpec?`(${anOrn.ornSpec})`:''}</Col>
                             <Col xs={{span: 2}} md={{span: 2}} className="orn-table-body-cell nos">{anOrn.ornNos}</Col>
                             {/* <Col xs={{span: 2}} md={{span: 2}} className="orn-table-body-cell wt">{anOrn.ornNWt}</Col> */}
                         </Row>

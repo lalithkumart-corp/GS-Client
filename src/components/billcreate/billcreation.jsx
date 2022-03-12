@@ -176,7 +176,7 @@ class BillCreation extends Component {
                     },
                     list: ['Loading...'],
                     limitedList: ['Loading...'],
-                    specList: ['Damage', 'Bend', 'Tread', 'Without Thiruvani', 'Stone missing', 'Full Stone'], //TODO: Map with Database
+                    specList: ['Damage', 'Bend', 'Tread', 'w/o Thiruvani', 'w/o Stone', 'Full Stone'], //TODO: Map with Database
                     validCategoryList: ['G', 'S', 'B'],
                     category: 'U', //unknown
                     totalWeight: 0.00,
@@ -1248,14 +1248,28 @@ class BillCreation extends Component {
                     printParams.storeName = this.props.storeDetail.loanLicenseName;
                     printParams.addressLine1 = this.props.storeDetail.loanBillAddressLine1;
                     printParams.addressLine2 = this.props.storeDetail.loanBillAddressLine2;
-                    printParams.userPicture = {url: this.state.userPicture.url};
-                    printParams.ornPicture = {url: this.state.ornPicture.url};
+                    printParams.userPicture = {url: this.getImageUrlForPrintData('user')};
+                    printParams.ornPicture = {url: this.getImageUrlForPrintData('orn')};
                     await this.setState({printContent: JSON.parse(JSON.stringify(printParams))});
                     this.printReceipt();
                 }
                 this.props.insertNewBill(requestParams);
             }
         }
+    }
+
+    getImageUrlForPrintData(identifier) {
+        let url = '';
+        switch(identifier) {
+            case 'user':
+                if(this.state.userPicture.url) url = this.state.userPicture.url;
+                else if(this.state.selectedCustomer && this.state.selectedCustomer.userImagePath) url = this.state.selectedCustomer.userImagePath;
+                break;
+            case 'orn':
+                url = this.state.ornPicture.url;
+                break;
+        }
+        return url;
     }
 
     isNewCustomerInserted() {
