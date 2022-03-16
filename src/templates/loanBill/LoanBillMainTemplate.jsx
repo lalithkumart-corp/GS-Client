@@ -229,10 +229,10 @@ export default class LoanBillMainTemplate extends Component {
             return (<LoanBillBodyTemplate currBillContent={this.state.currBillContent} settings = {this.state.settings}/>);
         else if(bodyTemplateId == 2)
             return (<LoanBillBodyTemplate2 currBillContent={this.state.currBillContent} settings = {this.state.settings}/>);
-        else if(bodyTemplateId == 3)
-            return (<LoanBillBodyTemplate3 currBillContent={this.state.currBillContent} settings = {this.state.settings}/>);
-        else if(bodyTemplateId == 4)
-            return (<LoanBillBodyTemplate4 currBillContent={this.state.currBillContent} settings = {this.state.settings}/>);
+        // else if(bodyTemplateId == 3)
+        //     return (<LoanBillBodyTemplate3 currBillContent={this.state.currBillContent} settings = {this.state.settings}/>);
+        // else if(bodyTemplateId == 4)
+        //     return (<LoanBillBodyTemplate4 currBillContent={this.state.currBillContent} settings = {this.state.settings}/>);
 
         return (<LoanBillBodyTemplate currBillContent={this.state.currBillContent} settings = {this.state.settings}/>);
     }

@@ -65,7 +65,7 @@ class GeneralInfo extends Component {
     }   
   
     componentWillReceiveProps(nextProps) {
-        this.setState({custDetail: nextProps.selectedCust, dataAltered: false, userPicture: JSON.parse(JSON.stringify(defaultPictureState))});
+        this.setState({custDetail: {...nextProps.selectedCust}, dataAltered: false, userPicture: JSON.parse(JSON.stringify(defaultPictureState))});
     }
 
     componentDidMount() {
@@ -560,7 +560,7 @@ class GeneralInfo extends Component {
                             type="button"
                             className='gs-button update-detail-btn'
                             ref={(domElm) => {this.domElmns.submitBtn = domElm}}
-                            disabled={!this.state.dataAltered}
+                            // disabled={!this.state.dataAltered}
                             onClick={(e) => this.updateDetails()}
                             value='Update Details'
                             />
