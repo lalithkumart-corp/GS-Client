@@ -43,9 +43,9 @@ class NavbarComp extends Component {
         }
     }
     componentDidMount() {
-        setInterval(() => {
-            this.props.serverStatusChecker();
-        }, 15000);
+        // setInterval(() => {
+        //     this.props.serverStatusChecker();
+        // }, 15000);
     }
     getTitie() {
         let title = 'Welcome';
