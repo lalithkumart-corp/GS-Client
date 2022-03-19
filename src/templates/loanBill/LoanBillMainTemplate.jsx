@@ -6,8 +6,8 @@ import './LoanBillMainTemplatePrint.css';
 
 import LoanBillBodyTemplate from './bodyTemplate1/LoanBillBodyTemplate';
 import LoanBillBodyTemplate2 from './bodyTemplate2/LoanBillBodyTemplate';
-import LoanBillBodyTemplate3 from './bodyTemplate3/LoanBillBodyTemplate';
-import LoanBillBodyTemplate4 from './bodyTemplate4/LoanBillBodyTemplate';
+// import LoanBillBodyTemplate3 from './bodyTemplate3/LoanBillBodyTemplate';
+// import LoanBillBodyTemplate4 from './bodyTemplate4/LoanBillBodyTemplate';
 
 
 const DEFAULTS = {
