@@ -145,6 +145,20 @@ class CustomerPortal extends Component {
         this.setState({selectedCust: aCust, customerList: custList, billHistory: null, billHistoryLoading: true});
     }
 
+    selectCustmerCardByCustKey(customerId) {
+        let custList = {...this.state.customerList};
+        let selectedCust = null;
+        _.each(custList, (aCust) => {
+            if(aCust.customerId == customerId) {
+                aCust.isSelected = true;
+                selectedCust = aCust;
+            } else
+                aCust.isSelected = false;
+        });
+        this.fetchCustomerHistory(customerId);        
+        this.setState({selectedCust: selectedCust, customerList: custList, billHistory: null, billHistoryLoading: true});
+    }
+
     async handlePageClick(selectedPage) {
         await this.setState({selectedPageIndex: selectedPage.selected});
         this.initiateFetchPledgebookAPI();
@@ -161,12 +175,14 @@ class CustomerPortal extends Component {
         }        
     }
 
-    async refreshCustomerList() {
-        await this.initiateFetchPledgebookAPI();        
+    async refreshCustomerList(cb) {
+        await this.initiateFetchPledgebookAPI(cb);        
     }
 
-    afterUpdate() {
-        this.refreshCustomerList();
+    afterUpdate(custId) {
+        this.refreshCustomerList(()=> {
+            this.selectCustmerCardByCustKey(custId);
+        });
     }
 
     getPageCount() {

@@ -406,7 +406,7 @@ class GeneralInfo extends Component {
         let response = await axios.post(UPDATE_CUSTOMER_DETAIL, apiParams);
         if(response.data.STATUS == 'SUCCESS') {
             toast.success(response.data.MSG);
-            this.props.afterUpdate();
+            this.props.afterUpdate(thatState.custDetail.customerId);
         } else {
             toast.error(response.data.MSG);
         }

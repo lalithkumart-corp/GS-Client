@@ -167,7 +167,7 @@ export default class LoanBillBodyTemplate extends Component {
         switch(id) {
             case 'user':
                 if(this.state.billContent.userPicture && this.state.billContent.userPicture.url)
-                    dom.push(<Row><img className="img-grayscale" src={this.state.billContent.userPicture.url} style={{maxHeight: '100px'}}/></Row>);
+                    dom.push(<Row><img className="img-grayscale" src={this.state.billContent.userPicture.url}/></Row>);
                 break;
             case 'orn':
                 if(this.state.billContent.ornPicture && this.state.billContent.ornPicture.url)

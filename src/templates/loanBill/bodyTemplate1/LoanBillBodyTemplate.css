@@ -34,7 +34,7 @@
 }
 .loan-bill-body-template1 .image-col.user {
     margin-top: 10px;
-    padding: 30px;
+    padding: 0 30px 0 0;
 }
 .loan-bill-body-template1 .image-col.orn {
     padding: 0 0 0 30px;
@@ -205,7 +205,7 @@
     }
     .loan-bill-body-template1 .image-col.user {
         margin-top: 10px;
-        padding: 30px;
+        padding: 0 30px 0 0;
     }
     .loan-bill-body-template1 .image-col.orn {
         padding: 0 0 0 30px;
