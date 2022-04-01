@@ -211,7 +211,7 @@ export default class LoanBillBodyTemplate extends Component {
             <Row className={`orn-table-header`}>
                 <Col className="orn-table-th-cell font17" xs={{span: 1}} md={{span: 1}} style={{paddingLeft: '3px'}}><b>S.No</b></Col>
                 <Col className="orn-table-th-cell font17" xs={{span: 9}} md={{span: 9}} style={{paddingLeft: "20px"}}><b>Articles Pledged</b></Col>
-                <Col className="orn-table-th-cell font17" xs={{span: 2}} md={{span: 2}} style={{paddingLeft: '3px'}}><b>Pcs</b></Col>
+                <Col className="orn-table-th-cell font17" xs={{span: 2}} md={{span: 2}} style={{paddingLeft: '3px', borderRight: 0}}><b>Pcs</b></Col>
                 {/* <Col className="orn-table-th-cell font17" xs={{span: 2}} md={{span: 2}} style={{paddingLeft: '3px'}}>WT</Col> */}
             </Row>
         )
@@ -228,7 +228,7 @@ export default class LoanBillBodyTemplate extends Component {
                     if(totalOrnLength > 10 && list.length == 9) {
                         list.push(
                             <Row>
-                                <Col xs={{span: 1}} md={{span: 1}} className="orn-table-body-cell nos">{index}</Col>
+                                <Col xs={{span: 1}} md={{span: 1}} className="orn-table-body-cell sno">{index}</Col>
                                 <Col xs={{span: 9}} md={{span: 9}} className="orn-table-body-cell item">Others</Col>
                                 <Col xs={{span: 2}} md={{span: 2}} className="orn-table-body-cell nos"></Col>
                                 {/* <Col xs={{span: 2}} md={{span: 2}} className="orn-table-body-cell wt"></Col> */}
@@ -237,7 +237,7 @@ export default class LoanBillBodyTemplate extends Component {
                     } else if(totalOrnLength <= 10) {
                         list.push(
                             <Row>
-                                <Col xs={{span: 1}} md={{span: 1}} className="orn-table-body-cell nos">{index}</Col>
+                                <Col xs={{span: 1}} md={{span: 1}} className="orn-table-body-cell sno">{index}</Col>
                                 <Col xs={{span: 9}} md={{span: 9}} className="orn-table-body-cell item">{this.enhanceOrnItemName(anOrn.ornItem, anOrn.ornNos)} {`${anOrn.ornSpec?(anOrn.ornSpec):''}`} </Col>
                                 <Col xs={{span: 2}} md={{span: 2}} className="orn-table-body-cell nos">{anOrn.ornNos}</Col>
                                 {/* <Col xs={{span: 2}} md={{span: 2}} className="orn-table-body-cell wt">{anOrn.ornNWt}</Col> */}
@@ -247,7 +247,7 @@ export default class LoanBillBodyTemplate extends Component {
                 } else {
                     list.push(
                         <Row>
-                            <Col xs={{span: 1}} md={{span: 1}} className="orn-table-body-cell nos">{index}</Col>
+                            <Col xs={{span: 1}} md={{span: 1}} className="orn-table-body-cell sno">{index}</Col>
                             <Col xs={{span: 9}} md={{span: 9}} className="orn-table-body-cell item">{this.enhanceOrnItemName(anOrn.ornItem, anOrn.ornNos)} {anOrn.ornSpec?`(${anOrn.ornSpec})`:''}</Col>
                             <Col xs={{span: 2}} md={{span: 2}} className="orn-table-body-cell nos">{anOrn.ornNos}</Col>
                             {/* <Col xs={{span: 2}} md={{span: 2}} className="orn-table-body-cell wt">{anOrn.ornNWt}</Col> */}
@@ -260,7 +260,7 @@ export default class LoanBillBodyTemplate extends Component {
             while(list.length <10) {
                 list.push(
                     <Row>
-                        <Col xs={{span: 1}} md={{span: 1}} className="orn-table-body-cell nos"></Col>
+                        <Col xs={{span: 1}} md={{span: 1}} className="orn-table-body-cell sno"></Col>
                         <Col xs={{span: 9}} md={{span: 9}} className="orn-table-body-cell item"></Col>
                         <Col xs={{span: 2}} md={{span: 2}} className="orn-table-body-cell nos"></Col>
                         {/* <Col xs={{span: 2}} md={{span: 2}} className="orn-table-body-cell wt"></Col> */}

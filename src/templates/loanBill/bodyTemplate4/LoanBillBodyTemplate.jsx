@@ -228,7 +228,7 @@ export default class LoanBillBodyTemplate extends Component {
                     if(totalOrnLength > 10 && list.length == 9) {
                         list.push(
                             <Row>
-                                <Col xs={{span: 1}} md={{span: 1}} className="orn-table-body-cell nos">{index}</Col>
+                                <Col xs={{span: 1}} md={{span: 1}} className="orn-table-body-cell sno">{index}</Col>
                                 <Col xs={{span: 9}} md={{span: 9}} className="orn-table-body-cell item">Others</Col>
                                 <Col xs={{span: 2}} md={{span: 2}} className="orn-table-body-cell nos"></Col>
                                 {/* <Col xs={{span: 2}} md={{span: 2}} className="orn-table-body-cell wt"></Col> */}
@@ -237,7 +237,7 @@ export default class LoanBillBodyTemplate extends Component {
                     } else if(totalOrnLength <= 10) {
                         list.push(
                             <Row>
-                                <Col xs={{span: 1}} md={{span: 1}} className="orn-table-body-cell nos">{index}</Col>
+                                <Col xs={{span: 1}} md={{span: 1}} className="orn-table-body-cell sno">{index}</Col>
                                 <Col xs={{span: 9}} md={{span: 9}} className="orn-table-body-cell item">{this.enhanceOrnItemName(anOrn.ornItem, anOrn.ornNos)} {`${anOrn.ornSpec?(anOrn.ornSpec):''}`} </Col>
                                 <Col xs={{span: 2}} md={{span: 2}} className="orn-table-body-cell nos">{anOrn.ornNos}</Col>
                                 {/* <Col xs={{span: 2}} md={{span: 2}} className="orn-table-body-cell wt">{anOrn.ornNWt}</Col> */}
@@ -248,9 +248,9 @@ export default class LoanBillBodyTemplate extends Component {
                     if(anOrn.ornItem) {
                         list.push(
                             <Row>
-                                <Col xs={{span: 1}} md={{span: 1}} className="orn-table-body-cell nos">{index}</Col>
-                                <Col xs={{span: 9}} md={{span: 9}} className="orn-table-body-cell item">{this.enhanceOrnItemName(anOrn.ornItem, anOrn.ornNos)} {anOrn.ornSpec?`(${anOrn.ornSpec})`:''}</Col>
-                                <Col xs={{span: 2}} md={{span: 2}} className="orn-table-body-cell nos">{anOrn.ornNos}</Col>
+                                <Col xs={{span: 1}} md={{span: 1}} className="orn-table-body-cell sno">{}</Col>
+                                <Col xs={{span: 9}} md={{span: 9}} className="orn-table-body-cell item">{}</Col>
+                                <Col xs={{span: 2}} md={{span: 2}} className="orn-table-body-cell nos">{}</Col>
                                 {/* <Col xs={{span: 2}} md={{span: 2}} className="orn-table-body-cell wt">{anOrn.ornNWt}</Col> */}
                             </Row>
                         );
@@ -262,7 +262,7 @@ export default class LoanBillBodyTemplate extends Component {
             while(list.length <10) {
                 list.push(
                     <Row>
-                        <Col xs={{span: 1}} md={{span: 1}} className="orn-table-body-cell nos"></Col>
+                        <Col xs={{span: 1}} md={{span: 1}} className="orn-table-body-cell sno"></Col>
                         <Col xs={{span: 9}} md={{span: 9}} className="orn-table-body-cell item"></Col>
                         <Col xs={{span: 2}} md={{span: 2}} className="orn-table-body-cell nos"></Col>
                         {/* <Col xs={{span: 2}} md={{span: 2}} className="orn-table-body-cell wt"></Col> */}
@@ -306,11 +306,11 @@ export default class LoanBillBodyTemplate extends Component {
     getTotalWtDom() {
         let gm ='';//this._totalWt;
         let mg = '';
-        if(this._totalWt) {
-            let wtVals = (''+this._totalWt).split('.');
-            gm = wtVals[0];
-            mg = formatNumberLength(wtVals[1], 3, 'suffix') || '000';
-        }
+        // if(this._totalWt) {
+        //     let wtVals = (''+this._totalWt).split('.');
+        //     gm = wtVals[0];
+        //     mg = formatNumberLength(wtVals[1], 3, 'suffix') || '000';
+        // }
         return (
             <Row className="total-wt-section">
                 <Col xs={12} style={{textAlign: 'center'}}>
