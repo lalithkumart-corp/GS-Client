@@ -211,7 +211,7 @@ export default class LoanBillBodyTemplate extends Component {
             <Row className={`orn-table-header`}>
                 <Col className="orn-table-th-cell font17" xs={{span: 1}} md={{span: 1}} style={{paddingLeft: '3px'}}><b>S.No</b></Col>
                 <Col className="orn-table-th-cell font17" xs={{span: 9}} md={{span: 9}} style={{paddingLeft: "20px"}}><b>Articles Pledged</b></Col>
-                <Col className="orn-table-th-cell font17" xs={{span: 2}} md={{span: 2}} style={{paddingLeft: '3px'}}><b>Pcs</b></Col>
+                <Col className="orn-table-th-cell font17" xs={{span: 2}} md={{span: 2}} style={{paddingLeft: '3px', borderRight: 0}}><b>Pcs</b></Col>
                 {/* <Col className="orn-table-th-cell font17" xs={{span: 2}} md={{span: 2}} style={{paddingLeft: '3px'}}>WT</Col> */}
             </Row>
         )
