@@ -165,13 +165,13 @@ export default class LoanBillMainTemplate extends Component {
         let leftImgStyles = {
             height: '70px',
             left: 46,
-            top: '50px',
+            top: '80px',
         }
 
         let rightImgStyles = {
             height: '90px',
             right: 70,
-            top: '42px',
+            top: '72px',
         }
 
         let templateId = DEFAULTS.BODY_TEMPLATE_ID;;

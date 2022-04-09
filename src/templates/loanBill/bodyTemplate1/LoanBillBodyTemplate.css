@@ -1,5 +1,5 @@
 .bill-header-section_1 {
-    margin: 15px 25px 0 25px;
+    margin: 45px 25px 0 25px;
     border: 1px solid;
     border-bottom: none;
     padding-bottom: 10px;
@@ -8,7 +8,7 @@
     margin: 0 25px 0px 25px;
     font-size: 20px;
     border: 1px solid;
-    padding: 15px 15px;
+    padding: 15px 15px 7px 15px;
 }
 .loan-bill-body-template1 .bill-no {
     text-align: left;
@@ -31,6 +31,11 @@
 .loan-bill-body-template1 .cust-info-col .cust-name-section {
     /* padding-top: 2px; */
     font-size: 22px;
+}
+.loan-bill-body-template1 .cust-info-col .amount-value-top {
+    color: red !important;
+    font-size: 26px;
+    line-height: 32px;
 }
 .loan-bill-body-template1 .image-col.user {
     margin-top: 10px;
@@ -175,7 +180,7 @@
 }
 @media print {
     .bill-header-section_1 {
-        margin: 15px 25px 0 25px;
+        margin: 45px 25px 0 25px;
         border: 1px solid;
         border-bottom: none;
         padding-bottom: 10px;
@@ -184,7 +189,7 @@
         margin: 0 25px 0 25px;
         font-size: 20px;
         border: 1px solid;
-        padding: 15px 15px;
+        padding: 15px 15px 7px 15px;
     }
     .loan-bill-body-template1 .bill-no {
         /* text-align: left; */
@@ -207,6 +212,14 @@
     .loan-bill-body-template1 .cust-info-col .cust-name-section {
         /* padding-top: 2px; */
         font-size: 22px;
+    }
+    .loan-bill-body-template1 .cust-info-col .amount-value-top {
+        color: red !important;
+        font-size: 25px !important;
+        line-height: 32px !important;
+    }
+    .loan-bill-body-template1 .cust-info-col .field-names.amount {
+        line-height: 32px !important;
     }
     .loan-bill-body-template1 .image-col.user {
         margin-top: 10px;

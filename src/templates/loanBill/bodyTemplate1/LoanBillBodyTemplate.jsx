@@ -113,10 +113,10 @@ export default class LoanBillBodyTemplate extends Component {
                     </div>
                     <Row style={{paddingBottom: '3px'}}>
                         <Col xs={2}>
-                            <span className={`field-names font17`}>AMOUNT:</span>
+                            <span className={`field-names amount font17`}>AMOUNT:</span>
                         </Col>
                         <Col xs={4} className="">
-                            <span>
+                            <span className="amount-value-top">
                                 ₹ {currencyFormatter(this.state.billContent.amount)}/-
                                 {/* {format(this.state.billContent.amount, {code: "INR", decimalDigits: 1, spaceBetweenAmountAndSymbol: true})}/- */}
                             </span>
@@ -330,9 +330,10 @@ export default class LoanBillBodyTemplate extends Component {
                 <Col xs={12} className="present-value-header">
                     Loan Amt
                 </Col>
-                <Col xs={12} className="present-value-col">
+                <Col xs={12} className="present-value-col" style={{fontSize: '40px', lineHeight: '35px'}}>
                     {/* {format(this.state.billContent.amount, {code: 'INR', decimalDigits: 0})}/- */}
-                    <span className="red-color-imp" style={{fontSize: '40px'}}>₹</span> {currencyFormatter(this.state.billContent.amount)}/-
+                    <span className="red-color-imp" style={{paddingRight: '5px'}}>₹</span> 
+                    <span style={{fontSize: '27px', verticalAlign: 'top'}}>{currencyFormatter(this.state.billContent.amount)}/- </span>
                 </Col>
             </Row>
         )
@@ -355,7 +356,7 @@ export default class LoanBillBodyTemplate extends Component {
 
     getSignatureRow() {
         return (
-            <Row className="signature-row" style={{marginTop: '35px'}}>
+            <Row className="signature-row" style={{marginTop: '25px'}}>
                 <Col xs={{span: 5}} md={{span: 5}} className="no-padding">
                     <div className="signature1-space"></div>
                     <div className="signature1-text" style={{paddingLeft: '15px', letterSpacing: '3px'}}>
@@ -381,7 +382,7 @@ export default class LoanBillBodyTemplate extends Component {
     getLastRow() {
         return (
             <Row className="bill-footer-text">
-                <Col xs={12} md={12} style={{textAlign: 'center', paddingTop: '20px'}}>
+                <Col xs={12} md={12} style={{textAlign: 'center', paddingTop: '10px', paddingBottom: '7px'}}>
                     <span className="last-row-tamil-text red-color-imp">அடகு பொருட்களுக்கு கடைசி தவணை 1 வருடம் 7 நாட்கள் மட்டுமே</span>
                 </Col>
             </Row>
