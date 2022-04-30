@@ -179,9 +179,10 @@ const _getBillRemarks = (thatState) => {
 
 export const getPicData = (thatState) => {
     let picData = {};
-    if(thatState.userPicture && (thatState.userPicture.id || thatState.userPicture.url) ) {
+    if(thatState.userPicture && (thatState.userPicture.id || thatState.userPicture.url) )
         picData = {imageId: thatState.userPicture.id, url: thatState.userPicture.url}
-    }
+    else if(thatState.custDetail && thatState.custDetail.imageTableId)
+        picData = {imageId: thatState.custDetail.imageTableId};
     // else if(thatState.selectedCustomer && thatState.selectedCustomer.userImagePath) {        
     //     picData = {
     //         // imageId: thatState.selectedCustomer.image.id,
