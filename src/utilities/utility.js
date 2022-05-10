@@ -98,6 +98,8 @@ export const convertBufferToBase64 = (imgBuff) => {
 }
 
 export const convertToLocalTime = (theDate, options) => {
+    if(!theDate) return null;
+    
     options = options || {};
 
     if(theDate.length == 24) // Ex: 2021-01-02T12:17:57.000Z
