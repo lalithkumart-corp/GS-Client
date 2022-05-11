@@ -13,3 +13,18 @@
     color: grey;
     text-align: center;
 }
+
+.custom-notes-card {
+    border: 1px solid #caca1f;
+    padding-top: 10px;
+    background-color: lightyellow;
+    margin-bottom: 10px;
+    .gs-cls-readonly {
+        .ql-toolbar {
+            display: none;
+        }
+        .ql-container {
+            border: none;
+        }
+    }
+}

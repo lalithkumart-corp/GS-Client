@@ -10,7 +10,7 @@ import axios from 'axios';
 import { FETCH_NOTES, INSERT_NOTE, UPDATE_NOTE, ARCHIVE_NOTE }  from '../../core/sitemap';
 import _ from 'lodash';
 import { convertToLocalTime } from '../../utilities/utility';
-import './notes.css';
+import './notes.scss';
 import axiosMiddleware from '../../core/axios';
 import { toast } from 'react-toastify';
 import { FaEdit, FaTrash } from 'react-icons/fa';
@@ -179,21 +179,21 @@ class Notes extends Component {
         let buffer = [];
         _.each(notesArr, (aNoteObj, index) => {
             buffer.push(
-                <Row>
+                <Row className="custom-notes-card">
                     <Col xs ={12}>
-                        <p> 
-                            <span>
-                                <FaEdit className="gs-icon" onClick={(e) => this.editNoteListener(aNoteObj.Id)}/>
-                                <FaTrash className="gs-icon" onClick={(e) => this.deleteNoteListener(aNoteObj.Id)}/>
-                                {/* <span className='icon edit-icon' onClick={(e) => this.onEditDetailIconClick(i)}><FontAwesomeIcon icon="edit" /></span>
-                                <span className='icon' onClick={(e) => this.onDeleteDetailIconClick(i)}><FontAwesomeIcon icon="trash" /></span> */}
-                            </span>
+                        <p>
                             <span className='float-right'>
                                 { convertToLocalTime(aNoteObj.CreatedDate) }
                             </span>
+                            <span className="float-right">
+                                <span style={{marginRight: '10px', fontSize: '13px'}}><FaEdit className="gs-icon" onClick={(e) => this.editNoteListener(aNoteObj.Id)}/></span>
+                                <span style={{marginRight: '10px', fontSize: '13px'}}><FaTrash className="gs-icon" onClick={(e) => this.deleteNoteListener(aNoteObj.Id)}/></span>
+                                {/* <span className='icon edit-icon' onClick={(e) => this.onEditDetailIconClick(i)}><FontAwesomeIcon icon="edit" /></span>
+                                <span className='icon' onClick={(e) => this.onDeleteDetailIconClick(i)}><FontAwesomeIcon icon="trash" /></span> */}
+                            </span>
                         </p>
                     </Col>
-                    <Col xs={12}> 
+                    <Col xs={12} className="no-padding"> 
                         <NoteCard saveCb={this.updateNoteContent} discardCb={this.cancelEdit} content={aNoteObj.Notes} noteId={aNoteObj.Id} readOnly={aNoteObj.readOnly}/>
 
                         {/* <ReactQuill
@@ -233,9 +233,9 @@ class Notes extends Component {
             <Container className='notes-main-container'>
                 <Row>
                     <Col xs={12}>
-                        <Row>
+                        <Row style={{marginBottom: '10px'}}>
                             <h4>Customer's:</h4>
-                            <input type="button" className='gs-button' value="+" onClick={this.onClickAddNoteBtn} style={{marginLeft: "30px", padding: "0px 30px"}}/> 
+                            <input type="button" className='gs-button bordered' value="+" onClick={this.onClickAddNoteBtn} style={{marginLeft: "30px", padding: "0px 30px"}}/> 
                         </Row>
                         {this.state.showNewPaper && this.getNewPaper()}
                         {this.getCustomRemarks()}
@@ -256,6 +256,11 @@ function NoteCard(props) {
 
     const [value, setValue] = useState(props.content || '');
 
+    useEffect(() => {
+        if(props.content !== undefined)
+            setValue(props.content);
+    }, [props.content]);
+
     const saveCb = () => {
         props.saveCb(value, props.noteId);
     }
@@ -273,6 +278,7 @@ function NoteCard(props) {
             <ReactQuill 
                 value = {value}
                 readOnly = {props.readOnly}
+                className= {props.readOnly?'gs-cls-readonly':''}
                 onChange = {(content, delta, source, editor) => onChange(content, delta, source, editor)}
             />
             {!props.readOnly && 
