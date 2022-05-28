@@ -29,6 +29,14 @@ export const constructFetchApiParams = (stateObj) => {
     return params;
 }
 
+export const constructConsolListGetAPIParams = (stateObj) => {
+    let params = {
+        startDate: getDateInUTC(stateObj.filters.date.startDate, {time: 'start'}),
+        endDate: getDateInUTC(stateObj.filters.date.endDate, {time: 'end'}),
+    };
+    return params;
+}
+
 const getOffsets = (stateObj) => {        
     let pageNumber = parseInt(stateObj.selectedPageIndex);
     let offsetStart = pageNumber * parseInt(stateObj.pageLimit);

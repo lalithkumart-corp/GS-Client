@@ -46,6 +46,27 @@
     .alert-icon {
         font-weight: bold;
     }
+    .consol-switch {
+        display: inline-block;
+        vertical-align: top;
+        padding-left: 40px;
+    }
+    .consolidate-transactions-table {
+        // max-height: 300px;
+        // overflow: scroll;
+        // display: block;
+        // thead, tbody {
+        //     display: table;
+        // }
+        // thead {
+        //     display: block;
+        // }
+        // tbody {
+        //     max-height: 300px;
+        //     overflow-x: hidden;
+        //     display: block;
+        // }
+    }
 }
 /**  gs-custom-multiselect-item */
 .gs-custom-multiselect-item.exclude{

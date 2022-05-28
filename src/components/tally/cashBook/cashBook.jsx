@@ -3,10 +3,10 @@ import {Tabs, Tab, Container, Row, Col, Dropdown} from 'react-bootstrap';
 import GSTable from '../../gs-table/GSTable';
 import axiosMiddleware from '../../../core/axios';
 import { convertToLocalTime, currencyFormatter } from '../../../utilities/utility';
-import { GET_FUND_TRN_LIST, GET_FUND_TRN_OVERVIEW, ADD_TAGS, REMOVE_TAGS } from '../../../core/sitemap';
+import { GET_FUND_TRN_LIST, GET_FUND_TRN_OVERVIEW, ADD_TAGS, REMOVE_TAGS, GET_FUND_TRNS_LIST_CONSOLIDATED } from '../../../core/sitemap';
 import { getAccessToken, getCashManagerFilters, setCashManagerFilter } from '../../../core/storage';
 import DateRangePicker from '../../dateRangePicker/dataRangePicker';
-import { constructFetchApiParams, getFilterValFromLocalStorage, getCreateAlertParams, getUpdateAlertParams, getDeleteAlertParams, deleteTransactions } from './helper';
+import { constructFetchApiParams, constructConsolListGetAPIParams, getFilterValFromLocalStorage, getCreateAlertParams, getUpdateAlertParams, getDeleteAlertParams, deleteTransactions } from './helper';
 import ReactPaginate from 'react-paginate';
 import './cashBook.scss';
 import {MultiSelect} from "react-multi-select-component";
@@ -34,7 +34,9 @@ export default class CashBook extends Component {
 
         this.state = {
             transactions: [],
+            consolTransactions: [],
             totalTransactionsCount: 0,
+            showConsolView: false,
             filters: {
                 date: {
                     startDate: getFilterValFromLocalStorage('START_DATE', this.filtersFromLocal) || past1daysStartDate,
@@ -65,6 +67,7 @@ export default class CashBook extends Component {
             isCustomActionPopverVisible: false,
             isFilterPopoverVisible: false,
             loadingList: false,
+            loadingConsolList: false,
             localCalculations: {
                 totalCashIn: null,
                 totalCashOut: null
@@ -261,6 +264,53 @@ export default class CashBook extends Component {
                 } 
             }
         ];
+
+        this.columnsForConsolView = [
+           {
+                id: 'transaction_date',
+                displayText: 'Date',
+                width: '7%',
+                formatter: (column, columnIndex, row, rowIndex) => {
+                    let tagNo = row['tag_indicator'];
+                    return (
+                        <div>
+                            <span>{convertToLocalTime(row[column.id], {excludeTime: true})}</span>
+                        </div>
+                    )
+                }
+            }, 
+            {
+                id: 'fund_house_name',
+                displayText: 'Account',
+                width: '15%'
+            },{
+                id: 'category',
+                displayText: 'Category',
+                width: '15%'
+            }, {
+                id: 'cash_in',
+                displayText: 'Cash In',
+                width: '15%',
+                formatter: (column, columnIndex, row, rowIndex) => {
+                    return (
+                        <span className="credit-style">{currencyFormatter(row[column.id])}</span>
+                    )
+                },
+                footerClassName: 'total-cash-in-footer-cell',
+                footerFormatter: () => <span>{currencyFormatter(this.state?this.state.localCalculations.totalCashIn:'')}</span>
+            },{
+                id: 'cash_out',
+                displayText: 'Cash Out',
+                width: '15%',
+                formatter: (column, columnIndex, row, rowIndex) => {
+                    return (
+                        <span className="debit-style">{currencyFormatter(row[column.id])}</span>
+                    )
+                },
+                footerClassName: 'total-cash-out-footer-cell',
+                footerFormatter: () => <span>{currencyFormatter(this.state?this.state.localCalculations.totalCashOut:'')}</span>
+            }
+        ]
         this.bindMethods();
     }
     bindMethods() {
@@ -279,10 +329,15 @@ export default class CashBook extends Component {
         this.onExitFilerPopover = this.onExitFilerPopover.bind(this);
         this.resetFilters = this.resetFilters.bind(this);
         this.applyFilters = this.applyFilters.bind(this);
+        this.toggleConsolView = this.toggleConsolView.bind(this);
     }
     componentDidMount() {
-        this.fetchTransactions();
-        this.fetchTransOverview();
+        if(this.state.showConsolView) {
+            this.fetchConsolidatedTransactions();
+        } else {
+            this.fetchTransactions();
+            this.fetchTransOverview();
+        }
     }
 
     componentWillReceiveProps(nextProps) {
@@ -293,9 +348,21 @@ export default class CashBook extends Component {
     }
 
     refresh() {
-        this.setState({selectedPageIndex: 0, selectedRowJson: [], selectedIndexes: []});
+        if(this.state.showConsolView) {
+            this.fetchConsolidatedTransactions();
+        } else {
+            this.setState({selectedPageIndex: 0, selectedRowJson: [], selectedIndexes: []});
+            this.triggerFundTransApis();
+        }
+    }
+
+    triggerFundTransApis() {
         this.fetchTransactions();
         this.fetchTransOverview();
+    }
+
+    triggerConsolViewApis() {
+        this.fetchConsolidatedTransactions();
     }
 
     async fetchTransactions() {
@@ -347,6 +414,23 @@ export default class CashBook extends Component {
                 newState.transactions = resp.data.RESP.results;
                 // this.openingBalance = resp.data.RESP.pageWiseOpeningBal;
                 newState.localCalculations = this.doLocalCalculations(resp.data.RESP.results);
+                this.setState(newState);
+            }
+        } catch(e) {
+            console.log(e);
+        }
+    }
+
+    async fetchConsolidatedTransactions() {
+        try {
+            this.setState({loadingConsolList: true});
+            let at = getAccessToken();
+            let params = constructConsolListGetAPIParams(this.state);
+            let resp = await axiosMiddleware.get(`${GET_FUND_TRNS_LIST_CONSOLIDATED}?access_token=${at}&params=${JSON.stringify(params)}`);
+            if(resp && resp.data && resp.data.RESP) {
+                let newState = {...this.state};
+                newState.consolTransactions = resp.data.RESP.results;
+                newState.loadingConsolList = false;
                 this.setState(newState);
             }
         } catch(e) {
@@ -428,8 +512,12 @@ export default class CashBook extends Component {
             newState.selectedPageIndex = 0;
             setCashManagerFilter({...newState.filters});
             await this.setState(newState);
-            this.fetchTransactions();
-            this.fetchTransOverview();
+            if(this.state.showConsolView) {
+                this.fetchConsolidatedTransactions();
+            } else {
+                this.fetchTransactions();
+                this.fetchTransOverview();
+            }
         },
         account: async (val) => {
             let newState = {...this.state};
@@ -722,13 +810,38 @@ export default class CashBook extends Component {
         return flag;
     }
 
+    toggleConsolView() {
+        let newState = {...this.state};
+        newState.showConsolView = !newState.showConsolView;
+        if(newState.showConsolView) {
+            this.triggerConsolViewApis();
+        } else {
+            this.triggerFundTransApis();
+        }
+        this.setState(newState);
+    }
+
     render() {
         return (
             <Row className="gs-card-content cash-book-main-card">
                 
                 <Col xs={7} md={7}>
                     <Row>
-                        <Col xs={12} md={12} sm={12}><h4>CASH TRANSACTIONS</h4></Col>
+                        <Col xs={12} md={12} sm={12}>
+                            <h4 style={{display: 'inline-block'}}>CASH TRANSACTIONS</h4>
+                            <div className='custom-control custom-switch consol-switch'>
+                                <input
+                                    type='checkbox'
+                                    className='custom-control-input'
+                                    id='customSwitches'
+                                    checked={this.state.showConsolView}
+                                    onChange={(e) => this.toggleConsolView()}
+                                />
+                                <label className='custom-control-label' htmlFor='customSwitches'>
+                                    Consolidated View
+                                </label>
+                            </div>
+                        </Col>
                         <Col xs={12} md={5} sm={5}>
                             <DateRangePicker 
                                 className = 'cash-book-date-filter'
@@ -830,34 +943,49 @@ export default class CashBook extends Component {
                             </Row>
                         </Col>
                 </Col>
-                <Col xs={6} md={6} sm={6} className='pagination-container'>
-                    <ReactPaginate previousLabel={"<"}
-                        nextLabel={">"}
-                        breakLabel={"..."}
-                        breakClassName={"break-me"}
-                        pageCount={this.getPageCount()}
-                        marginPagesDisplayed={2}
-                        pageRangeDisplayed={5}
-                        onPageChange={this.handlePageClick}
-                        containerClassName={"gs-pagination pagination"}
-                        subContainerClassName={"pages pagination"}
-                        activeClassName={"active"}
-                        forcePage={this.state.selectedPageIndex} />
-                </Col>
-                <Col xs={12} md={12} xs={12}>
-                    <GSTable 
-                        columns={this.columns}
-                        rowData={this.state.transactions}
-                        checkbox = {true}
-                        checkboxOnChangeListener = {this.handleCheckboxChangeListener}
-                        globalCheckBoxListener = {this.handleGlobalCheckboxChange}
-                        selectedIndexes = {this.state.selectedIndexes}
-                        selectedRowJson = {this.state.selectedRowJson}
-                        rowClickListener = {this.rowClickListener}
-                        loading={this.state.loadingList}
-                        showFooter={true}
-                    />
-                </Col>
+                {!this.state.showConsolView ?
+                    <>
+                        <Col xs={6} md={6} sm={6} className='pagination-container'>
+                            <ReactPaginate previousLabel={"<"}
+                                nextLabel={">"}
+                                breakLabel={"..."}
+                                breakClassName={"break-me"}
+                                pageCount={this.getPageCount()}
+                                marginPagesDisplayed={2}
+                                pageRangeDisplayed={5}
+                                onPageChange={this.handlePageClick}
+                                containerClassName={"gs-pagination pagination"}
+                                subContainerClassName={"pages pagination"}
+                                activeClassName={"active"}
+                                forcePage={this.state.selectedPageIndex} />
+                        </Col>
+                        <Col xs={12} md={12} xs={12}>
+                            <GSTable 
+                                columns={this.columns}
+                                rowData={this.state.transactions}
+                                checkbox = {true}
+                                checkboxOnChangeListener = {this.handleCheckboxChangeListener}
+                                globalCheckBoxListener = {this.handleGlobalCheckboxChange}
+                                selectedIndexes = {this.state.selectedIndexes}
+                                selectedRowJson = {this.state.selectedRowJson}
+                                rowClickListener = {this.rowClickListener}
+                                loading={this.state.loadingList}
+                                showFooter={true}
+                            />
+                        </Col>
+                    </>
+                    :
+                    <Col xs={12} md={12} xs={12}>
+                        <GSTable
+                            className="consolidate-transactions-table"
+                            columns={this.columnsForConsolView}
+                            rowData={this.state.consolTransactions}
+                            // rowClickListener = {this.consolRowClickListener}
+                            loading={this.state.loadingConsolList}
+                        />
+                    </Col>
+                    
+                }
             </Row>
         )
     }
