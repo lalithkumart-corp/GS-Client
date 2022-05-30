@@ -86,7 +86,7 @@ class BillCreation extends Component {
             openPaymentInputDiv: false,
             formData: {
                 date: {
-                    inputVal: moment().format('DD-MM-YYYY'),
+                    inputVal: new Date(),
                     hasError: false,
                     _inputVal: new Date().toISOString()
                 },
@@ -267,7 +267,7 @@ class BillCreation extends Component {
             let dateVal = getLoanDate();
             if(dateVal) {
                 state.formData.date = {
-                    inputVal: moment(dateVal).format('DD-MM-YYYY'),
+                    inputVal: new Date(dateVal), // moment(dateVal).format('DD-MM-YYYY'),
                     hasError: false,
                     _inputVal: getDateInUTC(dateVal)
                 };
@@ -503,7 +503,7 @@ class BillCreation extends Component {
     }
     updateFieldValuesInState(data) {
         let newState = {...this.state};
-        newState.formData.date.inputVal = convertToLocalTime(data.Date);
+        newState.formData.date.inputVal = new Date(data.Date);//convertToLocalTime(data.Date);
         newState.formData.date._inputVal = data.Date; //getDateInUTC(data.Date, {withSelectedTime: true});
         let splits = data.BillNo.split('.');
         if(splits.length > 1){
@@ -1516,9 +1516,9 @@ class BillCreation extends Component {
                     newState.formData[identifier].inputVal = val;
                     this.props.updateBillNoInStore(newState.formData.billseries.inputVal, val);
                     break;
-                case 'date':                    
-                    newState.formData[identifier].inputVal = moment(val).format('DD-MM-YYYY');
-                    newState.formData[identifier]._inputVal = getDateInUTC(val);
+                case 'date':
+                    newState.formData[identifier].inputVal = val; // moment(val).format('DD-MM-YYYY');
+                    newState.formData[identifier]._inputVal = val.toISOString();
                     setTimeout(() => {
                         this.transferFocus(e, options.currElmKey, options.traverseDirection);
                     }, 300);
@@ -1917,18 +1917,17 @@ class BillCreation extends Component {
                                     <Form.Label>Date</Form.Label>
                                     <DatePicker
                                         popperClassName="billcreation-datepicker" 
-                                        value={this.state.formData.date.inputVal} 
+                                        // value={this.state.formData.date.inputVal}
+                                        selected={this.state.formData.date.inputVal} 
                                         onChange={(fullDateVal, dateVal) => {this.inputControls.onChange(null, fullDateVal, 'date', {currElmKey: 'date'})} }
                                         ref = {(domElm) => { this.domElmns.date = domElm; }}
                                         onKeyUp = {(e) => this.handleKeyUp(e, {currElmKey: 'date'}) }
                                         readOnly={this.props.billCreation.loading}
                                         showMonthDropdown
-                                        // timeInputLabel="Time:"
-                                        // showTimeInput
-                                        // dateFormat="dd/MM/yyyy h:mm aa"
-                                        
-                                        // showTimeSelect
                                         showYearDropdown
+                                        timeInputLabel="Time:"
+                                        dateFormat="dd/MM/yyyy"
+                                        showTimeInput
                                         className='gs-input-cell'
                                         />
                                 </Form.Group>
