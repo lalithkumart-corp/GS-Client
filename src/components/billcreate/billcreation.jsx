@@ -269,7 +269,7 @@ class BillCreation extends Component {
                 state.formData.date = {
                     inputVal: new Date(dateVal), // moment(dateVal).format('DD-MM-YYYY'),
                     hasError: false,
-                    _inputVal: getDateInUTC(dateVal)
+                    _inputVal: dateVal
                 };
             }
         } catch(e) {
