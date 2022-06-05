@@ -32,8 +32,14 @@ export const constructFetchApiParams = (stateObj) => {
 export const constructConsolListGetAPIParams = (stateObj) => {
     let params = {
         startDate: getDateInUTC(stateObj.filters.date.startDate, {time: 'start'}),
-        endDate: getDateInUTC(stateObj.filters.date.endDate, {time: 'end'}),
+        endDate: getDateInUTC(stateObj.filters.date.endDate, {time: 'end'})
     };
+    if(stateObj.filters.selectedCategoryForGrouping.length > 0) {
+        params.groupTerms = stateObj.filters.selectedCategoryForGrouping.map(obj => obj.value);
+    }
+    let offsets = getOffsets(stateObj);
+    params.offsetStart = offsets[0] || 0;
+    params.offsetEnd = offsets[1] || 10;
     return params;
 }
 

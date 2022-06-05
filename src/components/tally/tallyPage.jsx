@@ -145,7 +145,7 @@ class TallyPage extends Component {
                                     setRefreshRedeemPreviewTableFlag={this.setRefreshRedeemPreviewTableFlag} 
                                     updateCommonStore = {this.updateMyState} />
                             </Tab>
-                            <Tab eventKey="cash" title="Cash">
+                            {/* <Tab eventKey="cash" title="Cash">
                                 <CashBookPreview 
                                     _startDateUTC={this.state._startDateUTC}
                                     _endDateUTC={this.state._endDateUTC} 
@@ -153,11 +153,12 @@ class TallyPage extends Component {
                                     setRefreshCashBookTableFlag={this.setRefreshCashBookTableFlag}
                                     updateCommonStore = {this.updateMyState}
                                     />
-                            </Tab>
+                            </Tab> */}
                             <Tab eventKey="balancesheet" title="Balance Sheet" >
                                 <BalanceSheet 
                                     commonStore={this.state.commonStore} 
                                     _startDateUTC={this.state._startDateUTC}
+                                    _endDateUTC={this.state._endDateUTC} 
                                     refreshBalanceSheet={this.state.refreshBalanceSheet}
                                     setRefreshBalanceSheetFlag={this.setRefreshBalanceSheetFlag}/>
                             </Tab>

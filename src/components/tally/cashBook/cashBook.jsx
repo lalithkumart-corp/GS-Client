@@ -3,6 +3,7 @@ import {Tabs, Tab, Container, Row, Col, Dropdown} from 'react-bootstrap';
 import GSTable from '../../gs-table/GSTable';
 import axiosMiddleware from '../../../core/axios';
 import { convertToLocalTime, currencyFormatter } from '../../../utilities/utility';
+import { fetchCategorySuggestions } from '../../../utilities/apiUtils';
 import { GET_FUND_TRN_LIST, GET_FUND_TRN_OVERVIEW, ADD_TAGS, REMOVE_TAGS, GET_FUND_TRNS_LIST_CONSOLIDATED } from '../../../core/sitemap';
 import { getAccessToken, getCashManagerFilters, setCashManagerFilter } from '../../../core/storage';
 import DateRangePicker from '../../dateRangePicker/dataRangePicker';
@@ -37,6 +38,7 @@ export default class CashBook extends Component {
             consolTransactions: [],
             totalTransactionsCount: 0,
             showConsolView: false,
+            allCategoryTerms: [],
             filters: {
                 date: {
                     startDate: getFilterValFromLocalStorage('START_DATE', this.filtersFromLocal) || past1daysStartDate,
@@ -50,7 +52,8 @@ export default class CashBook extends Component {
                     categories: []
                 },
                 remarks: '',
-                tagId: null
+                tagId: null,
+                selectedCategoryForGrouping: [{label: "GIRVI", value: "Girvi"}, {label: "REDEEM", value: "Redeem"}],
             },
             tempFilters: {
                 tagId: null,
@@ -269,7 +272,7 @@ export default class CashBook extends Component {
            {
                 id: 'transaction_date',
                 displayText: 'Date',
-                width: '7%',
+                width: '10%',
                 formatter: (column, columnIndex, row, rowIndex) => {
                     let tagNo = row['tag_indicator'];
                     return (
@@ -286,6 +289,10 @@ export default class CashBook extends Component {
             },{
                 id: 'category',
                 displayText: 'Category',
+                width: '15%'
+            },{
+                id: 'remarks',
+                displayText: 'Remarks',
                 width: '15%'
             }, {
                 id: 'cash_in',
@@ -333,6 +340,7 @@ export default class CashBook extends Component {
     }
     componentDidMount() {
         if(this.state.showConsolView) {
+            this.fetchTheCategorySuggestions();
             this.fetchConsolidatedTransactions();
         } else {
             this.fetchTransactions();
@@ -362,6 +370,7 @@ export default class CashBook extends Component {
     }
 
     triggerConsolViewApis() {
+        this.fetchTheCategorySuggestions();
         this.fetchConsolidatedTransactions();
     }
 
@@ -433,6 +442,19 @@ export default class CashBook extends Component {
                 newState.loadingConsolList = false;
                 this.setState(newState);
             }
+        } catch(e) {
+            console.log(e);
+        }
+    }
+
+    async fetchTheCategorySuggestions() {
+        try {
+            let RESP = await fetchCategorySuggestions();
+            let options = [];
+            _.each(RESP, (aCateg, index) => {
+                options.push({label: aCateg.toUpperCase(), value: aCateg});
+            });
+            this.setState({allCategoryTerms: options});
         } catch(e) {
             console.log(e);
         }
@@ -550,6 +572,12 @@ export default class CashBook extends Component {
             await this.setState(newState);
             this.fetchTransactions();
             this.fetchTransOverview();
+        },
+        categoryGrouping: async (val) => {
+            let newState = {...this.state};
+            newState.filters.selectedCategoryForGrouping = val;
+            await this.setState(newState);
+            this.fetchConsolidatedTransactions();
         }
     }
 
@@ -885,13 +913,27 @@ export default class CashBook extends Component {
                                             )
                                         }}
                                         >
-                                        <span 
-                                            className={`gs-icon ${this.haveAppliedFilters()?'active':''}`}
-                                            onClick={(e) => this.setState({isFilterPopoverVisible: !this.state.isFilterPopoverVisible})}
-                                            style={{lineHeight: '33px', fontSize: '20px'}}
-                                            >
-                                                <BiFilterAlt />
+                                        {!this.state.showConsolView && 
+                                            <span 
+                                                className={`gs-icon ${this.haveAppliedFilters()?'active':''}`}
+                                                onClick={(e) => this.setState({isFilterPopoverVisible: !this.state.isFilterPopoverVisible})}
+                                                style={{lineHeight: '33px', fontSize: '20px'}}
+                                                >
+                                                    <BiFilterAlt />
                                             </span>
+                                        }
+                                        {this.state.showConsolView && 
+                                            <div>
+                                                <MultiSelect
+                                                    options={this.state.allCategoryTerms}
+                                                    value={this.state.filters.selectedCategoryForGrouping}
+                                                    onChange={this.filterCallbacks.categoryGrouping}
+                                                    labelledBy=""
+                                                    className="category-grouping-multiselect-dpd"
+                                                    ItemRenderer={(params) => this.customItemRenderer('category', params)}
+                                                />
+                                            </div>
+                                        }
                                     </Popover>
                                 </Col>
                                 { this.state.selectedIndexes.length>0 &&

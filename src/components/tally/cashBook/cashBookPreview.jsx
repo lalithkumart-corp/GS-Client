@@ -9,7 +9,7 @@ import { getOffsets2 } from './helper';
 import ReactPaginate from 'react-paginate';
 import './cashBookPreview.scss';
 
-export default function CashBook(props) {
+export default function CashBookPreview(props) {
     const [transactions, setTransactions] = useState([]);
     const [selectedPageIndex, setSelectedPageIndex] = useState(0);
     const [pageLimit, setPageLimit] = useState(10);

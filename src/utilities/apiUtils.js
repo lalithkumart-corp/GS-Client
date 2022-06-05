@@ -60,7 +60,10 @@ export const fetchCategorySuggestions = async (identifier) => {
     try {
         let categories = [];
         let at = getAccessToken();
-        let resp = await axiosMiddleware.get(`${FETCH_CATEGORY_SUGGESTIONS}?access_token=${at}&mode=${identifier}`);
+        let url = `${FETCH_CATEGORY_SUGGESTIONS}?access_token=${at}`;
+        if(identifier)
+            url += `&mode=${identifier}`;
+        let resp = await axiosMiddleware.get(url);
         if(resp && resp.data && resp.data.STATUS == 'SUCCESS')
             categories = resp.data.RESP;
         return categories;

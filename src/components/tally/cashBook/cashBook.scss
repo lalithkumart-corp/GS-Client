@@ -87,6 +87,17 @@
     font-weight: 700;
 }
 
+.category-grouping-multiselect-dpd {
+    min-width: 150px;
+    max-width: 200px;
+    .dropdown-heading {
+        height: 32px !important;
+    }
+    .search input[type="text"] {
+        height: 29px;
+    }
+}
+
 .customer-filer-val,
 .remarks-filer-val {
     width: 100%;
