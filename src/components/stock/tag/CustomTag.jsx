@@ -7,6 +7,7 @@ import Collapse from 'react-collapse';
 import { AiOutlineCaretDown, AiOutlineCaretUp, AiOutlineEye, AiOutlineEyeInvisible } from 'react-icons/ai';
 import './CustomTag.scss';
 import {CopyToClipboard} from 'react-copy-to-clipboard';
+import profilesList from './profiles.json';
 
 const CustomTag = () => {
     const [tagHeight, setTagHeight] = useState(65);
@@ -52,7 +53,7 @@ const CustomTag = () => {
                 paddingRight: 0,
                 paddingBottom: 0,
                 paddingLeft: 0,
-                canDisplay: true,
+                canDisplay: false,
                 expand: false
             },
             elm3: {
@@ -64,7 +65,7 @@ const CustomTag = () => {
                 paddingRight: 0,
                 paddingBottom: 0,
                 paddingLeft: 0,
-                canDisplay: true,
+                canDisplay: false,
                 expand: false
             }
         },
@@ -92,7 +93,7 @@ const CustomTag = () => {
                 paddingRight: 0,
                 paddingBottom: 0,
                 paddingLeft: 0,
-                canDisplay: true,
+                canDisplay: false,
                 expand: false
             },
             elm3: {
@@ -104,7 +105,7 @@ const CustomTag = () => {
                 paddingRight: 0,
                 paddingBottom: 0,
                 paddingLeft: 0,
-                canDisplay: true,
+                canDisplay: false,
                 expand: false
             }
         }
@@ -158,7 +159,7 @@ const CustomTag = () => {
                 paddingRight: 0,
                 paddingBottom: 0,
                 paddingLeft: 0,
-                canDisplay: true,
+                canDisplay: false,
                 expand: false
             }
         },
@@ -186,7 +187,7 @@ const CustomTag = () => {
                 paddingRight: 0,
                 paddingBottom: 0,
                 paddingLeft: 0,
-                canDisplay: true,
+                canDisplay: false,
                 expand: false
             },
             elm3: {
@@ -198,7 +199,7 @@ const CustomTag = () => {
                 paddingRight: 0,
                 paddingBottom: 0,
                 paddingLeft: 0,
-                canDisplay: true,
+                canDisplay: false,
                 expand: false
             }
         }
@@ -211,9 +212,10 @@ const CustomTag = () => {
         content: () => componentRef.current
     });
 
-    const importProfileJSON = () => {
+    const importProfileJSON = (json) => {
         try {
-            let obj = JSON.parse(inputCSSJson);
+            debugger;
+            let obj = json || JSON.parse(inputCSSJson);
             setTagHeight(obj.tagHeight);
             setTagBodyWidth(obj.tagBodyWidth);
             setTagStemWidth(obj.tagStemWidth);
@@ -253,10 +255,16 @@ const CustomTag = () => {
             setRightPanelLines(val);
     }
 
-    const updateLeftStyle = (rowNo, parameter, value) => {
-        let leftStylesCopy = {...leftStyles};
-        leftStylesCopy[`row${rowNo}`][parameter] = value;
-        setLeftStyles(leftStylesCopy);
+    const updateRowStyle = (side, rowNo, parameter, value) => {
+        if(side == 'left') {
+            let leftStylesCopy = {...leftStyles};
+            leftStylesCopy[`row${rowNo}`][parameter] = value;
+            setLeftStyles(leftStylesCopy);
+        } else {
+            let rightStylesCopy = {...rightStyles};
+            rightStylesCopy[`row${rowNo}`][parameter] = value;
+            setRightStyles(rightStylesCopy);
+        }
     };
 
     const togglePanelElmVisibility = (side, rowNo, elmSpecifier) => {
@@ -310,10 +318,10 @@ const CustomTag = () => {
                     <Row>
                         <Col xs={2}><h5>Line {rowNo}</h5></Col>
                         <Col xs={4}>
-                            <div>Height: <input type="number" className="gs-input input-elm" value={styleBucket[`row${rowNo}`].height} onChange={(e) => updateLeftStyle(rowNo, 'height', e.target.value)}/></div>
+                            <div>Height: <input type="number" className="gs-input input-elm" value={styleBucket[`row${rowNo}`].height} onChange={(e) => updateRowStyle(side, rowNo, 'height', e.target.value)}/></div>
                         </Col>
                         <Col xs={4}>
-                            <div>Width: <input type="number" className="gs-input input-elm" value={styleBucket[`row${rowNo}`].width} onChange={(e) => updateLeftStyle(rowNo, 'width', e.target.value)}/></div>
+                            <div>Width: <input type="number" className="gs-input input-elm" value={styleBucket[`row${rowNo}`].width} onChange={(e) => updateRowStyle(side, rowNo, 'width', e.target.value)}/></div>
                         </Col>
                     </Row>
                     <Row>
@@ -439,6 +447,12 @@ const CustomTag = () => {
         setInputCssJson(e.target.value);
     }
 
+    const onChangeProfile = (e) => {
+        let profileNo = e.target.value;
+        let profileData = profilesList[`profile${profileNo}`];
+        setInputCssJson(JSON.stringify(profileData, undefined, 4));
+    }
+
     return (
         <Container className="custom-tag-container">
             <Row>
@@ -452,9 +466,33 @@ const CustomTag = () => {
                             <div>Left Side Line (max:3): <input type="number" className="gs-input input-elm" onChange={(e) => updateLineCount('left', e.target.value)} value={leftPanelLines} /></div>
                             <div>Right Side Line (max:3): <input type="number" className="gs-input input-elm" onChange={(e) => updateLineCount('right', e.target.value)} value={rightPanelLines} /></div>
                         </Col>
-                        <Col xs={6}>
+                        <Col xs={4}>
                             <textarea className="gs-input msg-input" value={inputCSSJson} onChange={(e) => onChangeCssJson(e)} cols="75" rows="4"/>
-                            <input type="button" className="gs-button" value="Import" onClick={()=>importProfileJSON()}/>
+                        </Col>
+                        <Col xs={2}>
+                            <Row>
+                                <Col xs={12}>
+                                    <span>Profiles: </span>
+                                    <select onChange={(e) => onChangeProfile(e)}>
+                                        <option value={0}>Select...</option>
+                                        {
+                                            (() => {
+                                                let optionsDom = [];
+                                                let profileKeys = Object.keys(profilesList);
+                                                for(let i=0; i<profileKeys.length; i++) {
+                                                    optionsDom.push(<option value={i+1}>{profileKeys[i]}</option>)
+                                                }
+                                                return optionsDom;
+                                            })()
+                                        }
+                                    </select>
+                                </Col>
+                            </Row>
+                            <Row>
+                                <Col xs={12}>
+                                    <input type="button" className="gs-button" value="Import" onClick={()=>importProfileJSON()}/>
+                                </Col>
+                            </Row>
                         </Col>
                     </Row>
                     <Row>
@@ -498,7 +536,7 @@ const CustomTag = () => {
             </Row>
             <Row>
                 <Col xs={2}>
-                    <input type="button" className="gs-button bordered" onClick={handlePrint} value="Print Tag" />
+                    <input type="button" className="gs-button bordered" style={{marginTop: '15px'}} onClick={handlePrint} value="Print Tag" />
                 </Col>
                 <Col xs={{span: 2, offset: 5}}>
                     <CopyToClipboard text={getAllStyles()}
@@ -533,8 +571,7 @@ const CustomTagDisplay = React.forwardRef((props, ref) => {
         return {
             display: 'inline-block',
             backgroundColor: 'lightgray',
-            width: props.tagStemWidth + 'px',
-            border: '7px solid lightgray'
+            width: props.tagStemWidth + 'px'
         };
     }
 
@@ -625,8 +662,8 @@ const CustomTagDisplay = React.forwardRef((props, ref) => {
         return {
             row1: {
                 main: {
-                    height: props.rightStyles.row1.height,
-                    width: props.rightStyles.row1.width,
+                    height: props.rightStyles.row1.height + 'px',
+                    width: props.rightStyles.row1.width + 'px',
                 },
                 elm1: {
                     width: props.rightStyles.row1.elm1.width + 'px',
@@ -664,8 +701,8 @@ const CustomTagDisplay = React.forwardRef((props, ref) => {
             },
             row2: {
                 main: {
-                    height: props.rightStyles.row2.height,
-                    width: props.rightStyles.row2.width
+                    height: props.rightStyles.row2.height + 'px',
+                    width: props.rightStyles.row2.width + 'px'
                 },
                 elm1: {
                     width: props.rightStyles.row2.elm1.width + 'px',
@@ -724,6 +761,8 @@ const CustomTagDisplay = React.forwardRef((props, ref) => {
         setRightPanelStyles(constructRightPanelStyles());
         setLeftPanelData(props.leftPanelData);
         setRightPanelData(props.rightPanelData);
+        setLeftPanelLines(props.leftPanelLines);
+        setRightPanelLines(props.rightPanelLines);
     }
     
     useEffect(() => {
@@ -736,7 +775,7 @@ const CustomTagDisplay = React.forwardRef((props, ref) => {
             <div style={tagBodyStyles}>
                 <div style={{display: 'inline-block'}}>
                 {
-                    leftPanelLines>=1 && <>
+                    leftPanelLines>0 && <>
                         <div style={leftPanelStyles.row1.main}>
                             <div style={leftPanelStyles.row1.elm1}>
                                 {leftPanelData.row1.elm1}
@@ -751,7 +790,7 @@ const CustomTagDisplay = React.forwardRef((props, ref) => {
                     </>
                 }
                 {
-                    leftPanelLines>=2 && <>
+                    leftPanelLines>1 && <>
                         <div style={leftPanelStyles.row2.main}>
                             <div style={leftPanelStyles.row2.elm1}>
                                 {leftPanelData.row2.elm1}
@@ -768,7 +807,7 @@ const CustomTagDisplay = React.forwardRef((props, ref) => {
                 </div>
                 <div style={{display: 'inline-block'}}>
                 {
-                    rightPanelLines>=1 && <>
+                    rightPanelLines>0 && <>
                         <div style={rightPanelStyles.row1.main}>
                             <div style={rightPanelStyles.row1.elm1}>
                                 {rightPanelData.row1.elm1}
@@ -783,7 +822,7 @@ const CustomTagDisplay = React.forwardRef((props, ref) => {
                     </>
                 }
                 {
-                    rightPanelLines>=2 && <>
+                    rightPanelLines>1 && <>
                         <div style={rightPanelStyles.row2.main}>
                             <div style={rightPanelStyles.row2.elm1}>
                                 {rightPanelData.row2.elm1}
