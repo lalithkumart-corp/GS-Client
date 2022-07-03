@@ -204,10 +204,29 @@ const CustomTag = () => {
         }
     });
 
+    const [inputCSSJson, setInputCssJson] = useState('');
+
     const componentRef = useRef();
     const handlePrint = useReactToPrint({
         content: () => componentRef.current
     });
+
+    const importProfileJSON = () => {
+        try {
+            let obj = JSON.parse(inputCSSJson);
+            setTagHeight(obj.tagHeight);
+            setTagBodyWidth(obj.tagBodyWidth);
+            setTagStemWidth(obj.tagStemWidth);
+            setLeftPanelLines(obj.leftPanelLines);
+            setLeftStyles(obj.leftStyles);
+            setLeftPanelData(obj.leftPanelData);
+            setRightPanelLines(obj.rightPanelLines);
+            setRightStyles(obj.rightStyles);
+            setRightPanelData(obj.rightPanelData);
+        } catch(e) {
+            alert('Error');
+        }
+    };
 
     const getAllStyles = () => {
         return JSON.stringify({
@@ -416,6 +435,10 @@ const CustomTag = () => {
         )
     }
 
+    const onChangeCssJson = (e) => {
+        setInputCssJson(e.target.value);
+    }
+
     return (
         <Container className="custom-tag-container">
             <Row>
@@ -429,12 +452,9 @@ const CustomTag = () => {
                             <div>Left Side Line (max:3): <input type="number" className="gs-input input-elm" onChange={(e) => updateLineCount('left', e.target.value)} value={leftPanelLines} /></div>
                             <div>Right Side Line (max:3): <input type="number" className="gs-input input-elm" onChange={(e) => updateLineCount('right', e.target.value)} value={rightPanelLines} /></div>
                         </Col>
-                        <Col xs={3} xsOffset={3}>
-                            {/* <input type="button" value="Display Styles" onClick={(e) => onClickDisplayStyles()} /> */}
-                            <CopyToClipboard text={getAllStyles()}
-                                onCopy={() => alert('Copied to Clipboard')}>
-                                <input type="button" value="Copy Styles" />
-                            </CopyToClipboard>
+                        <Col xs={6}>
+                            <textarea className="gs-input msg-input" value={inputCSSJson} onChange={(e) => onChangeCssJson(e)} cols="75" rows="4"/>
+                            <input type="button" className="gs-button" value="Import" onClick={()=>importProfileJSON()}/>
                         </Col>
                     </Row>
                     <Row>
@@ -476,7 +496,17 @@ const CustomTag = () => {
                     tagBodyWidth={tagBodyWidth}
                     tagStemWidth={tagStemWidth}/>
             </Row>
-            <input type="button" className="gs-button" onClick={handlePrint} value="Print Tag" />
+            <Row>
+                <Col xs={2}>
+                    <input type="button" className="gs-button bordered" onClick={handlePrint} value="Print Tag" />
+                </Col>
+                <Col xs={{span: 2, offset: 5}}>
+                    <CopyToClipboard text={getAllStyles()}
+                        onCopy={() => alert('Copied to Clipboard')}>
+                        <input type="button" className="gs-button bordered" value="Copy Styles" />
+                    </CopyToClipboard>
+                </Col>
+            </Row>
         </Container>
     )
 };
@@ -692,6 +722,8 @@ const CustomTagDisplay = React.forwardRef((props, ref) => {
         setTagStemStyles(constructTagStemStyles());
         setLeftPanelStyles(constructLeftPanelStyles());
         setRightPanelStyles(constructRightPanelStyles());
+        setLeftPanelData(props.leftPanelData);
+        setRightPanelData(props.rightPanelData);
     }
     
     useEffect(() => {
