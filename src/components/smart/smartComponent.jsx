@@ -34,6 +34,7 @@ import StockViewTabLayout from '../stock/viewStock/index';
 import SellItem from '../stock/sellItems/SellItem';
 import StockSetup from '../stock/setup/StockSetup';
 import TagDemo from '../stock/tag/TagDemo';
+import CustomTag from '../stock/tag/CustomTag';
 import ActivationPage from '../activation/ActivationPage';
 import FontViewerPage from '../fontViewer/FontView';
 import { getStoreDetails } from '../../actions/storeDetails';
@@ -92,11 +93,11 @@ class SmartComponent extends Component {
         }
     }
     render() {
-        let yy = LAL_M_AD_129;
+        var yy = LAL_M_AD_129;
         yy = yy.replaceAll('GS_', '');
         yy = yy.replaceAll('MAK_', '');
         yy = yy.replaceAll('INTER', '');
-        if(true || yy == "-236375844") { // temporarily making as tru for development mode
+        if(true || yy == "-274726249") { // temporarily making as tru for development mode
             if(this.props.auth.isAuthenticated) {
                 if(!this.props.auth.isActivated) {
                     return (
@@ -111,7 +112,7 @@ class SmartComponent extends Component {
                                 <div className='page-content'>
                                     <ToastContainer position={'top-center'} hideProgressBar={false}/>
                                     <Route exact path= '/' component={ActivationPage} />
-                                    <Route path= '/signup' component={SignUpPage} />
+                                    {/* <Route path= '/signup' component={SignUpPage} /> */}
                                     <Route path= '/logout' component={Logout} />
                                 </div>
                             </div>
@@ -150,6 +151,7 @@ class SmartComponent extends Component {
                                     <Route path= "/sell-item" component={SellItem} />
                                     <Route path= "/stock-setup" component={StockSetup} />
                                     <Route path= "/tag-demo" component={TagDemo} />
+                                    <Route path="/tag-v2" component={CustomTag} />
                                     <Route path="/label-generator" component={CustomLabel} />
                                     <Route path= "/font-view" component={FontViewerPage} />
                                     <Route path="/settings" component={Settings} />

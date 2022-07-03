@@ -1,0 +1,25 @@
+.custom-tag-container {
+    width: 1300px;
+    max-width: 1300px;
+    .input-elm {
+        width: 50px;
+        &.val-box {
+            width: 132px;
+        }
+        &.padding-box {
+            width: 30px;
+        }
+    }
+    .element-control-label {
+        height: 24px;
+    }
+    .elm-card {
+        background-color: antiquewhite;
+        border: 1px solid #f4d7b1;
+        .eye-icon, .arrow-toggle-icon {
+            cursor: pointer;
+            padding-left: 5px;
+            padding-right: 5px;
+        }
+    }
+}

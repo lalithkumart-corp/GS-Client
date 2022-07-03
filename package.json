@@ -62,7 +62,10 @@
     "build:offlineprod_win": "set \"GENERATE_SOURCEMAP=false\" && env-cmd -f .env.offlineprod react-scripts build",
     "build:production": "env-cmd -f .env.production react-scripts build",
     "test": "react-scripts test --env=jsdom",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "lint": "eslint --ext .js --ext .jsx ./src",
+    "lint-fix": "eslint --ext .js --ext .jsx --fix ./src",
+    "lint-output": "eslint --ext .js --ext .jsx -o ./lint-output.txt ./src"
   },
   "browserslist": {
     "production": [
@@ -77,6 +80,12 @@
     ]
   },
   "devDependencies": {
+    "eslint": "^8.18.0",
+    "eslint-config-airbnb": "^19.0.4",
+    "eslint-plugin-import": "^2.26.0",
+    "eslint-plugin-jsx-a11y": "^6.5.1",
+    "eslint-plugin-react": "^7.30.0",
+    "eslint-plugin-react-hooks": "^4.6.0",
     "node-sass": "^4.14.1",
     "source-map-explorer": "^2.5.2",
     "webpack-bundle-analyzer": "^4.4.0"
