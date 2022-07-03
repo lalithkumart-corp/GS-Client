@@ -6,6 +6,7 @@ import { Container, Row, Col } from 'react-bootstrap';
 import Collapse from 'react-collapse';
 import { AiOutlineCaretDown, AiOutlineCaretUp, AiOutlineEye, AiOutlineEyeInvisible } from 'react-icons/ai';
 import './CustomTag.scss';
+import {CopyToClipboard} from 'react-copy-to-clipboard';
 
 const CustomTag = () => {
     const [tagHeight, setTagHeight] = useState(65);
@@ -207,6 +208,20 @@ const CustomTag = () => {
     const handlePrint = useReactToPrint({
         content: () => componentRef.current
     });
+
+    const getAllStyles = () => {
+        return JSON.stringify({
+            tagHeight,
+            tagBodyWidth,
+            tagStemWidth,
+            leftPanelLines,
+            leftStyles,
+            leftPanelData,
+            rightPanelLines,
+            rightStyles,
+            rightPanelData
+        }, undefined, 4);
+    };
 
     const updateLineCount = (side, val) => {
         if(val >= 3) {
@@ -413,6 +428,13 @@ const CustomTag = () => {
                         <Col xs={3}>
                             <div>Left Side Line (max:3): <input type="number" className="gs-input input-elm" onChange={(e) => updateLineCount('left', e.target.value)} value={leftPanelLines} /></div>
                             <div>Right Side Line (max:3): <input type="number" className="gs-input input-elm" onChange={(e) => updateLineCount('right', e.target.value)} value={rightPanelLines} /></div>
+                        </Col>
+                        <Col xs={3} xsOffset={3}>
+                            {/* <input type="button" value="Display Styles" onClick={(e) => onClickDisplayStyles()} /> */}
+                            <CopyToClipboard text={getAllStyles()}
+                                onCopy={() => alert('Copied to Clipboard')}>
+                                <input type="button" value="Copy Styles" />
+                            </CopyToClipboard>
                         </Col>
                     </Row>
                     <Row>
