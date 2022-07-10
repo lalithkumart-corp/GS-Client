@@ -79,6 +79,10 @@
 .billcreation-datepicker .react-datepicker__time-box {
     width: 90px !important;
 } */
+
+.date-picker-container.bill-creation .gs-input-cell:read-only {
+    color: lightgray;
+}
 /*END: Custom styles for the Date Picker(to make it bigger font size looking */
 
 .customer-name-field-container .dropdown-menu > li,

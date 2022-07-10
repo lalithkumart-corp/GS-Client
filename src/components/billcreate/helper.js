@@ -65,8 +65,10 @@ const defaultPaymentObj = {
 export const buildRequestParams = (thatState = {}) => {
     let state = {...thatState}; //for preventing reference issue  
     state.selectedCustomer = state.selectedCustomer || {};  
+    let dateVal = state.formData.date._inputVal;
+    if(state.formData.date.isLive) dateVal = new Date().toISOString();
     let params = {
-        date: state.formData.date._inputVal.replace('T', ' ').slice(0,23),
+        date: dateVal.replace('T', ' ').slice(0,23),
         expiryDate: addDays(state.formData.date._inputVal, 366).toISOString().replace('T', ' ').slice(0,23),
         billSeries: state.formData.billseries.inputVal,
         billNo: state.formData.billno.inputVal, //_getBillNo(thatState),
@@ -99,8 +101,10 @@ export const buildRequestParams = (thatState = {}) => {
 export const buildRequestParamsForUpdate = (thatState = {}) => {    
     let state = {...thatState}; //for preventing reference issue
     state.selectedCustomer = state.selectedCustomer || {};
+    let dateVal = state.formData.date._inputVal;
+    if(state.formData.date.isLive) dateVal = new Date().toISOString();
     let params = {
-        date: state.formData.date._inputVal.replace('T', ' ').slice(0,23),
+        date: dateVal.replace('T', ' ').slice(0,23),
         expiryDate: addDays(state.formData.date._inputVal, 366).toISOString().replace('T', ' ').slice(0,23),
         billSeries: state.formData.billseries.inputVal,
         billNo: state.formData.billno.inputVal, //_getBillNo(thatState),     

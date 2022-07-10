@@ -9,6 +9,7 @@ const keys = {
     rates: 'rates',
     ssoUserFlag: 'ssoUserFlag',
     loanDate: 'loanDate',
+    loanDateBehaviour: 'loanDateBehaviour',
     pledgebookFilters: 'pledgebookFilters',
     cashManagerFilters: 'cashManagerFilters',
     loanBillTemplate: 'loanBillTemplate',
@@ -26,6 +27,7 @@ const keyMaps = {
         keys.rates,
         keys.ssoUserFlag,
         keys.loanDate,
+        keys.loanDateBehaviour,
         keys.pledgebookFilters,
         keys.cashManagerFilters,
         keys.loanBillTemplate,
@@ -263,6 +265,14 @@ export const setLoanDate = (dateVal) => {
 
 export const getLoanDate = () => {
     return _read(keys.loanDate);
+}
+
+export const setLoanDateBehaviour = (behaviour) => {
+    _save(keys.loanDateBehaviour, behaviour);
+}
+
+export const getLoanDateBehaviour = () => {
+    return _read(keys.loanDateBehaviour);
 }
 
 export const clearLoanDate = () => {

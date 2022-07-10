@@ -37,7 +37,7 @@ import ReactToPrint from 'react-to-print';
 import { FaEdit } from 'react-icons/fa';
 import CommonModal from '../common-modal/commonModal';
 import GeneralInfo from '../customerPortal/generalInfo';
-import { getLoanDate, setLoanDate } from '../../core/storage';
+import { getLoanDate, getLoanDateBehaviour, setLoanDate, setLoanDateBehaviour } from '../../core/storage';
 import { fetchMyAccountsList, fetchAllBanksList } from '../../utilities/apiUtils';
 import { format } from 'currency-formatter';
 import { PAYMENT_MODE } from '../../constants';
@@ -47,9 +47,9 @@ const SPACE_KEY = 32;
 
 var domList = new DoublyLinkedList();
 domList.add('billno', {type: 'formControl', enabled: true});
+domList.add('date', {type: 'datePicker', enabled: false});
 domList.add('amount', {type: 'formControl', enabled: true});
 domList.add('presentValue', {type: 'formControl', enabled: true});
-domList.add('date', {type: 'datePicker', enabled: false});
 domList.add('cname', {type: 'rautosuggest', enabled: true});
 domList.add('gaurdianName', {type: 'rautosuggest', enabled: true});
 domList.add('address', {type: 'rautosuggest', enabled: true});
@@ -88,7 +88,8 @@ class BillCreation extends Component {
                 date: {
                     inputVal: new Date(),
                     hasError: false,
-                    _inputVal: new Date().toISOString()
+                    _inputVal: new Date().toISOString(),
+                    isLive: true,
                 },
                 billseries: {
                     inputVal: props.billCreation.billSeries,
@@ -264,12 +265,14 @@ class BillCreation extends Component {
 
     populateFromLocalStorage(state) {
         try {
-            let dateVal = getLoanDate();
+            let dateVal = getLoanDate(); 
+            let loanDateBehaviour = getLoanDateBehaviour();
             if(dateVal) {
                 state.formData.date = {
                     inputVal: new Date(dateVal), // moment(dateVal).format('DD-MM-YYYY'),
                     hasError: false,
-                    _inputVal: dateVal
+                    _inputVal: dateVal,
+                    isLive: (loanDateBehaviour == 'static')?false: true
                 };
             }
         } catch(e) {
@@ -1489,6 +1492,13 @@ class BillCreation extends Component {
         }
     }
 
+    onClickDateLiveLabel = (e) => {
+        let newState = {...this.state};
+        newState.formData.date.isLive = !newState.formData.date.isLive;
+        this.setState(newState);
+        setLoanDateBehaviour(newState.formData.date.isLive?'live':'static');
+    }
+
     inputControls = {
         onChange: (e, val, identifier, options) => {
             let newState = {...this.state};
@@ -1881,6 +1891,12 @@ class BillCreation extends Component {
     /* END: DOM Getter's */    
     
     render(){
+        let dateLiveLabelStyles = {
+            border: `3px solid ${this.state.formData.date.isLive?'red':'grey'}`,
+            borderRadius: "50%",
+            display: "inline-block",
+            marginLeft: '5px'
+        }
         return(
             <Container className="bill-creation-container">
                 <Form>
@@ -1914,7 +1930,10 @@ class BillCreation extends Component {
                                 <Form.Group
                                     validationState= {this.state.formData.date.hasError ? "error" :null}
                                     >
-                                    <Form.Label>Date</Form.Label>
+                                    <Form.Label>
+                                        Date
+                                        &nbsp; (<span onClick={(e) => this.onClickDateLiveLabel(e)}> <span style={dateLiveLabelStyles}></span> Live </span>)
+                                    </Form.Label>
                                     <DatePicker
                                         popperClassName="billcreation-datepicker" 
                                         // value={this.state.formData.date.inputVal}
@@ -1922,7 +1941,7 @@ class BillCreation extends Component {
                                         onChange={(fullDateVal, dateVal) => {this.inputControls.onChange(null, fullDateVal, 'date', {currElmKey: 'date'})} }
                                         ref = {(domElm) => { this.domElmns.date = domElm; }}
                                         onKeyUp = {(e) => this.handleKeyUp(e, {currElmKey: 'date'}) }
-                                        readOnly={this.props.billCreation.loading}
+                                        readOnly={this.props.billCreation.loading || this.state.formData.date.isLive}
                                         showMonthDropdown
                                         showYearDropdown
                                         timeInputLabel="Time:"
