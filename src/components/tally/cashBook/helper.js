@@ -3,7 +3,7 @@ import { DELETE_FUND_TRANSACTION } from '../../../core/sitemap';
 import axiosMiddleware from '../../../core/axios';
 import { toast } from 'react-toastify';
 
-export const constructFetchApiParams = (stateObj) => {
+export const constructFetchApiParams = (stateObj, options={forExportApi:false}) => {
     let params = {
         startDate: getDateInUTC(stateObj.filters.date.startDate, {time: 'start'}),
         endDate: getDateInUTC(stateObj.filters.date.endDate, {time: 'end'}),
@@ -22,10 +22,12 @@ export const constructFetchApiParams = (stateObj) => {
 
     if(stateObj.filters.tagId)
         params.tagId = stateObj.filters.tagId;
-
-    let offsets = getOffsets(stateObj);
-    params.offsetStart = offsets[0] || 0;
-    params.offsetEnd = offsets[1] || 10;
+    
+    if(!options.forExportApi) {
+        let offsets = getOffsets(stateObj);
+        params.offsetStart = offsets[0] || 0;
+        params.offsetEnd = offsets[1] || 10;
+    }
     return params;
 }
 

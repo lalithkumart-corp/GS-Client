@@ -1,4 +1,4 @@
-import { getInterestRates, setInterestRates, clearInterestRates, getAccessToken } from '../core/storage';
+import { getInterestRates, setInterestRates, clearInterestRates, getAccessToken, getSession } from '../core/storage';
 import { SERVER_ASSETS_URL_PATH , GET_INTEREST_RATES } from '../core/sitemap';
 import axios from 'axios';
 
@@ -171,4 +171,11 @@ export const formatNumberLength = (num, len, pos) => {
             num = fix + num;
     }
     return num;
+}
+
+export const getCurrentUserId = () => {
+    let sessionObj = getSession();
+    if(sessionObj)
+        return sessionObj.userId;
+    return null;
 }

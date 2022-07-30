@@ -2,9 +2,9 @@ import React, { Component, useState, useRef, useEffect } from 'react';
 import {Tabs, Tab, Container, Row, Col, Dropdown} from 'react-bootstrap';
 import GSTable from '../../gs-table/GSTable';
 import axiosMiddleware from '../../../core/axios';
-import { convertToLocalTime, currencyFormatter } from '../../../utilities/utility';
+import { convertToLocalTime, currencyFormatter, getCurrentUserId } from '../../../utilities/utility';
 import { fetchCategorySuggestions } from '../../../utilities/apiUtils';
-import { GET_FUND_TRN_LIST, GET_FUND_TRN_OVERVIEW, ADD_TAGS, REMOVE_TAGS, GET_FUND_TRNS_LIST_CONSOLIDATED } from '../../../core/sitemap';
+import { GET_FUND_TRN_LIST, GET_FUND_TRN_OVERVIEW, ADD_TAGS, REMOVE_TAGS, GET_FUND_TRNS_LIST_CONSOLIDATED, EXPORT_FUND_TRNS } from '../../../core/sitemap';
 import { getAccessToken, getCashManagerFilters, setCashManagerFilter } from '../../../core/storage';
 import DateRangePicker from '../../dateRangePicker/dataRangePicker';
 import { constructFetchApiParams, constructConsolListGetAPIParams, getFilterValFromLocalStorage, getCreateAlertParams, getUpdateAlertParams, getDeleteAlertParams, deleteTransactions } from './helper';
@@ -17,7 +17,7 @@ import { format } from 'currency-formatter';
 import { MdNotifications, MdNotificationsActive, MdNotificationsNone, MdNotificationsOff, MdNotificationsPaused, MdBorderColor } from 'react-icons/md';
 import Popover, {ArrowContainer} from 'react-tiny-popover'
 import AlertComp from '../../alert/Alert';
-import { FaTrashAlt } from 'react-icons/fa';
+import { FaFileExcel, FaTrashAlt } from 'react-icons/fa';
 import { BiFilterAlt } from 'react-icons/bi';
 import { TAGS } from '../../../constants';
 import {TagInputComp, TagDisplayComp} from '../../gs-tag/tag';
@@ -253,6 +253,8 @@ export default class CashBook extends Component {
 
                     if(row.is_internal) {
                         return (<>
+                            {/* temp code for enabling DELETE option for Nirmala Devi Jain Store for specific duration */}
+                            {this.canShowDeleteBtnForSpecificUsers() && <span onClick={(e) => this.deleteTransaction(rowIndex, row)} style={{paddingRight: '5px'}}><FaTrashAlt className="gs-icon"/></span>}
                             {alertComp()}
                         </>)
                     } else {
@@ -337,6 +339,7 @@ export default class CashBook extends Component {
         this.resetFilters = this.resetFilters.bind(this);
         this.applyFilters = this.applyFilters.bind(this);
         this.toggleConsolView = this.toggleConsolView.bind(this);
+        this.onExportClick = this.onExportClick.bind(this);
     }
     componentDidMount() {
         if(this.state.showConsolView) {
@@ -713,6 +716,15 @@ export default class CashBook extends Component {
         return flag;
     }
 
+    canShowDeleteBtnForSpecificUsers() {
+        try {
+            let tmstp = +new Date();
+            return (getCurrentUserId() == 2 && tmstp<1660545163000)
+        } catch(e) {
+            return null;
+        }
+    }
+
     customItemRenderer(identifier, params) { // params = {checked, option={label, value}, onClick, disabled}
         let theDom = [];
         switch(identifier) {
@@ -849,6 +861,18 @@ export default class CashBook extends Component {
         this.setState(newState);
     }
 
+    async onExportClick() {
+        try {
+            let at = getAccessToken();
+            let params = constructFetchApiParams(this.state, {forExportApi: true});
+            params.fetchFilterCollections = true;
+            window.open(`${EXPORT_FUND_TRNS}?access_token=${at}&params=${JSON.stringify(params)}`);
+        } catch(e) {
+            console.error(e);
+            alert('Could not export');
+        }
+    }
+
     render() {
         return (
             <Row className="gs-card-content cash-book-main-card">
@@ -880,7 +904,8 @@ export default class CashBook extends Component {
                         </Col>
                         <Col xs={12} md={7} sm={7}>
                             <Row>
-                                <Col xs={3} md={3} style={{textAlign: 'center'}}>
+                                {/* <Col xs={3} md={3} style={{textAlign: 'center'}}> */}
+                                <div>
                                     <Popover
                                         containerClassName="cashbook-filter-popover"
                                         padding={0}
@@ -935,9 +960,19 @@ export default class CashBook extends Component {
                                             </div>
                                         }
                                     </Popover>
-                                </Col>
+                                </div>
+                                <div>
+                                    <span 
+                                        className={`gs-icon export-btn action-btn`}
+                                        onClick={this.onExportClick}
+                                        >
+                                            <FaFileExcel />
+                                    </span>
+                                </div>
+                                {/* </Col> */}
                                 { this.state.selectedIndexes.length>0 &&
-                                    <Col xs={6} md={6}>
+                                    <div style={{paddingLeft: '10px'}}>
+                                    {/* <Col xs={6} md={6}> */}
                                             <Popover
                                                 containerClassName="cashbook-custom-action-popover"
                                                 padding={0}
@@ -963,7 +998,8 @@ export default class CashBook extends Component {
                                                 >
                                                 <input type='button' className='gs-button bordered' value="Actions" onClick={(e) => this.setState({isCustomActionPopverVisible: !this.state.isCustomActionPopverVisible})}/>
                                             </Popover>
-                                    </Col>
+                                    {/* </Col> */}
+                                    </div>
                                 }
                             </Row>
                         </Col>

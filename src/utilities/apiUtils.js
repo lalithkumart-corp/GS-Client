@@ -77,7 +77,7 @@ export const saveLocation = async (latitude, longitude) => {
     try {
         let accessToken = getAccessToken();
         if(accessToken) {
-            let resp = await axios.post(SAVE_LOCATION, {latitude, longitude, accessToken});
+            let resp = await axiosMiddleware.post(SAVE_LOCATION, {latitude, longitude, accessToken});
         }
     } catch(e) {
         console.log(e);
