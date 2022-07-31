@@ -21,6 +21,7 @@ import { FaFileExcel, FaTrashAlt } from 'react-icons/fa';
 import { BiFilterAlt } from 'react-icons/bi';
 import { TAGS } from '../../../constants';
 import {TagInputComp, TagDisplayComp} from '../../gs-tag/tag';
+import {Tooltip} from 'react-tippy';
 
 export default class CashBook extends Component {
     constructor(props) {
@@ -95,7 +96,11 @@ export default class CashBook extends Component {
                     let tagNo = row['tag_indicator'];
                     return (
                         <div>
-                            <span>{convertToLocalTime(row[column.id], {excludeTime: true})}</span>
+                            <Tooltip title={convertToLocalTime(row[column.id])}
+                                    position="top"
+                                    trigger="mouseenter">
+                                <span>{convertToLocalTime(row[column.id], {excludeTime: true})}</span>
+                            </Tooltip>
                             {row['tag_indicator'] && 
                                 <TagDisplayComp tagNo={tagNo} tagVal={TAGS[tagNo]}/>
                             }

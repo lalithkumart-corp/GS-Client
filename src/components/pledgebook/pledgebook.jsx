@@ -25,6 +25,8 @@ import { MdNotifications, MdNotificationsActive, MdNotificationsNone, MdNotifica
 import axiosMiddleware from '../../core/axios';
 import { ARCHIVE_PLEDGEBOOK_BILLS, UNARCHIVE_PLEDGEBOOK_BILLS, TRASH_PLEDGEBOOK_BILLS, PERMANENTLY_DELETE_PLEDGEBOOK_BILLS, RESTORE_TRASHED_PLEDGEBOOK_BILLS } from '../../core/sitemap';
 import AlertComp from '../alert/Alert';
+import {Tooltip} from 'react-tippy';
+
 class Pledgebook extends Component {
     constructor(props) {
         super(props);        
@@ -98,14 +100,25 @@ class Pledgebook extends Component {
                     displayText: 'Pledged Date',
                     width: '22%',
                     formatter: (column, columnIndex, row, rowIndex) => {
+                        let pledgeDateWithTimeForTooltip = convertToLocalTime(row[column.id]);
                         if(row['closed_date']) {
                             let closed_date = convertToLocalTime(row['closed_date'], {excludeTime: true});
+                            let closedDateWithTimeForTooltip = convertToLocalTime(row['closed_date']);
                             return (
-                                <span>{convertToLocalTime(row[column.id], {excludeTime: true} )} - {closed_date}</span>
+                                <Tooltip title={pledgeDateWithTimeForTooltip + ' - ' + closedDateWithTimeForTooltip}
+                                        position="top"
+                                        trigger="mouseenter">
+                                    <span>{convertToLocalTime(row[column.id], {excludeTime: true} )} - {closed_date}</span>
+                                </Tooltip>
+                                // <span>{convertToLocalTime(row[column.id], {excludeTime: true} )} - {closed_date}</span>
                             )
                         } else {
                             return (
-                                <span>{convertToLocalTime(row[column.id], {excludeTime: true})}</span>
+                                <Tooltip title={pledgeDateWithTimeForTooltip}
+                                        position="top"
+                                        trigger="mouseenter">
+                                    <span>{convertToLocalTime(row[column.id], {excludeTime: true})}</span>
+                                </Tooltip>
                             )
                         }
                     },

@@ -20,6 +20,7 @@ import PaymentIn from '../payment/paymentIn';
 import { useEffect } from 'react';
 import axiosMiddleware from '../../core/axios';
 import { CashIn } from '../tally/cashManager/cashIn';
+import {Tooltip} from 'react-tippy';
 
 class PledgebookModal extends Component {
     constructor(props) {
@@ -327,7 +328,11 @@ function PaymentScreen(props) {
             width: '15%',
             formatter: (column, columnIndex, row, rowIndex) => {
                 return (
-                    <div>{convertToLocalTime(row[column.id], {excludeTime: true})}</div>
+                    <Tooltip title={convertToLocalTime(row[column.id])}
+                            position="top"
+                            trigger="mouseenter">
+                        <div>{convertToLocalTime(row[column.id], {excludeTime: true})}</div>
+                    </Tooltip>
                 )
             }
         },{
@@ -383,12 +388,11 @@ function PaymentScreen(props) {
 
     const addPaymentHandler = async (paymentData) => {
         try {
-            console.log(paymentData);
             let params = {
                 accessToken: getAccessToken(),
                 dateVal: paymentData.transactionDate,
                 category: paymentData.category,
-                remarks: paymentData.remarks,
+                remarks: `${props.currentBillData.BillNo} ${paymentData.remarks}`,
                 paymentDetails: {
                     value: paymentData.amount,
                     mode: paymentData.paymentMode
@@ -397,7 +401,13 @@ function PaymentScreen(props) {
                 customerId: props.currentBillData.CustomerId
             }
 
-            params.paymentDetails[paymentData.paymentMode] = {toAccountId: paymentData.fundHouse};
+            params.paymentDetails[paymentData.paymentMode] = {toAccountId: paymentData.accountId};
+
+            //validation step
+            if(!params.paymentDetails[paymentData.paymentMode].toAccountId) {
+                toast.error('Account where fund to be deposited is not mentioned.');
+                return;
+            }
 
             let resp = await axiosMiddleware.post(CASH_IN_FOR_BILL, params);
             if(resp.data.STATUS == 'EXCEPTION') {

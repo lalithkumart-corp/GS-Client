@@ -11,6 +11,7 @@ import DateRangePicker from '../dateRangePicker/dataRangePicker';
 import { convertToLocalTime, dateFormatter } from '../../utilities/utility';
 import { debounce, DebouncedFunc } from 'lodash';
 import EditUdhaar from './EditUdhaar';
+import {Tooltip} from 'react-tippy';
 
 function UdhaarListComp() {
 
@@ -59,7 +60,11 @@ function UdhaarListComp() {
             width: '7%',
             formatter: (column, columnIndex, row, rowIndex) => {
                 return (
-                    <div>{convertToLocalTime(row[column.id], {excludeTime: true})}</div>
+                    <Tooltip title={convertToLocalTime(row[column.id])}
+                            position="top"
+                            trigger="mouseenter">
+                        <div>{convertToLocalTime(row[column.id], {excludeTime: true})}</div>
+                    </Tooltip>
                 )
             }
         },

@@ -1,3 +1,4 @@
+import axios from 'axios';
 import axiosMiddleware from '../core/axios';
 import { FETCH_FUND_ACCOUNTS_LIST, FETCH_ALL_BANK_LIST, FETCH_CATEGORY_SUGGESTIONS, SAVE_LOCATION } from '../core/sitemap';
 import { getAccessToken, getMyFundAccountList, saveMyFundAccountsList, saveAllBanksList, getAllBanksList } from '../core/storage';
@@ -77,7 +78,8 @@ export const saveLocation = async (latitude, longitude) => {
     try {
         let accessToken = getAccessToken();
         if(accessToken) {
-            let resp = await axiosMiddleware.post(SAVE_LOCATION, {latitude, longitude, accessToken});
+            // dont use axiosmiddleware here, since axiosmiddleware will handle common errors and display error popup. However, here we dont need any error handling. SIlently log error.
+            let resp = await axios.post(SAVE_LOCATION, {latitude, longitude, accessToken});
         }
     } catch(e) {
         console.log(e);

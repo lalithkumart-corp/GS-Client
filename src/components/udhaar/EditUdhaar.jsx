@@ -218,7 +218,8 @@ function PaymentCard(props) {
                 customerId: getCustId(paymentData)
             }
 
-            params.paymentDetails[paymentData.paymentMode] = {toAccountId: paymentData.fundHouse};
+            params.paymentDetails[paymentData.paymentMode] = {toAccountId: paymentData.accountId};
+
 
             let resp = await axiosMiddleware.post(CASH_IN_FOR_BILL, params);
             if(resp.data.STATUS == 'EXCEPTION') {
