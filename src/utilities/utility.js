@@ -97,6 +97,16 @@ export const convertBufferToBase64 = (imgBuff) => {
     return imgPath;
 }
 
+// if current local time is Jul 31 2022 13:00:24, then output will be '2022-07-31 07:29:15'
+export const getCurrentDateTimeInUTCForDB = () => {
+    return new Date().toISOString().replace('T', ' ').slice(0,19);
+}
+
+export const getMyDateObjInUTCForDB = (dateObj) => {
+    return dateObj.toISOString().replace('T', ' ').slice(0,19);
+}
+
+// Ex: INPUT:  "2021-01-02T12:17:57.000Z" => OUTPUT: "02-01-2021 17:47:57"
 export const convertToLocalTime = (theDate, options) => {
     if(!theDate) return null;
     
@@ -125,6 +135,34 @@ export const convertToLocalTime = (theDate, options) => {
         localDate = `${dd}-${mm}-${yyyy} ${hr}:${min}:${sec}`;
     }
     return localDate;        
+}
+
+// Ex: If the current machine time is (06/08/2022 10:16 PM), means then
+// INPUT: new Date()  ===>   OUTPUT: 06-08-2022 22:16:50
+export const convertDateObjToStr = (dateObj, options) => {
+    if(!dateObj) return null;
+    
+    options = options || {};
+
+    const twoDigitFormat = (val) => {
+        val = parseInt(val);
+        if(val < 10)
+            val = '0'+val;
+        return val;
+    };
+    let dd = twoDigitFormat(dateObj.getDate());
+    let mm = twoDigitFormat(dateObj.getMonth() + 1);        
+    let yyyy = dateObj.getFullYear();
+    let localDate;
+    if(options.excludeTime) {
+        localDate = `${dd}-${mm}-${yyyy}`;
+    } else {
+        let hr = twoDigitFormat(dateObj.getHours());
+        let min = twoDigitFormat(dateObj.getMinutes());
+        let sec = twoDigitFormat(dateObj.getSeconds());
+        localDate = `${dd}-${mm}-${yyyy} ${hr}:${min}:${sec}`;
+    }
+    return localDate;    
 }
 
 export const currencyFormatter = (val) => {

@@ -17,7 +17,7 @@ import './SellItem.css';
 import {calcPurchaseTotals, calculateExchangeTotals, calculatePaymentFormData, validate, constructApiParams, resetPageState, defaultExchangeItemFormData, constructPrintContent } from './helper';
 import { toast } from 'react-toastify';
 import { DoublyLinkedList } from '../../../utilities/doublyLinkedList';
-import { getDateInUTC } from '../../../utilities/utility';
+import { getCurrentDateTimeInUTCForDB, getMyDateObjInUTCForDB } from '../../../utilities/utility';
 import ReactToPrint from 'react-to-print';
 import TemplateRenderer from '../../../templates/jewellery-gstBill/templateRenderer';
 
@@ -79,7 +79,8 @@ class SellItem extends Component {
             invoiceNo: props.invoice.gstInvoiceNo,
             date: {
                 inputVal: new Date(), //moment().format('DD-MM-YYYY'),
-                _inputVal: new Date().toISOString()
+                _inputVal: getCurrentDateTimeInUTCForDB(),
+                isLive: true
             },
             prodId: {
                 inputVal: '',
@@ -118,6 +119,7 @@ class SellItem extends Component {
         this.submit = this.submit.bind(this);
         this.focusTagIdInput = this.focusTagIdInput.bind(this);
         this.deleteItemFromPurchaseItemPreview = this.deleteItemFromPurchaseItemPreview.bind(this);
+        this.onClickDateLiveLabel = this.onClickDateLiveLabel.bind(this);
     }
     componentDidMount() {
         this.props.getBillNoFromDB();
@@ -187,9 +189,8 @@ class SellItem extends Component {
         newState.selectedCustomer = selectedCustomer;
         newState.customerSelectionModalOpen = false;
         await this.setState(newState);
-        setTimeout(()=>{
-            this.focusTagIdInput();
-        },300);
+        if(this.canEnableItemSellInput())
+            setTimeout(()=>{this.focusTagIdInput()},300);
     }
 
     onInputValChange(e, identifier) {
@@ -308,6 +309,12 @@ class SellItem extends Component {
             )
             return theDom;
         }
+    }
+
+    onClickDateLiveLabel = (e) => {
+        let newState = {...this.state};
+        newState.date.isLive = !newState.date.isLive;
+        this.setState(newState);
     }
 
     async addItemToBillPreview(e) {
@@ -472,6 +479,9 @@ class SellItem extends Component {
                     if(!e.target.value)
                         canTransferFocus = false;
                     break;
+                case RETAIL_PRICE:
+                    if(!this.canEnableItemSellInput())
+                        canTransferFocus = false;
             }
         }
         if(canTransferFocus)
@@ -651,7 +661,7 @@ class SellItem extends Component {
     onChangeDate(val) {
         let newState = {...this.state};
         newState.date.inputVal = val;
-        newState.date._inputVal = getDateInUTC(val);
+        newState.date._inputVal = getMyDateObjInUTCForDB(val); // getDateInUTC(val);
         this.setState(newState);
     }
 
@@ -881,9 +891,13 @@ class SellItem extends Component {
             </Col>
         )
     }
+
+    canEnableItemSellInput() {
+        return (this.state.selectedCustomer && parseInt(this.state.retailPrice)>0);
+    }
     getItemDetailView() {
         let buffer = [];
-        if(this.state.selectedCustomer) {
+        if(this.canEnableItemSellInput()) {
             buffer.push(
                 <Col xs={12}>
                     {this.getInputBox()}
@@ -896,8 +910,8 @@ class SellItem extends Component {
         } else {
             buffer.push(
                 <Col xs={12}>
-                    {this.state.selectedCustomer}
-                    <p style={{marginTop: "50px", textAlign: "center"}}>SELECT CUSTOMER ... </p>
+                    {/* {this.state.selectedCustomer} */}
+                    <p style={{marginTop: "50px", textAlign: "center"}}>SELECT CUSTOMER and SET RETAIL PRICE ... </p>
                 </Col>
             );
         }
@@ -1051,7 +1065,7 @@ class SellItem extends Component {
     }
 
     getSellingItemsTotal() {
-        if(this.state.selectedCustomer) {
+        if(this.canEnableItemSellInput()) {
             let total = 0;
             _.each(this.state.purchaseItemPreview, (aList, index) => {
                 total += aList.formData.price;
@@ -1068,7 +1082,7 @@ class SellItem extends Component {
     }
 
     getCheckboxForExchangeItem() {
-        if(this.state.selectedCustomer) {
+        if(this.canEnableItemSellInput()) {
             return (
                 <Col xs={{span: 12}}>
                     <GSCheckbox labelText="Have Items For Exchange?" 
@@ -1283,7 +1297,7 @@ class SellItem extends Component {
                         <Form.Control as="select"
                             onChange={(e) => this.onDropdownChange(e, PAYMENT_MODE)} 
                             value={this.state.paymentFormData.paymentMode}
-                            style={{ height: "26px" }}
+                            style={{ height: "26px", padding: 0 }}
                             // onKeyUp={(e) => this.handleKeyUp(e, {currElmKey: PAYMENT_MODE})}
                             // ref= {(domElm) => {this.domElmns[PAYMENT_MODE] = domElm; }}
                             >
@@ -1297,11 +1311,11 @@ class SellItem extends Component {
                 </div>
                 <div>
                     <span className="field-name amount-paid">Amout Paid:</span>
-                    <input type="number" className="field-val amount-paid" value={this.state.paymentFormData.paid} onChange={(e) => this.onInputValChange(e, AMT_PAID)}/>
+                    <input type="number" className="field-val amount-paid gs-input" value={this.state.paymentFormData.paid} onChange={(e) => this.onInputValChange(e, AMT_PAID)}/>
                 </div>
                 <div>
                     <span className="field-name amount-bal">Amount Bal:</span>
-                    <input type="number" className="field-val amount-paid" value={this.state.paymentFormData.balance} onChange={(e) => this.onInputValChange(e, AMT_BAL)}/>
+                    <input type="number" className="field-val amount-paid gs-input" value={this.state.paymentFormData.balance} onChange={(e) => this.onInputValChange(e, AMT_BAL)}/>
                 </div>
             </Col>
         );
@@ -1358,7 +1372,10 @@ class SellItem extends Component {
                                         <Form.Group
                                             // validationState= {this.state.date.hasError ? "error" :null}
                                             >
-                                            <Form.Label>Date</Form.Label>
+                                            <Form.Label>
+                                                Date
+                                                (<span className={`date-live-label`} onClick={(e) => this.onClickDateLiveLabel(e)}> <span className={`live-indicator ${this.state.date.isLive==false?'off':'on'}`}></span> Live </span>)
+                                            </Form.Label>
                                             <DatePicker
                                                 popperClassName="invoice-datepicker" 
                                                 // value={this.state.date.inputVal} 
@@ -1368,7 +1385,7 @@ class SellItem extends Component {
                                                 timeInputLabel="Time:"
                                                 showTimeInput
                                                 dateFormat="dd/MM/yyyy h:mm aa"
-                                                
+                                                readOnly={this.state.date.isLive}
                                                 // showTimeSelect
                                                 showYearDropdown
                                                 className='gs-input-cell bordered'
@@ -1388,6 +1405,7 @@ class SellItem extends Component {
                                                     placeholder=""
                                                     className="reatil-price-field"
                                                     onChange={(e) => this.onInputValChange(e, 'retailPrice')}
+                                                    onKeyUp = {(e) => this.onKeyUp(e, {currElmKey: RETAIL_PRICE})}
                                                 />
                                                 <FormControl.Feedback />
                                             </InputGroup>

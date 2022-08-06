@@ -84,3 +84,15 @@ body {
 .form-control.simple:focus{
     box-shadow: none;
 }
+
+.date-live-label {
+    .live-indicator {
+        border: 3px solid red;
+        border-radius: 50%;
+        display: inline-block;
+        margin-left: 5px;
+        &.off {
+            border: 3px solid grey;
+        }
+    }
+}

@@ -183,7 +183,7 @@ function GstBillTemplate2(props) {
                     <Col xs={6}>
                         <Row>
                             <Col xs={spans.itemName} className="no-padding" style={{fontSize: '16px', fontWeight: 'bold'}}>
-                                {anOrn.title}
+                                {anOrn.itemType} {anOrn.title} - {anOrn.huid}
                             </Col>
                             {/* <Col xs={spans.pcs} className="no-padding">
                                 {anOrn.quanity}
@@ -306,7 +306,7 @@ function GstBillTemplate2(props) {
                         {printContent.calculations.totalCgstVal}
                     </Col>
                 </Row>
-                <Row>
+                {printContent.calculations.oldNetAmt ? <Row>
                     <Col xs={{span: 6}} className="no-padding">
                         (-) Old Gold:
                     </Col>
@@ -316,7 +316,7 @@ function GstBillTemplate2(props) {
                     <Col xs={{span: 4}} className="no-padding">
                         {printContent.calculations.oldNetAmt}
                     </Col>
-                </Row>
+                </Row>:<></>}
                 {printContent.calculations.totalDiscount ? 
                 <Row>
                     <Col xs={{span: 6}} className="no-padding">

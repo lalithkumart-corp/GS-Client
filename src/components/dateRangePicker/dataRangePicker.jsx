@@ -4,7 +4,7 @@ import DateRangePicker from 'react-bootstrap-daterangepicker';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 let label;
 
-class DatePicker extends Component {
+class GsDateRangePicker extends Component {
     constructor(props) {
         super(props);
         let dates = this.getDateProps();
@@ -82,4 +82,4 @@ class DatePicker extends Component {
         );
     }
 }
-export default DatePicker;
+export default GsDateRangePicker;

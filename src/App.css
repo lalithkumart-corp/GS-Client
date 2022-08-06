@@ -178,6 +178,9 @@ html {
 .read-mode .gs-input-cell:focus {
     border: none;
 }
+.gs-input-cell[readonly] {
+  color: grey;
+}
 
 .gs-input-cell2 {  
   width: calc(100% - 15px);

@@ -1,3 +1,5 @@
+import { convertDateObjToStr, getCurrentDateTimeInUTCForDB } from '../../../utilities/utility';
+
 export let defaultExchangeItemFormData = {
     exMetal: 'G',
     exGrossWt: "",
@@ -205,6 +207,7 @@ export const constructApiParams = (stateObj, propObj) => {
             title: anItem.item_name,
             division: anItem.touch_name,
             prodId: anItem.prod_id, //TAGID
+            huid: anItem.huid,
             ornamentId: anItem.ornament,
             qty: anItem.formData.qty,
             grossWt: anItem.formData.grossWt,
@@ -276,7 +279,8 @@ export const constructApiParams = (stateObj, propObj) => {
         newProds,
         oldOrnaments,
         paymentFormData,
-        calculations
+        calculations,
+        date: stateObj.date.isLive?getCurrentDateTimeInUTCForDB():stateObj.date._inputVal
     }
 }
 
@@ -288,6 +292,7 @@ export const constructPrintContent = (stateObj, propObj) => {
     _.each(stateObj.purchaseItemPreview, (anItem, index) => {
         newProds.push({
             title: anItem.item_name,
+            huid: anItem.huid,
             qty: anItem.formData.qty,
             grossWt: anItem.formData.grossWt,
             netWt: anItem.formData.netWt,
@@ -336,10 +341,10 @@ export const constructPrintContent = (stateObj, propObj) => {
         hsCode: 7113,
         goldRatePerGm: (itemType=='G'?stateObj.retailPrice:propObj.rate.retailRate.gold),
         silverRatePerGm: (itemType=='S'?stateObj.retailPrice:propObj.rate.retailRate.silver),
-        billNo: `${stateObj.invoiceNo}.${stateObj.invoiceSeries}`,
+        billNo: `${stateObj.invoiceSeries}.${stateObj.invoiceNo}`,
         customerName: customerName,
         customerMobile: customerMobile,
-        dateVal: '23-09-2021',
+        dateVal: convertDateObjToStr(stateObj.date.isLive?new Date():stateObj.date.inputVal, {excludeTime: true}),
         ornaments: newProds,
         oldOrnaments,
         calculations: {

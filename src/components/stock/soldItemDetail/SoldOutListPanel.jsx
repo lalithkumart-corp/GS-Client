@@ -51,6 +51,21 @@ export default class SoldItems extends Component {
                     }
                 },
                 {
+                    id: 'InvoiceNo',
+                    displayText: 'Invoice No',
+                    isFilterable: true,
+                    filterCallback: this.filterCallbacks.invoiceNo,
+                    className: 'invoice-no',
+                    formatter: (column, columnIndex, row, rowIndex) => {
+                        return (
+                            <span className='invoice-no-cell'>
+                                {row[column.id]}
+                            </span>
+                        )
+                    },
+                    width: '7%'
+                },
+                {
                     id: 'CustomerName',
                     displayText: 'Customer',
                     isFilterable: true,
@@ -205,6 +220,7 @@ export default class SoldItems extends Component {
                     endDate: todaysEndDate
                 },
                 prodId: '',
+                invoiceNo: '',
                 itemName: '',
                 itemCategory: '',
                 itemSubCategory: ''
@@ -302,6 +318,13 @@ export default class SoldItems extends Component {
             newState.filters.date.endDate = new Date(endDate);
             await this.setState(newState);
             this.refresh();
+        },
+        invoiceNo: async (e, col, colIndex) => {
+            let val = e.target.value;
+            let newState = {...this.state};
+            newState.filters.invoiceNo = val;
+            await this.setState(newState);
+            this.refresh({fetchOnlyRows: true});
         },
         customer: async (e, col, colIndex) => {
             let val = e.target.value;
