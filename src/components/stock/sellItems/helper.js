@@ -302,11 +302,11 @@ export const constructPrintContent = (stateObj, propObj) => {
             sgstPercent: anItem.formData.sgstPercent || 0,
             sgstVal: anItem.formData.sgstVal || 0,
             discount: anItem.formData.discount,
-            itemType: anItem.itemType,
+            itemType: anItem.metal,
             amountWithTax: parseFloat((anItem.formData.priceOfOrn + anItem.formData.cgstVal + anItem.formData.sgstVal).toFixed(2)),
             amountWithTaxAndDiscount: parseFloat((anItem.formData.priceOfOrn + anItem.formData.cgstVal + anItem.formData.sgstVal - anItem.formData.discount).toFixed(2)),
         });
-        itemType = anItem.itemType;
+        itemType = anItem.metal;
     });
 
     let oldOrnaments = {};
@@ -336,7 +336,7 @@ export const constructPrintContent = (stateObj, propObj) => {
         hsCode: 7113,
         goldRatePerGm: (itemType=='G'?stateObj.retailPrice:propObj.rate.retailRate.gold),
         silverRatePerGm: (itemType=='S'?stateObj.retailPrice:propObj.rate.retailRate.silver),
-        billNo: 'A: 1',
+        billNo: `${stateObj.invoiceNo}.${stateObj.invoiceSeries}`,
         customerName: customerName,
         customerMobile: customerMobile,
         dateVal: '23-09-2021',

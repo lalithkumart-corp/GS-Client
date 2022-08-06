@@ -701,7 +701,9 @@ class SellItem extends Component {
                     <td>
                         <span className="field-value">{item.metal} - {item.item_name}{category1}</span>
                         <br></br>
-                        <span className="field-value">{category2}{size}</span>
+                        <span className="field-value">{category2?(category2+', '):''} {size?('S-'+size):''}</span>
+                        <br></br>
+                        <span className="field-value">{item.huid?('HUID-'+item.huid):''}</span>
                     </td>
                     <td>
                         <span className="field-value">{item.net_wt}</span>

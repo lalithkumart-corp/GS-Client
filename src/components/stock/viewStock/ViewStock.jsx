@@ -692,6 +692,7 @@ export default class ViewStock extends Component {
                         itemName: aStockItem.ItemName,
                         itemCategory: aStockItem.ItemCategory,
                         itemSubCategory: aStockItem.ItemSubCategory,
+                        huid: aStockItem.ItemHUID,
                         dimension: aStockItem.Dimension,
                         suplierName: aStockItem.Supplier,
                         supplierPersonName: aStockItem.SupplierPersonName,

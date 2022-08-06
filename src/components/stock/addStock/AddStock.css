@@ -142,7 +142,7 @@
 
 table.item-input-table {
     table-layout: fixed;
-    width: 100%;
+    /* width: 100%; */
 }
 .bill-meta-data-row th,
 .item-input-table th, 
