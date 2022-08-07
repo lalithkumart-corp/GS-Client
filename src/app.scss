@@ -96,3 +96,12 @@ body {
         }
     }
 }
+
+.gs-dropdown {
+    .dropdown-toggle,
+    .dropdown-toggle:focus {
+        background-color: transparent !important;
+        color: #2296f3 !important;
+        box-shadow: none !important;
+    }
+}

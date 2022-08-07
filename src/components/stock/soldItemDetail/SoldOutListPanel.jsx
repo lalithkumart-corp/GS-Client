@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 // import { connect } from 'react-redux';
-import { Container, Row, Col } from 'react-bootstrap';
+import { Container, Row, Col, Dropdown, DropdownButton } from 'react-bootstrap';
 import axios from '../../../core/axios';
 import { getAccessToken, getJewelleryGstBillTemplateSettings } from '../../../core/storage';
 import { toast } from 'react-toastify';
@@ -244,6 +244,7 @@ export default class SoldItems extends Component {
         this.filterCallbacks.itemSubCategory = this.filterCallbacks.itemSubCategory.bind(this);
         this.handlePreviewClose = this.handlePreviewClose.bind(this);
         this.onClickPrint = this.onClickPrint.bind(this);
+        this.printMultipleInvoicesHandler = this.printMultipleInvoicesHandler.bind(this);
     }
     async fetchTotals() {
         try {
@@ -365,18 +366,23 @@ export default class SoldItems extends Component {
     async onInvoiceClick(e, row) {
         e.stopPropagation();
         console.log(row);
+        this.fetchInvoices([row.InvoiceRef]);
+    }
+
+    async fetchInvoices(invoicesRefArr) {
         try {
             let at = getAccessToken();
-            let resp = await axios.get(`${FETCH_INVOICE_DATA}?access_token=${at}&invoice_key=${row.InvoiceRef}`);
+            let resp = await axios.get(`${FETCH_INVOICE_DATA}?access_token=${at}&invoice_keys=${JSON.stringify(invoicesRefArr)}`);
             if(resp && resp.data && resp.data.STATUS == 'SUCCESS') {
-                this.setState({printContent: JSON.parse(resp.data.RESP), previewVisibility: true});
+                this.setState({printContents: resp.data.RESP, previewVisibility: true});
             }
         } catch(e) {
             console.log(e);
         }
     }
+
     handlePreviewClose() {
-        this.setState({printContent: null, previewVisibility: false});
+        this.setState({printContents: null, previewVisibility: false});
     }
     onClickPrint() {
         this.printBtn.handlePrint();
@@ -413,6 +419,19 @@ export default class SoldItems extends Component {
         this.setState(newState);
     }
 
+    printMultipleInvoicesHandler() {
+        let newState = {...this.state};
+        if(newState.selectedInfo.rowObj.length < 0) {
+            toast.warn('Please select checkbox row/which invoices to print');
+            return;
+        }
+        let invoiceRefArr = [];
+        _.each(newState.selectedInfo.rowObj, (aRow, index) => {
+            invoiceRefArr.push(aRow.InvoiceRef);
+        });
+        this.fetchInvoices(invoiceRefArr);
+    }
+
     expandRow = {
         renderer: (row) => {
             return (
@@ -431,7 +450,7 @@ export default class SoldItems extends Component {
         return (
             <Container className="sold-out-list-container">
                 <Row>
-                    <Col>
+                    <Col xs={3} md={3}>
                         <DateRangePicker 
                             className = 'stock-sold-out-itens-date-filter'
                             selectDateRange={this.filterCallbacks.date}
@@ -439,6 +458,11 @@ export default class SoldItems extends Component {
                             endDate={this.state.filters.date.endDate}
                             showIcon= {false}
                         />
+                    </Col>
+                    <Col xs={3} md={3}>
+                        <DropdownButton className="gs-dropdown action-dropdown-for-sold-out-jewellery-list" title="Actions">
+                            <Dropdown.Item onClick={this.printMultipleInvoicesHandler}>Print Invoices</Dropdown.Item>
+                        </DropdownButton>
                     </Col>
                 </Row>
                 <Row>
@@ -466,7 +490,17 @@ export default class SoldItems extends Component {
                             className="print-hidden-btn"
                         />
                         <input type="button" className="gs-button" value="Print" onClick={this.onClickPrint} />
-                        <TemplateRenderer ref={(el) => (this.componentRef = el)} templateId={this.state.gstTemplateSettings.selectedTemplate} content={this.state.printContent}/>
+                        <div ref={(el) => (this.componentRef = el)}>
+                            {(() => {
+                                let invoiceTemplates = [];
+                                _.each(this.state.printContents, (aPrintData, index) => {
+                                    if(index && index%2 == 0)
+                                        invoiceTemplates.push(<br></br>);
+                                    invoiceTemplates.push(<TemplateRenderer templateId={this.state.gstTemplateSettings.selectedTemplate} content={aPrintData}/>);
+                                });
+                                return invoiceTemplates;
+                            })()}
+                        </div>
                     </CommonModal>
                 </Row>
             </Container>
