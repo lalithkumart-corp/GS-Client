@@ -1,6 +1,9 @@
 .sell-item-container {
     max-width: calc(100% - 20px);
 }
+.sell-item-container .cust-selection-modal .body {
+    padding: 20px;
+}
 .sell-item-container .customer-selection-parent-row {
     /* height: 50px; */
 }
@@ -116,3 +119,16 @@
     border: none;
     width: 100%;
 } */
+
+.sell-item-container .wastage-calc-tool .wt-col,
+.sell-item-container .wastage-calc-tool .rate-col {
+    padding-right: 0;
+}
+
+.sell-item-container .wastage-calc-tool .wsg-col {
+    padding: 0;
+}
+
+.sell-item-container .wastage-calc-tool .operator {
+    font-size: 16px;
+}

@@ -20,6 +20,7 @@ import { DoublyLinkedList } from '../../../utilities/doublyLinkedList';
 import { getCurrentDateTimeInUTCForDB, getMyDateObjInUTCForDB } from '../../../utilities/utility';
 import ReactToPrint from 'react-to-print';
 import TemplateRenderer from '../../../templates/jewellery-gstBill/templateRenderer';
+import WastageCalculator from '../../tools/wastageCalculator';
 
 const TAGID = 'tagid';
 const SELL_QTY = 'qty';
@@ -161,8 +162,8 @@ class SellItem extends Component {
                 netWt: newState.currSelectedItem.avl_n_wt,
                 wastage: "",
                 labour: "",
-                cgstPercent: "",
-                sgstPercent: "",
+                cgstPercent: 1.5,
+                sgstPercent: 1.5,
                 discount: "",
                 itemType: newState.currSelectedItem.metal
             };
@@ -229,7 +230,7 @@ class SellItem extends Component {
                 this.calculateExchangePrice();
                 break;
             case AMT_PAID:
-            case AMT_BAL:
+            // case AMT_BAL:
                 let vall = e.target.value;
                 if(vall) vall = parseFloat(vall);
                 newState.paymentFormData[identifier] = vall;
@@ -617,8 +618,8 @@ class SellItem extends Component {
                 newState.currSelectedItem.formData.wastageVal = wastageVal;
                 newState.currSelectedItem.formData.cgstVal = cgstVal;
                 newState.currSelectedItem.formData.sgstVal = sgstVal;
-                newState.currSelectedItem.formData.priceOfOrn = parseFloat(priceOfOrn.toFixed(3));
-                newState.currSelectedItem.formData.price = parseFloat(price.toFixed(3));
+                newState.currSelectedItem.formData.priceOfOrn = parseFloat(priceOfOrn.toFixed(2));
+                newState.currSelectedItem.formData.price = parseFloat(price.toFixed(2));
     
                 // newState.totalSellingPrice = price; //for multiple selling items
                 this.setState(newState);
@@ -638,7 +639,7 @@ class SellItem extends Component {
                 secWt = secWt - (secWt * wastage/100);
             price = secWt * oldRate;
             let newState = {...this.state};
-            newState.exchangeItemFormData[EX_PRICE] = price;
+            newState.exchangeItemFormData[EX_PRICE] = parseFloat(price.toFixed(2));
             this.setState(newState);
         }
     }
@@ -701,19 +702,22 @@ class SellItem extends Component {
                 category1 = ' - ' + item.item_category;
             let category2 = '';
             if(item.item_subcategory)
-                category2 = item.item_subcategory;
+                category2 = ' - ' + item.item_subcategory;
             let size = '';
             if(item.dimension)
-                size = <span className="field-name"><b>Size:</b><span>{item.dimension}</span></span>;
+                size = <span className="field-name"><b>Size:</b> &nbsp; <span>{item.dimension}</span></span>;
+            let huidDom = '';
+            if(item.huid)
+                huidDom = <span className="field-name"><b>HUID:</b> &nbsp; <span>{item.huid}</span></span>;
 
             row.push(
                 <tr>
                     <td>
-                        <span className="field-value">{item.metal} - {item.item_name}{category1}</span>
+                        <span className="field-value">{item.metal} - {item.item_name}{category1} {category2}</span>
                         <br></br>
-                        <span className="field-value">{category2?(category2+', '):''} {size?('S-'+size):''}</span>
+                        <span className="field-value">{size}</span>
                         <br></br>
-                        <span className="field-value">{item.huid?('HUID-'+item.huid):''}</span>
+                        <span className="field-value">{huidDom}</span>
                     </td>
                     <td>
                         <span className="field-value">{item.net_wt}</span>
@@ -1288,9 +1292,10 @@ class SellItem extends Component {
     getPaymentContainer() {
         return (
             <Col className="payment-column">
-                <p>New Item Price: {this.state.paymentFormData.totalPurchasePrice}</p>
-                <p>Old Item Price: {this.state.paymentFormData.totalExchangePrice}</p>
-                <p>Sum: {this.state.paymentFormData.sum}</p>
+                <p>New Item Price: ₹ {this.state.paymentFormData.totalPurchasePrice}</p>
+                <p>Old Item Price: ₹ {this.state.paymentFormData.totalExchangePrice}</p>
+                <p>Round Off: ₹ {this.state.paymentFormData.roundOffVal}</p>
+                <p style={{fontSize: '20px'}}>Sum: ₹ {this.state.paymentFormData.sum}</p>
                 <div className="pymnt-mode-input-div">
                     <span className="field-name payment-mode">Payment Mode:</span>
                     <Form.Group>
@@ -1310,12 +1315,13 @@ class SellItem extends Component {
                     </Form.Group>
                 </div>
                 <div>
-                    <span className="field-name amount-paid">Amout Paid:</span>
+                    <span className="field-name amount-paid">Amout Paid: ₹ </span>
                     <input type="number" className="field-val amount-paid gs-input" value={this.state.paymentFormData.paid} onChange={(e) => this.onInputValChange(e, AMT_PAID)}/>
                 </div>
                 <div>
                     <span className="field-name amount-bal">Amount Bal:</span>
-                    <input type="number" className="field-val amount-paid gs-input" value={this.state.paymentFormData.balance} onChange={(e) => this.onInputValChange(e, AMT_BAL)}/>
+                    <span>₹ {this.state.paymentFormData.balance}</span>
+                    {/* <input type="number" className="field-val amount-bal gs-input" disabled value={this.state.paymentFormData.balance} onChange={(e) => this.onInputValChange(e, AMT_BAL)}/>  */}
                 </div>
             </Col>
         );
@@ -1324,7 +1330,7 @@ class SellItem extends Component {
     render() {
         return (
             <Container className="sell-item-container">
-                <CommonModal modalOpen={this.state.customerSelectionModalOpen} handleClose={this.closeCustomerModal}>
+                <CommonModal modalOpen={this.state.customerSelectionModalOpen} handleClose={this.closeCustomerModal} secClass="cust-selection-modal">
                     <CustomerPicker onSelectCustomer={this.onSelectCustomer} handleClose={this.closeCustomerModal}/>
                 </CommonModal>
                 <Row>
@@ -1453,7 +1459,14 @@ class SellItem extends Component {
                             {this.getPaymentContainer()}
                         </Row>
                         <Row>
-                            <input type="button" className="gs-button" value="Submit" onClick={this.submit}/>
+                            <Col xs={12}>
+                                <input type="button" className="gs-button bordered" style={{width: '100%'}} value="Submit" onClick={this.submit}/>
+                            </Col>
+                        </Row>
+                        <Row>
+                            <Col xs={12} style={{border: '1px solid lightgrey', marginTop: '20px', marginLeft: '5px', paddingTop: '5px'}}>
+                                <WastageCalculator />
+                            </Col>
                         </Row>
                     </Col>
                 </Row>

@@ -133,6 +133,21 @@ export const calculatePaymentFormData = (stateObj) => {
     
     paymentFormData.sum = paymentFormData.totalPurchasePrice - paymentFormData.totalExchangePrice;
 
+    // Rounding off logic
+    paymentFormData.roundOffVal = 0;
+    let flooredVal = Math.floor(paymentFormData.sum);
+    let decimalsVal = parseFloat((paymentFormData.sum - flooredVal).toFixed(2));
+    if(decimalsVal) {
+        if(decimalsVal <= 0.5)
+            paymentFormData.roundOffVal = -(decimalsVal);
+        else
+            paymentFormData.roundOffVal = 1-decimalsVal;
+            
+        paymentFormData.roundOffVal = parseFloat(paymentFormData.roundOffVal.toFixed(2));
+    }
+    paymentFormData.sum = paymentFormData.sum + paymentFormData.roundOffVal;
+
+
     paymentFormData.balance = paymentFormData.sum - (paymentFormData.paid || 0);
 
     //the below calc is done for passing to print template
@@ -268,6 +283,7 @@ export const constructApiParams = (stateObj, propObj) => {
         totalDiscount: stateObj.paymentFormData._discountTotal,
         totalPurchasePrice: stateObj.paymentFormData.totalPurchasePrice,
         oldNetAmt: stateObj.paymentFormData.totalExchangePrice,
+        roundedOffVal: stateObj.paymentFormData.roundOffVal,
         grandTotal: stateObj.paymentFormData.sum,
     };
     return {
@@ -359,6 +375,7 @@ export const constructPrintContent = (stateObj, propObj) => {
             // totalPurchaseNetAmountWithTaxAndDiscount: stateObj.paymentFormData.totalPurchasePrice,
             totalPurchasePrice: stateObj.paymentFormData.totalPurchasePrice,
             oldNetAmt: stateObj.paymentFormData.totalExchangePrice,
+            roundedOffVal: stateObj.paymentFormData.roundOffVal,
             grandTotal: stateObj.paymentFormData.sum,
         }
     }

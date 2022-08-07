@@ -27,14 +27,14 @@ export default function WastageCalculator() {
     }
 
     return (
-        <>
+        <div className="wastage-calc-tool">
             <Row style={{marginBottom: '15px'}}>
                 <Col xs={12}><h5>Wastage Calculator</h5></Col>
             </Row>
             <Row>
-                <Col xs={3}>
+                <Col xs={3} className="wt-col">
                     <FormGroup>
-                        <FormLabel>Weight</FormLabel>
+                        <FormLabel>WT (gm)</FormLabel>
                         {/* <InputGroup>
                             <FormControl
                                 type="text"
@@ -47,21 +47,21 @@ export default function WastageCalculator() {
                                 <InputGroup.Text id="rupee-addon">gm</InputGroup.Text>
                             </InputGroup.Append>
                         </InputGroup> */}
-                        <input type="text" className="gs-input-cell" value={wt} onChange={(e) => setWt(e.target.value)} /> gm
+                        <input type="text" className="gs-input-cell" style={{paddingLeft: 0}} value={wt} onChange={(e) => setWt(e.target.value)} />
                     </FormGroup>
                 </Col>
                 <span className="calc operator plus">+</span>
-                <Col xs={2}>
+                <Col xs={2} className="wsg-col">
                     <FormGroup>
-                        <FormLabel>Wastage</FormLabel>
+                        <FormLabel>WSG (gm)</FormLabel>
                         <div style={{lineHeight: '32px'}}>
-                            <span>{wsg}gm</span>
+                            <span>{wsg}</span>
                             <span> ({wsgPercent}%)</span>
                         </div>
                     </FormGroup>
                 </Col>
                 <span className="calc operator multiply"> x </span>
-                <Col xs={3}>
+                <Col xs={3} className="rate-col">
                     <FormGroup>
                         <FormLabel>Rate</FormLabel>
                         {/* <InputGroup>
@@ -80,7 +80,7 @@ export default function WastageCalculator() {
                     </FormGroup>
                 </Col>
                 <span className="calc operator equal"> = </span>
-                <Col xs={3}>
+                <Col xs={3} className="total-col">
                     <FormGroup>
                         <FormLabel>Total</FormLabel>
                         {/* <InputGroup>
@@ -104,6 +104,6 @@ export default function WastageCalculator() {
                     <input type="button" class="gs-button" value="CALC" onClick={calcWsg} />
                 </Col>
             </Row>   
-        </>
+        </div>
     )
 }

@@ -7,7 +7,7 @@
     // -moz-box-shadow: -4px -2px 18px -8px rgba(0,0,0,0.74);
     border-radius: 10px;
 }
-.tools {
+.wastage-calc-tool {
     .gs-input-cell {
         @include gs-input-cell-style1;
         width: calc(100% - 30px);

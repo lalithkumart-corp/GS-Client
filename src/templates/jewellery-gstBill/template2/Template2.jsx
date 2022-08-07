@@ -330,6 +330,19 @@ function GstBillTemplate2(props) {
                     </Col>
                 </Row>
                 : <></>}
+                {printContent.calculations.roundedOffVal ?
+                <Row>
+                    <Col xs={{span: 6}} className="no-padding">
+                        Round Off:
+                    </Col>
+                    <Col xs={2}>
+                        ₹:
+                    </Col>
+                    <Col xs={{span: 4}} className="no-padding">
+                        {printContent.calculations.roundedOffVal}
+                    </Col>
+                </Row>
+                : <></>}
                 <Row style={{fontSize: '18px', fontWeight: 'bold'}}>
                     <Col xs={{span: 6}} className="no-padding">
                         Grand Total
