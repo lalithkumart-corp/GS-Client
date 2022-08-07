@@ -157,7 +157,7 @@ function GstBillTemplate2(props) {
                                 V.A
                             </Col>
                             <Col xs={spans.rate} className="no-padding">
-                                Rate
+                                Rate/gm
                             </Col>
                             <Col xs={spans.makingCharge} className="no-padding">
                                 M.Charge
@@ -413,7 +413,7 @@ function GstBillTemplate2(props) {
             </Row>
             <Row>
                 <Col xs={3}>MOBILE: </Col>
-                <Col xs={9}>{printContent.customerMobile}</Col>
+                <Col xs={9}>{(printContent.customerMobile && printContent.customerMobile!== 'null')?printContent.customerMobile:''}</Col>
             </Row>
         </>
         let rateAndDate = <>
@@ -422,8 +422,15 @@ function GstBillTemplate2(props) {
                 <Col xs={6}>{printContent.dateVal}</Col>
             </Row>
             <Row>
-                <Col xs={6} style={{paddingLeft: 0, paddingRight: 0}}>GOLD/SILVER Rate:</Col>
-                <Col xs={6}>{printContent.goldRatePerGm}/{printContent.silverRatePerGm}</Col>
+                <Col xs={6} style={{paddingLeft: 0, paddingRight: 0}}>
+                    {printContent.ornaments[0].itemType == 'G' && 'Gold Rate'}
+                    {printContent.ornaments[0].itemType == 'S' && 'Silver Rate'}
+                </Col>
+                <Col xs={6}>
+                    ₹ &nbsp;
+                    {printContent.ornaments[0].itemType == 'G' && printContent.goldRatePerGm}
+                    {printContent.ornaments[0].itemType == 'S' && printContent.silverRatePerGm}
+                </Col>
             </Row>
             {/* <Row>
                 <Col xs={6}>Silver Rate</Col>

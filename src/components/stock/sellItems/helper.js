@@ -142,7 +142,7 @@ export const calculatePaymentFormData = (stateObj) => {
             paymentFormData.roundOffVal = -(decimalsVal);
         else
             paymentFormData.roundOffVal = 1-decimalsVal;
-            
+
         paymentFormData.roundOffVal = parseFloat(paymentFormData.roundOffVal.toFixed(2));
     }
     paymentFormData.sum = paymentFormData.sum + paymentFormData.roundOffVal;
@@ -315,14 +315,14 @@ export const constructPrintContent = (stateObj, propObj) => {
             division: anItem.touch_name,
             wastagePercent: anItem.formData.wastage,
             pricePerGm: stateObj.retailPrice,
-            wastageVal: (anItem.formData.netWt * anItem.formData.wastage)/100,
+            wastageVal: parseFloat(((anItem.formData.netWt * anItem.formData.wastage)/100).toFixed(3)),
             makingCharge: anItem.formData.labour,
             priceOfOrn: anItem.formData.priceOfOrn, // price with Wastage + labourCharge
             cgstPercent: anItem.formData.cgstPercent || 0,
-            cgstVal: anItem.formData.cgstVal || 0,
+            cgstVal: parseFloat((anItem.formData.cgstVal || 0).toFixed(2)),
             sgstPercent: anItem.formData.sgstPercent || 0,
-            sgstVal: anItem.formData.sgstVal || 0,
-            discount: anItem.formData.discount,
+            sgstVal: parseFloat((anItem.formData.sgstVal || 0).toFixed(2)),
+            discount: parseFloat(anItem.formData.discount.toFixed(2)),
             itemType: anItem.metal,
             amountWithTax: parseFloat((anItem.formData.priceOfOrn + anItem.formData.cgstVal + anItem.formData.sgstVal).toFixed(2)),
             amountWithTaxAndDiscount: parseFloat((anItem.formData.priceOfOrn + anItem.formData.cgstVal + anItem.formData.sgstVal - anItem.formData.discount).toFixed(2)),
