@@ -422,15 +422,17 @@ function GstBillTemplate2(props) {
                 <Col xs={6}>{printContent.dateVal}</Col>
             </Row>
             <Row>
-                <Col xs={6} style={{paddingLeft: 0, paddingRight: 0}}>
-                    {printContent.ornaments[0].itemType == 'G' && 'Gold Rate'}
-                    {printContent.ornaments[0].itemType == 'S' && 'Silver Rate'}
-                </Col>
-                <Col xs={6}>
-                    ₹ &nbsp;
-                    {printContent.ornaments[0].itemType == 'G' && printContent.goldRatePerGm}
-                    {printContent.ornaments[0].itemType == 'S' && printContent.silverRatePerGm}
-                </Col>
+                {printContent.ornaments && printContent.ornaments.length > 0 && <>
+                    <Col xs={6} style={{paddingLeft: 0, paddingRight: 0}}>
+                        {printContent.ornaments[0].itemType == 'G' && 'Gold Rate'}
+                        {printContent.ornaments[0].itemType == 'S' && 'Silver Rate'}
+                    </Col>
+                    <Col xs={6}>
+                        ₹ &nbsp;
+                        {printContent.ornaments[0].itemType == 'G' && printContent.goldRatePerGm}
+                        {printContent.ornaments[0].itemType == 'S' && printContent.silverRatePerGm}
+                    </Col>
+                </>}
             </Row>
             {/* <Row>
                 <Col xs={6}>Silver Rate</Col>
