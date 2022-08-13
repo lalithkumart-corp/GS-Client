@@ -6,7 +6,7 @@ import './ViewStock.css';
 import { FETCH_STOCK_LIST, FETCH_STOCK_TOTALS } from '../../../core/sitemap';
 import _ from 'lodash';
 import { toast } from 'react-toastify';
-import { getAccessToken } from '../../../core/storage';
+import { getAccessToken, getStockListPageFilters, setStockListPageFilters } from '../../../core/storage';
 import ReactPaginate from 'react-paginate';
 import { convertToLocalTime, dateFormatter } from '../../../utilities/utility';
 import DateRangePicker from '../../dateRangePicker/dataRangePicker';
@@ -15,6 +15,7 @@ import Popover, {ArrowContainer} from 'react-tiny-popover'
 import {Tooltip} from 'react-tippy';
 import CommonModal from '../../common-modal/commonModal';
 import StockItemEdit from './StockItemEdit';
+import { getDataFromStorageRespObj } from './helper';
 
 const DEFAULT_SELECTION = {
     rowObj: [],
@@ -23,6 +24,7 @@ const DEFAULT_SELECTION = {
 export default class ViewStock extends Component {
     constructor(props) {
         super(props);
+        this.filtersFromLocal = getStockListPageFilters();
         let todaysDate = new Date();
         let past7daysStartDate = new Date();
         past7daysStartDate.setDate(past7daysStartDate.getDate()-730);
@@ -30,7 +32,6 @@ export default class ViewStock extends Component {
         let todaysEndDate = new Date();
         todaysEndDate.setHours(23,59,59,999);        
         this.state = {
-            lang: ['php', 'nodejs'],
             timeOut: 400,
             pageLimit: 10,
             selectedPageIndex: 0,
@@ -368,11 +369,11 @@ export default class ViewStock extends Component {
             ],
             filters: {
                 date: {
-                    startDate: past7daysStartDate,
-                    endDate: todaysEndDate
+                    startDate: getDataFromStorageRespObj('START_DATE', this.filtersFromLocal) || past7daysStartDate,
+                    endDate: getDataFromStorageRespObj('END_DATE', this.filtersFromLocal) || todaysEndDate
                 },
                 metalCategory: {gold: true, silver: true},
-                showOnlyAvlStockItems: true,
+                showOnlyAvlStockItems: getDataFromStorageRespObj('LIST_INCLUDES', this.filtersFromLocal),
                 prodId: '',
                 supplier: '',
                 itemName: '',
@@ -408,6 +409,7 @@ export default class ViewStock extends Component {
             newState.filters.date.endDate = new Date(endDate);
             newState.selectedInfo = DEFAULT_SELECTION;
             await this.setState(newState);
+            setStockListPageFilters(newState.filters);
             this.refresh();
         },
         supplier: async (e, col, colIndex) => {
@@ -603,6 +605,7 @@ export default class ViewStock extends Component {
         let newState = {...this.state};
         newState.filters.showOnlyAvlStockItems = e.target.checked;
         this.setState(newState);
+        setStockListPageFilters({...newState.filters,  showOnlyAvlStockItems: e.target.checked});
     }
     
     shouldExpndAll() {

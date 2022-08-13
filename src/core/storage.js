@@ -14,6 +14,8 @@ const keys = {
     cashManagerFilters: 'cashManagerFilters',
     loanBillTemplate: 'loanBillTemplate',
     jewelleryGstBillTemplateData: 'jewelleryGstBillTemplateData',
+    stockListPageFilters: 'stockListPageFilters',
+    stockSoldListPageFilters: 'stockSoldListPageFilters',
     myFundAccountsList: 'myFundAccountsList',
     allFundList: 'allFundList'
 };
@@ -33,7 +35,9 @@ const keyMaps = {
         keys.loanBillTemplate,
         keys.jewelleryGstBillTemplateData,
         keys.myFundAccountsList,
-        keys.allFundList
+        keys.allFundList,
+        keys.stockListPageFilters,
+        keys.stockSoldListPageFilters
     ],
     session: [
 
@@ -351,4 +355,20 @@ export const saveAllBanksList = (data) => {
 
 export const clearAllBanksList = () => {
     _clear(keys.allFundList);
+}
+
+export const setStockListPageFilters = (filterObj) => {
+    return _save(keys.stockListPageFilters, filterObj);
+}
+
+export const getStockListPageFilters = () => {
+    return _read(keys.stockListPageFilters);
+}
+
+export const setStockSoldListPageFilters = (filterObj) => {
+    return _save(keys.stockSoldListPageFilters, filterObj);
+}
+
+export const getStockSoldListPageFilters = () => {
+    return _read(keys.stockSoldListPageFilters);
 }

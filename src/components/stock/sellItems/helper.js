@@ -322,7 +322,7 @@ export const constructPrintContent = (stateObj, propObj) => {
             cgstVal: parseFloat((anItem.formData.cgstVal || 0).toFixed(2)),
             sgstPercent: anItem.formData.sgstPercent || 0,
             sgstVal: parseFloat((anItem.formData.sgstVal || 0).toFixed(2)),
-            discount: parseFloat(anItem.formData.discount.toFixed(2)),
+            discount: parseFloat(anItem.formData.discount?anItem.formData.discount.toFixed(2):0),
             itemType: anItem.metal,
             amountWithTax: parseFloat((anItem.formData.priceOfOrn + anItem.formData.cgstVal + anItem.formData.sgstVal).toFixed(2)),
             amountWithTaxAndDiscount: parseFloat((anItem.formData.priceOfOrn + anItem.formData.cgstVal + anItem.formData.sgstVal - anItem.formData.discount).toFixed(2)),

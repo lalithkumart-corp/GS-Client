@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 // import { connect } from 'react-redux';
 import { Container, Row, Col, Dropdown, DropdownButton } from 'react-bootstrap';
 import axios from '../../../core/axios';
-import { getAccessToken, getJewelleryGstBillTemplateSettings } from '../../../core/storage';
+import { getAccessToken, getJewelleryGstBillTemplateSettings, getStockSoldListPageFilters, setStockSoldListPageFilters } from '../../../core/storage';
 import { toast } from 'react-toastify';
 import { FETCH_STOCK_SOLD_ITEM_TOTALS, FETCH_STOCK_SOLD_OUT_LIST, FETCH_INVOICE_DATA } from '../../../core/sitemap';
 import GSTable from '../../gs-table/GSTable';
@@ -14,11 +14,12 @@ import {Tooltip} from 'react-tippy';
 import CommonModal from '../../common-modal/commonModal';
 import ReactToPrint from 'react-to-print';
 import TemplateRenderer from '../../../templates/jewellery-gstBill/templateRenderer';
-
+import { getDataFromStorageRespObj } from './helper';
 export default class SoldItems extends Component {
     constructor(props) {
         super(props);
         let todaysDate = new Date();
+        this.filtersFromLocal = getStockSoldListPageFilters();
         let past7daysStartDate = new Date();
         past7daysStartDate.setDate(past7daysStartDate.getDate()-730);
         todaysDate.setHours(0,0,0,0);
@@ -216,8 +217,8 @@ export default class SoldItems extends Component {
             ],
             filters: {
                 date: {
-                    startDate: past7daysStartDate,
-                    endDate: todaysEndDate
+                    startDate: getDataFromStorageRespObj('START_DATE', this.filtersFromLocal) || past7daysStartDate,
+                    endDate:  getDataFromStorageRespObj('END_DATE', this.filtersFromLocal) || todaysEndDate
                 },
                 prodId: '',
                 invoiceNo: '',
@@ -319,6 +320,7 @@ export default class SoldItems extends Component {
             newState.filters.date.endDate = new Date(endDate);
             await this.setState(newState);
             this.refresh();
+            setStockSoldListPageFilters(newState.filters);
         },
         invoiceNo: async (e, col, colIndex) => {
             let val = e.target.value;

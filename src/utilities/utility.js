@@ -217,3 +217,16 @@ export const getCurrentUserId = () => {
         return sessionObj.userId;
     return null;
 }
+
+// URL parser
+// Input: "?view=hybrid"    Output: {view: "hybrid"}
+export const getJsonFromUrl = (url) => {
+    if(!url) url = location.search;
+    var query = url.substr(1);
+    var result = {};
+    query.split("&").forEach((part) => {
+      var item = part.split("=");
+      result[item[0]] = decodeURIComponent(item[1]);
+    });
+    return result;
+}
