@@ -75,6 +75,7 @@ function GstBillingDemo() {
     let [dateVal, setDate] = useState(moment().format('DD-MM-YYYY'));
     let [customerName, setCustomerName] = useState('');
     let [cusomertAddr, setCusomertAddr] = useState('');
+    let [customerMobile, setCustomerMob] = useState(null);
     let [templateContent, setTemplateContent] = useState(null);
     let [ornData, setOrnaments] = useState(  JSON.parse(JSON.stringify(defaultOrn))  );
 
@@ -95,6 +96,10 @@ function GstBillingDemo() {
         };
     }, [printFlag]);
 
+    useEffect(() => {
+        calcGrandTotal();
+    },[cgstPercent, sgstPercent, goldRatePerGm, silverRatePerGm])
+
     let onChange = (val, identifier, options) => {
         switch(identifier) {
             case 'billSeries':
@@ -108,11 +113,9 @@ function GstBillingDemo() {
                 break;
             case 'goldRatePerGm':
                 setGoldRatePerGm(val);
-                calcGrandTotal();
                 break;
             case 'silverRatePerGm':
                 setSilverRatePerGm(val);
-                calcGrandTotal();
                 break;
             case 'billNo':
                 setBillNo(val);
@@ -125,6 +128,9 @@ function GstBillingDemo() {
                 break;
             case 'cusomertAddr':
                 setCusomertAddr(val);
+                break;
+            case 'customerMobile':
+                setCustomerMob(val);
                 break;
             case 'orn':
             case 'huid':
@@ -233,6 +239,7 @@ function GstBillingDemo() {
                 place: storeDetail.place,
                 city: storeDetail.city,
                 pinCode: storeDetail.city,
+                storeMobile1: storeDetail.mobile,
     
                 goldRatePerGm: goldRatePerGm,
                 silverRatePerGm: silverRatePerGm,
@@ -243,6 +250,7 @@ function GstBillingDemo() {
                 billNo: (billSeries?`${billSeries}:`:'')+billNo,
                 
                 customerName: customerName,
+                customerMobile: customerMobile,
                 customerAddress: cusomertAddr,
                 customerCardNo: '',
                 ornaments: [],
@@ -254,6 +262,7 @@ function GstBillingDemo() {
                     sgst: sgstPercent,
                     totalCgstVal: cgstVal,
                     totalSgstVal: sgstVal,
+                    roundedOffVal: roundOffVal,
                     grandTotal: grandTotal
                 }
             };
@@ -471,6 +480,18 @@ function GstBillingDemo() {
                                     placeholder=""
                                     onChange={(e) => onChange(e.target.value, 'customerName')} 
                                     value={customerName}
+                                />
+                                <FormControl.Feedback />
+                            </FormGroup>
+                        </Col>
+                        <Col xs={6} md={6}>
+                            <FormGroup>
+                                <FormLabel>Customer Mobile</FormLabel>
+                                <FormControl
+                                    type="text"
+                                    placeholder=""
+                                    onChange={(e) => onChange(e.target.value, 'customerMobile')} 
+                                    value={customerMobile}
                                 />
                                 <FormControl.Feedback />
                             </FormGroup>
