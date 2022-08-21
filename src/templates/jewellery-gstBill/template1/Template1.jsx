@@ -41,7 +41,7 @@ function GstBillTemplate1(props) {
             ornamentsListDom.push(
                 <div className="an-ornament">
                     <div className="an-orn-cell title">{anItem.title}</div>
-                    <div className="an-orn-cell qty">{anItem.quantity}</div>
+                    <div className="an-orn-cell qty">{anItem.qty}</div>
                     <div className="an-orn-cell nwt">{anItem.netWt}</div>
                     <div className="an-orn-cell gwt">{anItem.grossWt}</div>
                     <div className="an-orn-cell price">{anItem.price}</div>
@@ -126,7 +126,7 @@ function GstBillTemplate1(props) {
                                 <Row>
                                     <Col xs={6}>
                                         <span>RATE: </span>
-                                        <input type="text" value={printContent.pricePerGm} />
+                                        <input type="text" value={printContent.itemType=='gold'?printContent.goldRatePerGm:printContent.silverRatePerGm} />
                                     </Col>
                                     <Col xs={6}>
                                         <span>HSN: </span>
