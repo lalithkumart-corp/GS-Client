@@ -178,7 +178,7 @@ function GstBillingDemo() {
     }
 
     const onFocusPriceVal = (row) => {
-        let wtVal = ornData[row].qty * ornData[row].nwt;
+        let wtVal = ornData[row].nwt; // ornData[row].qty * ornData[row].nwt;
         let wtWithWst = wtVal;
         if(wtVal*ornData[row].wst)
             wtWithWst = wtVal + ((wtVal*ornData[row].wst)/100);

@@ -51,22 +51,26 @@ function GstBillTemplate2(props) {
 
         let addressLine = `${printContent.address}, ${printContent.place}, ${printContent.city}-${printContent.pinCode}`;
 
-        let mobileLine = `Ph- ${printContent.storeMobile1}`;
-        if(printContent.storeMobile2)
-            mobileLine += `, ${printContent.storeMobile2}`;
+        let mobileLine = '';
+        if(printContent.storeMobile1) {
+            mobileLine = `Ph- ${printContent.storeMobile1}`;
+            if(printContent.storeMobile2)
+                mobileLine += `, ${printContent.storeMobile2}`;
+        }
 
         //Styles
         let leftImgColStyles = {
             position: 'absolute',
             height: "65px",
             left: "25px",
-            top: "33px",
+            top: "50px",
         }
         let leftImgStyles={
             height: '100%'
         }
         let middleSectionStyles = {
-            textAlign: 'center'
+            textAlign: 'center',
+            paddingTop: '22px'
         }
         let storeNameStyles = {
             fontSize: "31px",
@@ -75,19 +79,19 @@ function GstBillTemplate2(props) {
             fontFamily: 'initial'
         }
         let addressLineStyle = {
-
+            fontSize: "16px"
         }
         let mobileStyle = {
-
+            fontSize: "16px"
         }
         let gstStyle = {
-
+            fontSize: "16px"
         }
         let rightImgColStyles = {
             position: 'absolute',
             height: "65px",
             right: "40px",
-            top: "29px",
+            top: "46px",
         }
         let rightImgStyles={
             height: '100%'
@@ -101,11 +105,11 @@ function GstBillTemplate2(props) {
         middleSection.push(
             <Col xs={12} style={middleSectionStyles}>
                 <div><span className="store-name" style={storeNameStyles}>{printContent.storeName}</span></div>
-                <div><span className="full-addr-line" style={addressLineStyle}>{addressLine}</span></div>
-                <div>   
+                <><span className="full-addr-line" style={addressLineStyle}>{addressLine}</span></> <br></br>
+                <>   
                     <span className="mobile-no" style={mobileStyle}>{mobileLine}</span>
                     <span className="gst-no" style={gstStyle}>, GST: {printContent.gstNumber}</span>
-                </div>
+                </>
             </Col>
         )
         rightSection.push(
@@ -187,7 +191,7 @@ function GstBillTemplate2(props) {
                     <Col xs={5}>
                         <Row>
                             <Col xs={spans.itemName} className="no-padding" style={{fontSize: '16px', fontWeight: 'bold'}}>
-                                {anOrn.itemType} {anOrn.title} - {anOrn.huid}
+                                {anOrn.itemType} {anOrn.title} {anOrn.huid?`- ${anOrn.huid}`:''}
                             </Col>
                             {/* <Col xs={spans.pcs} className="no-padding">
                                 {anOrn.quanity}
@@ -432,12 +436,12 @@ function GstBillTemplate2(props) {
         </>
         let rateAndDate = <>
             <Row>
-                <Col xs={6} style={{paddingLeft: 0}}>DATE:</Col>
+                <Col xs={4} style={{paddingLeft: 0}}>DATE:</Col>
                 <Col xs={6}>{printContent.dateVal}</Col>
             </Row>
             <Row>
                 {printContent.ornaments && printContent.ornaments.length > 0 && <>
-                    <Col xs={6} style={{paddingLeft: 0, paddingRight: 0}}>
+                    <Col xs={4} style={{paddingLeft: 0, paddingRight: 0}}>
                         {printContent.ornaments[0].itemType == 'G' && 'Gold Rate'}
                         {printContent.ornaments[0].itemType == 'S' && 'Silver Rate'}
                     </Col>
@@ -453,7 +457,7 @@ function GstBillTemplate2(props) {
                 <Col xs={6}>{printContent.silverRatePerGm}</Col>
             </Row> */}
             <Row>
-                <Col xs={6} style={{paddingLeft: 0}}>HSN NO:</Col>
+                <Col xs={4} style={{paddingLeft: 0}}>HSN NO:</Col>
                 <Col xs={6}>{printContent.hsCode}</Col>
             </Row>
         </>
@@ -499,7 +503,7 @@ function GstBillTemplate2(props) {
                         </div>
                         <div>Customer's Signature</div>
                     </Col>
-                    <Col xs={6}>
+                    <Col xs={6} style={{textAlign: "center"}}>
                         <div style={{height: '60px'}}>
 
                         </div>
@@ -508,7 +512,7 @@ function GstBillTemplate2(props) {
                 </Row>
             </div>
             <Row style={{textAlign: 'center', paddingBottom: '5px'}}>
-                <h5 style={{width: '100%'}}>Thank you! Visit Again</h5>
+                <h5 style={{width: '100%', margin: 0}}>Thank you! Visit Again</h5>
             </Row>
         </Col>
     }
@@ -520,7 +524,7 @@ function GstBillTemplate2(props) {
         let footerDom = constructFooter();
         return <> 
                 <Row style={{fontSize: '19px'}}>{headerDom}</Row>
-                <Row style={{marginTop: '30px'}}>{bodyDom}</Row>
+                <Row style={{marginTop: '23px'}}>{bodyDom}</Row>
                 <Row>{footerDom}</Row>
             </>;
     }
