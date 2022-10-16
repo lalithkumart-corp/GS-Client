@@ -208,10 +208,10 @@ function GstBillTemplate2(props) {
                                 {anOrn.qty}
                             </Col>
                             <Col xs={spans.netWt} className="no-padding">
-                                {anOrn.netWt*anOrn.qty}
+                                {anOrn.netWt}
                             </Col>
                             <Col xs={spans.wastage} className="no-padding">
-                                {anOrn.wastageVal*anOrn.qty}
+                                {anOrn.wastageVal}
                             </Col>
                             <Col xs={spans.rate} className="no-padding">
                                 {anOrn.pricePerGm}
@@ -421,7 +421,7 @@ function GstBillTemplate2(props) {
                 <Col xs={3}>INVOICE NO: </Col>
                 <Col xs={9}>
                     {printContent.billNo} 
-                    <span style={{width: '50px', position: 'absolute', top: '-8px'}}>
+                    <span style={{width: '50px', position: 'absolute', top: '-16px'}}>
                         <Barcode value={printContent.billNo} width={1} fontSize={20} height={25} displayValue={false}/>
                     </span>
                 </Col>

@@ -9,10 +9,67 @@ import TemplateRenderer from '../../../templates/jewellery-gstBill/templateRende
 import './gstBillingDemo.scss';
 import _ from 'lodash';
 import { numberFormatter, getRoundOffVal } from '../../../utilities/mathUtils';
+import { DoublyLinkedList } from '../../../utilities/doublyLinkedList';
 
 // import GstBillTemplate1 from '../../../templates/jewellery-gstBill/template1/Template1';
+const ENTER_KEY = 13;
+
+var domList = new DoublyLinkedList();
+domList.add('goldRatePerGm', {type: 'formControl', enabled: true});
+domList.add('silverRatePerGm', {type: 'formControl', enabled: true});
+domList.add('billSeries', {type: 'formControl', enabled: true});
+domList.add('billNo', {type: 'formControl', enabled: true});
+domList.add('date', {type: 'datePicker', enabled: true});
+domList.add('customerName', {type: 'formControl', enabled: true});
+domList.add('customerMobile', {type: 'formControl', enabled: true});
+domList.add('cusomertAddr', {type: 'formControl', enabled: true});
+domList.add('orn0', {type: 'defaultInput', enabled: true});
+domList.add('huid0', {type: 'defaultInput', enabled: true});
+domList.add('div0', {type: 'defaultInput', enabled: true});
+domList.add('qty0', {type: 'defaultInput', enabled: true});
+domList.add('gwt0', {type: 'defaultInput', enabled: true});
+domList.add('nwt0', {type: 'defaultInput', enabled: true});
+domList.add('wst0', {type: 'defaultInput', enabled: true});
+domList.add('wstVal0', {type: 'defaultInput', enabled: true});
+domList.add('mc0', {type: 'defaultInput', enabled: true});
+domList.add('price0', {type: 'defaultInput', enabled: true});
+domList.add('orn1', {type: 'defaultInput', enabled: true});
+domList.add('huid1', {type: 'defaultInput', enabled: true});
+domList.add('div1', {type: 'defaultInput', enabled: true});
+domList.add('qty1', {type: 'defaultInput', enabled: true});
+domList.add('gwt1', {type: 'defaultInput', enabled: true});
+domList.add('nwt1', {type: 'defaultInput', enabled: true});
+domList.add('wst1', {type: 'defaultInput', enabled: true});
+domList.add('wstVal1', {type: 'defaultInput', enabled: true});
+domList.add('mc1', {type: 'defaultInput', enabled: true});
+domList.add('price1', {type: 'defaultInput', enabled: true});
+domList.add('orn2', {type: 'defaultInput', enabled: true});
+domList.add('huid2', {type: 'defaultInput', enabled: true});
+domList.add('div2', {type: 'defaultInput', enabled: true});
+domList.add('qty2', {type: 'defaultInput', enabled: true});
+domList.add('gwt2', {type: 'defaultInput', enabled: true});
+domList.add('nwt2', {type: 'defaultInput', enabled: true});
+domList.add('wst2', {type: 'defaultInput', enabled: true});
+domList.add('wstVal2', {type: 'defaultInput', enabled: true});
+domList.add('mc2', {type: 'defaultInput', enabled: true});
+domList.add('price2', {type: 'defaultInput', enabled: true});
+domList.add('orn3', {type: 'defaultInput', enabled: true});
+domList.add('huid3', {type: 'defaultInput', enabled: true});
+domList.add('div3', {type: 'defaultInput', enabled: true});
+domList.add('qty3', {type: 'defaultInput', enabled: true});
+domList.add('gwt3', {type: 'defaultInput', enabled: true});
+domList.add('nwt3', {type: 'defaultInput', enabled: true});
+domList.add('wst3', {type: 'defaultInput', enabled: true});
+domList.add('wstVal3', {type: 'defaultInput', enabled: true});
+domList.add('mc3', {type: 'defaultInput', enabled: true});
+domList.add('price3', {type: 'defaultInput', enabled: true});
+
+domList.add('cgstPercent', {type: 'formControl', enabled: true});
+domList.add('sgstPercent', {type: 'formControl', enabled: true});
 
 function GstBillingDemo() {
+    let domElmns = {};
+    let domOrders = domList;
     let defaultOrn = [
         {
             title: '',
@@ -168,6 +225,14 @@ function GstBillingDemo() {
                     setOrnaments(newOrnData);
                 };
                 break;
+            case 'wstVal':
+                if(options) {
+                    let newOrnData = {...ornData};
+                    newOrnData[options.row][options.col] = val;
+                    newOrnData[options.row]['wst'] = numberFormatter((val*100)/ornData[options.row].nwt, 3);
+                    setOrnaments(newOrnData);
+                };
+                break;
             case 'cgstPercent':
                 setCgstPercent(val);
                 break;
@@ -175,6 +240,56 @@ function GstBillingDemo() {
                 setSgstPercent(val);
                 break;
         }
+    }
+
+    const handleKeyUp = (e, options) => {
+        e.persist();
+        if(e.keyCode == ENTER_KEY)
+            handleEnterKeyPress(e, options);
+    }
+
+    const handleEnterKeyPress = (e, options) => {
+        transferFocus(e, options.currElmKey, options.traverseDirection);
+    }
+
+    const transferFocus = (e, currentElmKey, direction='forward') => {
+        let nextElm;
+        if(direction == 'forward')
+            nextElm = getNextElm(currentElmKey);
+        else
+            nextElm = getPrevElm(currentElmKey);
+        try{
+            if(nextElm) {
+                if(nextElm.type == 'autosuggest')
+                    domElmns[nextElm.key].refs.input.focus();
+                else if(nextElm.type == 'datePicker')
+                    domElmns[nextElm.key].input.focus();
+                else if (nextElm.type == 'rautosuggest' || nextElm.type == 'defaultInput' || nextElm.type == 'formControl')
+                    domElmns[nextElm.key].focus();
+            }
+        } catch(e) {
+            //TODO: Remove this alert after completing development
+            alert(`ERROR Occured (${currentElmKey} - ${nextElm.key}) . Let me refresh.`);
+            window.location.reload(false);
+            console.log(e);
+            console.log(currentElmKey, nextElm.key, direction);
+        }
+    }
+
+    const getNextElm = (currElmKey) => {
+        let currNode = domList.findNode(currElmKey);
+        let nextNode = currNode.next;
+        if(nextNode && !nextNode.enabled)
+            nextNode = getNextElm(nextNode.key);        
+        return nextNode;
+    }
+
+    const getPrevElm = (currElmKey) => {        
+        let currNode = domList.findNode(currElmKey);
+        let prevNode = currNode.prev;
+        if(prevNode && !prevNode.enabled)
+            prevNode = getPrevElm(prevNode.key);        
+        return prevNode;
     }
 
     const onFocusPriceVal = (row) => {
@@ -315,32 +430,55 @@ function GstBillingDemo() {
         for(let i=0; i<rowsCount; i++) {
             rows.push(
                 <Row>
-                    <Col xs={3} className="no-padding">
-                        <input type="text" className="gs-input" value={ornData[i].title} onChange={(e) => onChange(e.target.value, 'orn', {row:i, col: 'title'} )} style={{width: '100%'}}/>
+                    <Col xs={2} className="no-padding">
+                        <input type="text" className="gs-input" value={ornData[i].title} onChange={(e) => onChange(e.target.value, 'orn', {row:i, col: 'title'} )} style={{width: '100%'}}
+                            ref= {(domElm) => {domElmns["orn" + i] = domElm; }}
+                            onKeyUp = {(e) => handleKeyUp(e, {currElmKey: "orn" + i}) }/>
                     </Col>
                     <Col xs={1} className="no-padding">
-                        <input type="text" className="gs-input" value={ornData[i].huid} onChange={(e) => onChange(e.target.value, 'huid', {row:i, col: 'huid'} )} style={{width: '100%'}}/>
+                        <input type="text" className="gs-input" value={ornData[i].huid} onChange={(e) => onChange(e.target.value, 'huid', {row:i, col: 'huid'} )} style={{width: '100%'}}
+                            ref= {(domElm) => {domElmns["huid"+i]  = domElm; }}
+                            onKeyUp = {(e) => handleKeyUp(e, {currElmKey: "huid"+i}) }/>
                     </Col>
                     <Col xs={1} className="no-padding">
-                        <input type="text" className="gs-input" value={ornData[i].div} onChange={(e) => onChange(e.target.value, 'div', {row:i, col: 'div'} )} style={{width: '100%'}}/>
+                        <input type="text" className="gs-input" value={ornData[i].div} onChange={(e) => onChange(e.target.value, 'div', {row:i, col: 'div'} )} style={{width: '100%'}}
+                            ref= {(domElm) => {domElmns["div"+i] = domElm; }}
+                            onKeyUp = {(e) => handleKeyUp(e, {currElmKey: "div"+i}) }/>
                     </Col>
                     <Col xs={1} className="no-padding">
-                        <input type="number" className="gs-input" value={ornData[i].qty} onChange={(e) => onChange(parseInt(e.target.value), 'qty', {row:i, col: 'qty'} )} style={{width: '100%'}}/>
+                        <input type="number" className="gs-input" value={ornData[i].qty} onChange={(e) => onChange(parseInt(e.target.value), 'qty', {row:i, col: 'qty'} )} style={{width: '100%'}}
+                            ref= {(domElm) => {domElmns["qty"+i] = domElm; }}
+                            onKeyUp = {(e) => handleKeyUp(e, {currElmKey: "qty"+i}) }/>
                     </Col>
                     <Col xs={1} className="no-padding">
-                        <input type="number" className="gs-input" value={ornData[i].gwt} onChange={(e) => onChange(parseFloat(e.target.value), 'gwt', {row:i, col: 'gwt'} )} style={{width: '100%'}}/>
+                        <input type="number" className="gs-input" value={ornData[i].gwt} onChange={(e) => onChange(parseFloat(e.target.value), 'gwt', {row:i, col: 'gwt'} )} style={{width: '100%'}}
+                            ref= {(domElm) => {domElmns["gwt"+i] = domElm; }}
+                            onKeyUp = {(e) => handleKeyUp(e, {currElmKey: "gwt"+i}) }/>
                     </Col>
                     <Col xs={1} className="no-padding">
-                        <input type="number" className="gs-input" value={ornData[i].nwt} onChange={(e) => onChange(parseFloat(e.target.value), 'nwt', {row:i, col: 'nwt'} )} style={{width: '100%'}}/>
+                        <input type="number" className="gs-input" value={ornData[i].nwt} onChange={(e) => onChange(parseFloat(e.target.value), 'nwt', {row:i, col: 'nwt'} )} style={{width: '100%'}}
+                            ref= {(domElm) => {domElmns["nwt"+i] = domElm; }}
+                            onKeyUp = {(e) => handleKeyUp(e, {currElmKey: "nwt"+i}) }/>
                     </Col>
                     <Col xs={1} className="no-padding">
-                        <input type="number" className="gs-input" value={ornData[i].wst} onChange={(e) => onChange(parseFloat(e.target.value), 'wst', {row:i, col: 'wst'} )} style={{width: '100%'}}/>
+                        <input type="number" className="gs-input" value={ornData[i].wst} onChange={(e) => onChange(parseFloat(e.target.value), 'wst', {row:i, col: 'wst'} )} style={{width: '100%'}}
+                            ref= {(domElm) => {domElmns["wst"+i] = domElm; }}
+                            onKeyUp = {(e) => handleKeyUp(e, {currElmKey: "wst"+i}) }/>
                     </Col>
                     <Col xs={1} className="no-padding">
-                        <input type="number" className="gs-input" value={ornData[i].mc} onChange={(e) => onChange(parseFloat(e.target.value), 'mc', {row:i, col: 'mc'} )} style={{width: '100%'}}/>
+                        <input type="number" className="gs-input" value={ornData[i].wstVal} onChange={(e) => onChange(parseFloat(e.target.value), 'wstVal', {row:i, col: 'wstVal'} )} style={{width: '100%'}}
+                            ref= {(domElm) => {domElmns["wstVal"+i] = domElm; }}
+                            onKeyUp = {(e) => handleKeyUp(e, {currElmKey: "wstVal"+i}) }/>
+                    </Col>
+                    <Col xs={1} className="no-padding">
+                        <input type="number" className="gs-input" value={ornData[i].mc} onChange={(e) => onChange(parseFloat(e.target.value), 'mc', {row:i, col: 'mc'} )} style={{width: '100%'}}
+                            ref= {(domElm) => {domElmns["mc"+i] = domElm; }}
+                            onKeyUp = {(e) => handleKeyUp(e, {currElmKey: "mc"+i}) }/>
                     </Col>
                     <Col xs={2} className="no-padding">
-                        <input type="number" className="gs-input" value={ornData[i].price} onFocus={(e)=>onFocusPriceVal(i)} readOnly onChange={(e) => onChange(e.target.value, 'price', {row:i, col: 'price'} )} style={{width: '100%'}}/>
+                        <input type="number" className="gs-input" value={ornData[i].price} onFocus={(e)=>onFocusPriceVal(i)} readOnly onChange={(e) => onChange(e.target.value, 'price', {row:i, col: 'price'} )} style={{width: '100%'}}
+                            ref= {(domElm) => {domElmns["price"+i] = domElm; }}
+                            onKeyUp = {(e) => handleKeyUp(e, {currElmKey: "price"+i}) }/>
                     </Col>
                 </Row>
             )
@@ -351,7 +489,7 @@ function GstBillingDemo() {
     let getTotalsRow = () => {
         return (
             <Row>
-                <Col xs={3} className="no-padding">
+                <Col xs={2} className="no-padding">
                 </Col>
                 <Col xs={1} className="no-padding">
                 </Col>
@@ -367,6 +505,8 @@ function GstBillingDemo() {
                 </Col>
                 <Col xs={1} className="no-padding">
                     {/* <input type="number" className="gs-input" value={totalsCalc.wst} readOnly style={{width: '100%'}}/> */}
+                </Col>
+                <Col xs={1} className="no-padding">
                 </Col>
                 <Col xs={1} className="no-padding">
                     <input type="number" className="gs-input" value={totalsCalc.mc} readOnly style={{width: '100%'}}/>
@@ -417,6 +557,8 @@ function GstBillingDemo() {
                                     placeholder=""
                                     value={goldRatePerGm}
                                     onChange={(e) => onChange(e.target.value, 'goldRatePerGm')}
+                                    onKeyUp = {(e) => handleKeyUp(e, {currElmKey: 'goldRatePerGm'}) }
+                                    ref={(domElm) => { domElmns.goldRatePerGm = domElm; }}
                                 />
                             </FormGroup>
                         </Col>
@@ -428,6 +570,8 @@ function GstBillingDemo() {
                                     placeholder=""
                                     value={silverRatePerGm}
                                     onChange={(e) => onChange(e.target.value, 'silverRatePerGm')}
+                                    onKeyUp = {(e) => handleKeyUp(e, {currElmKey: 'silverRatePerGm'}) }
+                                    ref={(domElm) => { domElmns.silverRatePerGm = domElm; }}
                                 />
                             </FormGroup>
                         </Col>
@@ -440,6 +584,8 @@ function GstBillingDemo() {
                                     type="text"
                                     placeholder=""
                                     onChange={(e) => onChange(e.target.value, 'billSeries')} 
+                                    onKeyUp = {(e) => handleKeyUp(e, {currElmKey: 'billSeries'}) }
+                                    ref={(domElm) => { domElmns.billSeries = domElm; }}
                                     value={billSeries}
                                 />
                                 <FormControl.Feedback />
@@ -451,7 +597,9 @@ function GstBillingDemo() {
                                 <FormControl
                                     type="number"
                                     placeholder=""
-                                    onChange={(e) => onChange(e.target.value, 'billNo')} 
+                                    onChange={(e) => onChange(e.target.value, 'billNo')}
+                                    onKeyUp = {(e) => handleKeyUp(e, {currElmKey: 'billNo'}) } 
+                                    ref={(domElm) => { domElmns.billNo = domElm; }}
                                     value={billNo}
                                 />
                                 <FormControl.Feedback />
@@ -464,6 +612,8 @@ function GstBillingDemo() {
                                     popperClassName="gst-bill-demo-datepicker-popper" 
                                     value={dateVal} 
                                     onChange={(fullDateVal, dateVal) => {onChange(fullDateVal, 'date')} }
+                                    onKeyUp = {(e) => handleKeyUp(e, {currElmKey: 'date'}) }
+                                    ref = {(domElm) => { domElmns.date = domElm; }}
                                     showMonthDropdown
                                     showYearDropdown
                                     className='gs-input-cell'
@@ -478,7 +628,9 @@ function GstBillingDemo() {
                                 <FormControl
                                     type="text"
                                     placeholder=""
-                                    onChange={(e) => onChange(e.target.value, 'customerName')} 
+                                    onChange={(e) => onChange(e.target.value, 'customerName')}
+                                    onKeyUp = {(e) => handleKeyUp(e, {currElmKey: 'customerName'}) } 
+                                    ref={(domElm) => { domElmns.customerName = domElm; }}
                                     value={customerName}
                                 />
                                 <FormControl.Feedback />
@@ -491,6 +643,8 @@ function GstBillingDemo() {
                                     type="text"
                                     placeholder=""
                                     onChange={(e) => onChange(e.target.value, 'customerMobile')} 
+                                    onKeyUp = {(e) => handleKeyUp(e, {currElmKey: 'customerMobile'}) }
+                                    ref={(domElm) => { domElmns.customerMobile = domElm; }}
                                     value={customerMobile}
                                 />
                                 <FormControl.Feedback />
@@ -505,6 +659,8 @@ function GstBillingDemo() {
                                     type="text"
                                     placeholder=""
                                     onChange={(e) => onChange(e.target.value, 'cusomertAddr')} 
+                                    onKeyUp = {(e) => handleKeyUp(e, {currElmKey: 'cusomertAddr'}) }
+                                    ref={(domElm) => { domElmns.cusomertAddr = domElm; }}
                                     value={cusomertAddr}
                                 />
                                 <FormControl.Feedback />
@@ -514,7 +670,7 @@ function GstBillingDemo() {
                     <Row>
                         <Col xs={12}>
                             <Row>
-                                <Col xs={3} className="no-padding">
+                                <Col xs={2} className="no-padding">
                                     <span> Title </span>
                                 </Col>
                                 <Col xs={1} className="no-padding">
@@ -534,6 +690,9 @@ function GstBillingDemo() {
                                 </Col>
                                 <Col xs={1} className="no-padding">
                                     <span> W.A % </span>
+                                </Col>
+                                <Col xs={1} className="no-padding">
+                                    <span> W.A </span>
                                 </Col>
                                 <Col xs={1} className="no-padding">
                                     <span> M.C </span>
