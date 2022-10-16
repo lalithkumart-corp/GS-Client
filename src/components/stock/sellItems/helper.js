@@ -1,4 +1,4 @@
-import { convertDateObjToStr, getCurrentDateTimeInUTCForDB } from '../../../utilities/utility';
+import { convertDateObjToStr, getCurrentDateTimeInUTCForDB, formatNo } from '../../../utilities/utility';
 
 export let defaultExchangeItemFormData = {
     exMetal: 'G',
@@ -56,9 +56,9 @@ export const calcPurchaseTotals = (billPreviewList) => {
         let sgstPercentAvg = calculateAvgSgstPercent(billPreviewList);
 
         totals.qty += anItem.formData.qty;
-        totals.grossWt += anItem.formData.grossWt;
-        totals.netWt += anItem.formData.netWt;
-        totals.wastageVal += anItem.formData.wastageVal;
+        totals.grossWt = formatNo(totals.grossWt + anItem.formData.grossWt, 3);
+        totals.netWt = formatNo(totals.netWt + anItem.formData.netWt, 3);
+        totals.wastageVal = formatNo(totals.wastageVal + anItem.formData.wastageVal, 3);
         totals.wastage = wastagePercentAvg;
         totals.cgstPercent = cgstPercentAvg;
         totals.sgstPercent = sgstPercentAvg;

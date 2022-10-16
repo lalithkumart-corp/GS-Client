@@ -230,3 +230,27 @@ export const getJsonFromUrl = (url) => {
     });
     return result;
 }
+
+
+// Problem: adding two float numbers, giving long decimals. 
+//      Adding 8.05+2.07 =>  10.120000000000001
+// Expected: 10.12
+// Solution: +(float1, float2).toFixed(12)
+// Usage: addNos(8.05, 2.07)
+export const addNos = (float1, float2) => {
+    return +(float1, float2).toFixed(12);
+}
+
+// Problem: adding two float numbers, giving long decimals. 
+//      Adding 8.05+2.07 =>  10.120000000000001
+// Expected: 10.12
+// Solution: below meth
+// Usage:   formatNo(8.05+2.07, 2)
+export const formatNo = (number, decimals) => {
+    var newnumber = new Number(number+'').toFixed(parseInt(decimals));
+    return parseFloat(newnumber); 
+}
+
+
+
+

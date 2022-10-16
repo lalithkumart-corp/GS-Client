@@ -70,13 +70,14 @@ function GstBillTemplate2(props) {
         }
         let middleSectionStyles = {
             textAlign: 'center',
-            paddingTop: '22px'
+            paddingTop: '37px'
         }
         let storeNameStyles = {
             fontSize: "31px",
             letterSpacing: "2px",
             fontWeight: "bold",
-            fontFamily: 'initial'
+            fontFamily: 'initial',
+            lineHeight: '24px'
         }
         let addressLineStyle = {
             fontSize: "16px"
@@ -104,7 +105,7 @@ function GstBillTemplate2(props) {
         )
         middleSection.push(
             <Col xs={12} style={middleSectionStyles}>
-                <div><span className="store-name" style={storeNameStyles}>{printContent.storeName}</span></div>
+                <><span className="store-name" style={storeNameStyles}>{printContent.storeName}</span></>  <br></br>
                 <><span className="full-addr-line" style={addressLineStyle}>{addressLine}</span></> <br></br>
                 <>   
                     <span className="mobile-no" style={mobileStyle}>{mobileLine}</span>
@@ -267,7 +268,7 @@ function GstBillTemplate2(props) {
 
         return <div style={{marginTop: '20px', paddingLeft: '10px', paddingRight: '10px'}}>
             {ornTableHeader}
-            <div style={{minHeight: '160px'}}>{ornBody}</div>
+            <div style={{minHeight: '140px'}}>{ornBody}</div>
             {ornFooter}
         </div>
     }
@@ -301,7 +302,7 @@ function GstBillTemplate2(props) {
     }
 
     const _constructPricingDom = () => {
-        return <div style={{fontSize: '17px'}}>
+        return <div style={{fontSize: '16px', minHeight: '130px'}}>
             <Row>
                     <Col xs={{span: 6}} className="no-padding">
                         SGST 1.5%

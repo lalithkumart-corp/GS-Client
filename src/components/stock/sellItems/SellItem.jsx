@@ -17,7 +17,7 @@ import './SellItem.css';
 import {calcPurchaseTotals, calculateExchangeTotals, calculatePaymentFormData, validate, constructApiParams, resetPageState, defaultExchangeItemFormData, constructPrintContent } from './helper';
 import { toast } from 'react-toastify';
 import { DoublyLinkedList } from '../../../utilities/doublyLinkedList';
-import { getCurrentDateTimeInUTCForDB, getMyDateObjInUTCForDB } from '../../../utilities/utility';
+import { formatNo, getCurrentDateTimeInUTCForDB, getMyDateObjInUTCForDB } from '../../../utilities/utility';
 import ReactToPrint from 'react-to-print';
 import TemplateRenderer from '../../../templates/jewellery-gstBill/templateRenderer';
 import WastageCalculator from '../../tools/wastageCalculator';
@@ -28,6 +28,7 @@ const SELL_WT = 'wt';
 const SELL_GWT = 'grossWt';
 const SELL_NWT = 'netWt';
 const SELL_WASTAGE = 'wastage';
+const SELL_WASTAGE_VAL = 'wastageVal';
 const SELL_LABOUR = 'labour';
 const SELL_CGST = 'cgstPercent';
 const SELL_SGST = 'sgstPercent';
@@ -37,6 +38,7 @@ const EX_METAL = 'exMetal';
 const EX_GROSS_WT = 'exGrossWt';
 const EX_NET_WT = 'exNetWt';
 const EX_WASTAGE = 'exWastage';
+const EX_WASTAGE_VAL = 'exWastageVal';
 const EX_OLD_RATE = 'exOldRate';
 const EX_PRICE = 'exPrice';
 const PAYMENT_MODE = 'paymentMode';
@@ -54,6 +56,7 @@ domList.add('qty1', {type: 'defaultInput', enabled: true});
 domList.add('wt1', {type: 'defaultInput', enabled: false});
 domList.add('wt2', {type: 'defaultInput', enabled: false});
 domList.add('wastage1', {type: 'defaultInput', enabled: true});
+domList.add('wastageVal1', {type: 'defaultInput', enabled: true});
 domList.add('labour1', {type: 'defaultInput', enabled: true});
 domList.add('cgstPercent1', {type: 'defaultInput', enabled: true});
 domList.add('sgstPercent1', {type: 'defaultInput', enabled: true});
@@ -62,6 +65,7 @@ domList.add('addItemToBillPreviewBtn', {type: 'defaultInput', enabled: true});
 domList.add(EX_GROSS_WT, {type: 'defaultInput', enabled: true});
 domList.add(EX_NET_WT, {type: 'defaultInput', enabled: true});
 domList.add(EX_WASTAGE, {type: 'defaultInput', enabled: true});
+domList.add(EX_WASTAGE_VAL, {type: 'defaultInput', enabled: true});
 domList.add(EX_OLD_RATE, {type: 'defaultInput', enabled: true});
 domList.add(EX_PRICE, {type: 'defaultInput', enabled: true});
 domList.add('exchangeAddBtn', {type: 'defaultInput', enabled: true});
@@ -161,6 +165,7 @@ class SellItem extends Component {
                 grossWt: newState.currSelectedItem.avl_g_wt,
                 netWt: newState.currSelectedItem.avl_n_wt,
                 wastage: "",
+                wastageVal: "",
                 labour: "",
                 cgstPercent: 1.5,
                 sgstPercent: 1.5,
@@ -199,7 +204,7 @@ class SellItem extends Component {
         switch(identifier) {
             case SELL_QTY:
                 newState.currSelectedItem.formData[identifier] = parseFloat(e.target.value);
-                this.calculateSellingPrice();
+                this.calculateSellingPrice(identifier);
                 let readOnly = this.preventWeighttModification(newState);
                 if(readOnly)
                     this.updateDomState('readOnlyWt');
@@ -209,12 +214,13 @@ class SellItem extends Component {
             case SELL_GWT:
             case SELL_NWT:
             case SELL_WASTAGE:
+            case SELL_WASTAGE_VAL:
             case SELL_LABOUR:
             case SELL_CGST:
             case SELL_SGST:
             case SELL_DISCOUNT:
                 newState.currSelectedItem.formData[identifier] = parseFloat(e.target.value);
-                this.calculateSellingPrice();
+                this.calculateSellingPrice(identifier);
                 break;
             case RETAIL_PRICE:
                 newState.retailPrice = parseInt(e.target.value);
@@ -222,12 +228,13 @@ class SellItem extends Component {
             case EX_GROSS_WT:
             case EX_NET_WT:
             case EX_WASTAGE:
+            case EX_WASTAGE_VAL:
             case EX_OLD_RATE:
             case EX_PRICE:
                 let val = e.target.value;
                 if(val) val = parseFloat(val);
                 newState.exchangeItemFormData[identifier] = val;
-                this.calculateExchangePrice();
+                this.calculateExchangePrice(identifier);
                 break;
             case AMT_PAID:
             // case AMT_BAL:
@@ -395,14 +402,17 @@ class SellItem extends Component {
     // }
 
     onClickExAddButton() {
+        let newState = {...this.state};
         let metal = this.state.exchangeItemFormData[EX_METAL];
         let grossWt = this.state.exchangeItemFormData[EX_GROSS_WT];
         let netWt = this.state.exchangeItemFormData[EX_NET_WT];
         let wastage = this.state.exchangeItemFormData[EX_WASTAGE];
-        let wastageVal = (this.state.exchangeItemFormData[EX_NET_WT]*this.state.exchangeItemFormData[EX_WASTAGE])/100;
+        let wastageVal = this.state.exchangeItemFormData[EX_WASTAGE_VAL];
+
+       
         let oldRate = this.state.exchangeItemFormData[EX_OLD_RATE];
         let price = this.state.exchangeItemFormData[EX_PRICE];
-        let newState = {...this.state};
+        
         let key = Object.keys(newState.exchangeItems) + 1;
         newState.exchangeItems[key] = {
             metal, grossWt, netWt, wastage, wastageVal, oldRate, price, 
@@ -580,7 +590,7 @@ class SellItem extends Component {
         return flag;
     }
 
-    calculateSellingPrice() {
+    calculateSellingPrice(currentInputElm) {
         if(this.state.retailPrice) {
             let newState = {...this.state};
             let wtPerQty = (this.state.currSelectedItem.gross_wt/this.state.currSelectedItem.quantity);
@@ -591,8 +601,16 @@ class SellItem extends Component {
 
                 let wt = this.state.currSelectedItem.formData.netWt || this.state.currSelectedItem.net_wt; //wtPerQty*qty;
                 
-                let wastage = this.state.currSelectedItem.formData.wastage || 0;
-                let wastageVal = ( wt* (wastage/100) );
+                let wastage;
+                let wastageVal;
+                if(currentInputElm == SELL_WASTAGE_VAL) {
+                    wastageVal = this.state.currSelectedItem.formData.wastageVal || 0;
+                    wastage = (wastageVal*100)/wt;
+                    newState.currSelectedItem.formData.wastage = wastage;
+                } else {
+                    wastage = this.state.currSelectedItem.formData.wastage || 0;
+                    wastageVal = ( wt* (wastage/100) );
+                }
                 let labour = this.state.currSelectedItem.formData.labour || 0;
                 let discount = this.state.currSelectedItem.formData.discount || 0;
                 let priceOfOrn = ( ( ( wt + wastageVal ) * retailPrice) + labour );
@@ -607,8 +625,8 @@ class SellItem extends Component {
                 let taxVal = 0;
 
                 if(percents > 0) {
-                    if(cgstPercent) cgstVal = parseFloat((price * (cgstPercent/100)).toFixed(2));
-                    if(sgstPercent) sgstVal = parseFloat((price * (sgstPercent/100)).toFixed(2));
+                    if(cgstPercent) cgstVal = formatNo(price * (cgstPercent/100), 2);
+                    if(sgstPercent) sgstVal = formatNo(price * (sgstPercent/100), 2);
                     taxVal = cgstVal + sgstVal; // (price * (percents/100));
                     price = price + taxVal;
                 }
@@ -618,8 +636,8 @@ class SellItem extends Component {
                 newState.currSelectedItem.formData.wastageVal = wastageVal;
                 newState.currSelectedItem.formData.cgstVal = cgstVal;
                 newState.currSelectedItem.formData.sgstVal = sgstVal;
-                newState.currSelectedItem.formData.priceOfOrn = parseFloat(priceOfOrn.toFixed(2));
-                newState.currSelectedItem.formData.price = parseFloat(price.toFixed(2));
+                newState.currSelectedItem.formData.priceOfOrn = formatNo(priceOfOrn, 2);
+                newState.currSelectedItem.formData.price = formatNo(price, 2);
     
                 // newState.totalSellingPrice = price; //for multiple selling items
                 this.setState(newState);
@@ -627,19 +645,27 @@ class SellItem extends Component {
         }
     }
 
-    calculateExchangePrice() {
+    calculateExchangePrice(identifier) {
         let price = null;
-        if(this.state.exchangeItemFormData[EX_NET_WT] && this.state.exchangeItemFormData[EX_OLD_RATE]) {
+        if(this.state.exchangeItemFormData[EX_NET_WT]) {
+            let newState = {...this.state};
             let netWt = this.state.exchangeItemFormData[EX_NET_WT];
             let wastage = this.state.exchangeItemFormData[EX_WASTAGE];
+            let wastageVal = this.state.exchangeItemFormData[EX_WASTAGE_VAL];
             let oldRate = this.state.exchangeItemFormData[EX_OLD_RATE];
+            
+            if(identifier == EX_WASTAGE_VAL) // !wastageVal && wastage
+                newState.exchangeItemFormData[EX_WASTAGE] = wastage = (wastageVal*100)/netWt;
+            if(identifier == EX_WASTAGE) // !wastage && wastageVal
+                newState.exchangeItemFormData[EX_WASTAGE_VAL] = wastageVal = (netWt*wastage)/100;
 
             let secWt = netWt;
             if(wastage)
                 secWt = secWt - (secWt * wastage/100);
-            price = secWt * oldRate;
-            let newState = {...this.state};
-            newState.exchangeItemFormData[EX_PRICE] = parseFloat(price.toFixed(2));
+            if(oldRate) {
+                price = secWt * oldRate;
+                newState.exchangeItemFormData[EX_PRICE] = parseFloat(price.toFixed(2));
+            }
             this.setState(newState);
         }
     }
@@ -780,7 +806,8 @@ class SellItem extends Component {
             formData.qty = this.state.currSelectedItem.formData.qty || null;
             formData.grossWt = this.state.currSelectedItem.formData.grossWt || null;
             formData.netWt = this.state.currSelectedItem.formData.netWt || null;
-            formData.wastage = this.state.currSelectedItem.formData.wastage || null;
+            formData.wastage = formatNo(this.state.currSelectedItem.formData.wastage, 2) || null;
+            formData.wastageVal = formatNo(this.state.currSelectedItem.formData.wastageVal, 3) || null;
             formData.labour = this.state.currSelectedItem.formData.labour || null;
             formData.cgstPercent = this.state.currSelectedItem.formData.cgstPercent || null;
             formData.sgstPercent = this.state.currSelectedItem.formData.sgstPercent || null;
@@ -801,12 +828,14 @@ class SellItem extends Component {
                                 <col style={{width: "12%"}}></col>
                                 <col style={{width: "12%"}}></col>
                                 <col style={{width: "12%"}}></col>
+                                <col style={{width: "12%"}}></col>
                             </colgroup>
                             <thead>
                                 <tr>
                                     <th>Qty</th>
                                     <th>G-Wt</th>
                                     <th>N-Wt</th>
+                                    <th>Wst(%)</th>
                                     <th>Wst</th>
                                     <th>Labour</th>
                                     <th>CGST%</th>
@@ -834,6 +863,11 @@ class SellItem extends Component {
                                         <input type="number" className="gs-input" value={formData.wastage} onChange={(e)=>this.onInputValChange(e, 'wastage')} readOnly={isReadOnly}
                                                                 onKeyUp = {(e) => this.onKeyUp(e, {currElmKey: 'wastage1'})}
                                                                 ref= {(domElm) => {this.domElmns.wastage1 = domElm;}} />
+                                    </td>
+                                    <td>
+                                        <input type="number" className="gs-input" value={formData.wastageVal} onChange={(e)=>this.onInputValChange(e, 'wastageVal')} readOnly={isReadOnly}
+                                                                onKeyUp = {(e) => this.onKeyUp(e, {currElmKey: 'wastageVal1'})}
+                                                                ref= {(domElm) => {this.domElmns.wastageVal1 = domElm;}} />
                                     </td>
                                     <td>
                                         <input type="number" className="gs-input" value={formData.labour} onChange={(e)=>this.onInputValChange(e, 'labour')} readOnly={isReadOnly}
@@ -1116,12 +1150,14 @@ class SellItem extends Component {
                             <col style={{width: "5%"}}></col>
                             <col style={{width: "5%"}}></col>
                             <col style={{width: "5%"}}></col>
+                            <col style={{width: "5%"}}></col>
                         </colgroup>
                         <thead>
                             <tr>
                                 <th>Metal</th>
                                 <th>G-wt</th>
                                 <th>N-wt</th>
+                                <th>Wastage(%)</th>
                                 <th>Wastage</th>
                                 <th>OldRate</th>
                                 <th>Price</th>
@@ -1157,6 +1193,11 @@ class SellItem extends Component {
                                     <input type="number" className="gs-input" value={this.state.exchangeItemFormData[EX_WASTAGE]} onChange={(e)=>this.onInputValChange(e, EX_WASTAGE)} 
                                             onKeyUp = {(e) => this.onKeyUp(e, {currElmKey: EX_WASTAGE})}
                                             ref= {(domElm) => {this.domElmns[EX_WASTAGE] = domElm; }}/>
+                                </td>
+                                <td>
+                                    <input type="number" className="gs-input" value={this.state.exchangeItemFormData[EX_WASTAGE_VAL]} onChange={(e)=>this.onInputValChange(e, EX_WASTAGE_VAL)} 
+                                            onKeyUp = {(e) => this.onKeyUp(e, {currElmKey: EX_WASTAGE_VAL})}
+                                            ref= {(domElm) => {this.domElmns[EX_WASTAGE_VAL] = domElm; }}/>
                                 </td>
                                 <td>
                                     <input type="number" className="gs-input" value={this.state.exchangeItemFormData[EX_OLD_RATE]} onChange={(e)=>this.onInputValChange(e, EX_OLD_RATE)} 
