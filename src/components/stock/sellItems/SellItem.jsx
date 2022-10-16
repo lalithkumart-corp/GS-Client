@@ -1336,7 +1336,7 @@ class SellItem extends Component {
                 <p>New Item Price: ₹ {this.state.paymentFormData.totalPurchasePrice}</p>
                 <p>Old Item Price: ₹ {this.state.paymentFormData.totalExchangePrice}</p>
                 <p>Round Off: ₹ {this.state.paymentFormData.roundOffVal}</p>
-                <p style={{fontSize: '20px'}}>Sum: ₹ {this.state.paymentFormData.sum}</p>
+                <p style={{fontSize: '20px'}}>Sum: ₹ {formatNo(this.state.paymentFormData.sum, 2)}</p>
                 <div className="pymnt-mode-input-div">
                     <span className="field-name payment-mode">Payment Mode:</span>
                     <Form.Group>
@@ -1361,7 +1361,7 @@ class SellItem extends Component {
                 </div>
                 <div>
                     <span className="field-name amount-bal">Amount Bal:</span>
-                    <span>₹ {this.state.paymentFormData.balance}</span>
+                    <span>₹ {formatNo(this.state.paymentFormData.balance, 2)}</span>
                     {/* <input type="number" className="field-val amount-bal gs-input" disabled value={this.state.paymentFormData.balance} onChange={(e) => this.onInputValChange(e, AMT_BAL)}/>  */}
                 </div>
             </Col>
