@@ -156,10 +156,11 @@ class SellItem extends Component {
     async fetchItemByProdId(prodId) {
         try {
             let at = getAccessToken();
-            prodId = prodId || this.state.prodId.inputVal;
-            let resp = await axiosMiddleware.get(`${FETCH_STOCKS_BY_PRODID}?access_token=${at}&prod_id=${prodId}`);
+            prodId = [prodId || this.state.prodId.inputVal];
+            let prodIdsArrStr = JSON.stringify(prodId);
+            let resp = await axiosMiddleware.get(`${FETCH_STOCKS_BY_PRODID}?access_token=${at}&prod_ids=${prodIdsArrStr}`);
             let newState = {...this.state};
-            newState.currSelectedItem = resp.data.ITEM;
+            newState.currSelectedItem = resp.data.ITEMS[0];
             newState.currSelectedItem.formData = {
                 qty: newState.currSelectedItem.avl_qty || 1,
                 grossWt: newState.currSelectedItem.avl_g_wt,

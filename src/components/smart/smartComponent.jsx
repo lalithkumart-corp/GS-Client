@@ -32,6 +32,7 @@ import AddStock from '../stock/addStock/AddStock';
 // import ViewStock from '../stock/viewStock/ViewStock';
 import StockViewTabLayout from '../stock/viewStock/index';
 import SellItem from '../stock/sellItems/SellItem';
+import JewelleryCustomerInvoicesList from '../stock/custInvoices/custInvoicesList';
 import StockSetup from '../stock/setup/StockSetup';
 import TagDemo from '../stock/tag/TagDemo';
 import CustomTag from '../stock/tag/CustomTag';
@@ -97,7 +98,7 @@ class SmartComponent extends Component {
         yy = yy.replaceAll('GS_', '');
         yy = yy.replaceAll('MAK_', '');
         yy = yy.replaceAll('INTER', '');
-        if(true || yy == "-274726249") { // temporarily making as tru for development mode
+        if(true || yy == "-236375844") { // temporarily making as tru for development mode
             if(this.props.auth.isAuthenticated) {
                 if(!this.props.auth.isActivated) {
                     return (
@@ -149,6 +150,7 @@ class SmartComponent extends Component {
                                     <Route path= "/stock-add" component={AddStock} />
                                     <Route path= "/stock-view" component={StockViewTabLayout} />
                                     <Route path= "/sell-item" component={SellItem} />
+                                    <Route path= "/jewellery-cust-invoices" component={JewelleryCustomerInvoicesList} />
                                     <Route path= "/stock-setup" component={StockSetup} />
                                     <Route path= "/tag-demo" component={TagDemo} />
                                     <Route path="/tag-v2" component={CustomTag} />

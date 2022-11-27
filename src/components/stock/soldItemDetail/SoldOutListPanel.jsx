@@ -8,13 +8,16 @@ import { FETCH_STOCK_SOLD_ITEM_TOTALS, FETCH_STOCK_SOLD_OUT_LIST, FETCH_INVOICE_
 import GSTable from '../../gs-table/GSTable';
 import { convertToLocalTime, dateFormatter } from '../../../utilities/utility';
 import DateRangePicker from '../../dateRangePicker/dataRangePicker';
-import './SoldOutListPanel.css';
+import './SoldOutListPanel.scss';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {Tooltip} from 'react-tippy';
 import CommonModal from '../../common-modal/commonModal';
 import ReactToPrint from 'react-to-print';
 import TemplateRenderer from '../../../templates/jewellery-gstBill/templateRenderer';
 import { getDataFromStorageRespObj } from './helper';
+import SellItemEditMode from '../sellItems/SellItemEditMode';
+import { GsScreen } from '../../gs-screen/GsScreen';
+import axiosMiddleware from '../../../core/axios';
 export default class SoldItems extends Component {
     constructor(props) {
         super(props);
@@ -26,6 +29,7 @@ export default class SoldItems extends Component {
         let todaysEndDate = new Date();
         todaysEndDate.setHours(23,59,59,999);
         this.state = {
+            currentScreen: 1,
             gstTemplateSettings: {},
             previewVisibility: false,
             timeOut: 400,
@@ -59,7 +63,7 @@ export default class SoldItems extends Component {
                     className: 'invoice-no',
                     formatter: (column, columnIndex, row, rowIndex) => {
                         return (
-                            <span className='invoice-no-cell'>
+                            <span className='invoice-no-cell' onClick={(e)=>this.onClickItem(e, row)}>
                                 {row[column.id]}
                             </span>
                         )
@@ -244,8 +248,12 @@ export default class SoldItems extends Component {
         this.filterCallbacks.itemCategory = this.filterCallbacks.itemCategory.bind(this);
         this.filterCallbacks.itemSubCategory = this.filterCallbacks.itemSubCategory.bind(this);
         this.handlePreviewClose = this.handlePreviewClose.bind(this);
+        this.goToStockListScreen = this.goToStockListScreen.bind(this);
         this.onClickPrint = this.onClickPrint.bind(this);
         this.printMultipleInvoicesHandler = this.printMultipleInvoicesHandler.bind(this);
+    }
+    setCurrentScreen(screenNo) {
+        this.setState({currentScreen: screenNo});
     }
     async fetchTotals() {
         try {
@@ -389,6 +397,12 @@ export default class SoldItems extends Component {
     onClickPrint() {
         this.printBtn.handlePrint();
     }
+    async onClickItem(e, row) {
+        this.setState({currentScreen:2, invoiceDataForUpdate: row}); // isEditDialogOpen: true
+    }
+    goToStockListScreen() {
+        this.setState({currentScreen: 1, invoiceDataForUpdate: null}); // isEditDialogOpen: false
+    }
     handleCheckboxChangeListener(params) {
         let newState = {...this.state};
         if(params.isChecked) {
@@ -451,60 +465,67 @@ export default class SoldItems extends Component {
     render() {
         return (
             <Container className="sold-out-list-container">
-                <Row>
-                    <Col xs={3} md={3}>
-                        <DateRangePicker 
-                            className = 'stock-sold-out-itens-date-filter'
-                            selectDateRange={this.filterCallbacks.date}
-                            startDate={this.state.filters.date.startDate}
-                            endDate={this.state.filters.date.endDate}
-                            showIcon= {false}
-                        />
+                <GsScreen showScreen={this.state.currentScreen==1?true:false} isMainScreen={true}>
+                    <Col xs={12} md={12}>
+                        <Row>
+                            <Col xs={3} md={3}>
+                                <DateRangePicker 
+                                    className = 'stock-sold-out-itens-date-filter'
+                                    selectDateRange={this.filterCallbacks.date}
+                                    startDate={this.state.filters.date.startDate}
+                                    endDate={this.state.filters.date.endDate}
+                                    showIcon= {false}
+                                />
+                            </Col>
+                            <Col xs={3} md={3}>
+                                <DropdownButton className="gs-dropdown action-dropdown-for-sold-out-jewellery-list" title="Actions">
+                                    <Dropdown.Item onClick={this.printMultipleInvoicesHandler}>Print Invoices</Dropdown.Item>
+                                </DropdownButton>
+                            </Col>
+                        </Row>
+                        <Row>
+                            <Col>
+                                <GSTable 
+                                    columns={this.state.columns}
+                                    rowData={this.state.soldOutItemsList}
+                                    expandRow = { this.expandRow }
+                                    // isGlobalExpandIconExpanded = {this.shouldExpndAll()} //in case of filter, we can enable...to show the ornaments in expanded section
+                                    className= {"my-stock-sold-items-view-table"}
+                                    checkbox = {true}
+                                    IsGlobalCheckboxSelected = {false} //optional
+                                    checkboxOnChangeListener = {this.handleCheckboxChangeListener}
+                                    globalCheckBoxListener = {this.handleGlobalCheckboxChange}
+                                    selectedIndexes = {this.state.selectedInfo.indexes}
+                                />
+                            </Col>
+                        </Row>
+                        <Row>
+                            <CommonModal modalOpen={this.state.previewVisibility} handleClose={this.handlePreviewClose} secClass="jewellery-bill-template-preview-modal">
+                                <ReactToPrint
+                                    ref={(domElm) => {this.printBtn = domElm}}
+                                    trigger={() => <a href="#"></a>}
+                                    content={() => this.componentRef}
+                                    className="print-hidden-btn"
+                                />
+                                <input type="button" className="gs-button" value="Print" onClick={this.onClickPrint} />
+                                <div ref={(el) => (this.componentRef = el)}>
+                                    {(() => {
+                                        let invoiceTemplates = [];
+                                        _.each(this.state.printContents, (aPrintData, index) => {
+                                            if(index && index%2 == 0)
+                                                invoiceTemplates.push(<br></br>);
+                                            invoiceTemplates.push(<TemplateRenderer templateId={this.state.gstTemplateSettings.selectedTemplate} content={aPrintData}/>);
+                                        });
+                                        return invoiceTemplates;
+                                    })()}
+                                </div>
+                            </CommonModal>
+                        </Row>
                     </Col>
-                    <Col xs={3} md={3}>
-                        <DropdownButton className="gs-dropdown action-dropdown-for-sold-out-jewellery-list" title="Actions">
-                            <Dropdown.Item onClick={this.printMultipleInvoicesHandler}>Print Invoices</Dropdown.Item>
-                        </DropdownButton>
-                    </Col>
-                </Row>
-                <Row>
-                    <Col>
-                        <GSTable 
-                            columns={this.state.columns}
-                            rowData={this.state.soldOutItemsList}
-                            expandRow = { this.expandRow }
-                            // isGlobalExpandIconExpanded = {this.shouldExpndAll()} //in case of filter, we can enable...to show the ornaments in expanded section
-                            className= {"my-stock-sold-items-view-table"}
-                            checkbox = {true}
-                            IsGlobalCheckboxSelected = {false} //optional
-                            checkboxOnChangeListener = {this.handleCheckboxChangeListener}
-                            globalCheckBoxListener = {this.handleGlobalCheckboxChange}
-                            selectedIndexes = {this.state.selectedInfo.indexes}
-                        />
-                    </Col>
-                </Row>
-                <Row>
-                    <CommonModal modalOpen={this.state.previewVisibility} handleClose={this.handlePreviewClose} secClass="jewellery-bill-template-preview-modal">
-                        <ReactToPrint
-                            ref={(domElm) => {this.printBtn = domElm}}
-                            trigger={() => <a href="#"></a>}
-                            content={() => this.componentRef}
-                            className="print-hidden-btn"
-                        />
-                        <input type="button" className="gs-button" value="Print" onClick={this.onClickPrint} />
-                        <div ref={(el) => (this.componentRef = el)}>
-                            {(() => {
-                                let invoiceTemplates = [];
-                                _.each(this.state.printContents, (aPrintData, index) => {
-                                    if(index && index%2 == 0)
-                                        invoiceTemplates.push(<br></br>);
-                                    invoiceTemplates.push(<TemplateRenderer templateId={this.state.gstTemplateSettings.selectedTemplate} content={aPrintData}/>);
-                                });
-                                return invoiceTemplates;
-                            })()}
-                        </div>
-                    </CommonModal>
-                </Row>
+                </GsScreen>
+                <GsScreen showScreen={this.state.currentScreen==2?true:false} goBack={this.goToStockListScreen} secClass={'edit-invoice-screen-sec-class'}>
+                    <SellItemEditMode data={this.state.invoiceDataForUpdate}/>
+                </GsScreen>
             </Container>
         )
     }

@@ -108,8 +108,8 @@ function GstBillTemplate2(props) {
                 <><span className="store-name" style={storeNameStyles}>{printContent.storeName}</span></>  <br></br>
                 <><span className="full-addr-line" style={addressLineStyle}>{addressLine}</span></> <br></br>
                 <>   
-                    <span className="mobile-no" style={mobileStyle}>{mobileLine}</span>
-                    <span className="gst-no" style={gstStyle}>, GST: {printContent.gstNumber}</span>
+                    {mobileLine && <span className="mobile-no" style={mobileStyle}>{mobileLine}, </span>}
+                    <span className="gst-no" style={gstStyle}>GST: {printContent.gstNumber}</span>
                 </>
             </Col>
         )
@@ -237,7 +237,8 @@ function GstBillTemplate2(props) {
         let ornFooter = [];
         let itemsQty = 0;
         _.each(printContent.ornaments, (anOrn) => {
-            itemsQty += anOrn.qty;
+            // itemsQty += anOrn.qty;
+            itemsQty++;
         });
         ornFooter.push(
             <>

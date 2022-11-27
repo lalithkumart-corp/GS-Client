@@ -16,6 +16,7 @@ const keys = {
     jewelleryGstBillTemplateData: 'jewelleryGstBillTemplateData',
     stockListPageFilters: 'stockListPageFilters',
     stockSoldListPageFilters: 'stockSoldListPageFilters',
+    jewelleryInvoiceListPageFilters: 'jewelleryInvoiceListPageFilters',
     myFundAccountsList: 'myFundAccountsList',
     allFundList: 'allFundList'
 };
@@ -37,7 +38,8 @@ const keyMaps = {
         keys.myFundAccountsList,
         keys.allFundList,
         keys.stockListPageFilters,
-        keys.stockSoldListPageFilters
+        keys.stockSoldListPageFilters,
+        keys.jewelleryInvoiceListPageFilters
     ],
     session: [
 
@@ -371,4 +373,12 @@ export const setStockSoldListPageFilters = (filterObj) => {
 
 export const getStockSoldListPageFilters = () => {
     return _read(keys.stockSoldListPageFilters);
+}
+
+export const setJewelleryCustInvoicesPageFilters = (filterObj) => {
+    return _save(keys.jewelleryInvoiceListPageFilters, filterObj);
+}
+
+export const getJewelleryCustInvoicesPageFilters = () => {
+    return _read(keys.jewelleryInvoiceListPageFilters);
 }
