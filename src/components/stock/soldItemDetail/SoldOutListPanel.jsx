@@ -56,6 +56,21 @@ export default class SoldItems extends Component {
                     }
                 },
                 {
+                    id: 'ProdId',
+                    displayText: 'Tag',
+                    isFilterable: true,
+                    filterCallback: this.filterCallbacks.tagId,
+                    className: 'tag-id',
+                    formatter: (column, columnIndex, row, rowIndex) => {
+                        return (
+                            <span className='tag-id-cell'>
+                                {row[column.id]}
+                            </span>
+                        )
+                    },
+                    width: '7%'
+                },
+                {
                     id: 'InvoiceNo',
                     displayText: 'Invoice No',
                     isFilterable: true,
@@ -79,21 +94,6 @@ export default class SoldItems extends Component {
                     formatter: (column, columnIndex, row, rowIndex) => {
                         return (
                             <span className='customer-name-cell'>
-                                {row[column.id]}
-                            </span>
-                        )
-                    },
-                    width: '7%'
-                },
-                {
-                    id: 'ProdId',
-                    displayText: 'Tag',
-                    isFilterable: true,
-                    filterCallback: this.filterCallbacks.tagId,
-                    className: 'tag-id',
-                    formatter: (column, columnIndex, row, rowIndex) => {
-                        return (
-                            <span className='tag-id-cell'>
                                 {row[column.id]}
                             </span>
                         )
