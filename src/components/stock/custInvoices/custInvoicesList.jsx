@@ -13,7 +13,9 @@ import TemplateRenderer from '../../../templates/jewellery-gstBill/templateRende
 import CommonModal from '../../common-modal/commonModal';
 import ReactToPrint from 'react-to-print';
 import ReactPaginate from 'react-paginate';
-
+import { GsScreen } from '../../gs-screen/GsScreen';
+import SellItemEditMode from '../sellItems/SellItemEditMode';
+import './custInvoicesList.scss';
 export default class JewelleryCustomerInvoicesList extends Component {
     constructor(props) {
         super(props);
@@ -27,12 +29,15 @@ export default class JewelleryCustomerInvoicesList extends Component {
         todaysEndDate.setHours(23,59,59,999);
 
         this.state = {
+            currentScreen: 1,
             customerInvoiceList: [],
             gstTemplateSettings: {},
             previewVisibility: false,
             timeOut: 400,
             pageLimit: 10,
             selectedPageIndex: 0,
+            invoiceUpdateMode: false,
+            rawInvoiceData: null,
             selectedInfo: {
                 rowObj: [],
                 indexes: [],
@@ -60,7 +65,9 @@ export default class JewelleryCustomerInvoicesList extends Component {
                     className: 'invoice-no-col',
                     formatter: (column, columnIndex, row, rowIndex) => {
                         return (
-                            <span>{row[column.id]}</span>
+                            <span className='invoice-no-cell' onClick={(e) => this.cellClickCallbacks.onInvoiceNoClick({column, columnIndex, row, rowIndex}, e)}>
+                                <b>{row[column.id]}</b>
+                            </span>
                         )
                     },
                     width: '5%'
@@ -176,6 +183,12 @@ export default class JewelleryCustomerInvoicesList extends Component {
             this.refresh({fetchOnlyRows: true});
         },
     }
+    cellClickCallbacks = {
+        onInvoiceNoClick: (params, e) => {
+            e.stopPropagation();
+            this.setState({currentScreen:2, invoiceUpdateMode: true, invoiceDataForUpdate: params.row});
+        }
+    }
     componentDidMount() {
         this.fetchTotals();
         this.fetchInvoicesPerPage();
@@ -238,7 +251,7 @@ export default class JewelleryCustomerInvoicesList extends Component {
     refresh(options={}) {
         clearTimeout(this.timer);
         this.timer = setTimeout(() => {
-            this.fetchRowsPerPage();
+            this.fetchInvoicesPerPage();
             if(!options.fetchOnlyRows)
                 this.fetchTotals();
         }, this.timeOut);
@@ -255,67 +268,76 @@ export default class JewelleryCustomerInvoicesList extends Component {
         return this.state.totals.invoices/this.state.pageLimit;
     }
 
+    goToInvoiceListScreen() {
+        this.setState({currentScreen: 1, invoiceDataForUpdate: null}); // isEditDialogOpen: false
+    }
+
     render() {
         return (
-            <Container>
-                <Row>
-                    <Col xs={3} md={3}>
-                        <DateRangePicker 
-                            className = 'stock-sold-out-itens-date-filter'
-                            selectDateRange={this.filterCallbacks.date}
-                            startDate={this.state.filters.date.startDate}
-                            endDate={this.state.filters.date.endDate}
-                            showIcon= {false}
-                        />
-                    </Col>
-                    <Col xs={4}>
-                        <ReactPaginate previousLabel={"<"}
-                            nextLabel={">"}
-                            breakLabel={"..."}
-                            breakClassName={"break-me"}
-                            pageCount={this.getPageCount()}
-                            marginPagesDisplayed={2}
-                            pageRangeDisplayed={5}
-                            onPageChange={this.handlePageClick}
-                            containerClassName={"gs-pagination pagination"}
-                            subContainerClassName={"pages pagination"}
-                            activeClassName={"active"}
-                            forcePage={this.state.selectedPageIndex} />
-                    </Col>
-                    <Col xs={4} style={{textAlign: 'right'}}>
-                        <span className="no-of-items">No. Of Invoices: {this.state.totals.invoices}</span>
-                    </Col>
-                </Row>
-                <Row>
-                    <Col xs={12}>
-                        <GSTable 
-                            columns={this.state.columns}
-                            rowData={this.state.customerInvoiceList}
-                        />
-                    </Col>
-                </Row>
-                <Row>
-                    <CommonModal modalOpen={this.state.previewVisibility} handleClose={this.handlePreviewClose} secClass="jewellery-bill-template-preview-modal">
-                        <ReactToPrint
-                            ref={(domElm) => {this.printBtn = domElm}}
-                            trigger={() => <a href="#"></a>}
-                            content={() => this.componentRef}
-                            className="print-hidden-btn"
-                        />
-                        <input type="button" className="gs-button" value="Print" onClick={this.onClickPrint} />
-                        <div ref={(el) => (this.componentRef = el)}>
-                            {(() => {
-                                let invoiceTemplates = [];
-                                _.each(this.state.printContents, (aPrintData, index) => {
-                                    if(index && index%2 == 0)
-                                        invoiceTemplates.push(<br></br>);
-                                    invoiceTemplates.push(<TemplateRenderer templateId={this.state.gstTemplateSettings.selectedTemplate} content={aPrintData}/>);
-                                });
-                                return invoiceTemplates;
-                            })()}
-                        </div>
-                    </CommonModal>
-                </Row>
+            <Container className={`cust-inv-container ${this.state.currentScreen==2?'full-screen':''}`}>
+                <GsScreen showScreen={this.state.currentScreen==1?true:false} isMainScreen={true}>
+                    <Row>
+                        <Col xs={3} md={3}>
+                            <DateRangePicker 
+                                className = 'stock-sold-out-itens-date-filter'
+                                selectDateRange={this.filterCallbacks.date}
+                                startDate={this.state.filters.date.startDate}
+                                endDate={this.state.filters.date.endDate}
+                                showIcon= {false}
+                            />
+                        </Col>
+                        <Col xs={4}>
+                            <ReactPaginate previousLabel={"<"}
+                                nextLabel={">"}
+                                breakLabel={"..."}
+                                breakClassName={"break-me"}
+                                pageCount={this.getPageCount()}
+                                marginPagesDisplayed={2}
+                                pageRangeDisplayed={5}
+                                onPageChange={this.handlePageClick}
+                                containerClassName={"gs-pagination pagination"}
+                                subContainerClassName={"pages pagination"}
+                                activeClassName={"active"}
+                                forcePage={this.state.selectedPageIndex} />
+                        </Col>
+                        <Col xs={4} style={{textAlign: 'right'}}>
+                            <span className="no-of-items">No. Of Invoices: {this.state.totals.invoices}</span>
+                        </Col>
+                    </Row>
+                    <Row>
+                        <Col xs={12}>
+                            <GSTable 
+                                columns={this.state.columns}
+                                rowData={this.state.customerInvoiceList}
+                            />
+                        </Col>
+                    </Row>
+                    <Row>
+                        <CommonModal modalOpen={this.state.previewVisibility} handleClose={this.handlePreviewClose} secClass="jewellery-bill-template-preview-modal">
+                            <ReactToPrint
+                                ref={(domElm) => {this.printBtn = domElm}}
+                                trigger={() => <a href="#"></a>}
+                                content={() => this.componentRef}
+                                className="print-hidden-btn"
+                            />
+                            <input type="button" className="gs-button" value="Print" onClick={this.onClickPrint} />
+                            <div ref={(el) => (this.componentRef = el)}>
+                                {(() => {
+                                    let invoiceTemplates = [];
+                                    _.each(this.state.printContents, (aPrintData, index) => {
+                                        if(index && index%2 == 0)
+                                            invoiceTemplates.push(<br></br>);
+                                        invoiceTemplates.push(<TemplateRenderer templateId={this.state.gstTemplateSettings.selectedTemplate} content={aPrintData}/>);
+                                    });
+                                    return invoiceTemplates;
+                                })()}
+                            </div>
+                        </CommonModal>
+                    </Row>
+                </GsScreen>
+                <GsScreen showScreen={this.state.currentScreen==2?true:false} goBack={this.goToInvoiceListScreen} secClass={'edit-invoice-screen-sec-class'}>
+                    <SellItemEditMode data={this.state.invoiceDataForUpdate}/>
+                </GsScreen>
             </Container>
         )
     }

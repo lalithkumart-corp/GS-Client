@@ -5,9 +5,10 @@ let axiosMiddleware = {
     get: (urlPath, configs) => {
         return new Promise( (resolve, reject) => {
             try {
-                // configs = configs || {};
-                // configs.headers = configs.headers || {};
-                // configs.headers.authorization = accessToken;
+                let accessToken = getAccessToken();
+                configs = configs || {};
+                configs.headers = configs.headers || {};
+                configs.headers.authorization = accessToken;
 
                 axios.get(urlPath, configs)
                 .then(

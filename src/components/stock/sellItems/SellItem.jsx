@@ -127,7 +127,11 @@ class SellItem extends Component {
         this.onClickDateLiveLabel = this.onClickDateLiveLabel.bind(this);
     }
     componentDidMount() {
-        this.props.getBillNoFromDB();
+        if(this.props.updateMode) {
+            
+        } else {
+            this.props.getBillNoFromDB();
+        }
         this.fetchProdIds();
     }
     componentWillReceiveProps(nextProps) {
@@ -140,6 +144,11 @@ class SellItem extends Component {
             newState = resetPageState(newState);
             this.state = newState;
             this.props.setClearEntriesFlag(false);
+        }
+        if(this.props.updateMode) {
+            let newState = {...this.state};
+            newState = {...newState, ...this.props.constructedPageDataForUpdate}; 
+            this.state = newState;
         }
     }
     async fetchProdIds() {

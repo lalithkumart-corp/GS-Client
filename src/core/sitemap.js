@@ -110,6 +110,7 @@ export const DELETE_ORN = `${config.proxy_protocol}://${config.proxy_api_host}:$
 export const UPDATE_INTEREST_RATES = `${config.proxy_protocol}://${config.proxy_api_host}:${config.proxy_api_port}/${config.restApiRoot}/Interests/update-rate-of-interest-details`;
 export const EXPORT_FULL_DB = `${config.proxy_protocol}://${config.proxy_api_host}:${config.proxy_api_port}/${config.restApiRoot}/Commons/export-db`;
 export const CREATE_NEW_CUSTOMER = `${config.proxy_protocol}://${config.proxy_api_host}:${config.proxy_api_port}/${config.restApiRoot}/Customers/create-new`;
+export const FETCH_CUSTOMER_RECORD = `${config.proxy_protocol}://${config.proxy_api_host}:${config.proxy_api_port}/${config.restApiRoot}/Customers/fetch-by-custid`;
 export const UPDATE_CUSTOMER_BY_MERGING = `${config.proxy_protocol}://${config.proxy_api_host}:${config.proxy_api_port}/${config.restApiRoot}/Customers/update-by-merging`;
 export const UPDATE_CUSTOMER_STATUS = `${config.proxy_protocol}://${config.proxy_api_host}:${config.proxy_api_port}/${config.restApiRoot}/Customers/update-status`;
 export const FETCH_ROLES_LIST = `${config.proxy_protocol}://${config.proxy_api_host}:${config.proxy_api_port}/${config.restApiRoot}/GsRoles/fetch-list`;
@@ -166,6 +167,7 @@ export const FETCH_AVL_JEWELLERY_BILL_TEMPLATES = `${config.proxy_protocol}://${
 
 export const SAVE_INVOICE_DATA = `${config.proxy_protocol}://${config.proxy_api_host}:${config.proxy_api_port}/${config.restApiRoot}/JewelleryInvoices/save-invoice`;
 export const FETCH_INVOICE_DATA = `${config.proxy_protocol}://${config.proxy_api_host}:${config.proxy_api_port}/${config.restApiRoot}/JewelleryInvoices/get-invoice-data`;
+export const FETCH_INVOICE_RECORD = `${config.proxy_protocol}://${config.proxy_api_host}:${config.proxy_api_port}/${config.restApiRoot}/JewelleryInvoices/get-invoice-record`;
 
 export const FETCH_FUND_ACCOUNTS_LIST = `${config.proxy_protocol}://${config.proxy_api_host}:${config.proxy_api_port}/${config.restApiRoot}/FundAccounts/get-list`;
 export const ADD_NEW_FUND_ACCOUNT = `${config.proxy_protocol}://${config.proxy_api_host}:${config.proxy_api_port}/${config.restApiRoot}/FundAccounts/insert-account`;
