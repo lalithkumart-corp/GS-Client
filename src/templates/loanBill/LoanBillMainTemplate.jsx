@@ -174,7 +174,7 @@ export default class LoanBillMainTemplate extends Component {
             top: '72px',
         }
 
-        let templateId = DEFAULTS.BODY_TEMPLATE_ID;;
+        let templateId = DEFAULTS.BODY_TEMPLATE_ID;
         if(this.state.settings && this.state.settings.bodyTemplate)
             templateId = this.state.settings.bodyTemplate;
 

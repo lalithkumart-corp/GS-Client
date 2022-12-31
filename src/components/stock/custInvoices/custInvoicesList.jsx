@@ -144,6 +144,7 @@ export default class JewelleryCustomerInvoicesList extends Component {
     }
     bindMethods() {
         this.handlePreviewClose = this.handlePreviewClose.bind(this);
+        this.goToInvoiceListScreen = this.goToInvoiceListScreen.bind(this);
     }
     filterCallbacks = {
         date: async (startDate, endDate) => {
