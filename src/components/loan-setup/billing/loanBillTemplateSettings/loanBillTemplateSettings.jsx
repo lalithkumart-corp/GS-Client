@@ -93,6 +93,8 @@ export default class LoanBillTemplateSettings extends Component {
                     fontSize: null
                 }
             },
+            userImageColoured: false,
+            ornImageColoured: false,
             bodyTemplateId: null,
             avlTemplates: [],
             currBillContent: {}
@@ -157,6 +159,11 @@ export default class LoanBillTemplateSettings extends Component {
         newState.fifthLine.text = headerObj.fifthLine.text;
         newState.fifthLine.styles.fontSize = headerObj.fifthLine.styles.fontSize;
 
+        let other = JSON.parse(respData.other);
+        if(Object.keys(other).length > 0) {
+            newState.userImageColoured = other.userImageColoured;
+            newState.ornImageColoured = other.ornImageColoured;
+        }
         newState.bodyTemplateId = respData.bodyTemplate;
         this.setState(newState);
     }
@@ -210,6 +217,18 @@ export default class LoanBillTemplateSettings extends Component {
         newState.fifthLine.styles[part] = val;
         this.setState(newState);
     }
+    imageColorSetting(e, identifier) {
+        let newState = {...this.state};
+        switch(identifier) {
+            case 'user':
+                newState.userImageColoured = !newState.userImageColoured;
+                break;
+            case 'orn':
+                newState.ornImageColoured = !newState.ornImageColoured;
+                break;
+        }
+        this.setState(newState);
+    }
     onChangeTemplateId(val) {
         let newState = {...this.state};
         newState.bodyTemplateId = val;
@@ -253,8 +272,12 @@ export default class LoanBillTemplateSettings extends Component {
                     fontSize: this.state.fifthLine.styles.fontSize
                 }
             }
+        };
+        let other = {
+            userImageColoured: this.state.userImageColoured,
+            ornImageColoured: this.state.ornImageColoured
         }
-        return {headerSettings: cntxt, bodyTemplateId: this.state.bodyTemplateId};
+        return {headerSettings: cntxt, other: other, bodyTemplateId: this.state.bodyTemplateId};
     }
     async updateDB() {
         try {
@@ -562,6 +585,29 @@ export default class LoanBillTemplateSettings extends Component {
                                                     value={this.state.fifthLine.styles.fontSize}
                                                     onChange={(e) => this.onChangeFifthLineStyles(e.target.value, 'fontSize')}
                                                 />
+                                            </Form.Group>
+                                        </Col>
+                                    </Row>
+                                </Col>
+                            </Row>
+                            <Row className="image-color-setting">
+                                <Col xs={12} md={12}>
+                                    <Row>
+                                        <Col xs={12} className="image-color-setting-header">
+                                            <h5 style={{textAlign: 'center'}}>Image Color Setting</h5>
+                                        </Col>
+                                    </Row>
+                                    <Row>
+                                        <Col xs={8} md={8}>
+                                            <Form.Group>
+                                                <Form.Check id='' type='checkbox' checked={this.state.userImageColoured} value="" label='User Image - Coloured' onChange={(e)=>this.imageColorSetting(e, 'user')}/>
+                                            </Form.Group>
+                                        </Col>
+                                    </Row>
+                                    <Row>
+                                        <Col xs={8} md={8}>
+                                            <Form.Group>
+                                                <Form.Check id='' type='checkbox' checked={this.state.ornImageColoured} value="" label='Orn Image - Coloured' onChange={(e)=>this.imageColorSetting(e, 'orn')}/>
                                             </Form.Group>
                                         </Col>
                                     </Row>

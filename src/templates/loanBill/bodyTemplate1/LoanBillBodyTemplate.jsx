@@ -164,14 +164,19 @@ export default class LoanBillBodyTemplate extends Component {
 
     getImageSection(id) {
         let dom = [];
+        let clsName = "img-grayscale";
         switch(id) {
             case 'user':
+                if(this.state.settings.other && this.state.settings.other.userImageColoured) // check in localstorage under key "loanBillTemplate -> other"
+                    clsName = "";
                 if(this.state.billContent.userPicture && this.state.billContent.userPicture.url)
-                    dom.push(<Row><img className="img-grayscale-lalith-disabled-gray-making-color" src={this.state.billContent.userPicture.url}/></Row>);
+                    dom.push(<Row><img className={clsName} src={this.state.billContent.userPicture.url}/></Row>);
                 break;
             case 'orn':
+                if(this.state.settings.other && this.state.settings.other.ornImageColoured) // check in localstorage under key "loanBillTemplate -> other"
+                    clsName = "";
                 if(this.state.billContent.ornPicture && this.state.billContent.ornPicture.url)
-                    dom.push(<Row><img className="img-grayscale-lalith-disabled-gray-making-color" src={this.state.billContent.ornPicture.url}/></Row>);
+                    dom.push(<Row><img className={clsName} src={this.state.billContent.ornPicture.url}/></Row>);
                 break;
         }
         return dom;

@@ -52,6 +52,8 @@ export default class LoanBillMainTemplate extends Component {
         if(data) {
             if(data.header)
                 data.header = JSON.parse(data.header);
+            if(data.other)
+                data.other = JSON.parse(data.other);
         }
         newState.settings = data;
         this.setState(newState);
