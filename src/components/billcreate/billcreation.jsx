@@ -23,9 +23,9 @@ import sh from 'shorthash';
 import EditDetailsDialog from './editDetailsDialog';
 import { insertNewBill, updateBill, updateClearEntriesFlag, showEditDetailModal, hideEditDetailModal, getBillNoFromDB, disableReadOnlyMode, updateBillNoInStore } from '../../actions/billCreation';
 import { DoublyLinkedList } from '../../utilities/doublyLinkedList';
-import { getGaurdianNameList, getAddressList, getPlaceList, getCityList, getPincodeList, getMobileList, buildRequestParams, buildRequestParamsForUpdate, updateBillNumber, resetState, defaultPictureState, defaultOrnPictureState, validateFormValues, fetchCustomerMetaData, fetchOrnList } from './helper';
+import { getGaurdianNameList, getAddressList, getPlaceList, getCityList, getPincodeList, getMobileList, buildRequestParams, buildRequestParamsForUpdate, updateBillNumber, resetState, defaultPictureState, defaultOrnPictureState, validateFormValues, fetchCustomerMetaData, fetchOrnList, addDays } from './helper';
 // import { getAccessToken } from '../../core/storage';
-import { getDateInUTC, currencyFormatter, getInterestRate, convertToLocalTime } from '../../utilities/utility';
+import { getDateInUTC, currencyFormatter, getInterestRate, convertToLocalTime, convertDateObjToStr } from '../../utilities/utility';
 import { getRateOfInterest } from '../redeem/helper';
 import Picture from '../profilePic/picture';
 import { toast } from 'react-toastify';
@@ -84,6 +84,7 @@ class BillCreation extends Component {
             showMoreInputs: false,
             openInterestInputDiv: false,
             openPaymentInputDiv: false,
+            openMiscInputCompDiv: false,
             formData: {
                 date: {
                     inputVal: new Date(),
@@ -91,6 +92,12 @@ class BillCreation extends Component {
                     _inputVal: new Date().toISOString(),
                     isLive: true,
                 },
+                expiryDayLimit: 366,
+                expiryDate: addDays(new Date(), 366),
+                // expiryDate: {
+                //     inputVal: addDays(new Date(), 366),
+                //     _inputVal: addDays(new Date(), 366).toISOString(),
+                // },
                 billseries: {
                     inputVal: props.billCreation.billSeries,
                     hasError: false 
@@ -1096,6 +1103,10 @@ class BillCreation extends Component {
         this.setState({openPaymentInputDiv: !this.state.openPaymentInputDiv});
     }
 
+    toggleMiscInputsDom() {
+        this.setState({openMiscInputCompDiv: !this.state.openMiscInputCompDiv});
+    }
+
     async insertItemIntoMoreBucket() {        
         let newState = {...this.state};
         let obj = {
@@ -1177,6 +1188,8 @@ class BillCreation extends Component {
                 this.toggleInterestDom();
             } else if(options.currElmKey == 'paymentCollapsibleDiv') {
                 this.togglePaymentDom();
+            } else if(options.currElmKey == 'miscInputsCollapsibleBody') {
+                this.toggleMiscInputsDom();
             }
         }
     }
@@ -1533,6 +1546,13 @@ class BillCreation extends Component {
                         this.transferFocus(e, options.currElmKey, options.traverseDirection);
                     }, 300);
                     setLoanDate(val); // set in localstorage
+                    break;
+                case 'expiryDayLimit':
+                    newState.formData.expiryDayLimit = val;
+                    let dateVal = newState.formData.date.inputVal;
+                    if(newState.formData.date.isLive)
+                        dateVal = new Date();
+                    newState.formData.expiryDate = addDays(dateVal, parseInt(val));
                     break;
                 case 'billRemarks':
                     newState.formData.moreDetails.billRemarks = val;
@@ -2444,6 +2464,37 @@ class BillCreation extends Component {
                                         </div>
                                     </div>
 
+                                </Collapse>
+                            </div>
+                        </Col>
+                        <Col xs={4}>
+                            <div className="misc-inputs-component">
+                                <div className="misc-inputs-component-header">
+                                    <div
+                                        className='misc-inputs-component-collapsipla-span'
+                                        ref= {(domElm) => {this.domElmns.miscInputsCollapsibleBody = domElm; }}
+                                        onClick={(e) => {this.handleClick(e, {currElmKey: 'miscInputsCollapsibleBody'})}}
+                                    >
+                                        <span> More... </span>
+                                    </div>
+                                </div>
+                                <Collapse isOpened={this.state.openMiscInputCompDiv} className="misc-inputs-component-body">
+                                    <div className="misc-inputs-component-body-content">
+                                        <Row>
+                                            <Col xs={7}>
+                                                Expiry days: 
+                                            </Col>
+                                            <Col xs={5} style={{padding: '0 4px'}}>
+                                                <input type='number' className='gs-input-cell compact bordered' 
+                                                    value={this.state.formData.expiryDayLimit}
+                                                    onChange={(e) => this.inputControls.onChange(e, e.target.value, 'expiryDayLimit')}
+                                                />
+                                            </Col>
+                                            <Col xs={12}>
+                                                {convertDateObjToStr(this.state.formData.expiryDate, {excludeTime: true})}
+                                            </Col>
+                                        </Row>
+                                    </div>
                                 </Collapse>
                             </div>
                         </Col>

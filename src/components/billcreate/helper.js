@@ -66,10 +66,14 @@ export const buildRequestParams = (thatState = {}) => {
     let state = {...thatState}; //for preventing reference issue  
     state.selectedCustomer = state.selectedCustomer || {};  
     let dateVal = state.formData.date._inputVal;
-    if(state.formData.date.isLive) dateVal = new Date().toISOString();
+    let expiryDateVal = addDays(dateVal, state.formData.expiryDayLimit).toISOString();
+    if(state.formData.date.isLive) { 
+        dateVal = new Date().toISOString();
+        expiryDateVal = addDays(new Date(), state.formData.expiryDayLimit).toISOString();
+    }
     let params = {
         date: dateVal.replace('T', ' ').slice(0,23),
-        expiryDate: addDays(state.formData.date._inputVal, 366).toISOString().replace('T', ' ').slice(0,23),
+        expiryDate: expiryDateVal.replace('T', ' ').slice(0,23), // addDays(dateVal, 366).toISOString().replace('T', ' ').slice(0,23),
         billSeries: state.formData.billseries.inputVal,
         billNo: state.formData.billno.inputVal, //_getBillNo(thatState),
         amount: state.formData.amount.inputVal || 0,
@@ -98,14 +102,18 @@ export const buildRequestParams = (thatState = {}) => {
     return params;
 }
 
-export const buildRequestParamsForUpdate = (thatState = {}) => {    
+export const buildRequestParamsForUpdate = (thatState = {}) => {
     let state = {...thatState}; //for preventing reference issue
     state.selectedCustomer = state.selectedCustomer || {};
     let dateVal = state.formData.date._inputVal;
-    if(state.formData.date.isLive) dateVal = new Date().toISOString();
+    let expiryDateVal = addDays(dateVal, state.formData.expiryDayLimit).toISOString();
+    if(state.formData.date.isLive) {
+        dateVal = new Date().toISOString();
+        expiryDateVal = addDays(new Date(), state.formData.expiryDayLimit).toISOString();
+    }
     let params = {
         date: dateVal.replace('T', ' ').slice(0,23),
-        expiryDate: addDays(state.formData.date._inputVal, 366).toISOString().replace('T', ' ').slice(0,23),
+        expiryDate: expiryDateVal.replace('T', ' ').slice(0,23),// addDays(dateVal, 366).toISOString().replace('T', ' ').slice(0,23),
         billSeries: state.formData.billseries.inputVal,
         billNo: state.formData.billno.inputVal, //_getBillNo(thatState),     
         amount: state.formData.amount.inputVal || 0,
@@ -295,7 +303,11 @@ export const resetState = (nextProps, newState) => {
             anItem.other = 0;
             anItem.autoFetch = true;
         } else if(index == 'paymentMode') {
-            anItem = 'cash';
+            newState.formData[index] = 'cash';
+        } else if (index == 'expiryDayLimit') {
+            newState.formData[index] = 366;
+        } else if (index == 'expiryDate') {
+            newState.formData[index] = addDays(new Date(), 366);
         } else {
             if(index !== 'date' && index !== 'billseries') {
                 anItem.hasError = false;
@@ -424,8 +436,8 @@ export const fetchOrnList = () => {
     })
 }
 
-const addDays = (dateVal, days) => {
+export const addDays = (dateVal, days) => {
     let y = new Date(dateVal);
-    y.setDate(y.getDate() + days);
+    y.setDate(y.getDate() + parseInt(days));
     return y;
 }
