@@ -41,6 +41,7 @@ import { getLoanDate, getLoanDateBehaviour, setLoanDate, setLoanDateBehaviour } 
 import { fetchMyAccountsList, fetchAllBanksList } from '../../utilities/apiUtils';
 import { format } from 'currency-formatter';
 import { PAYMENT_MODE } from '../../constants';
+import { LOAN_BILL_EXPIRY_DAYS } from '../../constants';
 
 const ENTER_KEY = 13;
 const SPACE_KEY = 32;
@@ -92,12 +93,8 @@ class BillCreation extends Component {
                     _inputVal: new Date().toISOString(),
                     isLive: true,
                 },
-                expiryDayLimit: 366,
-                expiryDate: addDays(new Date(), 366),
-                // expiryDate: {
-                //     inputVal: addDays(new Date(), 366),
-                //     _inputVal: addDays(new Date(), 366).toISOString(),
-                // },
+                expiryDayLimit: LOAN_BILL_EXPIRY_DAYS,
+                expiryDate: addDays(new Date(), LOAN_BILL_EXPIRY_DAYS),
                 billseries: {
                     inputVal: props.billCreation.billSeries,
                     hasError: false 
@@ -594,7 +591,19 @@ class BillCreation extends Component {
                 ifscCode: data.fundTransaction_cash_out_to_bank_ifsc
             }
         }
+        newState.formData.expiryDayLimit = this.getDateDiff(data.Date, data.ExpiryDate);
         this.setState(newState);
+    }
+    getDateDiff(date1, date2) {
+        let defaultReturnVal = 0;
+        if(date1 && date2) {
+            date1 = date1.replace('T', ' ').slice(0,23);
+            date2 = date2.replace('T', ' ').slice(0,23);
+            return moment(date2).diff(date1, 'days');
+        } else {
+            return defaultReturnVal;
+        }
+        
     }
     async setInterestRates() {
         let rates = await getInterestRate();

@@ -8,6 +8,7 @@ import './LoanBillBodyTemplate.css';
 import { formatNumberLength, currencyFormatter } from '../../../utilities/utility';
 import { FaRegHandPointRight } from 'react-icons/fa';
 import nosWordMap from '../../numberWordMap.json'; 
+import { LOAN_BILL_EXPIRY_YEAR_DAY, LOAN_BILL_EXPIRY_YR } from '../../../constants';
 export default class LoanBillBodyTemplate extends Component {
     constructor(props) {
         super(props);
@@ -47,18 +48,47 @@ export default class LoanBillBodyTemplate extends Component {
         )
     }
 
-    getDate() {
+    getDate(options) {
         let date = ''
-        if(this.state.billContent.date)
-            date = moment(this.state.billContent.date).format('DD-MM-YYYY');
+        if(this.state.billContent.date) {
+            if(options && options.asMomentObj)
+                date = moment(this.state.billContent.date);
+            else
+                date = moment(this.state.billContent.date).format('DD-MM-YYYY');
+        }
         return date;
     }
 
-    getExpiryDate() {
+    getExpiryDate(options) {
         let date = '';
-        if(this.state.billContent.expiryDate)
-            date = moment(this.state.billContent.expiryDate).format('DD-MM-YYYY');
+        if(this.state.billContent.expiryDate) {
+            if(options && options.asMomentObj)
+                date = moment(this.state.billContent.expiryDate);
+            else
+                date = moment(this.state.billContent.expiryDate).format('DD-MM-YYYY');
+        }
         return date;
+    }
+
+    getExpiryDays() {
+        let days = 0;
+        let loanDate = this.getDate({asMomentObj: true});
+        let expireDate = this.getExpiryDate({asMomentObj: true});
+        if(loanDate && expireDate)
+            days = expireDate.diff(loanDate, 'days');
+        return days;
+    }
+
+    getDiffInYearMonthDate(loanDate, expireDate) {
+        var years = expireDate.diff(loanDate, 'year');
+        loanDate.add(years, 'years');
+
+        var mons = expireDate.diff(loanDate, 'months');
+        loanDate.add(mons, 'months');
+
+        var days = expireDate.diff(loanDate, 'days');
+
+        return {years, mons, days};
     }
 
     getBillNo() {
@@ -385,10 +415,27 @@ export default class LoanBillBodyTemplate extends Component {
     }
 
     getLastRow() {
+        let txt = '';
+        let loanDate = this.getDate({asMomentObj: true});
+        let expireDate = this.getExpiryDate({asMomentObj: true});
+        let {days, mons, years } = {days: LOAN_BILL_EXPIRY_YEAR_DAY, mons: 0, years: LOAN_BILL_EXPIRY_YR};
+        if(loanDate && expireDate) {
+            let obj = this.getDiffInYearMonthDate(loanDate, expireDate);
+            days = obj.days;
+            mons = obj.mons;
+            years = obj.years;
+        }
+        if(years)
+            txt += ` ${years} வருடம்`;
+        if(mons)
+            txt += ` ${mons} மாதம்`;
+        if(days)
+            txt += ` ${days} நாட்கள்`;
+        
         return (
             <Row className="bill-footer-text">
                 <Col xs={12} md={12} style={{textAlign: 'center', paddingTop: '10px', paddingBottom: '7px'}}>
-                    <span className="last-row-tamil-text red-color-imp">அடகு பொருட்களுக்கு கடைசி தவணை 1 வருடம் 7 நாட்கள் மட்டுமே</span>
+                    <span className="last-row-tamil-text red-color-imp">அடகு பொருட்களுக்கு கடைசி தவணை{txt} மட்டுமே</span>
                 </Col>
             </Row>
         )

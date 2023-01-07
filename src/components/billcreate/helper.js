@@ -2,6 +2,7 @@ import _ from 'lodash';
 import { PLEDGEBOOK_METADATA, ORNAMENT_LIST, FETCH_CUSTOMERS_BASIC_LIST } from '../../core/sitemap';
 import { getAccessToken } from '../../core/storage';
 import axiosMiddleware from '../../core/axios';
+import { LOAN_BILL_EXPIRY_DAYS } from '../../constants';
 
 export const defaultPictureState = {
     holder: {
@@ -73,7 +74,7 @@ export const buildRequestParams = (thatState = {}) => {
     }
     let params = {
         date: dateVal.replace('T', ' ').slice(0,23),
-        expiryDate: expiryDateVal.replace('T', ' ').slice(0,23), // addDays(dateVal, 366).toISOString().replace('T', ' ').slice(0,23),
+        expiryDate: expiryDateVal.replace('T', ' ').slice(0,23), // addDays(dateVal, LOAN_BILL_EXPIRY_DAYS).toISOString().replace('T', ' ').slice(0,23),
         billSeries: state.formData.billseries.inputVal,
         billNo: state.formData.billno.inputVal, //_getBillNo(thatState),
         amount: state.formData.amount.inputVal || 0,
@@ -113,7 +114,7 @@ export const buildRequestParamsForUpdate = (thatState = {}) => {
     }
     let params = {
         date: dateVal.replace('T', ' ').slice(0,23),
-        expiryDate: expiryDateVal.replace('T', ' ').slice(0,23),// addDays(dateVal, 366).toISOString().replace('T', ' ').slice(0,23),
+        expiryDate: expiryDateVal.replace('T', ' ').slice(0,23),// addDays(dateVal, LOAN_BILL_EXPIRY_DAYS).toISOString().replace('T', ' ').slice(0,23),
         billSeries: state.formData.billseries.inputVal,
         billNo: state.formData.billno.inputVal, //_getBillNo(thatState),     
         amount: state.formData.amount.inputVal || 0,
@@ -305,9 +306,9 @@ export const resetState = (nextProps, newState) => {
         } else if(index == 'paymentMode') {
             newState.formData[index] = 'cash';
         } else if (index == 'expiryDayLimit') {
-            newState.formData[index] = 366;
+            newState.formData[index] = LOAN_BILL_EXPIRY_DAYS;
         } else if (index == 'expiryDate') {
-            newState.formData[index] = addDays(new Date(), 366);
+            newState.formData[index] = addDays(new Date(), LOAN_BILL_EXPIRY_DAYS);
         } else {
             if(index !== 'date' && index !== 'billseries') {
                 anItem.hasError = false;

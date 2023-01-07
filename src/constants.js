@@ -20,3 +20,8 @@ export const TAGS = {
     6: 'tick',
     7: 'doubletick'
 }
+
+export const ONE_YEAR_DAYS = 365;
+export const LOAN_BILL_EXPIRY_DAYS = ONE_YEAR_DAYS + 7; // 1 year + 7 days
+export const LOAN_BILL_EXPIRY_YR = 1;
+export const LOAN_BILL_EXPIRY_YEAR_DAY = 7;
