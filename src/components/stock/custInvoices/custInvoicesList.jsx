@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { Container, Row, Col } from 'react-bootstrap';
 import axiosMiddleware from '../../../core/axios';
-import { FETCH_JWL_CUST_INVOICES_LIST, FETCH_JWL_CUST_INVOICES_LIST_COUNT, FETCH_INVOICE_DATA } from '../../../core/sitemap';
+import { FETCH_JWL_CUST_INVOICES_LIST, FETCH_JWL_CUST_INVOICES_LIST_COUNT, FETCH_INVOICE_DATA, DELETE_JWL_INVOICE } from '../../../core/sitemap';
 import { getAccessToken, getJewelleryCustInvoicesPageFilters, setJewelleryCustInvoicesPageFilters, getJewelleryGstBillTemplateSettings } from '../../../core/storage';
 import { getFilterParams, getDataFromStorageRespObj } from './helper';
 import DateRangePicker from '../../dateRangePicker/dataRangePicker';
@@ -16,6 +16,7 @@ import ReactPaginate from 'react-paginate';
 import { GsScreen } from '../../gs-screen/GsScreen';
 import SellItemEditMode from '../sellItems/SellItemEditMode';
 import './custInvoicesList.scss';
+import { toast } from 'react-toastify';
 export default class JewelleryCustomerInvoicesList extends Component {
     constructor(props) {
         super(props);
@@ -118,11 +119,20 @@ export default class JewelleryCustomerInvoicesList extends Component {
                     formatter: (column, columnIndex, row, rowIndex) => {
                         return (
                             <span className='actions-cell'>
-                                <Tooltip title="Invoice"
-                                        position="top"
-                                        trigger="mouseenter">
-                                    <span className="invoice-btn gs-icon"><FontAwesomeIcon icon={['fas', 'file-pdf']} onClick={(e) => this.onInvoiceClick(e, row)}/></span>
-                                </Tooltip>
+                                <span>
+                                    <Tooltip title="Invoice"
+                                            position="top"
+                                            trigger="mouseenter">
+                                        <span className="invoice-btn gs-icon"><FontAwesomeIcon icon={['fas', 'file-pdf']} onClick={(e) => this.onInvoiceClick(e, row)}/></span>
+                                    </Tooltip>
+                                </span>
+                                <span style={{marginLeft: '10px'}}>
+                                    <Tooltip title="Delete Invoice"
+                                            position='top'
+                                            trigger='mouseenter'>
+                                        <span className="invoice-btn gs-icon"><FontAwesomeIcon icon='trash' onClick={(e)=> this.onDeleteInvoiceClick(e, row)}/></span>
+                                    </Tooltip>
+                                </span>
                             </span>
                         )
                     },
@@ -219,6 +229,24 @@ export default class JewelleryCustomerInvoicesList extends Component {
     onInvoiceClick(e, row) {
         e.stopPropagation();
         this.fetchInvoiceData([row.invoiceRef]);
+    }
+
+    async onDeleteInvoiceClick(e, row) {
+        try {
+            e.stopPropagation();
+            if(confirm("Are you sure to delete this invoice ?")) {
+                let res = await axiosMiddleware.delete(DELETE_JWL_INVOICE, {data: {invoiceRef: row.invoiceRef}});
+                if(res && res.data && res.data.STATUS == 'SUCCESS') {
+                    toast.success('Deleted specific invoice successfully');
+                    this.refresh();
+                } else {
+                    toast.error(res.data.MSG || "Some Error occured while deleting the invoice details in server");
+                }
+            }
+        } catch(e) {
+            console.log(e);
+            toast.error('Some error occured');
+        }
     }
 
     async fetchInvoiceData(invoicesRefArr) {
