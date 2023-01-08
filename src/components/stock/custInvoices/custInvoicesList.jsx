@@ -155,6 +155,7 @@ export default class JewelleryCustomerInvoicesList extends Component {
     bindMethods() {
         this.handlePreviewClose = this.handlePreviewClose.bind(this);
         this.goToInvoiceListScreen = this.goToInvoiceListScreen.bind(this);
+        this.onClickPrint = this.onClickPrint.bind(this);
     }
     filterCallbacks = {
         date: async (startDate, endDate) => {
@@ -299,6 +300,10 @@ export default class JewelleryCustomerInvoicesList extends Component {
 
     goToInvoiceListScreen() {
         this.setState({currentScreen: 1, invoiceDataForUpdate: null}); // isEditDialogOpen: false
+    }
+
+    onClickPrint() {
+        this.printBtn.handlePrint();
     }
 
     render() {

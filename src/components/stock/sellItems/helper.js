@@ -5,6 +5,7 @@ export let defaultExchangeItemFormData = {
     exGrossWt: "",
     exNetWt: "",
     exWastage: "",
+    exWastageVal: "",
     exOldRate: "",
     exPrice: ""
 }
@@ -42,6 +43,7 @@ export const calcPurchaseTotals = (billPreviewList) => {
         grossWt: 0,
         netWt: 0,
         wastage: 0,
+        wastageVal: 0,
         labour: 0,
         priceOfOrn: 0, // price without tax, without discount (only with Wastage, labour)
         cgstPercent: 0,
@@ -54,11 +56,10 @@ export const calcPurchaseTotals = (billPreviewList) => {
         let wastagePercentAvg = calcualteAvgWastagePercent(billPreviewList);
         let cgstPercentAvg = calculateAvgCgstPercent(billPreviewList);
         let sgstPercentAvg = calculateAvgSgstPercent(billPreviewList);
-
         totals.qty += anItem.formData.qty;
-        totals.grossWt = formatNo(totals.grossWt + anItem.formData.grossWt, 3);
-        totals.netWt = formatNo(totals.netWt + anItem.formData.netWt, 3);
-        totals.wastageVal = formatNo(totals.wastageVal + anItem.formData.wastageVal, 3);
+        totals.grossWt = totals.grossWt + anItem.formData.grossWt;
+        totals.netWt = totals.netWt + anItem.formData.netWt;
+        totals.wastageVal = totals.wastageVal + anItem.formData.wastageVal;
         totals.wastage = wastagePercentAvg;
         totals.cgstPercent = cgstPercentAvg;
         totals.sgstPercent = sgstPercentAvg;
@@ -130,7 +131,7 @@ export const calculatePaymentFormData = (stateObj) => {
         paymentFormData.totalPurchasePrice = stateObj.purchaseTotals.price;
     if(typeof stateObj.exchangeItemsTotals.price !== "undefined")
         paymentFormData.totalExchangePrice = stateObj.exchangeItemsTotals.price;
-    
+
     paymentFormData.sum = paymentFormData.totalPurchasePrice - paymentFormData.totalExchangePrice;
 
     // Rounding off logic
@@ -195,7 +196,7 @@ export const validate = (stateObj, propObj) => {
                 msg.push(`Check the Qty of item: ${index}.`);
             }
         });
-        if(stateObj.paymentFormData.paid > stateObj.paymentFormData.sum) {
+        if(stateObj.paymentFormData.paid > formatNo(stateObj.paymentFormData.sum,2)) {
             flag = false;
             msg.push('Paid amount is greater than the actual Total amount.');
         }

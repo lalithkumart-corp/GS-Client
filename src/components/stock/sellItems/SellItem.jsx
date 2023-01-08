@@ -811,7 +811,7 @@ class SellItem extends Component {
         )
     }
     getSellingInputControls() {
-        let formData = {qty: "", grossWt: "", netWt:"", wastage: "", labour: "", cgstPercent: "", sgstPercent: "", discount: "", price: ""};
+        let formData = {qty: "", grossWt: "", netWt:"", wastage: "", wastageVal: "", labour: "", cgstPercent: "", sgstPercent: "", discount: "", price: ""};
         if(this.state.currSelectedItem && Object.keys(this.state.currSelectedItem) !== 0 && this.state.currSelectedItem.formData) {
             formData.qty = this.state.currSelectedItem.formData.qty || null;
             formData.grossWt = this.state.currSelectedItem.formData.grossWt || null;
@@ -846,7 +846,7 @@ class SellItem extends Component {
                                     <th>G-Wt</th>
                                     <th>N-Wt</th>
                                     <th>Wst(%)</th>
-                                    <th>Wst</th>
+                                    <th>Wst(Gm)</th>
                                     <th>Labour</th>
                                     <th>CGST%</th>
                                     <th>SGST%</th>
@@ -979,14 +979,15 @@ class SellItem extends Component {
                         <td>{++iteration}</td>
                         <td>{anItem.prod_id}</td>
                         <td>{anItem.formData.qty}</td>
-                        <td>{anItem.formData.grossWt}</td>
-                        <td>{anItem.formData.netWt}</td>
-                        <td>{anItem.formData.wastage}</td>
-                        <td>{anItem.formData.labour}</td>
-                        <td>{anItem.formData.cgstPercent}</td>
-                        <td>{anItem.formData.sgstPercent}</td>
-                        <td>{anItem.formData.discount}</td>
-                        <td>{anItem.formData.price}</td>
+                        <td>{formatNo(anItem.formData.grossWt,3)}</td>
+                        <td>{formatNo(anItem.formData.netWt,3)}</td>
+                        <td>{formatNo(anItem.formData.wastage,2)}</td>
+                        <td>{formatNo(anItem.formData.wastageVal,3)}</td>
+                        <td>{formatNo(anItem.formData.labour,2)}</td>
+                        <td>{formatNo(anItem.formData.cgstPercent,2)}</td>
+                        <td>{formatNo(anItem.formData.sgstPercent,2)}</td>
+                        <td>{formatNo(anItem.formData.discount,2)}</td>
+                        <td>{formatNo(anItem.formData.price,2)}</td>
                         <td>
                             <span onClick={(e) => this.deleteItemFromPurchaseItemPreview(anItem.prod_id)}><FontAwesomeIcon icon="backspace"/></span>
                             <span onClick={(e) => this.enableEditView(index)} style={{paddingLeft: '10px'}}><FontAwesomeIcon icon="edit"/></span>                             
@@ -1065,6 +1066,7 @@ class SellItem extends Component {
                         <col style={{width: "5%"}}></col>
                         <col style={{width: "5%"}}></col>
                         <col style={{width: "5%"}}></col>
+                        <col style={{width: "5%"}}></col>
                         <col style={{width: "10%"}}></col>
                         <col style={{width: "10%"}}></col>
                         <col style={{width: "5%"}}></col>
@@ -1076,7 +1078,8 @@ class SellItem extends Component {
                             <td>Qty</td>
                             <td>G-Wt</td>
                             <td>N-Wt</td>
-                            <td>Wastage</td>
+                            <td>Wst(%)</td>
+                            <td>Wst(Gm)</td>
                             <td>Labour</td>
                             <td>CGST</td>
                             <td>SGST</td>
@@ -1091,10 +1094,11 @@ class SellItem extends Component {
                             <td>Total</td>
                             <td></td>
                             <td>{this.state.purchaseTotals.qty}</td>
-                            <td>{this.state.purchaseTotals.grossWt}</td>
-                            <td>{this.state.purchaseTotals.netWt}</td>
-                            <td>{this.state.purchaseTotals.wastage}</td>
-                            <td>{this.state.purchaseTotals.labour}</td>
+                            <td>{formatNo(this.state.purchaseTotals.grossWt,3)}</td>
+                            <td>{formatNo(this.state.purchaseTotals.netWt,3)}</td>
+                            <td>{formatNo(this.state.purchaseTotals.wastage,2)}</td>
+                            <td>{formatNo(this.state.purchaseTotals.wastageVal,3)}</td>
+                            <td>{formatNo(this.state.purchaseTotals.labour,2)}</td>
                             <td></td>
                             <td></td>
                             <td>{this.state.purchaseTotals.discount}</td>
@@ -1168,7 +1172,7 @@ class SellItem extends Component {
                                 <th>G-wt</th>
                                 <th>N-wt</th>
                                 <th>Wastage(%)</th>
-                                <th>Wastage</th>
+                                <th>Wastage(Gm)</th>
                                 <th>OldRate</th>
                                 <th>Price</th>
                             </tr>
@@ -1200,12 +1204,12 @@ class SellItem extends Component {
                                             ref= {(domElm) => {this.domElmns[EX_NET_WT] = domElm; }}/>
                                 </td>
                                 <td>
-                                    <input type="number" className="gs-input" value={this.state.exchangeItemFormData[EX_WASTAGE]} onChange={(e)=>this.onInputValChange(e, EX_WASTAGE)} 
+                                    <input type="number" className="gs-input" value={formatNo(this.state.exchangeItemFormData[EX_WASTAGE],2) || null} onChange={(e)=>this.onInputValChange(e, EX_WASTAGE)} 
                                             onKeyUp = {(e) => this.onKeyUp(e, {currElmKey: EX_WASTAGE})}
                                             ref= {(domElm) => {this.domElmns[EX_WASTAGE] = domElm; }}/>
                                 </td>
                                 <td>
-                                    <input type="number" className="gs-input" value={this.state.exchangeItemFormData[EX_WASTAGE_VAL]} onChange={(e)=>this.onInputValChange(e, EX_WASTAGE_VAL)} 
+                                    <input type="number" className="gs-input" value={formatNo(this.state.exchangeItemFormData[EX_WASTAGE_VAL],3) || null} onChange={(e)=>this.onInputValChange(e, EX_WASTAGE_VAL)} 
                                             onKeyUp = {(e) => this.onKeyUp(e, {currElmKey: EX_WASTAGE_VAL})}
                                             ref= {(domElm) => {this.domElmns[EX_WASTAGE_VAL] = domElm; }}/>
                                 </td>
@@ -1215,7 +1219,7 @@ class SellItem extends Component {
                                             ref= {(domElm) => {this.domElmns[EX_OLD_RATE] = domElm; }}/>
                                 </td>
                                 <td>
-                                    <input type="number" className="gs-input" value={this.state.exchangeItemFormData[EX_PRICE]} onChange={(e)=>this.onInputValChange(e, EX_PRICE)} 
+                                    <input type="number" className="gs-input" value={formatNo(this.state.exchangeItemFormData[EX_PRICE],2)} onChange={(e)=>this.onInputValChange(e, EX_PRICE)} 
                                             onKeyUp = {(e) => this.onKeyUp(e, {currElmKey: EX_PRICE})}
                                             ref= {(domElm) => {this.domElmns[EX_PRICE] = domElm; }}/>
                                 </td>
@@ -1278,11 +1282,12 @@ class SellItem extends Component {
             rows.push(
                 <tr>
                     <td>{anItem.metal}</td>
-                    <td>{anItem.grossWt}</td>
-                    <td>{anItem.netWt}</td>
-                    <td>{anItem.wastage}</td>
+                    <td>{formatNo(anItem.grossWt,3)}</td>
+                    <td>{formatNo(anItem.netWt,3)}</td>
+                    <td>{formatNo(anItem.wastage,2)}</td>
+                    <td>{formatNo(anItem.wastageVal,2)}</td>
                     <td>{anItem.oldRate}</td>
-                    <td>{anItem.price}</td>
+                    <td>{formatNo(anItem.price,2)}</td>
                 </tr>
             )
         });
@@ -1306,6 +1311,7 @@ class SellItem extends Component {
                     <td>{this.state.exchangeItemsTotals.netWt}</td>
                     <td></td>
                     <td></td>
+                    <td></td>
                     <td>{this.state.exchangeItemsTotals.price}</td>
                 </tr>
             )
@@ -1318,6 +1324,7 @@ class SellItem extends Component {
                             <col style={{width: "5%"}}></col>
                             <col style={{width: "5%"}}></col>
                             <col style={{width: "5%"}}></col>
+                            <col style={{width: "5%"}}></col>
                             <col style={{width: "7%"}}></col>
                             <col style={{width: "10%"}}></col>
                         </colgroup>
@@ -1326,7 +1333,8 @@ class SellItem extends Component {
                                 <th>Metal</th>
                                 <th>GrossWt</th>
                                 <th>NetWt</th>
-                                <th>Wastage</th>
+                                <th>Wst(%)</th>
+                                <th>Wst(Gm)</th>
                                 <th>OldRate</th>
                                 <th>Price</th>
                             </tr>

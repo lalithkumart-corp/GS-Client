@@ -4,6 +4,7 @@ import Barcode from "react-barcode";
 import GSCheckbox from '../../../components/ui/gs-checkbox/checkbox';
 import _ from 'lodash';
 import './Template2.scss';
+import { formatNo } from '../../../utilities/utility';
 
 const DEFAULT_TEMPLATE_STRUC = {
     ornaments: [],
@@ -208,16 +209,16 @@ function GstBillTemplate2(props) {
                                 {anOrn.qty}
                             </Col>
                             <Col xs={spans.netWt} className="no-padding">
-                                {anOrn.netWt}
+                                {formatNo(anOrn.netWt,3)}
                             </Col>
                             <Col xs={spans.wastage} className="no-padding">
-                                {anOrn.wastageVal}
+                                {formatNo(anOrn.wastageVal,3)}
                             </Col>
                             <Col xs={spans.rate} className="no-padding">
-                                {anOrn.pricePerGm}
+                                {formatNo(anOrn.pricePerGm,2)}
                             </Col>
                             <Col xs={spans.makingCharge} className="no-padding">
-                                {anOrn.makingCharge}
+                                {formatNo(anOrn.makingCharge)}
                             </Col>
                             {/* <Col xs={spans.amt} className="no-padding">
                                 {anOrn.amount}
@@ -256,10 +257,10 @@ function GstBillTemplate2(props) {
                                 
                             </Col>
                             <Col xs={{span: spans.netWt}} className="no-padding">
-                                {(totalNetWt||0).toFixed(3)}
+                                {formatNo(totalNetWt||0, 3)}
                             </Col>
                             <Col xs={{span: spans.netAmt, offset: 6}} className="no-padding">
-                                ₹: {printContent.calculations.totalNetAmount}
+                                ₹: {formatNo(printContent.calculations.totalNetAmount,2)}
                             </Col>
                         </Row>
                     </Col>
@@ -290,11 +291,11 @@ function GstBillTemplate2(props) {
                                 <Col xs={3} className="no-padding">Net Amt</Col>
                             </Row>
                             <Row>
-                                <Col xs={2} className="no-padding">{printContent.oldOrnaments.grossWt}</Col>
-                                <Col xs={2} className="no-padding">{printContent.oldOrnaments.lessWt}</Col>
-                                <Col xs={2} className="no-padding">{printContent.oldOrnaments.netWt}</Col>
-                                <Col xs={3} className="no-padding">{printContent.oldOrnaments.pricePerGram}</Col>
-                                <Col xs={3} className="no-padding">{printContent.oldOrnaments.netAmount}</Col>
+                                <Col xs={2} className="no-padding">{formatNo(printContent.oldOrnaments.grossWt,3)}</Col>
+                                <Col xs={2} className="no-padding">{formatNo(printContent.oldOrnaments.lessWt,3)}</Col>
+                                <Col xs={2} className="no-padding">{formatNo(printContent.oldOrnaments.netWt,3)}</Col>
+                                <Col xs={3} className="no-padding">{formatNo(printContent.oldOrnaments.pricePerGram,2)}</Col>
+                                <Col xs={3} className="no-padding">{formatNo(printContent.oldOrnaments.netAmount,2)}</Col>
                             </Row>
                         </Col>
                     </div>
@@ -312,7 +313,7 @@ function GstBillTemplate2(props) {
                         ₹:
                     </Col>
                     <Col xs={4} className="no-padding">
-                        {printContent.calculations.totalSgstVal}
+                        {formatNo(printContent.calculations.totalSgstVal,2)}
                     </Col>
                 </Row>
                 <Row>
@@ -323,7 +324,7 @@ function GstBillTemplate2(props) {
                         ₹:
                     </Col>
                     <Col xs={4} className="no-padding">
-                        {printContent.calculations.totalCgstVal}
+                        {formatNo(printContent.calculations.totalCgstVal,2)}
                     </Col>
                 </Row>
                 {printContent.calculations.oldNetAmt ? <Row>
@@ -334,7 +335,7 @@ function GstBillTemplate2(props) {
                         ₹:
                     </Col>
                     <Col xs={{span: 4}} className="no-padding">
-                        {printContent.calculations.oldNetAmt}
+                        {formatNo(printContent.calculations.oldNetAmt,2)}
                     </Col>
                 </Row>:<></>}
                 {printContent.calculations.totalDiscount ? 
@@ -346,7 +347,7 @@ function GstBillTemplate2(props) {
                         ₹:
                     </Col>
                     <Col xs={{span: 4}} className="no-padding">
-                        {printContent.calculations.totalDiscount}
+                        {formatNo(printContent.calculations.totalDiscount,2)}
                     </Col>
                 </Row>
                 : <></>}
@@ -359,7 +360,7 @@ function GstBillTemplate2(props) {
                         ₹:
                     </Col>
                     <Col xs={{span: 4}} className="no-padding">
-                        {printContent.calculations.roundedOffVal}
+                        {formatNo(printContent.calculations.roundedOffVal,2)}
                     </Col>
                 </Row>
                 : <></>}
@@ -371,7 +372,7 @@ function GstBillTemplate2(props) {
                         ₹:
                     </Col>
                     <Col xs={4} className="no-padding">
-                        {printContent.calculations.grandTotal}
+                        {formatNo(printContent.calculations.grandTotal,2)}
                     </Col>
                 </Row>
                 {/* {printContent.payments.card && 
