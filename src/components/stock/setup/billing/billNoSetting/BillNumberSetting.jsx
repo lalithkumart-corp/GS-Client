@@ -26,7 +26,8 @@ export default function BillNoSetting({gstBillSettings}) {
     const onUpdateClick = () => {
         let apiParams = {
             billSeries: billSeries,
-            billNo: billNumber
+            billNo: billNumber,
+            category: 'gst'
         };
         triggerUpdateApi(apiParams);
     }

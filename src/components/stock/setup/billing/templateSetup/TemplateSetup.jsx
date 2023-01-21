@@ -2,7 +2,7 @@ import { useState, useRef, useEffect } from 'react';
 // import { useReactToPrint } from 'react-to-print';
 import { Row, Col } from 'react-bootstrap';
 import ReactToPrint from 'react-to-print';
-import { GET_JEWELLERY_BILL_SETTINGS, FETCH_AVL_JEWELLERY_BILL_TEMPLATES } from '../../../../../core/sitemap';
+import { GET_JEWELLERY_BILL_SETTINGS, FETCH_AVL_JEWELLERY_BILL_TEMPLATES, UPDATE_JEWELLERY_BILL_SETTINGS } from '../../../../../core/sitemap';
 import { getAccessToken } from '../../../../../core/storage';
 import CommonModal from '../../../../common-modal/commonModal';
 import axiosMiddleware from '../../../../../core/axios';
@@ -12,6 +12,7 @@ import ImageZoom from 'react-medium-image-zoom';
 import TemplateRenderer from '../../../../../templates/jewellery-gstBill/templateRenderer';
 import './TemplateSetup.scss';
 import { template1, template2, template3 } from './sampleTemplateContent';
+import { toast } from 'react-toastify';
 
 export default function TemplateSetup(props) {
     let componentRef = useRef();
@@ -28,6 +29,10 @@ export default function TemplateSetup(props) {
         // fetchSettings();
         fetchAvlTemplates();
     }, []);
+
+    useEffect(() => {
+        setSelectedTemplateId(props.gstBillSettings.selectedTemplate);
+    }, [props.gstBillSettings.selectedTemplate]);
 
     let onClickPreviewBtn = () => {
         setPreviewVisibility(true);
@@ -64,15 +69,16 @@ export default function TemplateSetup(props) {
         }
     }
 
-    const onChangeTemplateSelection = () => {
-
+    const onChangeTemplateSelection = (e, templateId) => {
+        setSelectedTemplateId(templateId);
     }
 
     const getTemplateListSelectionContainer = () => {
         let templatesContainer = [];
         _.each(templatesList, (aTemplate, index) => {
             let checked = false;
-            if(props.gstBillSettings.selectedTemplate && aTemplate.template_id == props.gstBillSettings.selectedTemplate)
+            debugger;
+            if(selectedTemplateId && aTemplate.template_id == selectedTemplateId)
                 checked = true;
 
             let theUrl = aTemplate.screenshot_url;
@@ -102,6 +108,21 @@ export default function TemplateSetup(props) {
         )
     }
 
+    const updateDB = async () => {
+        try {
+            let apiParams = {
+                category: 'gst',
+                selectedTemplate: selectedTemplateId
+            };
+            let resp = await axiosMiddleware.post(UPDATE_JEWELLERY_BILL_SETTINGS, apiParams);
+            if(resp && resp.data && resp.data.STATUS == 'SUCCESS')
+                toast.success('Updated Successfully!');
+        } catch(e) {
+            toast.error('Error!');
+            console.log(e);
+        }
+    }
+
     return (
         <div className="jewellery-template-setup-container">
             <Row className="gs-card">
@@ -123,6 +144,11 @@ export default function TemplateSetup(props) {
                     </Row>
                     <Row>
                         {getTemplateListSelectionContainer()}
+                    </Row>
+                    <Row>
+                        <Col xs={{span: 12}} md={{span: 12}} style={{textAlign: 'right'}}>
+                            <input type='button' className='gs-button' value='UPDATE' onClick={updateDB}/>
+                        </Col>
                     </Row>
                 </Col>
             </Row>
