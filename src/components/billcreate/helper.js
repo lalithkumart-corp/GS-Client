@@ -3,6 +3,7 @@ import { PLEDGEBOOK_METADATA, ORNAMENT_LIST, FETCH_CUSTOMERS_BASIC_LIST } from '
 import { getAccessToken } from '../../core/storage';
 import axiosMiddleware from '../../core/axios';
 import { LOAN_BILL_EXPIRY_DAYS } from '../../constants';
+import { addDays } from '../../utilities/utility';
 
 export const defaultPictureState = {
     holder: {
@@ -435,10 +436,4 @@ export const fetchOrnList = () => {
                 }
             )
     })
-}
-
-export const addDays = (dateVal, days) => {
-    let y = new Date(dateVal);
-    y.setDate(y.getDate() + parseInt(days));
-    return y;
 }

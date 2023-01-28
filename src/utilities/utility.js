@@ -251,6 +251,8 @@ export const formatNo = (number, decimals) => {
     return parseFloat(newnumber); 
 }
 
-
-
-
+export const addDays = (dateVal, days) => {
+    let y = new Date(dateVal);
+    y.setDate(y.getDate() + parseInt(days));
+    return y;
+}

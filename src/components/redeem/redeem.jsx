@@ -473,7 +473,7 @@ class Redeem extends Component {
         if(this.state.selectedBillData) {
             theDom = <Col xs={12} md={12}>
             <Row>
-                <Col xs={{ span: 6, offset: 2}} xs={{span: 6, offset: 2}}>
+                <Col xs={{ span: 6, offset: 2}} md={{span: 6, offset: 2}}>
                     <Row>
                         <Col xs={6} style={{fontSize: "13px"}}>
                             <Row>
@@ -499,6 +499,7 @@ class Redeem extends Component {
                                             placeholder=""
                                             className="gs-input-cell2 int-amt-per-mon-input"
                                             onChange={(e) => this.inputControls.onChange(e, e.target.value, "interestPerMonth")}
+                                            style={{paddingLeft: '4px'}}
                                         />
                                         <FormControl.Feedback />
                                     </InputGroup>
@@ -516,7 +517,7 @@ class Redeem extends Component {
                         </Col> 
                     </Row>
                     <Row>
-                        <Col xs={{span: 6, offset: 6}} xs={{span: 6, offset: 6}}>
+                        <Col xs={{span: 6, offset: 6}} md={{span: 6, offset: 6}}>
                             <Row>
                                 <Col xs={6}>
                                     <p className='text-align-right lightgrey' style={{margin: '7px 0 0 0'}}>Discount</p>
