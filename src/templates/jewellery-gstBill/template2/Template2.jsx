@@ -50,7 +50,17 @@ function GstBillTemplate2(props) {
                 rightLogoImgSrc = printContent.headerRightLogo.src;
         }
 
-        let addressLine = `${printContent.address}, ${printContent.place}, ${printContent.city}-${printContent.pinCode}`;
+        let strNme = printContent.storeName || '<Store Name>';
+
+        let addressLine = '';
+        if(printContent.address)
+            addressLine += `${printContent.address}, `;
+        if(printContent.place)
+            addressLine += `${printContent.place}, `;
+        if(printContent.city)
+            addressLine += `${printContent.city}-${printContent.pinCode}`
+
+        if(!addressLine) addressLine = '<address-line>';
 
         let mobileLine = '';
         if(printContent.storeMobile1) {
@@ -106,11 +116,11 @@ function GstBillTemplate2(props) {
         )
         middleSection.push(
             <Col xs={12} style={middleSectionStyles}>
-                <><span className="store-name" style={storeNameStyles}>{printContent.storeName}</span></>  <br></br>
+                <><span className="store-name" style={storeNameStyles}>{strNme}</span></>  <br></br>
                 <><span className="full-addr-line" style={addressLineStyle}>{addressLine}</span></> <br></br>
                 <>   
                     {mobileLine && <span className="mobile-no" style={mobileStyle}>{mobileLine}, </span>}
-                    <span className="gst-no" style={gstStyle}>GST: {printContent.gstNumber}</span>
+                    {printContent.gstNumber && <span className="gst-no" style={gstStyle}>GST: {printContent.gstNumber}</span>}
                 </>
             </Col>
         )

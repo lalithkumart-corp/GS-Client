@@ -75,8 +75,8 @@ function GstBillingDemo() {
             title: '',
             huid: '',
             div: '',
-            wst: 0,
-            mc: 0,
+            wst: '',
+            mc: '',
             qty: '',
             gwt: '',
             nwt: '',
@@ -86,8 +86,8 @@ function GstBillingDemo() {
             title: '',
             huid: '',
             div: '',
-            wst: 0,
-            mc: 0,
+            wst: '',
+            mc: '',
             qty: '',
             gwt: '',
             nwt: '',
@@ -97,8 +97,8 @@ function GstBillingDemo() {
             title: '',
             huid: '',
             div: '',
-            wst: 0,
-            mc: 0,
+            wst: '',
+            mc: '',
             qty: '',
             gwt: '',
             nwt: '',
@@ -108,8 +108,8 @@ function GstBillingDemo() {
             title: '',
             huid: '',
             div: '',
-            wst: 0,
-            mc: 0,
+            wst: '',
+            mc: '',
             qty: '',
             gwt: '',
             nwt: '',
@@ -295,15 +295,17 @@ function GstBillingDemo() {
     const onFocusPriceVal = (row) => {
         let wtVal = ornData[row].nwt; // ornData[row].qty * ornData[row].nwt;
         let wtWithWst = wtVal;
-        if(wtVal*ornData[row].wst)
-            wtWithWst = wtVal + ((wtVal*ornData[row].wst)/100);
+        let mcVal = ornData[row].mc || 0;
+        let wstInput = ornData[row].wst || 0;
+        if(wtVal*wstInput)
+            wtWithWst = wtVal + ((wtVal*wstInput)/100);
 
         let gramPrice = goldRatePerGm;
         if(categ == 'silver')
             gramPrice = silverRatePerGm;
 
         let price = (gramPrice * wtWithWst);
-        price = numberFormatter(price + parseFloat(ornData[row].mc), 2);
+        price = numberFormatter(price + parseFloat(mcVal), 2);
 
         let newOrnData = {...ornData};
         newOrnData[row]['price'] = price;
@@ -353,7 +355,7 @@ function GstBillingDemo() {
                 address: storeDetail.address,
                 place: storeDetail.place,
                 city: storeDetail.city,
-                pinCode: storeDetail.city,
+                pinCode: storeDetail.pincode,
                 storeMobile1: storeDetail.mobile,
     
                 goldRatePerGm: goldRatePerGm,
