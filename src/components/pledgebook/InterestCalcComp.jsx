@@ -114,6 +114,18 @@ export const InterestCalcComp = ({pledgedDate, closingDate, amount, roi, ornType
                         </Row>
                     </Col>
                 </Row>
+                <Row>
+                    <Col xs={{span: 6, offset: 6}} md={{span: 6, offset: 6}}>
+                        <Row style={{margin: '20px 0 10px 0'}}>
+                            <Col xs={6}>
+                                <p className='text-align-right' style={{margin: 0}}>Total Interest</p>
+                            </Col>
+                            <Col xs={6}>
+                                {obj._totalInterestValue - obj._discountValue}
+                            </Col>
+                        </Row>
+                    </Col>
+                </Row>
             </>}
         </div>
     )

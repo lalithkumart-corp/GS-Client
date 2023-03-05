@@ -572,7 +572,8 @@ export const RenewalScreen = (props) => {
 
     const getMoneyDiff = () => {
         let principalDiff = theBillData.Amount-newPrincipal;
-        let custAmt = theBillData._totalInterestValue - theBillData._discountValue + principalDiff + newInterestValue;
+        let customerPayInAmounts = tableData.reduce((sum, aRowData)=> sum+aRowData._amt, 0);
+        let custAmt = theBillData._totalInterestValue - theBillData._discountValue - customerPayInAmounts + principalDiff + newInterestValue;
         return custAmt;
     }
 
@@ -648,19 +649,22 @@ export const RenewalScreen = (props) => {
                 <Row className="renewal-screen-body">
                     <Col xs={{ span: 6, offset: 2}} md={{span: 6, offset: 2}}>
                         <Row style={{border: '1px solid lightgrey'}}>
+                            <Col xs={12} md={12}>
+                                <h4>Principal</h4>
+                            </Col>
                             <Col xs={{span: 6, offset: 6}} md={{span: 6, offset: 6}}>
                                 <Row>
-                                    <Col xs={8} md={8} className='no-padding'>
-                                        <h4>Principal</h4>
-                                    </Col>
-                                    <Col xs={4} md={4}>
-                                        ₹ {theBillData.Amount}
+                                    <Col xs={{span: 6, offset: 6}} md={{span: 6, offset: 6}}>
+                                        <span style={{fontSize: '20px'}}>₹ {theBillData.Amount}</span>
                                     </Col>
                                 </Row>
                             </Col>
                         </Row>
-                        <Row>
-                            <Col xs={12} md={12} style={{border: '1px solid lightgrey', paddingBottom: '10px'}}>
+                        <Row style={{border: '1px solid lightgrey', paddingBottom: '10px'}}>
+                            <Col xs={12} md={12}>
+                                <h4>Interest</h4>
+                            </Col>
+                            <Col xs={12} md={12}>
                                 <InterestCalcComp 
                                     pledgedDate={theBillData.Date} 
                                     closingDate={moment().format('DD/MM/YYYY')} 
@@ -671,15 +675,14 @@ export const RenewalScreen = (props) => {
                             </Col>
                         </Row>
                         { tableData && tableData.length>0 && 
-                            <Row style={{border: '1px solid lightgrey'}}>
-                                <Col xs={6} md={6}>
+                            <Row style={{border: '1px solid lightgrey', paddingBottom: '15px'}}>
+                                <Col xs={12} md={12}>
                                     <h4>Other Payments</h4>
                                 </Col>
-                                <Col xs={6} md={6}>
+                                <Col xs={{span: 6, offset: 6}} md={{span: 6, offset: 6}}>
                                     {( ()=>{
                                         let rows = [];
                                         _.each(tableData, (aRow, index) => {
-                                            let clr = aRow._cashFlow=='in'?'green':'red';
                                             rows.push(<Row>
                                                 <Col xs={4} md={4} className='no-padding'>
                                                     {aRow.category}
@@ -688,7 +691,7 @@ export const RenewalScreen = (props) => {
                                                     &nbsp;<span style={{fontSize: "10px"}}>=</span> &nbsp;
                                                 </Col>
                                                 <Col xs={6} md={6}>
-                                                    <span style={{color: clr}}>{aRow._amt}</span>
+                                                    <span>{aRow._amt}</span>
                                                 </Col>
                                             </Row>);
                                         });
@@ -697,16 +700,16 @@ export const RenewalScreen = (props) => {
                                 </Col>
                             </Row>
                         }
-                        <Row style={{border: '1px solid lightgrey', paddingTop: '10px', paddingBottom: '10px'}}>
+                        <Row style={{border: '1px solid lightgrey', paddingTop: '10px', paddingBottom: '20px'}}>
+                            <Col xs={12} md={12}>
+                                <h4>New Principal &nbsp; &nbsp; &nbsp; &nbsp; {billSeries + ": " + billNumber}</h4>
+                            </Col>
                             <Col xs={6} md={6}>
-                                {billSeries + ": " + billNumber}
+                                {/* {billSeries + ": " + billNumber} */}
                             </Col>
                             <Col xs={{span: 6}} md={{span: 6}}>
                                 <Row>
-                                    <Col xs={6} md={6} className='no-padding'>
-                                        <h4>New Principal</h4>
-                                    </Col>
-                                    <Col xs={6} md={6}>
+                                    <Col xs={{span: 6, offset: 6}} md={{span: 6, offset: 6}}>
                                         <InputGroup>
                                             <InputGroup.Prepend>
                                                 <InputGroup.Text className="new-principal-amt-addon" >₹</InputGroup.Text>
@@ -733,7 +736,10 @@ export const RenewalScreen = (props) => {
                             </Col>
                         </Row>
 
-                        <Row style={{marginTop: '10px'}}>
+                        <Row style={{padding: '10px 0 20px 0', marginBottom: '20px', border: '1px solid lightgrey'}}>
+                            <Col xs={12} md={12} style={{marginBottom: '15px'}}>
+                                <h4>Due Amount</h4>
+                            </Col>
                             <Col xs={4}>
                                 <PaymentSelectionCard paymentMode={'cash'} onChange={(obj) => onChangePaymentInputs(obj)}/>
                             </Col>
@@ -743,17 +749,19 @@ export const RenewalScreen = (props) => {
                                         (()=>{
                                             let dom = [];
                                             let bal = getMoneyDiff();
-                                            let txt = bal>0?'From Customer':'Pay to Customer'
+                                            let customerPayInAmounts = tableData.reduce((sum, aRowData)=> sum+aRowData._amt, 0);
+                                            let balDetail = `( ${theBillData.Amount} + ${theBillData._totalInterestValue - theBillData._discountValue} `;
+                                            if(customerPayInAmounts != 0) balDetail += `- ${customerPayInAmounts} `;
+                                            balDetail += `- ${newPrincipal} + ${newInterestValue} )`;
                                             dom.push(<Col xs={8} md={8} className='no-padding'>
-                                                        <h4>{txt}</h4>
+                                                        <span> {balDetail} </span>
                                                     </Col>);
                                             dom.push(<Col xs={4} md={4}>
-                                                        <span style={{fontWeight: 'bold', fontSize: '18px'}} >₹ {bal<0?(bal*-1):bal}</span>
+                                                        <span style={{fontWeight: 'bold', fontSize: '18px'}} >₹ {bal}</span>
                                                     </Col>);
                                             return dom;
                                         })()
                                     }
-                                    
                                 </Row>
                             </Col>
                         </Row>
