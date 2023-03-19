@@ -32,11 +32,11 @@ class Pledgebook extends Component {
         super(props);        
         this.timeOut = 300;
         let todaysDate = new Date();
-        let past7daysStartDate = new Date();
-        past7daysStartDate.setDate(past7daysStartDate.getDate()-730);
+        let pastDate = new Date();
+        pastDate.setDate(pastDate.getDate()-730);
         todaysDate.setHours(0,0,0,0);
         let todaysEndDate = new Date();
-        todaysEndDate.setHours(23,59,59,999);    
+        todaysEndDate.setHours(23,59,59,999);
         
         this.filtersFromLocal = getPledgebookFilters();
         
@@ -49,7 +49,7 @@ class Pledgebook extends Component {
             alertPopups: {},
             filters: {
                 date: {
-                    startDate: past7daysStartDate,
+                    startDate: pastDate,
                     endDate: todaysEndDate
                 },
                 cName: '',
@@ -452,8 +452,69 @@ class Pledgebook extends Component {
         }
     }
 
-    handleClose() {
+    handleClose(params) {
         this.setState({PBmodalIsOpen: false, currentBillData: null, currRowIndex: null});
+        if(params && params.showPledgebookInitialPage) {
+            this.resetUserSelections(() => {
+                this.refresh();
+            });
+        }
+    }
+
+    resetUserSelections(cb) {
+        let todaysDate = new Date();
+        let pastDate = new Date();
+        pastDate.setDate(pastDate.getDate()-730);
+        todaysDate.setHours(0,0,0,0);
+        let todaysEndDate = new Date();
+        todaysEndDate.setHours(23,59,59,999);
+        let newState = {...this.state};
+        newState = {...newState, 
+            billDisplayFlag: getFilterValFromLocalStorage('BILL_DISPLAY_FLAG', this.filtersFromLocal) || 'pending',
+            offsetStart: 0,
+            offsetEnd: 10,
+            alertPopups: {},
+            filters : {
+                date: {
+                    startDate: pastDate,
+                    endDate: todaysEndDate
+                },
+                cName: null,
+                gName: null,
+                address: null,
+                billNo: null,
+                amount: null,
+                mobile: null,
+                custom: {
+                    mobile: {
+                        enabled: false,
+                        inputVal: ''
+                    },
+                    pledgeAmt: {
+                        grt: 2000,
+                        lsr: 2500,
+                        enabled: false
+                    }
+                },
+                ornCategory: {
+                    gold: getFilterValFromLocalStorage('ORN_CATEG_GOLD', this.filtersFromLocal) || false,
+                    silver: getFilterValFromLocalStorage('ORN_CATEG_SILVER', this.filtersFromLocal) || false,
+                    brass: getFilterValFromLocalStorage('ORN_CATEG_BRASS', this.filtersFromLocal) || false,
+                },
+                includeArchived: getFilterValFromLocalStorage('INCLUDE_ARCH', this.filtersFromLocal) || false,
+                showOnlyArchived: getFilterValFromLocalStorage('INCLUDE_ONLY_ARCH', this.filtersFromLocal) || false,
+                includeTrashed: getFilterValFromLocalStorage('INCLUDE_TRASHED', this.filtersFromLocal) || false,
+                showOnlyTrashed: getFilterValFromLocalStorage('INCLUDE_ONLY_TRASHED', this.filtersFromLocal) || false,
+            },
+            selectedPageIndex: 0,
+            selectedIndexes: [],
+            selectedRowJson: [],
+            pageLimit: 10
+        }
+        this.setState(newState, () => {
+            if(cb)
+                cb();
+        });
     }
 
     //params will receive the following {isChecked, column, colIndex, row, rowIndex}

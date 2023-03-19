@@ -141,8 +141,10 @@ class PledgebookModal extends Component {
         this.setState({mainScreen: false, paymentScreenVisibility: true, renewalScreenVisibility: false});
     }
 
-    showMainScreen() {
+    showMainScreen(params) {
         this.setState({mainScreen: true, paymentScreenVisibility: false, renewalScreenVisibility: false});
+        if(params && params.showPledgebookInitialPage)
+            this.handleClose(params);
     }
 
     async onPrintClick() {
@@ -238,6 +240,10 @@ class PledgebookModal extends Component {
         if(!this.canShowBtn(btn))
             className = 'hidden';        
         return className;
+    }
+
+    handleClose(params) {
+        this.props.handleClose(params);
     }
 
     render() {        
@@ -522,7 +528,7 @@ export const RenewalScreen = (props) => {
     }
 
     const goBack = () => {
-        props.showMainScreen();
+        props.showMainScreen({showPledgebookInitialPage: true});
     }
 
     const fetchPaymentsListByBill = async () => {
@@ -650,7 +656,7 @@ export const RenewalScreen = (props) => {
                     <Col xs={{ span: 6, offset: 2}} md={{span: 6, offset: 2}}>
                         <Row style={{border: '1px solid lightgrey'}}>
                             <Col xs={12} md={12}>
-                                <h4>Principal</h4>
+                                <h4>Principal  &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span style={{color: 'grey'}}>{theBillData.BillNo}</span></h4>
                             </Col>
                             <Col xs={{span: 6, offset: 6}} md={{span: 6, offset: 6}}>
                                 <Row>

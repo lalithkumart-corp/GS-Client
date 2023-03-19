@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { Row, Col } from 'react-bootstrap';
 import './redeem-preview.scss';
 import { format } from 'currency-formatter';
-
+import { convertToLocalTime } from '../../utilities/utility';
 export default class RedeemPreview extends Component {
     constructor(props) {
         super(props);
@@ -17,7 +17,7 @@ export default class RedeemPreview extends Component {
                     <Row className="a-row">
                         <Col xs={5}>Redeemed Date</Col>
                         <Col xs={7}>
-                            {this.props.currentBillData.closed_date}
+                            {convertToLocalTime(this.props.currentBillData.closed_date)}
                         </Col>
                     </Row>
                     <Row className="a-row">
