@@ -2,6 +2,7 @@ import {useState} from 'react';
 import {Row, Col, FormGroup, FormLabel, FormControl, InputGroup } from 'react-bootstrap';
 import { toast } from 'react-toastify';
 import './wastageCalculator.scss';
+import { wastageCalc } from './wastageCalculator';
 
 export default function WastageCalculator() {
     let [wt, setWt] = useState();
@@ -14,16 +15,9 @@ export default function WastageCalculator() {
     const calcWsg = () => {
         try {
             if(total && rate && wt) {
-                let _total = parseFloat(total);
-                let _gst = parseFloat(gst) || 0;
-                let _rate = parseFloat(rate);
-                let _wt = parseFloat(wt);
-                // let prcent = ((total/(rate/100))-(wt*100))/wt;     // This calc is without considering GST
-                let prcent = (_total*100*100)/((100+_gst)*_rate*_wt)-100;   //This calc will consider GST as well.
-                let wsg = (wt*prcent)/100;
-                prcent = prcent.toFixed(3);
-                setWsgPercent(parseFloat(prcent));
-                setWsg(wsg.toFixed(3));
+                let {wsgPercent, wsgVal} = wastageCalc(wt, rate, gst, total);
+                setWsgPercent(wsgPercent);
+                setWsg(wsgVal);
             } else {
                 toast.warn('Please fill up inputs');
             }
@@ -70,18 +64,6 @@ export default function WastageCalculator() {
                 <Col xs={2} className="rate-col" style={{padding: "0 0 0 10px"}}>
                     <FormGroup>
                         <FormLabel>Rate ₹</FormLabel>
-                        {/* <InputGroup>
-                            <InputGroup.Prepend>
-                                <InputGroup.Text id="rupee-addon">₹</InputGroup.Text>
-                            </InputGroup.Prepend>
-                            <FormControl
-                                type="text"
-                                placeholder=""
-                                onChange={(e) => setRate(e.target.value)} 
-                                value={rate}
-                                className="simple"
-                            />
-                        </InputGroup> */}
                         <div><input type="text" className="gs-input-cell" style={{width: '100%'}} value={rate} onChange={(e) => setRate(e.target.value)} /></div>
                     </FormGroup>
                 </Col>
@@ -98,25 +80,13 @@ export default function WastageCalculator() {
                 <Col xs={2} className="total-col" style={{padding: "0 0 0 10px"}}>
                     <FormGroup>
                         <FormLabel>Total ₹</FormLabel>
-                        {/* <InputGroup>
-                            <InputGroup.Prepend>
-                                <InputGroup.Text id="rupee-addon">₹</InputGroup.Text>
-                            </InputGroup.Prepend>
-                            <FormControl
-                                type="text"
-                                placeholder=""
-                                onChange={(e) => setTotal(e.target.value)} 
-                                value={total}
-                                className="simple"
-                            />
-                        </InputGroup> */}
                         <div><input type="text" className="gs-input-cell" style={{width: '100%'}} value={total} onChange={(e) => setTotal(e.target.value)} /></div>
                     </FormGroup>
                 </Col>
             </Row>
             <Row>
-                <Col xs={12} style={{textAlign: 'center'}}>
-                    <input type="button" class="gs-button" value="CALC" onClick={calcWsg} />
+                <Col xs={12} style={{textAlign: 'center', marginTop: '15px', marginBottom: '15px'}}>
+                    <input type="button" class="gs-button bordered" value="CALC" onClick={calcWsg} />
                 </Col>
             </Row>   
         </div>

@@ -21,6 +21,7 @@ import { formatNo, getCurrentDateTimeInUTCForDB, getMyDateObjInUTCForDB } from '
 import ReactToPrint from 'react-to-print';
 import TemplateRenderer from '../../../templates/jewellery-gstBill/templateRenderer';
 import WastageCalculator from '../../tools/wastageCalculator';
+import { wastageCalc } from '../../tools/wastageCalculator/wastageCalculator';
 
 const TAGID = 'tagid';
 const SELL_QTY = 'qty';
@@ -33,6 +34,7 @@ const SELL_LABOUR = 'labour';
 const SELL_CGST = 'cgstPercent';
 const SELL_SGST = 'sgstPercent';
 const SELL_DISCOUNT = 'discount';
+const SELL_PRICE = 'price';
 const RETAIL_PRICE = 'retailPrice';
 const EX_METAL = 'exMetal';
 const EX_GROSS_WT = 'exGrossWt';
@@ -61,6 +63,7 @@ domList.add('labour1', {type: 'defaultInput', enabled: true});
 domList.add('cgstPercent1', {type: 'defaultInput', enabled: true});
 domList.add('sgstPercent1', {type: 'defaultInput', enabled: true});
 domList.add('discount1', {type: 'defaultInput', enabled: true});
+domList.add('price1', {type: 'defaultInput', enabled: true});
 domList.add('addItemToBillPreviewBtn', {type: 'defaultInput', enabled: true});
 domList.add(EX_GROSS_WT, {type: 'defaultInput', enabled: true});
 domList.add(EX_NET_WT, {type: 'defaultInput', enabled: true});
@@ -231,6 +234,10 @@ class SellItem extends Component {
             case SELL_DISCOUNT:
                 newState.currSelectedItem.formData[identifier] = parseFloat(e.target.value);
                 this.calculateSellingPrice(identifier);
+                break;
+            case SELL_PRICE:
+                newState.currSelectedItem.formData[identifier] = parseFloat(e.target.value);
+                newState = this.calculateWastageDetailsBySellingPrice(e.target.value, newState, true);
                 break;
             case RETAIL_PRICE:
                 newState.retailPrice = parseInt(e.target.value);
@@ -655,6 +662,35 @@ class SellItem extends Component {
         }
     }
 
+    calculateWastageDetailsBySellingPrice(sellingPriceVal, newState, cb) {
+        let wt = newState.currSelectedItem.formData.netWt;
+        let rate = newState.retailPrice;
+        let percents = newState.currSelectedItem.formData.cgstPercent + newState.currSelectedItem.formData.sgstPercent;
+        let total = sellingPriceVal;
+        let {wsgPercent, wsgVal} = wastageCalc(wt, rate, percents, total);
+        
+        //calc wastage percent and value
+        newState.currSelectedItem.formData.wastage = wsgPercent;
+        newState.currSelectedItem.formData.wastageVal = wsgVal;
+
+        //calc priceOfOrn
+        let _priceOfOrn = parseFloat(wt*rate);
+        _priceOfOrn = formatNo((_priceOfOrn + (_priceOfOrn*wsgPercent)/100), 2);
+        newState.currSelectedItem.formData.priceOfOrn = _priceOfOrn
+
+        //calc gst values
+        let cgstPercent = newState.currSelectedItem.formData.cgstPercent || 0;
+        let sgstPercent = newState.currSelectedItem.formData.sgstPercent || 0;
+        if(cgstPercent)
+            newState.currSelectedItem.formData.cgstVal = formatNo(_priceOfOrn * (cgstPercent/100), 2);
+        if(sgstPercent)
+            newState.currSelectedItem.formData.sgstVal = formatNo(_priceOfOrn * (sgstPercent/100), 2);
+
+        console.log(newState);
+        if(cb) return newState;
+        else this.setState(newState);
+    }
+
     calculateExchangePrice(identifier) {
         let price = null;
         if(this.state.exchangeItemFormData[EX_NET_WT]) {
@@ -920,7 +956,10 @@ class SellItem extends Component {
                                             ref= {(domElm) => {this.domElmns.discount1 = domElm;}} />
                                     </td>
                                     <td>
-                                        <span className="selling-price-val">{formData.price}</span>
+                                    <input type="number" className="gs-input" value={formData.price} onChange={(e) => this.onInputValChange(e, 'price')} readOnly={isReadOnly}
+                                            onKeyUp = {(e) => this.onKeyUp(e, {currElmKey: 'price1'})}
+                                            ref= {(domElm) => {this.domElmns.price1 = domElm;}} />
+                                        {/* <span className="selling-price-val">{formData.price}</span> */}
                                     </td>
                                 </tr>
                             </tbody>

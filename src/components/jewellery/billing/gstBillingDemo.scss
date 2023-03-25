@@ -6,9 +6,13 @@
     }
     .gs-input-cell {
         width: 100%;
+        padding-left: 7px;
     }
 }
 .jewellery-gst-bill-demo .gst-bill-preview .jewellery-gst-bill-paper.has-preview {
     transform: scale(0.7);
     margin-top: -120px;
+}
+.jewellery-gst-bill-demo .gst-bill-preview .jewellery-gst-bill-paper {
+    margin-left: -35px;
 }

@@ -10,6 +10,9 @@ import './gstBillingDemo.scss';
 import _ from 'lodash';
 import { numberFormatter, getRoundOffVal } from '../../../utilities/mathUtils';
 import { DoublyLinkedList } from '../../../utilities/doublyLinkedList';
+import WastageCalculator from '../../tools/wastageCalculator';
+import { wastageCalc } from '../../tools/wastageCalculator/wastageCalculator';
+import { Collapse } from 'react-collapse';
 
 // import GstBillTemplate1 from '../../../templates/jewellery-gstBill/template1/Template1';
 const ENTER_KEY = 13;
@@ -19,7 +22,7 @@ domList.add('goldRatePerGm', {type: 'formControl', enabled: true});
 domList.add('silverRatePerGm', {type: 'formControl', enabled: true});
 domList.add('billSeries', {type: 'formControl', enabled: true});
 domList.add('billNo', {type: 'formControl', enabled: true});
-domList.add('date', {type: 'datePicker', enabled: true});
+// domList.add('date', {type: 'datePicker', enabled: true});
 domList.add('customerName', {type: 'formControl', enabled: true});
 domList.add('customerMobile', {type: 'formControl', enabled: true});
 domList.add('cusomertAddr', {type: 'formControl', enabled: true});
@@ -80,6 +83,9 @@ function GstBillingDemo() {
             qty: '',
             gwt: '',
             nwt: '',
+            priceOfOrn: '',
+            cgst: 1.5,
+            sgst: 1.5,
             price: ''
         },
         {
@@ -91,6 +97,9 @@ function GstBillingDemo() {
             qty: '',
             gwt: '',
             nwt: '',
+            priceOfOrn: '',
+            cgst: 1.5,
+            sgst: 1.5,
             price: ''
         },
         {
@@ -102,6 +111,9 @@ function GstBillingDemo() {
             qty: '',
             gwt: '',
             nwt: '',
+            priceOfOrn: '',
+            cgst: 1.5,
+            sgst: 1.5,
             price: ''
         },
         {
@@ -113,6 +125,9 @@ function GstBillingDemo() {
             qty: '',
             gwt: '',
             nwt: '',
+            priceOfOrn: '',
+            cgst: 1.5,
+            sgst: 1.5,
             price: ''
         }
     ]
@@ -145,6 +160,7 @@ function GstBillingDemo() {
     let [sgstVal, setSgstVal] = useState('');
     let [roundOffVal, setRoundOffVal] = useState(0);
     let [grandTotal, setGrandTotal] = useState('');
+    let [toolsVisibility, setToolsVisibility] = useState(true);
 
     useEffect(() => {
         if(printFlag && templateContent) {
@@ -210,7 +226,6 @@ function GstBillingDemo() {
                 };
                 break;
             case 'mc':
-            case 'price':
                 if(options) {
                     let newOrnData = {...ornData};
                     newOrnData[options.row][options.col] = numberFormatter(val, 2);
@@ -232,6 +247,20 @@ function GstBillingDemo() {
                     newOrnData[options.row]['wst'] = numberFormatter((val*100)/ornData[options.row].nwt, 3);
                     setOrnaments(newOrnData);
                 };
+                break;
+            case 'cgst':
+            case 'sgst':
+                if(options) {
+                    let newOrnData = {...ornData};
+                    newOrnData[options.row][options.col] = numberFormatter(val, 1);
+                    setOrnaments(newOrnData);
+                }
+                break;
+            case 'price':
+                let newOrnData = {...ornData};
+                newOrnData[options.row].price = val;
+                calcWastageBySellingPrice(newOrnData, options);
+                // setOrnaments()
                 break;
             case 'cgstPercent':
                 setCgstPercent(val);
@@ -292,7 +321,30 @@ function GstBillingDemo() {
         return prevNode;
     }
 
+    const calcWastageBySellingPrice = (newOrnData, options) => {
+        let wt = newOrnData[options.row].nwt;
+        let rate = goldRatePerGm;
+        let percents = newOrnData[options.row].cgst + newOrnData[options.row].sgst;
+        let total = newOrnData[options.row].price;
+        let {wsgPercent, wsgVal} = wastageCalc(wt, rate, percents, total);
+        newOrnData[options.row].wst = wsgPercent;
+        newOrnData[options.row].wstVal = wsgVal;
+
+        //calc priceOfOrn
+        let wtVal = newOrnData[options.row].nwt + (newOrnData[options.row].nwt*wsgPercent)/100; 
+        let gramPrice = goldRatePerGm;
+        let mcVal = newOrnData[options.row].mc || 0;
+        if(categ == 'silver')
+            gramPrice = silverRatePerGm;
+        newOrnData[options.row].priceOfOrn = numberFormatter( (wtVal*gramPrice) + parseFloat(mcVal), 2); //without tax
+
+        setOrnaments(newOrnData);
+        calcTotals();
+        calcGrandTotal();
+    }
+
     const onFocusPriceVal = (row) => {
+        let newOrnData = {...ornData};
         let wtVal = ornData[row].nwt; // ornData[row].qty * ornData[row].nwt;
         let wtWithWst = wtVal;
         let mcVal = ornData[row].mc || 0;
@@ -304,11 +356,18 @@ function GstBillingDemo() {
         if(categ == 'silver')
             gramPrice = silverRatePerGm;
 
+        // add making charge
         let price = (gramPrice * wtWithWst);
         price = numberFormatter(price + parseFloat(mcVal), 2);
 
-        let newOrnData = {...ornData};
-        newOrnData[row]['price'] = price;
+        newOrnData[row].priceOfOrn = price;
+
+        // add gst
+        let gst = (ornData[row].cgst || 0) + (ornData[row].sgst || 0);
+        price = price + (price*gst)/100;
+
+        
+        newOrnData[row]['price'] = numberFormatter(price, 2);
         setOrnaments(newOrnData);
         calcTotals();
         calcGrandTotal();
@@ -331,12 +390,7 @@ function GstBillingDemo() {
     const calcGrandTotal = () => {
         let ornPrices = numberFormatter(ornData[0]['price'], 2) + numberFormatter(ornData[1]['price'], 2) + numberFormatter(ornData[2]['price'], 2) + numberFormatter(ornData[3]['price'], 2);
         if(ornPrices) {
-            // let s1 = (ornPrices + parseFloat(makingCharge || 0));
-            let cgstVal = numberFormatter((ornPrices*parseFloat(cgstPercent))/100, 2);
-            let sgstVal = numberFormatter((ornPrices*parseFloat(sgstPercent))/100, 2);
-            setCgstVal(cgstVal);
-            setSgstVal(sgstVal);
-            let grandTotal = ornPrices + cgstVal + sgstVal;
+            let grandTotal = ornPrices;// + cgstVal + sgstVal;
             let roundOffVal = getRoundOffVal(grandTotal); 
             grandTotal = numberFormatter(grandTotal + roundOffVal, 2);
             setRoundOffVal(roundOffVal);
@@ -375,14 +429,17 @@ function GstBillingDemo() {
                 calculations: {
                     totalMakingCharge: makingCharge,
                     totalNetAmount: 0,
-                    cgst: cgstPercent,
-                    sgst: sgstPercent,
-                    totalCgstVal: cgstVal,
-                    totalSgstVal: sgstVal,
+                    cgst: 0,
+                    sgst: 0,
+                    totalCgstVal: 0,
+                    totalSgstVal: 0,
                     roundedOffVal: roundOffVal,
                     grandTotal: grandTotal
                 }
             };
+            let cgstPercentAvg = 0;
+            let sgstPercentAvg = 0;
+            let iteration = 0;
             _.each(ornData, (anOrn, index) => {
                 if(anOrn.title) {
                     printData.ornaments.push({
@@ -395,17 +452,29 @@ function GstBillingDemo() {
                         wastagePercent: anOrn.wst,
                         wastageVal: anOrn.wstVal,
                         makingCharge: anOrn.mc,
-                        cgstPercent: cgstPercent,
-                        sgstPercent: cgstPercent,
+                        cgstPercent: anOrn.cgst,
+                        sgstPercent: anOrn.sgst,
                         discount: 0,
                         itemType: categ=='gold'?"G":"S",
                         pricePerGm: categ=='gold'?goldRatePerGm:silverRatePerGm,
-                        priceOfOrn: anOrn.price,
-                    })
+                        priceOfOrn: anOrn.priceOfOrn,
+                    });
+
+                    cgstPercentAvg += anOrn.cgst;
+                    sgstPercentAvg += anOrn.sgst;
+                    printData.calculations.totalCgstVal += numberFormatter((anOrn.priceOfOrn*anOrn.cgst)/100,2);
+                    printData.calculations.totalSgstVal += numberFormatter((anOrn.priceOfOrn*anOrn.sgst)/100,2);
+                    iteration++;
+
                 }
             });
+            cgstPercentAvg = cgstPercentAvg/iteration;
+            sgstPercentAvg = sgstPercentAvg/iteration;
+            printData.calculations.cgst = cgstPercentAvg;
+            printData.calculations.sgst = sgstPercentAvg;
+
             printData.calculations.totalNetAmount = printData.ornaments.reduce(
-                (accumulator, currentValue) => accumulator + currentValue.priceOfOrn,
+                (accumulator, currentValue) => accumulator + parseFloat(currentValue.priceOfOrn),
                 0
             );
             console.log(printData);
@@ -432,55 +501,73 @@ function GstBillingDemo() {
         for(let i=0; i<rowsCount; i++) {
             rows.push(
                 <Row>
-                    <Col xs={2} className="no-padding">
-                        <input type="text" className="gs-input" value={ornData[i].title} onChange={(e) => onChange(e.target.value, 'orn', {row:i, col: 'title'} )} style={{width: '100%'}}
-                            ref= {(domElm) => {domElmns["orn" + i] = domElm; }}
-                            onKeyUp = {(e) => handleKeyUp(e, {currElmKey: "orn" + i}) }/>
+                    <Col xs={6}>
+                        <Row>
+                            <Col xs={3} className="no-padding">
+                                <input type="text" className="gs-input" value={ornData[i].title} onChange={(e) => onChange(e.target.value, 'orn', {row:i, col: 'title'} )} style={{width: '100%'}}
+                                    ref= {(domElm) => {domElmns["orn" + i] = domElm; }}
+                                    onKeyUp = {(e) => handleKeyUp(e, {currElmKey: "orn" + i}) }/>
+                            </Col>
+                            <Col xs={1} className="no-padding">
+                                <input type="text" className="gs-input" value={ornData[i].huid} onChange={(e) => onChange(e.target.value, 'huid', {row:i, col: 'huid'} )} style={{width: '100%'}}
+                                    ref= {(domElm) => {domElmns["huid"+i]  = domElm; }}
+                                    onKeyUp = {(e) => handleKeyUp(e, {currElmKey: "huid"+i}) }/>
+                            </Col>
+                            <Col xs={2} className="no-padding">
+                                <input type="text" className="gs-input" value={ornData[i].div} onChange={(e) => onChange(e.target.value, 'div', {row:i, col: 'div'} )} style={{width: '100%'}}
+                                    ref= {(domElm) => {domElmns["div"+i] = domElm; }}
+                                    onKeyUp = {(e) => handleKeyUp(e, {currElmKey: "div"+i}) }/>
+                            </Col>
+                            <Col xs={1} className="no-padding">
+                                <input type="number" className="gs-input" value={ornData[i].qty} onChange={(e) => onChange(parseInt(e.target.value), 'qty', {row:i, col: 'qty'} )} style={{width: '100%'}}
+                                    ref= {(domElm) => {domElmns["qty"+i] = domElm; }}
+                                    onKeyUp = {(e) => handleKeyUp(e, {currElmKey: "qty"+i}) }/>
+                            </Col>
+                            <Col xs={2} className="no-padding">
+                                <input type="number" className="gs-input" value={ornData[i].gwt} onChange={(e) => onChange(parseFloat(e.target.value), 'gwt', {row:i, col: 'gwt'} )} style={{width: '100%'}}
+                                    ref= {(domElm) => {domElmns["gwt"+i] = domElm; }}
+                                    onKeyUp = {(e) => handleKeyUp(e, {currElmKey: "gwt"+i}) }/>
+                            </Col>
+                            <Col xs={2} className="no-padding">
+                                <input type="number" className="gs-input" value={ornData[i].nwt} onChange={(e) => onChange(parseFloat(e.target.value), 'nwt', {row:i, col: 'nwt'} )} style={{width: '100%'}}
+                                    ref= {(domElm) => {domElmns["nwt"+i] = domElm; }}
+                                    onKeyUp = {(e) => handleKeyUp(e, {currElmKey: "nwt"+i}) }/>
+                            </Col>
+                        </Row>
                     </Col>
-                    <Col xs={1} className="no-padding">
-                        <input type="text" className="gs-input" value={ornData[i].huid} onChange={(e) => onChange(e.target.value, 'huid', {row:i, col: 'huid'} )} style={{width: '100%'}}
-                            ref= {(domElm) => {domElmns["huid"+i]  = domElm; }}
-                            onKeyUp = {(e) => handleKeyUp(e, {currElmKey: "huid"+i}) }/>
-                    </Col>
-                    <Col xs={1} className="no-padding">
-                        <input type="text" className="gs-input" value={ornData[i].div} onChange={(e) => onChange(e.target.value, 'div', {row:i, col: 'div'} )} style={{width: '100%'}}
-                            ref= {(domElm) => {domElmns["div"+i] = domElm; }}
-                            onKeyUp = {(e) => handleKeyUp(e, {currElmKey: "div"+i}) }/>
-                    </Col>
-                    <Col xs={1} className="no-padding">
-                        <input type="number" className="gs-input" value={ornData[i].qty} onChange={(e) => onChange(parseInt(e.target.value), 'qty', {row:i, col: 'qty'} )} style={{width: '100%'}}
-                            ref= {(domElm) => {domElmns["qty"+i] = domElm; }}
-                            onKeyUp = {(e) => handleKeyUp(e, {currElmKey: "qty"+i}) }/>
-                    </Col>
-                    <Col xs={1} className="no-padding">
-                        <input type="number" className="gs-input" value={ornData[i].gwt} onChange={(e) => onChange(parseFloat(e.target.value), 'gwt', {row:i, col: 'gwt'} )} style={{width: '100%'}}
-                            ref= {(domElm) => {domElmns["gwt"+i] = domElm; }}
-                            onKeyUp = {(e) => handleKeyUp(e, {currElmKey: "gwt"+i}) }/>
-                    </Col>
-                    <Col xs={1} className="no-padding">
-                        <input type="number" className="gs-input" value={ornData[i].nwt} onChange={(e) => onChange(parseFloat(e.target.value), 'nwt', {row:i, col: 'nwt'} )} style={{width: '100%'}}
-                            ref= {(domElm) => {domElmns["nwt"+i] = domElm; }}
-                            onKeyUp = {(e) => handleKeyUp(e, {currElmKey: "nwt"+i}) }/>
-                    </Col>
-                    <Col xs={1} className="no-padding">
-                        <input type="number" className="gs-input" value={ornData[i].wst} onChange={(e) => onChange(parseFloat(e.target.value), 'wst', {row:i, col: 'wst'} )} style={{width: '100%'}}
-                            ref= {(domElm) => {domElmns["wst"+i] = domElm; }}
-                            onKeyUp = {(e) => handleKeyUp(e, {currElmKey: "wst"+i}) }/>
-                    </Col>
-                    <Col xs={1} className="no-padding">
-                        <input type="number" className="gs-input" value={ornData[i].wstVal} onChange={(e) => onChange(parseFloat(e.target.value), 'wstVal', {row:i, col: 'wstVal'} )} style={{width: '100%'}}
-                            ref= {(domElm) => {domElmns["wstVal"+i] = domElm; }}
-                            onKeyUp = {(e) => handleKeyUp(e, {currElmKey: "wstVal"+i}) }/>
-                    </Col>
-                    <Col xs={1} className="no-padding">
-                        <input type="number" className="gs-input" value={ornData[i].mc} onChange={(e) => onChange(parseFloat(e.target.value), 'mc', {row:i, col: 'mc'} )} style={{width: '100%'}}
-                            ref= {(domElm) => {domElmns["mc"+i] = domElm; }}
-                            onKeyUp = {(e) => handleKeyUp(e, {currElmKey: "mc"+i}) }/>
-                    </Col>
-                    <Col xs={2} className="no-padding">
-                        <input type="number" className="gs-input" value={ornData[i].price} onFocus={(e)=>onFocusPriceVal(i)} readOnly onChange={(e) => onChange(e.target.value, 'price', {row:i, col: 'price'} )} style={{width: '100%'}}
-                            ref= {(domElm) => {domElmns["price"+i] = domElm; }}
-                            onKeyUp = {(e) => handleKeyUp(e, {currElmKey: "price"+i}) }/>
+                    <Col xs={6}>
+                        <Row>
+                            <Col xs={2} className="no-padding">
+                                <input type="number" className="gs-input" value={ornData[i].wst} onChange={(e) => onChange(parseFloat(e.target.value), 'wst', {row:i, col: 'wst'} )} style={{width: '100%'}}
+                                    ref= {(domElm) => {domElmns["wst"+i] = domElm; }}
+                                    onKeyUp = {(e) => handleKeyUp(e, {currElmKey: "wst"+i}) }/>
+                            </Col>
+                            <Col xs={2} className="no-padding">
+                                <input type="number" className="gs-input" value={ornData[i].wstVal} onChange={(e) => onChange(parseFloat(e.target.value), 'wstVal', {row:i, col: 'wstVal'} )} style={{width: '100%'}}
+                                    ref= {(domElm) => {domElmns["wstVal"+i] = domElm; }}
+                                    onKeyUp = {(e) => handleKeyUp(e, {currElmKey: "wstVal"+i}) }/>
+                            </Col>
+                            <Col xs={1} className="no-padding">
+                                <input type="number" className="gs-input" value={ornData[i].mc} onChange={(e) => onChange(parseFloat(e.target.value), 'mc', {row:i, col: 'mc'} )} style={{width: '100%'}}
+                                    ref= {(domElm) => {domElmns["mc"+i] = domElm; }}
+                                    onKeyUp = {(e) => handleKeyUp(e, {currElmKey: "mc"+i}) }/>
+                            </Col>
+                            <Col xs={2} className="no-padding">
+                                <input type="number" className="gs-input" value={ornData[i].cgst} onChange={(e) => onChange(parseFloat(e.target.value), 'cgst', {row:i, col: 'cgst'} )} style={{width: '100%'}}
+                                    ref= {(domElm) => {domElmns["cgst"+i] = domElm; }}
+                                    onKeyUp = {(e) => handleKeyUp(e, {currElmKey: "cgst"+i}) }/>
+                            </Col>
+                            <Col xs={2} className="no-padding">
+                                <input type="number" className="gs-input" value={ornData[i].sgst} onChange={(e) => onChange(parseFloat(e.target.value), 'sgst', {row:i, col: 'sgst'} )} style={{width: '100%'}}
+                                    ref= {(domElm) => {domElmns["sgst"+i] = domElm; }}
+                                    onKeyUp = {(e) => handleKeyUp(e, {currElmKey: "sgst"+i}) }/>
+                            </Col>
+                            <Col xs={3} className="no-padding">
+                                <input type="number" className="gs-input" value={ornData[i].price} onFocus={(e)=>onFocusPriceVal(i)} onChange={(e) => onChange(e.target.value, 'price', {row:i, col: 'price'} )} style={{width: '100%'}}
+                                    ref= {(domElm) => {domElmns["price"+i] = domElm; }}
+                                    onKeyUp = {(e) => handleKeyUp(e, {currElmKey: "price"+i}) }/>
+                            </Col>
+                        </Row>
                     </Col>
                 </Row>
             )
@@ -491,30 +578,42 @@ function GstBillingDemo() {
     let getTotalsRow = () => {
         return (
             <Row>
-                <Col xs={2} className="no-padding">
+                <Col xs={6}>
+                    <Row>
+                        <Col xs={3} className="no-padding">
+                        </Col>
+                        <Col xs={1} className="no-padding">
+                        </Col>
+                        <Col xs={2} className="no-padding">
+                        </Col>
+                        <Col xs={1} className="no-padding">
+                            <input type="number" className="gs-input" value={totalsCalc.qty} readOnly style={{width: '100%'}}/>
+                        </Col>
+                        <Col xs={2} className="no-padding">
+                        </Col>
+                        <Col xs={2} className="no-padding">
+                            <input type="number" className="gs-input" value={totalsCalc.nwt} readOnly style={{width: '100%'}}/>
+                        </Col>
+                    </Row>
                 </Col>
-                <Col xs={1} className="no-padding">
-                </Col>
-                <Col xs={1} className="no-padding">
-                </Col>
-                <Col xs={1} className="no-padding">
-                    <input type="number" className="gs-input" value={totalsCalc.qty} readOnly style={{width: '100%'}}/>
-                </Col>
-                <Col xs={1} className="no-padding">
-                </Col>
-                <Col xs={1} className="no-padding">
-                    <input type="number" className="gs-input" value={totalsCalc.nwt} readOnly style={{width: '100%'}}/>
-                </Col>
-                <Col xs={1} className="no-padding">
-                    {/* <input type="number" className="gs-input" value={totalsCalc.wst} readOnly style={{width: '100%'}}/> */}
-                </Col>
-                <Col xs={1} className="no-padding">
-                </Col>
-                <Col xs={1} className="no-padding">
-                    <input type="number" className="gs-input" value={totalsCalc.mc} readOnly style={{width: '100%'}}/>
-                </Col>
-                <Col xs={2} className="no-padding">
-                    <input type="number" className="gs-input" value={totalsCalc.price} readOnly style={{width: '100%'}}/>
+                <Col xs={6}>
+                    <Row>
+                        <Col xs={2} className="no-padding">
+                            {/* <input type="number" className="gs-input" value={totalsCalc.wst} readOnly style={{width: '100%'}}/> */}
+                        </Col>
+                        <Col xs={2} className="no-padding">
+                        </Col>
+                        <Col xs={1} className="no-padding">
+                            <input type="number" className="gs-input" value={totalsCalc.mc} readOnly style={{width: '100%'}}/>
+                        </Col>
+                        <Col xs={2} className="no-padding">
+                        </Col>
+                        <Col xs={2} className="no-padding">
+                        </Col>
+                        <Col xs={3} className="no-padding">
+                            <input type="number" className="gs-input" value={totalsCalc.price} readOnly style={{width: '100%'}}/>
+                        </Col>
+                    </Row>
                 </Col>
             </Row>
         )
@@ -523,91 +622,9 @@ function GstBillingDemo() {
     return (
         <Container style={{maxWidth: "98%"}} className="jewellery-gst-bill-demo">
             <Row>
-                <Col xs={6}>
+                <Col xs={7} style={{backgroundColor: 'antiquewhite', paddingTop: '15px'}}>
                     <Row>
-                        <Col xs={3} md={3}>
-                            <FormGroup>
-                                <FormLabel>HSN</FormLabel>
-                                <FormControl
-                                    type="text"
-                                    placeholder=""
-                                    onChange={(e) => onChange(e.target.value, 'hsCode')} 
-                                    value={hsCode}
-                                />
-                                <FormControl.Feedback />
-                            </FormGroup>
-                        </Col>
-                        <Col xs={3} md={3}>
-                            <FormGroup>
-                                <FormLabel>Category</FormLabel>
-                                <FormControl
-                                    as="select"
-                                    placeholder=""
-                                    value={categ}
-                                    onChange={(e) => onChange(e.target.value, 'categ')}
-                                >
-                                   <option key="gold" value="gold">Gold</option>
-                                   <option key="silver" value="silver">Silver</option>
-                                </FormControl>
-                            </FormGroup>
-                        </Col>
-                        <Col xs={3} md={3}>
-                            <FormGroup>
-                                <FormLabel>G - Price/Gm</FormLabel>
-                                <FormControl
-                                    type="text"
-                                    placeholder=""
-                                    value={goldRatePerGm}
-                                    onChange={(e) => onChange(e.target.value, 'goldRatePerGm')}
-                                    onKeyUp = {(e) => handleKeyUp(e, {currElmKey: 'goldRatePerGm'}) }
-                                    ref={(domElm) => { domElmns.goldRatePerGm = domElm; }}
-                                />
-                            </FormGroup>
-                        </Col>
-                        <Col xs={3} md={3}>
-                            <FormGroup>
-                                <FormLabel>S - Price/Gm</FormLabel>
-                                <FormControl
-                                    type="text"
-                                    placeholder=""
-                                    value={silverRatePerGm}
-                                    onChange={(e) => onChange(e.target.value, 'silverRatePerGm')}
-                                    onKeyUp = {(e) => handleKeyUp(e, {currElmKey: 'silverRatePerGm'}) }
-                                    ref={(domElm) => { domElmns.silverRatePerGm = domElm; }}
-                                />
-                            </FormGroup>
-                        </Col>
-                    </Row>
-                    <Row>
-                        <Col xs={3} md={3}>
-                            <FormGroup>
-                                <FormLabel>Bill Series</FormLabel>
-                                <FormControl
-                                    type="text"
-                                    placeholder=""
-                                    onChange={(e) => onChange(e.target.value, 'billSeries')} 
-                                    onKeyUp = {(e) => handleKeyUp(e, {currElmKey: 'billSeries'}) }
-                                    ref={(domElm) => { domElmns.billSeries = domElm; }}
-                                    value={billSeries}
-                                />
-                                <FormControl.Feedback />
-                            </FormGroup>
-                        </Col>
-                        <Col xs={3} md={3}>
-                            <FormGroup>
-                                <FormLabel>Bill No</FormLabel>
-                                <FormControl
-                                    type="number"
-                                    placeholder=""
-                                    onChange={(e) => onChange(e.target.value, 'billNo')}
-                                    onKeyUp = {(e) => handleKeyUp(e, {currElmKey: 'billNo'}) } 
-                                    ref={(domElm) => { domElmns.billNo = domElm; }}
-                                    value={billNo}
-                                />
-                                <FormControl.Feedback />
-                            </FormGroup>
-                        </Col>
-                        <Col xs={3} md={3}>
+                        <Col xs={2} md={2}>
                             <FormGroup className="gst-bill-demo-datepicker">
                                 <FormLabel>Date</FormLabel>
                                 <DatePicker
@@ -622,9 +639,91 @@ function GstBillingDemo() {
                                     />
                             </FormGroup>
                         </Col>
+                        <Col xs={2} md={2}>
+                            <FormGroup>
+                                <FormLabel>HSN</FormLabel>
+                                <FormControl
+                                    type="text"
+                                    placeholder=""
+                                    onChange={(e) => onChange(e.target.value, 'hsCode')} 
+                                    value={hsCode}
+                                />
+                                <FormControl.Feedback />
+                            </FormGroup>
+                        </Col>
+                        <Col xs={2} md={2}>
+                            <FormGroup>
+                                <FormLabel>Category</FormLabel>
+                                <FormControl
+                                    as="select"
+                                    placeholder=""
+                                    value={categ}
+                                    onChange={(e) => onChange(e.target.value, 'categ')}
+                                >
+                                   <option key="gold" value="gold">Gold</option>
+                                   <option key="silver" value="silver">Silver</option>
+                                </FormControl>
+                            </FormGroup>
+                        </Col>
+                        <Col xs={2} md={2}>
+                            <FormGroup>
+                                <FormLabel>G - Price/Gm</FormLabel>
+                                <FormControl
+                                    type="text"
+                                    placeholder=""
+                                    value={goldRatePerGm}
+                                    onChange={(e) => onChange(e.target.value, 'goldRatePerGm')}
+                                    onKeyUp = {(e) => handleKeyUp(e, {currElmKey: 'goldRatePerGm'}) }
+                                    ref={(domElm) => { domElmns.goldRatePerGm = domElm; }}
+                                />
+                            </FormGroup>
+                        </Col>
+                        <Col xs={2} md={2}>
+                            <FormGroup>
+                                <FormLabel>S - Price/Gm</FormLabel>
+                                <FormControl
+                                    type="text"
+                                    placeholder=""
+                                    value={silverRatePerGm}
+                                    onChange={(e) => onChange(e.target.value, 'silverRatePerGm')}
+                                    onKeyUp = {(e) => handleKeyUp(e, {currElmKey: 'silverRatePerGm'}) }
+                                    ref={(domElm) => { domElmns.silverRatePerGm = domElm; }}
+                                />
+                            </FormGroup>
+                        </Col>
+                    </Row>
+                    <Row>
+                        <Col xs={2} md={2}>
+                            <FormGroup>
+                                <FormLabel>Bill Series</FormLabel>
+                                <FormControl
+                                    type="text"
+                                    placeholder=""
+                                    onChange={(e) => onChange(e.target.value, 'billSeries')} 
+                                    onKeyUp = {(e) => handleKeyUp(e, {currElmKey: 'billSeries'}) }
+                                    ref={(domElm) => { domElmns.billSeries = domElm; }}
+                                    value={billSeries}
+                                />
+                                <FormControl.Feedback />
+                            </FormGroup>
+                        </Col>
+                        <Col xs={2} md={2}>
+                            <FormGroup>
+                                <FormLabel>Bill No</FormLabel>
+                                <FormControl
+                                    type="number"
+                                    placeholder=""
+                                    onChange={(e) => onChange(e.target.value, 'billNo')}
+                                    onKeyUp = {(e) => handleKeyUp(e, {currElmKey: 'billNo'}) } 
+                                    ref={(domElm) => { domElmns.billNo = domElm; }}
+                                    value={billNo}
+                                />
+                                <FormControl.Feedback />
+                            </FormGroup>
+                        </Col>
                     </Row>
                     <Row>   
-                        <Col xs={6} md={6}>
+                        <Col xs={3} md={3}>
                             <FormGroup>
                                 <FormLabel>Customer Name</FormLabel>
                                 <FormControl
@@ -638,7 +737,7 @@ function GstBillingDemo() {
                                 <FormControl.Feedback />
                             </FormGroup>
                         </Col>
-                        <Col xs={6} md={6}>
+                        <Col xs={3} md={3}>
                             <FormGroup>
                                 <FormLabel>Customer Mobile</FormLabel>
                                 <FormControl
@@ -652,9 +751,7 @@ function GstBillingDemo() {
                                 <FormControl.Feedback />
                             </FormGroup>
                         </Col>
-                    </Row>
-                    <Row>
-                        <Col xs={12}>
+                        <Col xs={6}>
                             <FormGroup>
                                 <FormLabel>Address</FormLabel>
                                 <FormControl
@@ -669,97 +766,85 @@ function GstBillingDemo() {
                             </FormGroup>
                         </Col>
                     </Row>
-                    <Row>
+                    <Row style={{padding: '0 15px'}}>
                         <Col xs={12}>
                             <Row>
-                                <Col xs={2} className="no-padding">
-                                    <span> Title </span>
+                                <Col xs={6}>
+                                    <Row>
+                                        <Col xs={3} className="no-padding">
+                                            <span> Title </span>
+                                        </Col>
+                                        <Col xs={1} className="no-padding">
+                                            <span> HUID </span>
+                                        </Col>
+                                        <Col xs={2} className="no-padding">
+                                            <span> Div </span>
+                                        </Col>
+                                        <Col xs={1} className="no-padding">
+                                            <span> qty </span>
+                                        </Col>
+                                        <Col xs={2} className="no-padding">
+                                            <span> gwt </span>
+                                        </Col>
+                                        <Col xs={2} className="no-padding">
+                                            <span> nwt </span>
+                                        </Col>
+                                    </Row>
                                 </Col>
-                                <Col xs={1} className="no-padding">
-                                    <span> HUID </span>
+                                <Col xs={6}>
+                                    <Row>
+                                        <Col xs={2} className="no-padding">
+                                            <span> W.A % </span>
+                                        </Col>
+                                        <Col xs={2} className="no-padding">
+                                            <span> W.A </span>
+                                        </Col>
+                                        <Col xs={1} className="no-padding">
+                                            <span> M.C </span>
+                                        </Col>
+                                        <Col xs={2} className="no-padding">
+                                            <span>CGST</span>
+                                        </Col>
+                                        <Col xs={2} className="no-padding">
+                                            <span>SGST</span>
+                                        </Col>
+                                        <Col xs={3} className="no-padding">
+                                            <span> price </span>
+                                        </Col>
+                                    </Row>
                                 </Col>
-                                <Col xs={1} className="no-padding">
-                                    <span> Div </span>
-                                </Col>
-                                <Col xs={1} className="no-padding">
-                                    <span> qty </span>
-                                </Col>
-                                <Col xs={1} className="no-padding">
-                                    <span> gwt </span>
-                                </Col>
-                                <Col xs={1} className="no-padding">
-                                    <span> nwt </span>
-                                </Col>
-                                <Col xs={1} className="no-padding">
-                                    <span> W.A % </span>
-                                </Col>
-                                <Col xs={1} className="no-padding">
-                                    <span> W.A </span>
-                                </Col>
-                                <Col xs={1} className="no-padding">
-                                    <span> M.C </span>
-                                </Col>
-                                <Col xs={2} className="no-padding">
-                                    <span> price </span>
-                                </Col>
+                                
                             </Row>
                             {getOrnInputRows()}
                             {getTotalsRow()}
                         </Col>
                     </Row>
-                    {/* <Row>
-                        <Col xs={4} style={{paddingTop: '15px'}}>
-                            <FormGroup>
-                                <FormLabel>Making Charges</FormLabel>
-                                <FormControl
-                                    type="text"
-                                    placeholder=""
-                                    onChange={(e) => onChange(e.target.value, 'makingCharge')} 
-                                    value={makingCharge}
-                                />
-                                <FormControl.Feedback />
-                            </FormGroup>
-                        </Col>
-                    </Row> */}
-                    <Row>
-                        <Col xs={4}>
-                            <FormGroup>
-                                <FormLabel>CGST %</FormLabel>
-                                <FormControl
-                                    type="text"
-                                    placeholder=""
-                                    onChange={(e) => onChange(e.target.value, 'cgstPercent')}
-                                    value={cgstPercent}
-                                />
-                                <FormControl.Feedback />
-                            </FormGroup>
-                        </Col>
-                        <Col xs={4}>
-                            <FormGroup>
-                                <FormLabel>SGST %</FormLabel>
-                                <FormControl
-                                    type="text"
-                                    placeholder=""
-                                    onChange={(e) => onChange(e.target.value, 'sgstPercent')} 
-                                    value={sgstPercent}
-                                />
-                                <FormControl.Feedback />
-                            </FormGroup>
-                        </Col>
-                    </Row>
-                    <Row>
+                    <Row style={{marginTop: '20px'}}>
                         <Col xs={12}>
-                            <h5>CGST: ₹ {cgstVal}</h5>
-                            <h5>SGCT: ₹ {sgstVal}</h5>
                             <h5>RoundOff: ₹ {roundOffVal}</h5>
                             <h4>Grand Total: ₹ {grandTotal}</h4>
                         </Col>
                     </Row>
+                    <hr style={{
+                        borderColor: "black",
+                        marginTop: "35px",
+                        marginBottom: "25px"
+                    }}></hr>
+                    <h4 
+                        style={{cursor: 'pointer'}}
+                        onClick={(e)=>{setToolsVisibility(!toolsVisibility)}}>Tools &gt; </h4>
+                    <Collapse isOpened={toolsVisibility}>
+                        <Row>
+                            <Col xs={7} className="card" style={{marginLeft: '15px', paddingTop: '10px'}}>
+                                <WastageCalculator />
+                            </Col>
+                        </Row>
+                    </Collapse>
                 </Col>
-                <Col xs={6}>
+                <Col xs={5}>
                     <input type="button" className="gs-button bordered" value="Preview" onClick={onClickPreview} />
-                    <input type="button" className="gs-button bordered" value="Print" onClick={onClickPrint} />
-                    <div className="gst-bill-preview">
+                    <input type="button" className="gs-button bordered" value="Print" onClick={onClickPrint} style={{marginLeft: '15px'}} />
+                    <div className="gst-bill-preview" style={{transform: 'scale(0.68)', transformOrigin: "left top"}}>
                         <TemplateRenderer ref={(el) => (componentRef = el)} templateId={2} content={templateContent}/>
                     </div>
                     <ReactToPrint 
