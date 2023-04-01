@@ -612,7 +612,7 @@ export const RenewalScreen = (props) => {
             uniqueIdentifier: theBillData.UniqueIdentifier,
             billNo: billNumber,
             billSeries: billSeries,
-            amount: newPrincipal,
+            amount: parseInt(newPrincipal),
             landedCost: newPrincipal-newInterestValue,
             date: new Date().toISOString().replace('T', ' ').slice(0,23),
             expiryDate: addDays(new Date(), LOAN_BILL_EXPIRY_DAYS).toISOString().replace('T', ' ').slice(0,23),

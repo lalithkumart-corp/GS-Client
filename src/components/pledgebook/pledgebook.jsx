@@ -30,6 +30,7 @@ import {Tooltip} from 'react-tippy';
 class Pledgebook extends Component {
     constructor(props) {
         super(props);        
+        this.elem = document.createElement('div');
         this.timeOut = 300;
         let todaysDate = new Date();
         let pastDate = new Date();
@@ -376,6 +377,7 @@ class Pledgebook extends Component {
         this.shouldDisableCustomFilterApplyBtn = this.shouldDisableCustomFilterApplyBtn.bind(this);
         this.closePopover = this.closePopover.bind(this);
         this.setAllowanceOfActions = this.setAllowanceOfActions.bind(this);
+        this.afterBillFetchListener = this.afterBillFetchListener.bind(this);
     }
 
     componentDidMount() {
@@ -391,7 +393,9 @@ class Pledgebook extends Component {
             newState.loadingList = false;
             newState.totalCount = nextProps.pledgeBook.totalCount;
             if(newState.currRowIndex)
-                newState.currentBillData = newState.pendingBillList[newState.currRowIndex];            
+                newState.currentBillData = newState.pendingBillList[newState.currRowIndex];
+            console.log('--Triggered event');
+            this.elem.dispatchEvent(new Event('fetchedPledgebookData'), {newState});           
         }        
         this.setState(newState);
     }
@@ -452,12 +456,18 @@ class Pledgebook extends Component {
         }
     }
 
+    afterBillFetchListener = (e, newState) => {
+        console.log('--Listened');
+        this.elem.removeEventListener('fetchedPledgebookData', null);
+    }
+
     handleClose(params) {
         this.setState({PBmodalIsOpen: false, currentBillData: null, currRowIndex: null});
         if(params && params.showPledgebookInitialPage) {
             this.resetUserSelections(() => {
                 this.refresh();
             });
+            this.elem.addEventListener('fetchedPledgebookData', this.afterBillFetchListener);
         }
     }
 
