@@ -26,11 +26,12 @@ import axiosMiddleware from '../../core/axios';
 import { ARCHIVE_PLEDGEBOOK_BILLS, UNARCHIVE_PLEDGEBOOK_BILLS, TRASH_PLEDGEBOOK_BILLS, PERMANENTLY_DELETE_PLEDGEBOOK_BILLS, RESTORE_TRASHED_PLEDGEBOOK_BILLS } from '../../core/sitemap';
 import AlertComp from '../alert/Alert';
 import {Tooltip} from 'react-tippy';
+import EventEmitter from 'events';
 
 class Pledgebook extends Component {
     constructor(props) {
         super(props);        
-        this.elem = document.createElement('div');
+        this.myEvt = new EventEmitter();
         this.timeOut = 300;
         let todaysDate = new Date();
         let pastDate = new Date();
@@ -395,9 +396,11 @@ class Pledgebook extends Component {
             if(newState.currRowIndex)
                 newState.currentBillData = newState.pendingBillList[newState.currRowIndex];
             console.log('--Triggered event');
-            this.elem.dispatchEvent(new Event('fetchedPledgebookData'), {newState});           
+            this.setState(newState);
+            this.myEvt.emit('fetchedPledgebookData', newState);
+        } else {
+            this.setState(newState);
         }        
-        this.setState(newState);
     }
 
     componentWillUpdate(newProps, newState, newContext) {
@@ -456,9 +459,10 @@ class Pledgebook extends Component {
         }
     }
 
-    afterBillFetchListener = (e, newState) => {
+    afterBillFetchListener = (newState) => {
         console.log('--Listened');
-        this.elem.removeEventListener('fetchedPledgebookData', null);
+        this.myEvt.removeAllListeners(['fetchedPledgebookData']);
+        this.setState({PBmodalIsOpen: true, currentBillData: newState.pendingBillList[0], currRowIndex: 0});
     }
 
     handleClose(params) {
@@ -467,7 +471,7 @@ class Pledgebook extends Component {
             this.resetUserSelections(() => {
                 this.refresh();
             });
-            this.elem.addEventListener('fetchedPledgebookData', this.afterBillFetchListener);
+            this.myEvt.once('fetchedPledgebookData', this.afterBillFetchListener);
         }
     }
 

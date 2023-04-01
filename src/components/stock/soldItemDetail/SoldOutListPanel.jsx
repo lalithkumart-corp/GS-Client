@@ -71,6 +71,21 @@ export default class SoldItems extends Component {
                     width: '7%'
                 },
                 {
+                    id: 'ProdHuid',
+                    displayText: 'HUID',
+                    isFilterable: true,
+                    filterCallback: this.filterCallbacks.huid,
+                    className: 'huid-id',
+                    formatter: (column, columnIndex, row, rowIndex) => {
+                        return (
+                            <span className='huid-cell'>
+                                {row[column.id]}
+                            </span>
+                        )
+                    },
+                    width: '7%'
+                },
+                {
                     id: 'InvoiceNo',
                     displayText: 'Invoice No',
                     isFilterable: true,
@@ -310,7 +325,14 @@ export default class SoldItems extends Component {
             date: {
                 startDate: dateFormatter(this.state.filters.date.startDate),
                 endDate: dateFormatter(endDate)
-            }
+            },
+            invoiceNo: this.state.filters.invoiceNo,
+            customer: this.state.filters.customer,
+            prodId: this.state.filters.prodId,
+            prodHuid: this.state.filters.prodHuid,
+            itemName: this.state.filters.itemName,
+            itemCategory: this.state.filters.itemCategory,
+            itemSubCategory: this.state.filters.itemSubCategory,
         }
         return filters;
     }
@@ -348,6 +370,13 @@ export default class SoldItems extends Component {
             let val = e.target.value;
             let newState = {...this.state};
             newState.filters.prodId = val;
+            await this.setState(newState);
+            this.refresh({fetchOnlyRows: true});
+        },
+        huid: async (e, col, colIndex) => {
+            let val = e.target.value;
+            let newState = {...this.state};
+            newState.filters.prodHuid = val;
             await this.setState(newState);
             this.refresh({fetchOnlyRows: true});
         },

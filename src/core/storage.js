@@ -13,6 +13,7 @@ const keys = {
     pledgebookFilters: 'pledgebookFilters',
     cashManagerFilters: 'cashManagerFilters',
     loanBillTemplate: 'loanBillTemplate',
+    jewelleryTagTemplateData: 'jewelleryTagTemplateData',
     jewelleryGstBillTemplateData: 'jewelleryGstBillTemplateData',
     stockListPageFilters: 'stockListPageFilters',
     stockSoldListPageFilters: 'stockSoldListPageFilters',
@@ -39,7 +40,8 @@ const keyMaps = {
         keys.allFundList,
         keys.stockListPageFilters,
         keys.stockSoldListPageFilters,
-        keys.jewelleryInvoiceListPageFilters
+        keys.jewelleryInvoiceListPageFilters,
+        keys.jewelleryTagTemplateData
     ],
     session: [
 
@@ -226,6 +228,7 @@ export const clearSession = () => {
     clearLoanDate();
     clearMyFundAccountsList();
     clearAllBanksList();
+    clearJewelleryTagTemplateSettings();
     _clear(keys.session);
 }
 
@@ -333,6 +336,19 @@ export const getJewelleryGstBillTemplateSettings = () => {
 
 export const clearJewelleryGstBillTemplateSettings = () => {
     _clear(keys.jewelleryGstBillTemplateData);
+}
+
+export const saveJewelleryTagTemplateSettings = (data) => {
+    _save(keys.jewelleryTagTemplateData, data);
+}
+
+export const getJewelleryTagTemplateSettings = () => {
+    let templateData = _read(keys.jewelleryTagTemplateData);
+    return templateData;
+}
+
+export const clearJewelleryTagTemplateSettings = () => {
+    _clear(keys.jewelleryTagTemplateData);
 }
 
 export const getMyFundAccountList = () => {

@@ -16,12 +16,16 @@ import {Tooltip} from 'react-tippy';
 import CommonModal from '../../common-modal/commonModal';
 import StockItemEdit from './StockItemEdit';
 import { getDataFromStorageRespObj } from './helper';
+import TagTemplateRenderer from '../../../templates/jewellery-tag/templateRenderer';
+import { getTagSettings } from '../../jewellery/tag/tagController';
+import ReactToPrint from 'react-to-print';
 
 const DEFAULT_SELECTION = {
     rowObj: [],
     indexes: []
 }
 export default class ViewStock extends Component {
+    domElms = {};
     constructor(props) {
         super(props);
         this.filtersFromLocal = getStockListPageFilters();
@@ -59,7 +63,7 @@ export default class ViewStock extends Component {
                 },
                 {
                     id: 'itemCode',
-                    displayText: 'Code',
+                    displayText: 'Tag',
                     isFilterable: true,
                     filterCallback: this.filterCallbacks.itemCode,
                     className: 'stock-product-code-col',
@@ -67,6 +71,21 @@ export default class ViewStock extends Component {
                         return (
                             <span className='product-code-cell' onClick={(e)=>this.onClickItem(e, row)}>
                                 {row[column.id]}{row['itemCodeNumber']}
+                            </span>
+                        )
+                    },
+                    width: '5%'
+                },
+                {
+                    id: 'itemHuid',
+                    displayText: 'HUID',
+                    isFilterable: true,
+                    filterCallback: this.filterCallbacks.itemHuid,
+                    className: 'stock-product-huid-col',
+                    formatter: (column, columnIndex, row, rowIndex) => {
+                        return (
+                            <span className='product-huid-cell' onClick={(e)=>this.onClickItem(e, row)}>
+                                {row[column.id]}
                             </span>
                         )
                     },
@@ -359,7 +378,7 @@ export default class ViewStock extends Component {
                                 <Tooltip title="Print Tag"
                                         position="top"
                                         trigger="mouseenter">
-                                    <span className="tag-print-btn gs-icon"><FontAwesomeIcon icon='print' onClick={(e) => this.printClickListener(row)}/></span>
+                                    <span className="tag-print-btn gs-icon"><FontAwesomeIcon icon='print' onClick={(e) => this.printClickListener(e, row)}/></span>
                                 </Tooltip>
                             </span>
                         )
@@ -401,6 +420,7 @@ export default class ViewStock extends Component {
     componentDidMount() {
         this.fetchTotals();
         this.fetchStockListPerPage();
+        this.fetchJewelleryTagSettings();
     }
     filterCallbacks = {
         date: async (startDate, endDate) => {
@@ -424,6 +444,14 @@ export default class ViewStock extends Component {
             let val = e.target.value;
             let newState = {...this.state};
             newState.filters.prodId = val;
+            newState.selectedInfo = DEFAULT_SELECTION;
+            await this.setState(newState);
+            this.refresh({fetchOnlyRows: true});
+        },
+        itemHuid: async (e) => {
+            let val = e.target.value;
+            let newState = {...this.state};
+            newState.filters.huid = val;
             newState.selectedInfo = DEFAULT_SELECTION;
             await this.setState(newState);
             this.refresh({fetchOnlyRows: true});
@@ -465,8 +493,27 @@ export default class ViewStock extends Component {
 
         }
     }
-    printClickListener(row) {
-
+    async fetchJewelleryTagSettings() {
+        let tagSettings = await getTagSettings();
+        this.setState({jewelleryTagId: tagSettings.selected_tag_template_id, storeNameAbbr: tagSettings.store_name_abbr});
+    }
+    printClickListener(e, row) {
+        e.stopPropagation();
+        this.setState({jewelleryTagContent: {
+            storeName: this.state.storeNameAbbr,
+            touch: row.touch,
+            showBis: false,
+            grams: row.avlNWt,
+            size: row.dimension,
+            itemName: row.itemName,
+            itemHuid: row.itemHuid,
+        }}, ()=> {
+            if(this.domElms.tagPrintBtn) {
+                this.domElms.tagPrintBtn.handlePrint();
+            } else {
+                alert('Error priting the tag');
+            }
+        });
     }
     expandRow = {
         renderer: (row) => {
@@ -636,6 +683,7 @@ export default class ViewStock extends Component {
             },
             metalCategory: metalCategory,
             prodId: this.state.filters.prodId,
+            huid: this.state.filters.huid,
             itemName: this.state.filters.itemName,
             itemCategory: this.state.filters.itemCategory,
             itemSubCategory: this.state.filters.itemSubCategory,
@@ -692,6 +740,7 @@ export default class ViewStock extends Component {
                         uid: aStockItem.UID,
                         itemCode: aStockItem.ItemCode || '',
                         itemCodeNumber: aStockItem.ItemCodeNumber,
+                        itemHuid: aStockItem.ItemHUID,
                         itemName: aStockItem.ItemName,
                         itemCategory: aStockItem.ItemCategory,
                         itemSubCategory: aStockItem.ItemSubCategory,
@@ -847,6 +896,14 @@ export default class ViewStock extends Component {
                 <CommonModal secClass="edit-stock-common-modal" modalOpen={this.state.isItemEditModalOpen} handleClose={(e)=> {this.setState({isItemEditModalOpen: false, itemEditData: null})}}>
                     <StockItemEdit itemEditData={this.state.itemEditData}/>
                 </CommonModal>
+                <div className="tag-renderer-comp">
+                    <TagTemplateRenderer ref={(el) => (this.componentRef = el)} templateId={this.state.jewelleryTagId} content={this.state.jewelleryTagContent}/>
+                </div>
+                <ReactToPrint 
+                    ref={(domElm) => {this.domElms.tagPrintBtn = domElm}}
+                    trigger = {()=> <a href="#"></a>}
+                    content={()=>this.componentRef}
+                />
             </Container>
         )
     }

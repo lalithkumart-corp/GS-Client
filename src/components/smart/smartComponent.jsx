@@ -34,6 +34,7 @@ import StockViewTabLayout from '../stock/viewStock/index';
 import SellItem from '../stock/sellItems/SellItem';
 import JewelleryCustomerInvoicesList from '../stock/custInvoices/custInvoicesList';
 import StockSetup from '../stock/setup/StockSetup';
+import TagSetup from '../jewellery/tag/TagSetup.jsx';
 import TagDemo from '../stock/tag/TagDemo';
 import CustomTag from '../stock/tag/CustomTag';
 import ActivationPage from '../activation/ActivationPage';
@@ -98,7 +99,7 @@ class SmartComponent extends Component {
         yy = yy.replaceAll('GS_', '');
         yy = yy.replaceAll('MAK_', '');
         yy = yy.replaceAll('INTER', '');
-        if(true || yy == "-236375844") { // temporarily making as tru for development mode
+        if(true || yy == "-1844838684") { // temporarily making as tru for development mode
             if(this.props.auth.isAuthenticated) {
                 if(!this.props.auth.isActivated) {
                     return (
@@ -152,6 +153,7 @@ class SmartComponent extends Component {
                                     <Route path= "/sell-item" component={SellItem} />
                                     <Route path= "/jewellery-cust-invoices" component={JewelleryCustomerInvoicesList} />
                                     <Route path= "/stock-setup" component={StockSetup} />
+                                    <Route path="/tag-setup" component={TagSetup} />
                                     <Route path= "/tag-demo" component={TagDemo} />
                                     <Route path="/tag-v2" component={CustomTag} />
                                     <Route path="/label-generator" component={CustomLabel} />
@@ -177,7 +179,7 @@ class SmartComponent extends Component {
                         <div>
                             <ToastContainer position={'top-center'} hideProgressBar={false}/>
                             <Route exact path= '/' component={LoginPage} />
-                            <Route path= '/signup' component={SignUpPage} />
+                            {/* <Route path= '/signup' component={SignUpPage} /> */}
                             <Route path= '/logout' component={Logout} />
                         </div>
                     </Router>

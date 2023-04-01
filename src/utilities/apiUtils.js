@@ -2,6 +2,8 @@ import axios from 'axios';
 import axiosMiddleware from '../core/axios';
 import { FETCH_FUND_ACCOUNTS_LIST, FETCH_ALL_BANK_LIST, FETCH_CATEGORY_SUGGESTIONS, SAVE_LOCATION } from '../core/sitemap';
 import { getAccessToken, getMyFundAccountList, saveMyFundAccountsList, saveAllBanksList, getAllBanksList } from '../core/storage';
+import { toast } from 'react-toastify';
+
 export const fetchMyAccountsList = async () => {
     try {
         let myFundList = getMyFundAccountList();

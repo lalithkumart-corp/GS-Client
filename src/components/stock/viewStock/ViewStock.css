@@ -137,3 +137,13 @@
 .edit-stock-common-modal .container {
     max-width: 100%;
 }
+
+.tag-renderer-comp {
+    display: none;
+}
+
+@media print {
+    .tag-renderer-comp {
+        display: block;
+    }
+}
