@@ -73,9 +73,8 @@
     padding-left: 7px;
 }
 .filter-popover-trigger-btn {
-    margin-left: 10px;
+    margin: 7px 10px 0 16px;
     color: #337ab7;
-    vertical-align: super;
 }
 .no-of-items {
     margin-top: 14px;
@@ -138,9 +137,20 @@
     max-width: 100%;
 }
 
-.tag-renderer-comp {
-    display: none;
+.view-stock-container .more-actions-dropdown {
+    display: inline-block;
 }
+.view-stock-container #dropdown-more-actions {
+    background-color: white;
+    color: #337ab7;
+    border: none;
+}
+.view-stock-container #dropdown-more-actions:disabled {
+    color: lightgrey;
+}
+/* .tag-renderer-comp {
+    display: none;
+} */
 
 @media print {
     .tag-renderer-comp {

@@ -6,18 +6,17 @@ export default class TemplateRenderer extends Component {
     constructor(props) {
         super(props);
     }
-    getTemplateById = () => {
+    getTemplateById = (tag) => {
         let theDom = [];
         switch(this.props.templateId) {
             case 1:
-                theDom.push(<Template1 {...this.props.content} />);
+                theDom.push(<Template1 {...tag} />);
                 break;
             case 2:
-                debugger;
-                theDom.push(<Template2 {...this.props.content} />);
+                theDom.push(<Template2 {...tag} />);
                 break;
             default:
-                theDom.push(<Template1 {...this.props.content} />);
+                theDom.push(<Template1 {...tag} />);
         }
         return theDom;
     }
@@ -25,7 +24,13 @@ export default class TemplateRenderer extends Component {
     render() {
         return (
             <div>
-                {this.getTemplateById()}    
+                {(()=> {
+                    let dom = [];
+                    _.each(this.props.content, (tag) => {
+                        dom.push(this.getTemplateById(tag));
+                    });
+                    return dom;
+                })()}
             </div>
         )
     }

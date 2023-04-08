@@ -5,6 +5,14 @@
             max-width: 100%;
         }
     }
+    .action-dropdown-for-sold-out-jewellery-list {
+        button.dropdown-toggle {
+            border: none;
+            &:disabled {
+                color: lightgray !important;
+            }
+        }
+    }
 }
 .stock-sold-out-itens-date-filter {
     border: 1px solid !important;

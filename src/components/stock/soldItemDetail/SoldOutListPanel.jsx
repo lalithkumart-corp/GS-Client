@@ -497,7 +497,7 @@ export default class SoldItems extends Component {
                 <GsScreen showScreen={this.state.currentScreen==1?true:false} isMainScreen={true}>
                     <Col xs={12} md={12}>
                         <Row>
-                            <Col xs={3} md={3}>
+                            <Col xs={3} md={3} style={{display: 'flex'}}>
                                 <DateRangePicker 
                                     className = 'stock-sold-out-itens-date-filter'
                                     selectDateRange={this.filterCallbacks.date}
@@ -505,9 +505,7 @@ export default class SoldItems extends Component {
                                     endDate={this.state.filters.date.endDate}
                                     showIcon= {false}
                                 />
-                            </Col>
-                            <Col xs={3} md={3}>
-                                <DropdownButton className="gs-dropdown action-dropdown-for-sold-out-jewellery-list" title="Actions">
+                                <DropdownButton className="gs-dropdown action-dropdown-for-sold-out-jewellery-list" title="Actions" disabled={!this.state.selectedInfo.indexes.length}>
                                     <Dropdown.Item onClick={this.printMultipleInvoicesHandler}>Print Invoices</Dropdown.Item>
                                 </DropdownButton>
                             </Col>

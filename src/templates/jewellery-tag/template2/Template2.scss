@@ -1,0 +1,52 @@
+
+.jewellery-tag-template-2-label {
+    width: 475px;
+    height: 65px;
+    font-family: monospace;
+    padding-left: 15px;
+    background-color: lightgray;
+    .label-content-section {
+        width: 317px;
+        height: 65px;
+        padding-left: 15px;
+        .section-1, .section-2 {
+            width: 150px;
+            height: 65px;
+            display: inline-block;
+        }
+        .section-1 {
+            .row-1 {
+                height: 32px;
+                .store-name-abbr {
+                    display: inline-block;
+                }
+                .item-division {
+                    display: inline-block;
+                }
+            }
+            .row-2 {
+                height: 32px;
+                .item-wt {
+                    display: inline-block;
+                }
+            }
+        }
+        .section-2 {
+            .row-1 {
+                height: 32px;
+                .item-size {
+                    display: inline-block;
+                }
+                .item-name {
+                    display: inline-block;
+                }
+            }
+            .row-2 {
+                height: 32px;
+                .item-wt {
+                    display: inline-block;
+                }
+            }
+        }
+    }
+}

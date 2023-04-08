@@ -1,21 +1,36 @@
+import './Template2.scss';
 
 const Template2 = ({
-    storeName, touch, showBis, 
-    grams, size, itemName
+    storeName, touch, 
+    grams, size, itemName, huid, config
 }) => {
+    config = config || {};
+    let showSize = size?true:false;
+    let showHuid = huid?true:false;
+    let showItemName = false;
+    if(!showSize && !showHuid) showItemName = true;
+
+    grams = grams?parseFloat(grams).toFixed(3):'';
+
     const storeNameStyles = {
         width: '45px',
         fontSize: 20,
         fontWeight: 'bold'
     };
-    const touchStyles = {
+    const itemDivStyles = {
+        textAlign: 'center',
+        width: '70px',
         fontSize: '17px',
         fontWeight: 'bold'
     };
-    const imgStyles = {
-        display: showBis?'inline':'none',
-        position: 'absolute',
-        height: '20px'
+    const hallmarkLogoSpanStyles = {
+        height: '19px',
+        width: '24px',
+        display: config.showBis?'inline-block':'none'
+    };
+    const hallmarkLogoStyles = {
+        height: '100%',
+        marginTop: '-6px'
     };
     const weightStyles = {
         fontSize: '22px',
@@ -24,49 +39,56 @@ const Template2 = ({
     const itemNameStyles = {
         fontSize: '17px',
         fontWeight: 'normal',
-        width: '35px'
+        width: '35px',
+        display: showItemName?'inline-block': 'none',
+    };
+    const huidStyles = {
+        display: showHuid?'inline-block':'none',
+        fontWeight: 'bold',
+        fontSize: '17px'
     };
     const itemSizeStyles = {
         width: '34px',
         fontSize: '16px',
-        fontWeight: 'bold'
+        fontWeight: 'bold',
+        display: showSize?'inline-block':'none'
     };
 
-debugger;
     return (
-        <div style={{height: '60px', width: '425px', paddingLeft: '15px', fontFamily: 'monospace'}}>
-            <div style={{width: '302px', display: "inline-block", height: '65px', backgroundColor: 'lightgray', paddingTop: '6px'}}>
-                <div style={{width: '150px', display: "inline-block"}}>
-                    <div style={{height: '20px', paddingLeft: '4px'}}>
-                        <span style={storeNameStyles}>{storeName}</span>
-                        <span style={touchStyles}>{touch}</span>
-                        <span style={{marginLeft: '58px', height: '12px'}}><img style={imgStyles} src='/images/bis.jpg' /></span>
+        <>
+            <div className="jewellery-tag-template-2-label">
+                <div  className='label-content-section'>
+                    <div className='section-1'>
+                        <div className='row-1'>
+                            <span className='store-name-abbr' style={storeNameStyles}>{storeName}</span>
+                            <span className='item-division' style={itemDivStyles}>{touch}</span>
+                            <span className='hallmark-logo-span' style={hallmarkLogoSpanStyles}>
+                                <img className='hallmark-logo' style={hallmarkLogoStyles} src='/images/bis.jpg' />
+                            </span>
+                        </div>
+                        <div className='row-2'>
+                            <span style={{fontWeight: 'bold'}}>
+                                <span style={{fontSize: '22px'}}>wt: </span>
+                                <span style={weightStyles}>{grams}</span>
+                            </span>
+                        </div>
                     </div>
-                    <div style={{height: '30px', paddingLeft: '4px'}}>
-                        <span style={{fontWeight: 'bold'}}>
-                            <span style={{fontSize: '22px'}}>wt: </span>
-                            <span style={weightStyles}>{grams}</span>
-                        </span>
-                    </div>
-                </div>
-                <div style={{width: '150px', display: "inline-block", height: '50px'}}>
-                    <div style={{height: '20px', fontSize: '16px'}}>
-                        {/* <span style={mcDivStyles}>
-                            <span style={mcLabelStyles}>{this.props.form.mc.label}</span>
-                            <span style={mcStyles}>{this.props.makingCharge}</span>
-                        </span> */}
-                        <span style={itemSizeStyles}>{size}</span>
-                        <span style={itemNameStyles}>{itemName}</span>
-                    </div>
-                    <div style={{height: '30px'}}>
-                        <span style={{fontWeight: 'bold', paddingLeft: '3px'}}>
-                            <span style={{fontSize: '22px'}}>wt: </span>
-                            <span style={weightStyles}>{grams}</span>
-                        </span>
+                    <div className='section-2'>
+                        <div className='row-1'>
+                            <span style={itemSizeStyles}>{showSize?`s${size}`:''}</span>
+                            <span style={itemNameStyles}>{showItemName?itemName:''}</span>
+                            <span style={huidStyles}>{showHuid?huid:''}</span>
+                        </div>
+                        <div className='row-2'>
+                            <span style={{fontWeight: 'bold', paddingLeft: '3px'}}>
+                                <span style={{fontSize: '22px'}}>wt: </span>
+                                <span style={weightStyles}>{grams}</span>
+                            </span>
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
+        </>
     )
 }
 

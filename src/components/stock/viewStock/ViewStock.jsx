@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Container, Row, Col, Form } from 'react-bootstrap';
+import { Container, Row, Col, Form, Dropdown } from 'react-bootstrap';
 import axios from '../../../core/axios';
 import GSTable from '../../gs-table/GSTable';
 import './ViewStock.css';
@@ -35,8 +35,8 @@ export default class ViewStock extends Component {
         todaysDate.setHours(0,0,0,0);
         let todaysEndDate = new Date();
         todaysEndDate.setHours(23,59,59,999);        
+        this.timeOut = 400;
         this.state = {
-            timeOut: 400,
             pageLimit: 10,
             selectedPageIndex: 0,
             stockList: [],
@@ -416,6 +416,9 @@ export default class ViewStock extends Component {
         this.onFilterBtnClick = this.onFilterBtnClick.bind(this);
         this.onMetalCategoryFilterChange = this.onMetalCategoryFilterChange.bind(this);
         this.refresh = this.refresh.bind(this);
+        this.handleTagPrint = this.handleTagPrint.bind(this);
+        this.constructTagDataForPrint = this.constructTagDataForPrint.bind(this);
+        this.printClickListener = this.printClickListener.bind(this);
     }
     componentDidMount() {
         this.fetchTotals();
@@ -438,7 +441,7 @@ export default class ViewStock extends Component {
             newState.filters.supplier = val;
             newState.selectedInfo = DEFAULT_SELECTION;
             await this.setState(newState);
-            this.refresh({fetchOnlyRows: true});
+            this.refresh();
         },
         itemCode: async (e) => {
             let val = e.target.value;
@@ -446,7 +449,7 @@ export default class ViewStock extends Component {
             newState.filters.prodId = val;
             newState.selectedInfo = DEFAULT_SELECTION;
             await this.setState(newState);
-            this.refresh({fetchOnlyRows: true});
+            this.refresh();
         },
         itemHuid: async (e) => {
             let val = e.target.value;
@@ -454,7 +457,7 @@ export default class ViewStock extends Component {
             newState.filters.huid = val;
             newState.selectedInfo = DEFAULT_SELECTION;
             await this.setState(newState);
-            this.refresh({fetchOnlyRows: true});
+            this.refresh();
         },
         itemName: async (e) => {
             let val = e.target.value;
@@ -462,7 +465,7 @@ export default class ViewStock extends Component {
             newState.filters.itemName = val;
             newState.selectedInfo = DEFAULT_SELECTION;
             await this.setState(newState);
-            this.refresh({fetchOnlyRows: true});
+            this.refresh();
         },
         itemCategory: async (e) => {
             let val = e.target.value;
@@ -470,7 +473,7 @@ export default class ViewStock extends Component {
             newState.filters.itemCategory = val;
             newState.selectedInfo = DEFAULT_SELECTION;
             await this.setState(newState);
-            this.refresh({fetchOnlyRows: true});
+            this.refresh();
         },
         itemSubCategory: async (e) => {
             let val = e.target.value;
@@ -478,7 +481,7 @@ export default class ViewStock extends Component {
             newState.filters.itemSubCategory = val;
             newState.selectedInfo = DEFAULT_SELECTION;
             await this.setState(newState);
-            this.refresh({fetchOnlyRows: true});
+            this.refresh();
         },
         dimension: async (e) => {
             let val = e.target.value;
@@ -486,7 +489,7 @@ export default class ViewStock extends Component {
             newState.filters.dimension = val;
             newState.selectedInfo = DEFAULT_SELECTION;
             await this.setState(newState);
-            this.refresh({fetchOnlyRows: true});
+            this.refresh();
         },
         iTouch: () => {},
         touch: async () => {
@@ -497,23 +500,40 @@ export default class ViewStock extends Component {
         let tagSettings = await getTagSettings();
         this.setState({jewelleryTagId: tagSettings.selected_tag_template_id, storeNameAbbr: tagSettings.store_name_abbr});
     }
-    printClickListener(e, row) {
-        e.stopPropagation();
-        this.setState({jewelleryTagContent: {
-            storeName: this.state.storeNameAbbr,
-            touch: row.touch,
-            showBis: false,
-            grams: row.avlNWt,
-            size: row.dimension,
-            itemName: row.itemName,
-            itemHuid: row.itemHuid,
-        }}, ()=> {
+
+    handleTagPrint(arr) {
+        this.setState({
+            jewelleryTagContent: this.constructTagDataForPrint(arr)
+        }, ()=> {
             if(this.domElms.tagPrintBtn) {
                 this.domElms.tagPrintBtn.handlePrint();
             } else {
                 alert('Error priting the tag');
             }
         });
+    }
+
+    constructTagDataForPrint(arr) {
+        let dataArr = [];
+        _.each(arr, (row) => {
+            dataArr.push({
+                storeName: this.state.storeNameAbbr,
+                touch: row.touch,
+                grams: row.avlNWt,
+                size: row.dimension,
+                itemName: row.itemName,
+                huid: row.itemHuid,
+                config: {
+                    showBis: true,
+                }
+            });
+        });
+        return dataArr;
+    }
+
+    printClickListener(e, row) {
+        e.stopPropagation();
+        this.handleTagPrint([row]);
     }
     expandRow = {
         renderer: (row) => {
@@ -653,6 +673,14 @@ export default class ViewStock extends Component {
         newState.filters.showOnlyAvlStockItems = e.target.checked;
         this.setState(newState);
         setStockListPageFilters({...newState.filters,  showOnlyAvlStockItems: e.target.checked});
+    }
+    
+    onMoreActionsDpdClick = (e, identifier) => {
+        switch(identifier) {
+            case 'printTag': 
+                this.handleTagPrint(this.state.selectedInfo.rowObj);
+                break;
+        }
     }
     
     shouldExpndAll() {
@@ -799,7 +827,7 @@ export default class ViewStock extends Component {
         return (
             <Container className="view-stock-container">
                 <Row>
-                    <Col xs={4}>
+                    <Col xs={4} style={{display: 'flex'}}>
                         <DateRangePicker 
                             className = 'stock-view-date-filter'
                             selectDateRange={this.filterCallbacks.date}
@@ -855,7 +883,17 @@ export default class ViewStock extends Component {
                         >
                             <span className='filter-popover-trigger-btn' onClick={this.onFilterBtnClick}>
                                 <FontAwesomeIcon icon='filter'/>
-                            </span>                                    
+                            </span>
+
+                            <Dropdown className="more-actions-dropdown action-btn">
+                                <Dropdown.Toggle id="dropdown-more-actions" disabled={!this.state.selectedInfo.indexes.length}>
+                                    More Actions 
+                                </Dropdown.Toggle>
+                                <Dropdown.Menu>
+                                    <Dropdown.Item onClick={(e) => this.onMoreActionsDpdClick(e, 'printTag')}>Print Tag</Dropdown.Item>
+                                </Dropdown.Menu>
+                            </Dropdown>
+
                         </Popover>
                     </Col>
                     <Col xs={4}>
@@ -870,7 +908,8 @@ export default class ViewStock extends Component {
                             containerClassName={"gs-pagination pagination"}
                             subContainerClassName={"pages pagination"}
                             activeClassName={"active"}
-                            forcePage={this.state.selectedPageIndex} />
+                            forcePage={this.state.selectedPageIndex}
+                        />
                     </Col>
                     <Col xs={4} style={{textAlign: 'right'}}>
                         <span className="no-of-items">No. Of StockItems: {this.state.totals.stockItems}</span>
@@ -889,6 +928,7 @@ export default class ViewStock extends Component {
                             checkboxOnChangeListener = {this.handleCheckboxChangeListener}
                             globalCheckBoxListener = {this.handleGlobalCheckboxChange}
                             selectedIndexes = {this.state.selectedInfo.indexes}
+                            selectedRowJson = {this.state.selectedInfo.rowObj} 
                             showFooter = {true}
                         />
                     </Col>
