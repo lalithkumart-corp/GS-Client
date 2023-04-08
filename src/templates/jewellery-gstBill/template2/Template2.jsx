@@ -154,7 +154,7 @@ function GstBillTemplate2(props) {
         let totalNetWt = 0;
         let ornTableHeader = 
             <>
-                <Row  style={{fontWeight: 'bold', borderBottom: '1px solid grey'}}>
+                <Row  style={{fontWeight: 'bold', borderBottom: '1px solid grey'}} className="orn-table-header">
                     <Col xs={5}>
                         <Row>
                             <Col xs={spans.itemName} className="no-padding">

@@ -16,3 +16,26 @@
 .jewellery-gst-bill-demo .gst-bill-preview .jewellery-gst-bill-paper {
     margin-left: -35px;
 }
+.jewellery-gst-bill-demo {
+    .orn-totals-row {
+        .gs-input {
+            border: none;
+            &:focus-visible {
+                outline: none;
+            }
+        }
+    }
+    .orn-input-row {
+        .gs-input {
+            border: 1px solid lightgray;
+            &:focus-visible {
+                outline: none;
+            }
+        }
+    }
+}
+.jewellery-gst-bill-demo .round-off-input {
+    width: 57px;
+    border: 1px solid lightgray;
+    outline: none;
+}
