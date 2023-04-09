@@ -167,7 +167,8 @@ export const FETCH_AVL_LOAN_BILL_TEMPLATES = `${config.proxy_protocol}://${confi
 export const GET_JEWELLERY_BILL_SETTINGS = `${config.proxy_protocol}://${config.proxy_api_host}:${config.proxy_api_port}/${config.restApiRoot}/JewelleryBillSettings/get-settings`;
 export const UPDATE_JEWELLERY_BILL_SETTINGS = `${config.proxy_protocol}://${config.proxy_api_host}:${config.proxy_api_port}/${config.restApiRoot}/JewelleryBillSettings/update-settings`;
 export const FETCH_AVL_JEWELLERY_BILL_TEMPLATES = `${config.proxy_protocol}://${config.proxy_api_host}:${config.proxy_api_port}/${config.restApiRoot}/JewelleryBillSettings/fetch-avl-jewellery-bill-templates`;
-
+export const FETCH_AVL_JEWELLERY_TAG_TEMPLATES = `${config.proxy_protocol}://${config.proxy_api_host}:${config.proxy_api_port}/${config.restApiRoot}/JewelleryTagAvlTemplates/fetch-list`;
+export const UPDATE_JEWELLERY_TAG_SETTINGS = `${config.proxy_protocol}://${config.proxy_api_host}:${config.proxy_api_port}/${config.restApiRoot}/JewelleryTagSettings/update-tag-selection`;
 export const GET_JEWELLERY_TAG_SETTINGS = `${config.proxy_protocol}://${config.proxy_api_host}:${config.proxy_api_port}/${config.restApiRoot}/JewelleryTagSettings/get-settings`;
 
 export const SAVE_INVOICE_DATA = `${config.proxy_protocol}://${config.proxy_api_host}:${config.proxy_api_port}/${config.restApiRoot}/JewelleryInvoices/save-invoice`;

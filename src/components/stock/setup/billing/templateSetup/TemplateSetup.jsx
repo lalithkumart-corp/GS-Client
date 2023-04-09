@@ -77,7 +77,6 @@ export default function TemplateSetup(props) {
         let templatesContainer = [];
         _.each(templatesList, (aTemplate, index) => {
             let checked = false;
-            debugger;
             if(selectedTemplateId && aTemplate.template_id == selectedTemplateId)
                 checked = true;
 

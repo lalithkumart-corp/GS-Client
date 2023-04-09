@@ -518,7 +518,7 @@ export default class ViewStock extends Component {
         _.each(arr, (row) => {
             dataArr.push({
                 storeName: this.state.storeNameAbbr,
-                touch: row.touch,
+                division: row.touch,
                 grams: row.avlNWt,
                 size: row.dimension,
                 itemName: row.itemName,

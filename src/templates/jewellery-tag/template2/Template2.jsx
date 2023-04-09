@@ -1,7 +1,7 @@
 import './Template2.scss';
 
 const Template2 = ({
-    storeName, touch, 
+    storeName, division, 
     grams, size, itemName, huid, config
 }) => {
     config = config || {};
@@ -61,7 +61,7 @@ const Template2 = ({
                     <div className='section-1'>
                         <div className='row-1'>
                             <span className='store-name-abbr' style={storeNameStyles}>{storeName}</span>
-                            <span className='item-division' style={itemDivStyles}>{touch}</span>
+                            <span className='item-division' style={itemDivStyles}>{division}</span>
                             <span className='hallmark-logo-span' style={hallmarkLogoSpanStyles}>
                                 <img className='hallmark-logo' style={hallmarkLogoStyles} src='/images/bis.jpg' />
                             </span>

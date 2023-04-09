@@ -6,6 +6,8 @@ import RateSetup from '../rateSetup/RateSetup';
 // import BillingTemplateSetting from '../billingTemplateSetting/billTemplateSettings';
 // import GeneralSetup from '../../settings/general/GeneralSetup';
 import Billing from './billing/main';
+import TagSetup from '../../jewellery/tag/TagSetup';
+
 import './StockSetup.css';
 
 export default class AddStock extends Component {
@@ -27,6 +29,9 @@ export default class AddStock extends Component {
                     </Tab>
                     <Tab eventKey="billing" title="Billing">
                         <Billing />
+                    </Tab>
+                    <Tab eventKey="tagSetup" title="Tag">
+                        <TagSetup />
                     </Tab>
                 </Tabs>
             </Container>
