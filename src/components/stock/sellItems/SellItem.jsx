@@ -6,7 +6,7 @@ import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 
 import { getBillNoFromDB, storeSellingDataInDb, setClearEntriesFlag } from '../../../actions/invoice';
-import { FETCH_PROD_IDS, FETCH_STOCKS_BY_PRODID, SALE_ITEM } from '../../../core/sitemap';
+import { FETCH_PROD_IDS, FETCH_STOCKS_BY_PRODID, FETCH_STOCKS_BY_ID, SALE_ITEM, FETCH_JEWELLERY_BILLING_AUTO_SUGGESTIONS } from '../../../core/sitemap';
 import axiosMiddleware from '../../../core/axios';
 import { getAccessToken } from '../../../core/storage';
 import CustomerPicker from '../../customerPanel/CustomerPickerModal';
@@ -22,8 +22,10 @@ import ReactToPrint from 'react-to-print';
 import TemplateRenderer from '../../../templates/jewellery-gstBill/templateRenderer';
 import WastageCalculator from '../../tools/wastageCalculator';
 import { wastageCalc } from '../../tools/wastageCalculator/wastageCalculator';
+import { MdRefresh } from 'react-icons/md';
 
 const TAGID = 'tagid';
+const HUID = 'huid';
 const SELL_QTY = 'qty';
 const SELL_WT = 'wt';
 const SELL_GWT = 'grossWt';
@@ -54,6 +56,7 @@ const SPACE_KEY = 32;
 var domList = new DoublyLinkedList();
 domList.add('retailPrice', {type: 'defaultInput', enabled: true});
 domList.add('tagid', {type: 'rautosuggest', enabled: true});
+domList.add(HUID, {type: 'rautosuggest', enabled: false});
 domList.add('qty1', {type: 'defaultInput', enabled: true});
 domList.add('wt1', {type: 'defaultInput', enabled: false});
 domList.add('wt2', {type: 'defaultInput', enabled: false});
@@ -95,6 +98,11 @@ class SellItem extends Component {
                 prodIdList: [],
                 limitedProdIdList: []
             },
+            huid: {
+                inputVal: '',
+                huidList: [],
+                limitedHuidList: []
+            },
             currSelectedItem: {},
             purchaseItemPreview: {},
             purchaseTotals: {},
@@ -110,7 +118,8 @@ class SellItem extends Component {
                 paymentDetails: {},
                 paid: 0,
                 balance: 0
-            }
+            },
+            roundOffRangeSel: 5
         }
         this.bindMethods();
     }
@@ -118,8 +127,8 @@ class SellItem extends Component {
         this.closeCustomerModal = this.closeCustomerModal.bind(this);
         this.openCustomerModal = this.openCustomerModal.bind(this);
         this.onSelectCustomer = this.onSelectCustomer.bind(this);
-        this.fetchProdIds = this.fetchProdIds.bind(this);
-        this.fetchItemByProdId = this.fetchItemByProdId.bind(this);
+        this.fetchAutoSuggestions = this.fetchAutoSuggestions.bind(this);
+        this.fetchItemById = this.fetchItemById.bind(this);
         this.changeCustomer = this.changeCustomer.bind(this);
         this.onInputValChange = this.onInputValChange.bind(this);
         this.addItemToBillPreview = this.addItemToBillPreview.bind(this);
@@ -128,6 +137,7 @@ class SellItem extends Component {
         this.focusTagIdInput = this.focusTagIdInput.bind(this);
         this.deleteItemFromPurchaseItemPreview = this.deleteItemFromPurchaseItemPreview.bind(this);
         this.onClickDateLiveLabel = this.onClickDateLiveLabel.bind(this);
+        this.onClickRoundOffRange = this.onClickRoundOffRange.bind(this);
     }
     componentDidMount() {
         if(this.props.updateMode) {
@@ -135,7 +145,7 @@ class SellItem extends Component {
         } else {
             this.props.getBillNoFromDB();
         }
-        this.fetchProdIds();
+        this.fetchAutoSuggestions();
     }
     componentWillReceiveProps(nextProps) {
         if(nextProps.invoice.gstInvoiceNo !== this.state.invoiceNo) {
@@ -154,23 +164,22 @@ class SellItem extends Component {
             this.state = newState;
         }
     }
-    async fetchProdIds() {
+    async fetchAutoSuggestions() {
         try {
-            let at = getAccessToken();
-            let resp = await axiosMiddleware.get(`${FETCH_PROD_IDS}?access_token=${at}`);
+            let resp = await axiosMiddleware.get(`${FETCH_JEWELLERY_BILLING_AUTO_SUGGESTIONS}`);
             let newState = {...this.state};
-            newState.prodId.prodIdList = resp.data.LIST;
+            newState.prodId.prodIdList = resp.data.PROD_ID_LIST;
+            newState.huid.huidList = resp.data.HUID_LIST;
             this.setState(newState);
         } catch(e) {
             console.log(e);
         }
     }
-    async fetchItemByProdId(prodId) {
+    async fetchItemById(id, identifier) {
         try {
             let at = getAccessToken();
-            prodId = [prodId || this.state.prodId.inputVal];
-            let prodIdsArrStr = JSON.stringify(prodId);
-            let resp = await axiosMiddleware.get(`${FETCH_STOCKS_BY_PRODID}?access_token=${at}&prod_ids=${prodIdsArrStr}`);
+            let idArr = JSON.stringify([id]);
+            let resp = await axiosMiddleware.get(`${FETCH_STOCKS_BY_ID}?access_token=${at}&ids=${idArr}&identifier=${identifier}`);
             let newState = {...this.state};
             newState.currSelectedItem = resp.data.ITEMS[0];
             newState.currSelectedItem.formData = {
@@ -185,6 +194,10 @@ class SellItem extends Component {
                 discount: "",
                 itemType: newState.currSelectedItem.metal
             };
+            if(identifier == 'huid') // If HUID is entered, then set the TAG input field
+                newState.prodId.inputVal = newState.currSelectedItem.prod_id;
+            if(identifier == 'prodid') // If TAG is entered, then set the HUID input field
+                newState.huid.inputVal = newState.currSelectedItem.huid;
             this.setState(newState);
             this.calculateSellingPrice();
         } catch(e) {
@@ -299,6 +312,12 @@ class SellItem extends Component {
                     suggestionsList = suggestionsList.slice(0, 35);
                     newState.prodId.limitedProdIdList = suggestionsList;
                     break;
+                case HUID:
+                    var lowerCaseVal = value.toLowerCase();
+                    suggestionsList = this.state.huid.huidList.filter(aSuggestion => aSuggestion.toLowerCase().slice(0, lowerCaseVal.length) === lowerCaseVal);
+                    suggestionsList = suggestionsList.slice(0, 35);
+                    newState.huid.limitedHuidList = suggestionsList;
+                    break;
             }
             this.setState(newState);
         },
@@ -307,6 +326,9 @@ class SellItem extends Component {
             switch(identifier) {
                 case TAGID:
                     newState.prodId.inputVal = newValue;
+                    break;
+                case HUID:
+                    newState.huid.inputVal = newValue;
                     break;
             }
             this.setState(newState);
@@ -323,7 +345,14 @@ class SellItem extends Component {
         },
         onSuggestionSelected: (event, { suggestion, suggestionValue, suggestionIndex, sectionIndex, method }, identifier, options) => {
             let newState = {...this.state};
-            newState.prodId.inputVal = suggestion;
+            switch(identifier) {
+                case TAGID:
+                    newState.prodId.inputVal = suggestion;
+                    break;
+                case HUID:
+                    newState.huid.inputVal = suggestion;
+                    break;
+            }
             this.setState(newState);
         },
         renderSuggestion: (suggestion, identifier) => {
@@ -342,12 +371,17 @@ class SellItem extends Component {
         this.setState(newState);
     }
 
+    onCalcRefreshClick = () => {
+        this.calculateSellingPrice(SELL_WASTAGE_VAL);
+    }
+
     async addItemToBillPreview(e) {
         let newState = {...this.state};
         newState.purchaseItemPreview = newState.purchaseItemPreview || {};
         newState.purchaseItemPreview[this.state.currSelectedItem.prod_id] = JSON.parse(JSON.stringify(this.state.currSelectedItem));
         newState.purchaseItemPreview[this.state.currSelectedItem.prod_id].tempFormData = {...newState.purchaseItemPreview[this.state.currSelectedItem.prod_id].formData};
         newState.prodId.inputVal = "";
+        newState.huid.inputVal = "";
         newState.purchaseTotals = calcPurchaseTotals(newState.purchaseItemPreview);
         newState.currSelectedItem = {};
         newState.paymentFormData = calculatePaymentFormData(newState);
@@ -441,6 +475,19 @@ class SellItem extends Component {
         this.focusExGrossWtInput();
     }
 
+    onClickRoundOffRange() {
+        let newState = {...this.state};
+        let roundOffRanges = [1,5,10];
+        let currentRange = this.state.roundOffRangeSel;
+        let nextRange;
+        if(currentRange == 1) nextRange = 5;
+        if(currentRange == 5) nextRange = 10;
+        if(currentRange == 10) nextRange = 1;
+        newState.roundOffRangeSel = nextRange;
+        newState.paymentFormData = calculatePaymentFormData(newState);
+        this.setState(newState);
+    }
+
     async submit() {
         let validation = validate(this.state, this.props);
         if(validation.flag) {
@@ -499,7 +546,16 @@ class SellItem extends Component {
                     newState.prodId.inputVal = prodId;
                     this.setState(newState);
                     if(prodId)
-                        this.fetchItemByProdId(prodId);
+                        this.fetchItemById(prodId, 'prodid');
+                    else
+                        canTransferFocus = false;
+                    break;
+                case HUID:
+                    let huid = e.target.value;
+                    newState.huid.inputVal = huid;
+                    this.setState(newState);
+                    if(huid)
+                        this.fetchItemById(huid, 'huid');
                     else
                         canTransferFocus = false;
                     break;
@@ -738,13 +794,13 @@ class SellItem extends Component {
         this.setState(newState);
     }
 
-    getInputBox() {
+    getInputElems() {
         return (
             <Row style={{marginTop: "25px"}}>
                 <Col xs={3}>
                     <Form.Group>
                         {/* <Form.Label>TagId</Form.Label> */}
-                        TagId: <ReactAutosuggest 
+                        TagId: <ReactAutosuggest    
                             suggestions={this.state.prodId.limitedProdIdList}
                             onSuggestionsFetchRequested={({value}) => this.reactAutosuggestControls.onSuggestionsFetchRequested({value}, TAGID)}
                             getSuggestionValue={(suggestion, e) => this.reactAutosuggestControls.getSuggestionValue(suggestion)}
@@ -759,6 +815,26 @@ class SellItem extends Component {
                                 autoComplete:"no"
                             }}
                             ref = {(domElm) => { this.domElmns.tagid = domElm?domElm.input:domElm; }}
+                        />
+                    </Form.Group>
+                </Col>
+                <Col xs={3}>
+                    <Form.Group>
+                        HUID: <ReactAutosuggest 
+                            suggestions={this.state.huid.limitedHuidList}
+                            onSuggestionsFetchRequested={({value}) => this.reactAutosuggestControls.onSuggestionsFetchRequested({value}, HUID)}
+                            getSuggestionValue={(suggestion, e) => this.reactAutosuggestControls.getSuggestionValue(suggestion)}
+                            renderSuggestion={(suggestion) => this.reactAutosuggestControls.renderSuggestion(suggestion, HUID)}
+                            onSuggestionSelected={(event, { suggestion, suggestionValue, suggestionIndex, sectionIndex, method}) => this.reactAutosuggestControls.onSuggestionSelected(event, { suggestion, suggestionValue, suggestionIndex, sectionIndex, method }, HUID)}
+                            inputProps={{
+                                placeholder: 'Enter HUID',
+                                value: this.state.huid.inputVal,
+                                onChange: (e, {newValue, method}) => this.reactAutosuggestControls.onChange(e, {newValue, method}, HUID),
+                                onKeyUp: (e) => this.reactAutosuggestControls.onKeyUp(e, {currElmKey: HUID}),
+                                className: "react-autosuggest__input huid",
+                                autoComplete:"no"
+                            }}
+                            ref = {(domElm) => { this.domElmns.huid = domElm?domElm.input:domElm; }}
                         />
                     </Form.Group>
                 </Col>
@@ -945,7 +1021,15 @@ class SellItem extends Component {
                             <thead>
                                 <tr>
                                     <th>Discount</th>
-                                    <th>Price</th>
+                                    <th>
+                                        <span>Price
+                                            <span className="calc-refresh-icon" style={{cursor: 'pointer', marginLeft: '20px', color: '#2196f3'}}
+                                                onClick={(e) => this.onCalcRefreshClick()}
+                                                title={"Refresh action to caculate the Price value considering the rounded wastage value."}>
+                                                <MdRefresh />    
+                                            </span> 
+                                        </span>
+                                    </th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -987,7 +1071,7 @@ class SellItem extends Component {
         if(this.canEnableItemSellInput()) {
             buffer.push(
                 <Col xs={12}>
-                    {this.getInputBox()}
+                    {this.getInputElems()}
                     <Row className="item-detail-row">
                         {this.getSelectedItemView()}
                         {this.getSellingInputControls()}
@@ -1392,7 +1476,7 @@ class SellItem extends Component {
             <Col className="payment-column">
                 <p>New Item Price: ₹ {this.state.paymentFormData.totalPurchasePrice}</p>
                 <p>Old Item Price: ₹ {this.state.paymentFormData.totalExchangePrice}</p>
-                <p>Round Off: ₹ {this.state.paymentFormData.roundOffVal}</p>
+                <p>Round Off: ₹ {this.state.paymentFormData.roundOffVal} &nbsp; &nbsp; <span className="round-off-selector" onClick={this.onClickRoundOffRange}> By {this.state.roundOffRangeSel}</span></p>
                 <p style={{fontSize: '20px'}}>Sum: ₹ {formatNo(this.state.paymentFormData.sum, 2)}</p>
                 <div className="pymnt-mode-input-div">
                     <span className="field-name payment-mode">Payment Mode:</span>
@@ -1436,12 +1520,12 @@ class SellItem extends Component {
                         <Row className="customer-selection-parent-row">
                             <Col xs={3} className="customer-selection-panel">
                                 { this.doesSelectedCustomerExist() ?
-                                    <Row style={{marginTop: '14px'}}>
-                                        <Col xs={2}><span onClick={this.changeCustomer}><FontAwesomeIcon icon="user-edit"/></span></Col>
+                                    <Row style={{marginTop: '26px'}}>
+                                        <Col xs={2}><span onClick={this.changeCustomer} className="change-customer-icon"><FontAwesomeIcon icon="user-edit"/></span></Col>
                                         <Col xs={9}>{this.state.selectedCustomer.cname}</Col>
                                     </Row>
                                     :
-                                    <Row style={{marginTop: '6px'}}>
+                                    <Row style={{marginTop: '20px'}}>
                                         <Col>
                                             <input type="button" 
                                                 className="gs-button" 
@@ -1492,7 +1576,7 @@ class SellItem extends Component {
                                                 readOnly={this.state.date.isLive}
                                                 // showTimeSelect
                                                 showYearDropdown
-                                                className='gs-input-cell bordered'
+                                                className='gs-input-cell bordered date-picker-input'
                                                 />
                                         </Form.Group>
                                     </Col>

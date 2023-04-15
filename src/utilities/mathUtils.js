@@ -7,17 +7,21 @@ export const numberFormatter = (numberVal, decimalDigits) => {
     return tt;
 }
 
-export const getRoundOffVal = (numberVal) => {
+export const getRoundOffVal = (numberVal, roundOffUnit) => {
+    roundOffUnit = roundOffUnit || 1;
     let roundOffVal = 0;
     let flooredVal = Math.floor(numberVal);
-    let decimalsVal = numberFormatter((numberVal - flooredVal), 2);
-    if(decimalsVal) {
-        if(decimalsVal <= 0.5)
-            roundOffVal = -(decimalsVal);
+    let floaterVal = numberFormatter((numberVal - flooredVal), 2);
+    if(roundOffUnit > 1)
+        floaterVal = numberVal%roundOffUnit;
+    if(floaterVal) {
+        if(floaterVal <= roundOffUnit/2)
+            roundOffVal = -(floaterVal);
         else
-            roundOffVal = 1-decimalsVal;
+            roundOffVal = roundOffUnit-floaterVal;
 
         roundOffVal = numberFormatter(roundOffVal, 2);
     }
+    // console.log(`Input: ${numberVal}, roundOffUnit: ${roundOffUnit}, output: ${roundOffVal}`);
     return roundOffVal;
 }

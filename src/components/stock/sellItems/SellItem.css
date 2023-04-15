@@ -132,3 +132,18 @@
 .sell-item-container .wastage-calc-tool .operator {
     font-size: 16px;
 }
+
+.sell-item-container .round-off-selector {
+    color: #2196f3;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+.sell-item-container .date-picker-input {
+    padding-left: 5px;
+}
+
+.sell-item-container .change-customer-icon {
+    color: #2196f3;
+    cursor: pointer;
+}

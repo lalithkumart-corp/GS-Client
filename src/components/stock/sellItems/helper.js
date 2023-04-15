@@ -1,4 +1,5 @@
 import { convertDateObjToStr, getCurrentDateTimeInUTCForDB, formatNo } from '../../../utilities/utility';
+import { getRoundOffVal } from '../../../utilities/mathUtils';
 
 export let defaultExchangeItemFormData = {
     exMetal: 'G',
@@ -135,17 +136,22 @@ export const calculatePaymentFormData = (stateObj) => {
     paymentFormData.sum = paymentFormData.totalPurchasePrice - paymentFormData.totalExchangePrice;
 
     // Rounding off logic
-    paymentFormData.roundOffVal = 0;
-    let flooredVal = Math.floor(paymentFormData.sum);
-    let decimalsVal = parseFloat((paymentFormData.sum - flooredVal).toFixed(2));
-    if(decimalsVal) {
-        if(decimalsVal <= 0.5)
-            paymentFormData.roundOffVal = -(decimalsVal);
+    paymentFormData.roundOffVal = getRoundOffVal(paymentFormData.sum, stateObj.roundOffRangeSel);
+    /*let flooredVal = Math.floor(paymentFormData.sum);
+
+    let floaterVal = parseFloat((paymentFormData.sum - flooredVal).toFixed(2));
+    if(stateObj.roundOffRangeSel > 1)
+        floaterVal = (paymentFormData.sum - flooredVal)%stateObj.roundOffRangeSel;
+    
+    if(floaterVal) {
+        if(floaterVal <= stateObj.roundOffRangeSel/2)
+            paymentFormData.roundOffVal = -(floaterVal);
         else
-            paymentFormData.roundOffVal = 1-decimalsVal;
+            paymentFormData.roundOffVal = stateObj.roundOffRangeSel-floaterVal;
 
         paymentFormData.roundOffVal = parseFloat(paymentFormData.roundOffVal.toFixed(2));
-    }
+    }*/
+
     paymentFormData.sum = paymentFormData.sum + paymentFormData.roundOffVal;
 
 
@@ -358,7 +364,7 @@ export const constructPrintContent = (stateObj, propObj) => {
         hsCode: 7113,
         goldRatePerGm: (itemType=='G'?stateObj.retailPrice:propObj.rate.retailRate.gold),
         silverRatePerGm: (itemType=='S'?stateObj.retailPrice:propObj.rate.retailRate.silver),
-        billNo: `${stateObj.invoiceSeries}.${stateObj.invoiceNo}`,
+        billNo: stateObj.invoiceSeries?`${stateObj.invoiceSeries}.${stateObj.invoiceNo}`:stateObj.invoiceNo,
         customerName: customerName,
         customerMobile: customerMobile,
         dateVal: convertDateObjToStr(stateObj.date.isLive?new Date():stateObj.date.inputVal, {excludeTime: true}),

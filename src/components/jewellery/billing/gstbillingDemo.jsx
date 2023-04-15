@@ -160,6 +160,7 @@ function GstBillingDemo() {
     let [cgstVal, setCgstVal] = useState('');
     let [sgstVal, setSgstVal] = useState('');
     let [roundOffVal, setRoundOffVal] = useState(0);
+    let [roundOffRangeSel, setRoundOffRangeSel] = useState(1);
     let [grandTotal, setGrandTotal] = useState('');
     let [toolsVisibility, setToolsVisibility] = useState(true);
 
@@ -325,6 +326,8 @@ function GstBillingDemo() {
     const calcWastageBySellingPrice = (newOrnData, options) => {
         let wt = newOrnData[options.row].nwt;
         let rate = goldRatePerGm;
+        if(categ == 'silver')
+            rate = silverRatePerGm;
         let percents = newOrnData[options.row].cgst + newOrnData[options.row].sgst;
         let total = newOrnData[options.row].price;
         let {wsgPercent, wsgVal } = wastageCalc(wt, rate, percents, total);
@@ -386,6 +389,17 @@ function GstBillingDemo() {
         onFocusPriceVal(row, {considerWsgVal: true});
     }
 
+    const onClickRoundOffRange = () => {
+        //  [1,5,10];
+        let nextRange;
+        if(roundOffRangeSel == 1) nextRange = 5;
+        if(roundOffRangeSel == 5) nextRange = 10;
+        if(roundOffRangeSel == 10) nextRange = 1;
+        console.log('New range', nextRange);
+        setRoundOffRangeSel(nextRange);
+        calcGrandTotal({roundOffRangeSel: nextRange});
+    }
+
     const calcTotals = () => {
         let totalQty = parseFloat(ornData[0]['qty'] || 0 ) + parseFloat(ornData[1]['qty'] || 0 ) + parseFloat(ornData[2]['qty'] || 0 ) + parseFloat(ornData[3]['qty'] || 0 ); 
         let totalWt = parseFloat(ornData[0]['nwt'] || 0 ) + parseFloat(ornData[1]['nwt'] || 0 ) + parseFloat(ornData[2]['nwt'] || 0 ) + parseFloat(ornData[3]['nwt'] || 0 );
@@ -400,11 +414,12 @@ function GstBillingDemo() {
         });
     }
 
-    const calcGrandTotal = () => {
+    const calcGrandTotal = (hotState) => {
+        hotState = hotState || {};
         let ornPrices = numberFormatter(ornData[0]['price'], 2) + numberFormatter(ornData[1]['price'], 2) + numberFormatter(ornData[2]['price'], 2) + numberFormatter(ornData[3]['price'], 2);
         if(ornPrices) {
             let grandTotal = ornPrices;// + cgstVal + sgstVal;
-            let roundOffVal = getRoundOffVal(grandTotal);
+            let roundOffVal = getRoundOffVal(grandTotal, typeof hotState.roundOffRangeSel !== 'undefined'?hotState.roundOffRangeSel:roundOffRangeSel);
             grandTotal = numberFormatter(grandTotal + roundOffVal, 2);
             setRoundOffVal(roundOffVal);
             setGrandTotal(grandTotal);
@@ -854,7 +869,7 @@ function GstBillingDemo() {
                     </Row>
                     <Row style={{marginTop: '20px'}}>
                         <Col xs={12}>
-                            <h5>RoundOff: ₹ <input type='text' className="round-off-input" onChange={(e) => onChangeRoundOffVal(e.target.value)} value={roundOffVal} /></h5>
+                            <h5>RoundOff: ₹ <input type='text' className="round-off-input" onChange={(e) => onChangeRoundOffVal(e.target.value)} value={roundOffVal} /> <span className="round-off-selector" onClick={onClickRoundOffRange}> By {roundOffRangeSel}</span></h5>
                             <h4>Grand Total: ₹ {grandTotal}</h4>
                         </Col>
                     </Row>
