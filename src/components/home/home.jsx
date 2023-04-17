@@ -1,18 +1,18 @@
 import React, { Component } from 'react';
+import { useNavigate } from "react-router-dom";
 import './home.scss';
-import history from './../../history.js';
 import { GiReceiveMoney } from 'react-icons/gi';
 import { TbReportMoney } from 'react-icons/tb';
 import { BsTable  } from 'react-icons/bs';
 import { FaFileInvoiceDollar } from 'react-icons/fa';
 import { RiStackLine } from 'react-icons/ri';
 import { MdOutlineLibraryAdd } from 'react-icons/md';
-export default class Home extends Component {
+class HomeClass extends Component {
     	constructor(props) {
             super(props);
         }
         onClickIcons(identifier) {
-            history.push(`/${identifier}`);
+            this.props.navigate(`/${identifier}`);
         }
         render() {
             return (
@@ -35,3 +35,11 @@ export default class Home extends Component {
             )
         }
 }
+
+
+const Home = props => {
+    const navigate = useNavigate();
+  
+    return <HomeClass navigate={navigate} {...props} />
+}
+export default Home;
