@@ -5,7 +5,7 @@
 
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import { Container, Row, Col, Form, FormGroup, FormLabel, FormControl, HelpBlock, InputGroup, Button, Card } from 'react-bootstrap';
+import { Container, Row, Col, Form, InputGroup, HelpBlock, Button, Card } from 'react-bootstrap';
 import DatePicker from 'react-datepicker';
 //import DatePicker from 'react-16-bootstrap-date-picker';
 import 'react-datepicker/dist/react-datepicker.css';
@@ -30,7 +30,7 @@ import { getRateOfInterest } from '../redeem/helper';
 import Picture from '../profilePic/picture';
 import { toast } from 'react-toastify';
 import BillHistoryView from './billHistoryView';
-import Popover from 'react-tiny-popover';
+import {Popover} from 'react-tiny-popover';
 import BillTemplate from './billTemplate2';
 import LoanBillMainTemplate from '../../templates/loanBill/LoanBillMainTemplate';
 import ReactToPrint from 'react-to-print';
@@ -40,8 +40,7 @@ import GeneralInfo from '../customerPortal/generalInfo';
 import { getLoanDate, getLoanDateBehaviour, setLoanDate, setLoanDateBehaviour } from '../../core/storage';
 import { fetchMyAccountsList, fetchAllBanksList } from '../../utilities/apiUtils';
 import { format } from 'currency-formatter';
-import { PAYMENT_MODE } from '../../constants';
-import { LOAN_BILL_EXPIRY_DAYS } from '../../constants';
+import { PAYMENT_MODE, LOAN_BILL_EXPIRY_DAYS } from '../../constants';
 
 const ENTER_KEY = 13;
 const SPACE_KEY = 32;
@@ -1811,8 +1810,8 @@ class BillCreation extends Component {
                         />
                     </Col>
                     <Col xs={6} md={6}>
-                        <FormGroup>
-                            <FormControl
+                        <Form.Group>
+                            <Form.Control
                                 type="text"
                                 placeholder="Enter text"
                                 onChange={(e) => this.inputControls.onChange(null, e.target.value, 'moreCustomerDetailsValue')} 
@@ -1821,8 +1820,8 @@ class BillCreation extends Component {
                                 ref = {(domElm) => { this.domElmns.moreCustomerDetailValue = domElm; }}
                                 readOnly={this.props.billCreation.loading}
                             />
-                            <FormControl.Feedback />
-                        </FormGroup>
+                            <Form.Control.Feedback />
+                        </Form.Group>
                     </Col>                    
                 </Row>
             )
@@ -1864,10 +1863,8 @@ class BillCreation extends Component {
                     <Col xs={12} md={12}>
                         <Form.Group>
                             <InputGroup>
-                                <InputGroup.Prepend>
-                                    <InputGroup.Text>Bill Notes</InputGroup.Text>
-                                </InputGroup.Prepend>
-                                <FormControl as="textarea" 
+                                <InputGroup.Text>Bill Notes</InputGroup.Text>
+                                <Form.Control as="textarea" 
                                     placeholder="Type here..." 
                                     value={this.state.formData.moreDetails.billRemarks} 
                                     onChange={(e) => this.inputControls.onChange(null, e.target.value, "billRemarks")}
@@ -1929,6 +1926,7 @@ class BillCreation extends Component {
         return(
             <Container className="bill-creation-container">
                 <Form>
+                <Row>
                 <Col className="left-pane" xs={8} md={8}>
                     <Row>
                         <Col xs={3} md={3}>
@@ -1937,10 +1935,9 @@ class BillCreation extends Component {
                                 >
                                 <Form.Label>Bill No</Form.Label>
                                 <InputGroup>
-                                    <InputGroup.Prepend>
                                         <InputGroup.Text id="bill-no-addon" className={this.props.billCreation.loading?"readOnly": ""}>{this.state.formData.billseries.inputVal}</InputGroup.Text>
-                                    </InputGroup.Prepend>
-                                    <FormControl
+                                    
+                                    <Form.Control
                                         type="text"
                                         value={this.state.formData.billno.inputVal}
                                         placeholder=""
@@ -1951,7 +1948,7 @@ class BillCreation extends Component {
                                         onKeyUp = {(e) => this.handleKeyUp(e, {currElmKey: 'billno'}) }
                                         readOnly={this.props.billCreation.loading}
                                     />
-                                    <FormControl.Feedback />
+                                    <Form.Control.Feedback />
                                 </InputGroup>
                             </Form.Group>
                         </Col>
@@ -1986,10 +1983,9 @@ class BillCreation extends Component {
                                 >
                                 <Form.Label>Pledge Amount</Form.Label>
                                 <InputGroup>
-                                    <InputGroup.Prepend>
                                         <InputGroup.Text id="rupee-addon" className={this.props.billCreation.loading?"readOnly": ""}>Rs:</InputGroup.Text>
-                                    </InputGroup.Prepend>
-                                    <FormControl
+                                    
+                                    <Form.Control
                                         type="number"
                                         value={this.state.formData.amount.inputVal}
                                         placeholder="0.00"
@@ -2000,7 +1996,7 @@ class BillCreation extends Component {
                                         onKeyUp = {(e) => this.handleKeyUp(e, {currElmKey: 'amount', isAmountValInput: true}) }
                                         readOnly={this.props.billCreation.loading}
                                     />
-                                    <FormControl.Feedback />
+                                    <Form.Control.Feedback />
                                 </InputGroup>
                             </Form.Group>
                         </Col>
@@ -2010,10 +2006,9 @@ class BillCreation extends Component {
                                 >
                                 <Form.Label>Present Value</Form.Label>
                                 <InputGroup>
-                                    <InputGroup.Prepend>
                                         <InputGroup.Text id="rupee-addon" className={this.props.billCreation.loading?"readOnly": ""}>Value</InputGroup.Text>
-                                    </InputGroup.Prepend>
-                                    <FormControl
+                                    
+                                    <Form.Control
                                         type="number"
                                         value={this.state.formData.presentValue.inputVal}
                                         placeholder="0.00"
@@ -2024,7 +2019,7 @@ class BillCreation extends Component {
                                         onKeyUp = {(e) => this.handleKeyUp(e, {currElmKey: 'presentValue'}) }
                                         readOnly={this.props.billCreation.loading}
                                     />
-                                    <FormControl.Feedback />
+                                    <Form.Control.Feedback />
                                 </InputGroup>
                             </Form.Group>
                         </Col>
@@ -2082,7 +2077,7 @@ class BillCreation extends Component {
                                     }}
                                     ref = {(domElm) => { this.domElmns.gaurdianName = domElm?domElm.input:domElm; }}
                                 />
-                                <FormControl.Feedback />
+                                <Form.Control.Feedback />
                             </Form.Group>
                         </Col>
                     </Row>
@@ -2109,7 +2104,7 @@ class BillCreation extends Component {
                                     }}
                                     ref = {(domElm) => { this.domElmns.address = domElm?domElm.input:domElm; }}
                                 />
-                                <FormControl.Feedback />
+                                <Form.Control.Feedback />
                             </Form.Group>
                         </Col>
                     </Row>
@@ -2136,7 +2131,7 @@ class BillCreation extends Component {
                                     }}
                                     ref = {(domElm) => { this.domElmns.place = domElm?domElm.input:domElm; }}
                                 />
-                                <FormControl.Feedback />
+                                <Form.Control.Feedback />
                             </Form.Group>
                         </Col>
                         <Col xs={3} md={3} className='r-a-s-dropdown'>
@@ -2161,7 +2156,7 @@ class BillCreation extends Component {
                                     }}
                                     ref = {(domElm) => { this.domElmns.city = domElm?domElm.input:domElm; }}
                                 />
-                                <FormControl.Feedback />
+                                <Form.Control.Feedback />
                             </Form.Group>
                         </Col>                            
                     {/* </Row>
@@ -2188,7 +2183,7 @@ class BillCreation extends Component {
                                     }}
                                     ref = {(domElm) => { this.domElmns.pincode = domElm?domElm.input:domElm; }}
                                 />
-                                <FormControl.Feedback />
+                                <Form.Control.Feedback />
                             </Form.Group>
                         </Col>
                         <Col xs={3} md={3} className='r-a-s-dropdown'>
@@ -2211,7 +2206,7 @@ class BillCreation extends Component {
                                     }}
                                     ref = {(domElm) => { this.domElmns.mobile = domElm?domElm.input:domElm; }}
                                 />
-                                <FormControl.Feedback />
+                                <Form.Control.Feedback />
                             </Form.Group>
                         </Col>
                     </Row>
@@ -2290,10 +2285,12 @@ class BillCreation extends Component {
                                     )
                                 }}
                                 >
+                                    <>
                                     <span className='amount-display-text' style={{fontWeight: 'bold', fontSize: '20px'}} onClick={(e) => this.amtPopoverTrigger()}>RS: {currencyFormatter(this.state.formData.amount.inputVal) || 0.00}</span>
                                     {this.state.formData.amount.landedCost > 0 && 
                                         <span style={{paddingLeft: "15px", fontSize: "14px"}}> ({format(this.state.formData.amount.landedCost || 0, {code: 'INR'})}) </span>
                                     }
+                                    </>
                             </Popover>
                         </Col>
                         <Col xs={6} md={6} style={{paddingTop: '4px', textAlign: 'right'}}>
@@ -2552,6 +2549,7 @@ class BillCreation extends Component {
                         <BillHistoryView custId={this.getSelectedCustId()}/>
                     </Row>
                 </Col>
+                </Row>
                 <EditDetailsDialog {...this.state.editModalContent} update={this.updateItemInMoreDetail} />
                 {/* <BillTemplate ref={el => (this.componentRef = el)} data={this.state.printContent} /> */}
                 <LoanBillMainTemplate ref={el => (this.componentRef = el)} currBillContent={this.state.printContent}/>

@@ -5,6 +5,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Row, Col, FormGroup, FormLabel, FormControl, HelpBlock, InputGroup, Button, Glyphicon } from 'react-bootstrap';
 import { convertBufferToBase64 } from '../../utilities/utility';
 import ImageZoom from 'react-medium-image-zoom';
+import 'react-medium-image-zoom/dist/styles.css';
 
 class Picture extends Component {
     constructor(props) {
@@ -253,14 +254,13 @@ class Picture extends Component {
                     <Col xs={12} md={12}>
                         {
                             this.state.picture.holder.show &&
-                            <ImageZoom
-                                image={{
-                                src: this.picture.helpers.getImageForHolder(),
-                                alt: 'Golden Gate Bridge',
-                                className: 'image-viewer',
-                                // style: { width: '50em' }
-                                }}
-                            />
+                            <ImageZoom>
+                                <img 
+                                    alt='Image not Found'
+                                    src= {this.picture.helpers.getImageForHolder()}
+                                    className={'image-viewer'}
+                                />
+                            </ImageZoom>
                             // <img src={this.picture.helpers.getImageForHolder()} className='image-viewer'/>
                         }
                         {

@@ -119,6 +119,7 @@ class SellItem extends Component {
                 paid: 0,
                 balance: 0
             },
+            showCalcRefreshIcon: false,
             roundOffRangeSel: 5
         }
         this.bindMethods();
@@ -251,6 +252,7 @@ class SellItem extends Component {
             case SELL_PRICE:
                 newState.currSelectedItem.formData[identifier] = parseFloat(e.target.value);
                 newState = this.calculateWastageDetailsBySellingPrice(e.target.value, newState, true);
+                newState.showCalcRefreshIcon = true;
                 break;
             case RETAIL_PRICE:
                 newState.retailPrice = parseInt(e.target.value);
@@ -373,6 +375,7 @@ class SellItem extends Component {
 
     onCalcRefreshClick = () => {
         this.calculateSellingPrice(SELL_WASTAGE_VAL);
+        this.setState({showCalcRefreshIcon: false});
     }
 
     async addItemToBillPreview(e) {
@@ -713,6 +716,9 @@ class SellItem extends Component {
                 newState.currSelectedItem.formData.price = formatNo(price, 2);
     
                 // newState.totalSellingPrice = price; //for multiple selling items
+
+                newState.showCalcRefreshIcon = false;
+
                 this.setState(newState);
             }
         }
@@ -742,7 +748,6 @@ class SellItem extends Component {
         if(sgstPercent)
             newState.currSelectedItem.formData.sgstVal = formatNo(_priceOfOrn * (sgstPercent/100), 2);
 
-        console.log(newState);
         if(cb) return newState;
         else this.setState(newState);
     }
@@ -1023,11 +1028,13 @@ class SellItem extends Component {
                                     <th>Discount</th>
                                     <th>
                                         <span>Price
-                                            <span className="calc-refresh-icon" style={{cursor: 'pointer', marginLeft: '20px', color: '#2196f3'}}
-                                                onClick={(e) => this.onCalcRefreshClick()}
-                                                title={"Refresh action to caculate the Price value considering the rounded wastage value."}>
-                                                <MdRefresh />    
-                                            </span> 
+                                            {this.state.showCalcRefreshIcon && 
+                                                <span className="calc-refresh-icon" style={{cursor: 'pointer', marginLeft: '20px', color: '#2196f3'}}
+                                                    onClick={(e) => this.onCalcRefreshClick()}
+                                                    title={"Refresh action to caculate the Price value considering the rounded wastage value."}>
+                                                    <MdRefresh />    
+                                                </span> 
+                                            }
                                         </span>
                                     </th>
                                 </tr>

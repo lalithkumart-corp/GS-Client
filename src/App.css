@@ -33,7 +33,9 @@ html {
 .font-weight-bold {
   font-weight: bold;
 }
-
+.row+.row {
+  margin-top: 10px;
+}
 .gs-button {  
   color: #2196f3;
   border: none;
@@ -412,6 +414,7 @@ input[type=checkbox], input[type=radio] {
 .gs-icon {
   color: #2296f3;
   cursor: pointer;
+  width: auto;
 }
 .gs-icon:hover,
 .gs-icon:focus,

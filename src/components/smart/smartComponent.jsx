@@ -1,11 +1,11 @@
 import React, { Component } from 'react';
-import { Router, Route } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { connect } from 'react-redux';
 import { isAccountActive } from '../../actions/login.js';
 import Header from '../header/header';
 import Home from '../home/home';
 import LoginPage from '../login/login';
-import BillCreation from '../billcreate/billcreation';
+import BillCreation from '../billcreate/billcreation.jsx';
 import Redeem from '../redeem/redeem';
 import Pledgebook from '../pledgebook/pledgebook';
 import CustomerPortal from '../customerPortal/customersPortal';
@@ -99,7 +99,7 @@ class SmartComponent extends Component {
         yy = yy.replaceAll('GS_', '');
         yy = yy.replaceAll('MAK_', '');
         yy = yy.replaceAll('INTER', '');
-        if(true || yy == "-1844838684") { // temporarily making as tru for development mode
+        if(true) {// yy == "-1844838684" // temporarily making as tru for development mode
             if(this.props.auth.isAuthenticated) {
                 if(!this.props.auth.isActivated) {
                     return (
@@ -113,9 +113,11 @@ class SmartComponent extends Component {
                                 </div>
                                 <div className='page-content'>
                                     <ToastContainer position={'top-center'} hideProgressBar={false}/>
-                                    <Route exact path= '/' component={ActivationPage} />
-                                    {/* <Route path= '/signup' component={SignUpPage} /> */}
-                                    <Route path= '/logout' component={Logout} />
+                                    <Routes>
+                                    <Route exact path= '/' Component={ActivationPage} />
+                                    {/* <Route path= '/signup' Component={SignUpPage} /> */}
+                                    <Route path= '/logout' Component={Logout} />
+                                    </Routes>
                                 </div>
                             </div>
                         </Router>
@@ -132,39 +134,41 @@ class SmartComponent extends Component {
                                 </div>
                                 <div className='page-content'>
                                     <ToastContainer position={'top-center'} hideProgressBar={false}/>
+                                    <Routes>
                                     {/* <ReactTooltip /> */}
-                                    <Route exact path='/' component={Home} />
-                                    <Route path= '/billcreate' component={BillCreation} />
-                                    <Route path= '/redeem' component={Redeem} />
-                                    <Route path= '/pledgebook' component={Pledgebook} />
-                                    <Route path= '/customer-portal' component={CustomerPortal} />                                
-                                    <Route path= '/users' component={Users} />
-                                    <Route path= '/demo' component={Demo} />
-                                    <Route path= '/picture' component={Picture} />
-                                    <Route path= '/logout' component={Logout} />
-                                    <Route path= '/uploadpicdemo' component={UploadPicDemo} />
-                                    <Route path= '/loan-settings' component={LoanSetup} />
-                                    <Route path= '/backup_restore' component={BackupRestore} />
-                                    <Route path= '/cash-manager' component={CashManager} />
-                                    <Route path= '/tally' component={TallyPage} />
-                                    {/* <Route path= "/products" component={Products} /> */}
-                                    <Route path= "/stock-add" component={AddStock} />
-                                    <Route path= "/stock-view" component={StockViewTabLayout} />
-                                    <Route path= "/sell-item" component={SellItem} />
-                                    <Route path= "/jewellery-cust-invoices" component={JewelleryCustomerInvoicesList} />
-                                    <Route path= "/stock-setup" component={StockSetup} />
-                                    <Route path="/tag-setup" component={TagSetup} />
-                                    <Route path= "/tag-demo" component={TagDemo} />
-                                    <Route path="/tag-v2" component={CustomTag} />
-                                    <Route path="/label-generator" component={CustomLabel} />
-                                    <Route path= "/font-view" component={FontViewerPage} />
-                                    <Route path="/settings" component={Settings} />
-                                    <Route path= "/contact-manager" component={MyContacts} />
-                                    <Route path="/udhaar-create" component={UdhaarEntry} />
-                                    <Route path="/udhaar-list" component={UdhaarListComp} />
-                                    <Route path="/reset-pwd" component={ResetPassword} />
-                                    <Route path="/gst-bill-generator" component={GstBillingDemo} />
-                                    <Route path="/tools" component={Tools} />
+                                    <Route exact path='/' Component={Home} />
+                                    <Route path= '/billcreate' Component={BillCreation} />
+                                    <Route path= '/redeem' Component={Redeem} />
+                                    <Route path= '/pledgebook' Component={Pledgebook} />
+                                    <Route path= '/customer-portal' Component={CustomerPortal} />                                
+                                    <Route path= '/users' Component={Users} />
+                                    <Route path= '/demo' Component={Demo} />
+                                    <Route path= '/picture' Component={Picture} />
+                                    <Route path= '/logout' Component={Logout} />
+                                    <Route path= '/uploadpicdemo' Component={UploadPicDemo} />
+                                    <Route path= '/loan-settings' Component={LoanSetup} />
+                                    <Route path= '/backup_restore' Component={BackupRestore} />
+                                    <Route path= '/cash-manager' Component={CashManager} />
+                                    <Route path= '/tally' Component={TallyPage} />
+                                    {/* <Route path= "/products" Component={Products} /> */}
+                                    <Route path= "/stock-add" Component={AddStock} />
+                                    <Route path= "/stock-view" Component={StockViewTabLayout} />
+                                    <Route path= "/sell-item" Component={SellItem} />
+                                    <Route path= "/jewellery-cust-invoices" Component={JewelleryCustomerInvoicesList} />
+                                    <Route path= "/stock-setup" Component={StockSetup} />
+                                    <Route path="/tag-setup" Component={TagSetup} />
+                                    <Route path= "/tag-demo" Component={TagDemo} />
+                                    <Route path="/tag-v2" Component={CustomTag} />
+                                    <Route path="/label-generator" Component={CustomLabel} />
+                                    <Route path= "/font-view" Component={FontViewerPage} />
+                                    <Route path="/settings" Component={Settings} />
+                                    <Route path= "/contact-manager" Component={MyContacts} />
+                                    <Route path="/udhaar-create" Component={UdhaarEntry} />
+                                    <Route path="/udhaar-list" Component={UdhaarListComp} />
+                                    <Route path="/reset-pwd" Component={ResetPassword} />
+                                    <Route path="/gst-bill-generator" Component={GstBillingDemo} />
+                                    <Route path="/tools" Component={Tools} />
+                                    </Routes>
                                 </div>
                                 {/* <div className="floating-right-side-bar"> */}
                                 <div className={`floating-right-side-bar ${this.props.rightSideBar.visibility?'show':'hide'} `}>
@@ -178,9 +182,11 @@ class SmartComponent extends Component {
                     <Router history={history}>
                         <div>
                             <ToastContainer position={'top-center'} hideProgressBar={false}/>
-                            <Route exact path= '/' component={LoginPage} />
-                            {/* <Route path= '/signup' component={SignUpPage} /> */}
-                            <Route path= '/logout' component={Logout} />
+                            <Routes>
+                                <Route exact path= '/' Component={LoginPage} />
+                                {/* <Route path= '/signup' Component={SignUpPage} /> */}
+                                <Route path= '/logout' Component={Logout} />
+                            </Routes>
                         </div>
                     </Router>
                 )

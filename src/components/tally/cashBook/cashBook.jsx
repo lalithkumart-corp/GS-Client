@@ -15,7 +15,7 @@ import { toast } from 'react-toastify';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { format } from 'currency-formatter';
 import { MdNotifications, MdNotificationsActive, MdNotificationsNone, MdNotificationsOff, MdNotificationsPaused, MdBorderColor } from 'react-icons/md';
-import Popover, {ArrowContainer} from 'react-tiny-popover'
+import {Popover, ArrowContainer} from 'react-tiny-popover'
 import AlertComp from '../../alert/Alert';
 import { FaFileExcel, FaTrashAlt } from 'react-icons/fa';
 import { BiFilterAlt } from 'react-icons/bi';
@@ -943,6 +943,7 @@ export default class CashBook extends Component {
                                             )
                                         }}
                                         >
+                                        <>
                                         {!this.state.showConsolView && 
                                             <span 
                                                 className={`gs-icon ${this.haveAppliedFilters()?'active':''}`}
@@ -953,7 +954,7 @@ export default class CashBook extends Component {
                                             </span>
                                         }
                                         {this.state.showConsolView && 
-                                            <div>
+                                            <div style={{display: 'inline-block'}}>
                                                 <MultiSelect
                                                     options={this.state.allCategoryTerms}
                                                     value={this.state.filters.selectedCategoryForGrouping}
@@ -964,9 +965,10 @@ export default class CashBook extends Component {
                                                 />
                                             </div>
                                         }
+                                        </>
                                     </Popover>
                                 </div>
-                                <div>
+                                <div style={{display: 'inline-block'}}>
                                     <span 
                                         className={`gs-icon export-btn action-btn`}
                                         onClick={this.onExportClick}
@@ -1042,7 +1044,7 @@ export default class CashBook extends Component {
                                 activeClassName={"active"}
                                 forcePage={this.state.selectedPageIndex} />
                         </Col>
-                        <Col xs={12} md={12} xs={12}>
+                        <Col xs={12} md={12}>
                             <GSTable 
                                 columns={this.columns}
                                 rowData={this.state.transactions}

@@ -11,7 +11,7 @@ import ReactPaginate from 'react-paginate';
 import { convertToLocalTime, dateFormatter } from '../../../utilities/utility';
 import DateRangePicker from '../../dateRangePicker/dataRangePicker';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import Popover, {ArrowContainer} from 'react-tiny-popover'
+import {Popover, ArrowContainer} from 'react-tiny-popover';
 import {Tooltip} from 'react-tippy';
 import CommonModal from '../../common-modal/commonModal';
 import StockItemEdit from './StockItemEdit';
@@ -881,19 +881,20 @@ export default class ViewStock extends Component {
                             }
                         }
                         >
-                            <span className='filter-popover-trigger-btn' onClick={this.onFilterBtnClick}>
-                                <FontAwesomeIcon icon='filter'/>
-                            </span>
+                            <>
+                                <span className='filter-popover-trigger-btn' onClick={this.onFilterBtnClick}>
+                                    <FontAwesomeIcon icon='filter'/>
+                                </span>
 
-                            <Dropdown className="more-actions-dropdown action-btn">
-                                <Dropdown.Toggle id="dropdown-more-actions" disabled={!this.state.selectedInfo.indexes.length}>
-                                    More Actions 
-                                </Dropdown.Toggle>
-                                <Dropdown.Menu>
-                                    <Dropdown.Item onClick={(e) => this.onMoreActionsDpdClick(e, 'printTag')}>Print Tag</Dropdown.Item>
-                                </Dropdown.Menu>
-                            </Dropdown>
-
+                                <Dropdown className="more-actions-dropdown action-btn">
+                                    <Dropdown.Toggle id="dropdown-more-actions" disabled={!this.state.selectedInfo.indexes.length}>
+                                        More Actions 
+                                    </Dropdown.Toggle>
+                                    <Dropdown.Menu>
+                                        <Dropdown.Item onClick={(e) => this.onMoreActionsDpdClick(e, 'printTag')}>Print Tag</Dropdown.Item>
+                                    </Dropdown.Menu>
+                                </Dropdown>
+                            </>
                         </Popover>
                     </Col>
                     <Col xs={4}>
