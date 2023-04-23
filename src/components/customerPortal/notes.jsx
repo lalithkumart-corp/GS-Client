@@ -234,8 +234,8 @@ class Notes extends Component {
                 <Row>
                     <Col xs={12}>
                         <Row style={{marginBottom: '10px'}}>
-                            <h4>Customer's:</h4>
-                            <input type="button" className='gs-button bordered' value="+" onClick={this.onClickAddNoteBtn} style={{marginLeft: "30px", padding: "0px 30px"}}/> 
+                            <h4 style={{display: 'inline-block', width: 'auto'}}>Customer's:</h4>
+                            <input type="button" className='gs-button bordered' value="+" onClick={this.onClickAddNoteBtn} style={{marginLeft: "30px", padding: "0px 25px", width: '63px'}}/> 
                         </Row>
                         {this.state.showNewPaper && this.getNewPaper()}
                         {this.getCustomRemarks()}

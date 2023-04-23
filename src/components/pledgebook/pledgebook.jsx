@@ -15,7 +15,7 @@ import DateRangePicker from '../dateRangePicker/dataRangePicker';
 import { getDateInUTC, convertToLocalTime, dateFormatter, currencyFormatter } from '../../utilities/utility';
 import ImageZoom from 'react-medium-image-zoom';
 //import Popover from 'react-simple-popover';
-import {Popover, ArrowContainer} from 'react-tiny-popover'
+import {Popover, ArrowContainer} from 'react-tiny-popover';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import PledgebookExportPopup from './pledgebookExportPopup';
 import { toast } from 'react-toastify';
@@ -1255,14 +1255,15 @@ class Pledgebook extends Component {
                             isOpen={this.state.moreFilter.popoverOpen}
                             onClickOutside={() => this.onMoreFilterPopoverTrigger(false)}
                             position={'right'}
-                            content={({position, targetRect, popoverRect}) => {
+                            content={({position, childRect, popoverRect}) => {
                                 return (
                                     <ArrowContainer
                                         position={position}
-                                        targetRect={targetRect}
+                                        childRect={childRect}
                                         popoverRect={popoverRect}
                                         arrowColor={'white'}
                                         arrowSize={10}
+                                        arrowClassName='pledgebook-filter-popoever-arrow'
                                     >
                                         <Row className='gs-card'>
                                             <Col className='gs-card-content'>

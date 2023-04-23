@@ -297,9 +297,7 @@ function UdhaarEntry(props) {
                                         <Form.Group>
                                             <Form.Label>S.No</Form.Label>
                                             <InputGroup>
-                                                <InputGroup.Prepend>
-                                                    <InputGroup.Text id="udhaar-bill-no-addon" className={loading?"readOnly": ""}>{billSeries}</InputGroup.Text>
-                                                </InputGroup.Prepend>
+                                                <InputGroup.Text id="udhaar-bill-no-addon" className={loading?"readOnly": ""}>{billSeries}</InputGroup.Text>
                                                 <FormControl
                                                     type="text"
                                                     value={billNo}
@@ -339,9 +337,7 @@ function UdhaarEntry(props) {
                                         <Form.Group>
                                             <Form.Label>Amount</Form.Label>
                                             <InputGroup>
-                                                <InputGroup.Prepend>
                                                     <InputGroup.Text id="rupee-addon" className={loading?"readOnly": ""}>Rs:</InputGroup.Text>
-                                                </InputGroup.Prepend>
                                                 <FormControl
                                                     type="number"
                                                     value={amount}

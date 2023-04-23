@@ -938,7 +938,7 @@ class AddStock extends Component {
                                                     ref = {(domElm) => { this.domElmns[PROD_CODE_SERIES] = domElm?domElm.input:domElm; }}
                                                 />
                                             </Col>
-                                            <Col xs={{span: 8}} className="no-padding">
+                                            <Col xs={{span: 8}} className="no-padding item-name-input-col">
                                                 <ReactAutosuggest
                                                     suggestions={this.state.autoSuggestions.filteredItemNameList}
                                                     onSuggestionsFetchRequested={({value}) => this.reactAutosuggestControls.onSuggestionsFetchRequested({value}, PROD_NAME)}
@@ -1083,7 +1083,7 @@ class AddStock extends Component {
                                 <tr>
                                     <td>
                                         <Row className="no-margin">
-                                        <Col xs={{span: 5}} className="no-padding">
+                                        <Col xs={{span: 5}} className="no-padding item-category1-input-col">
                                                 <ReactAutosuggest
                                                     suggestions={this.state.autoSuggestions.filteredItemCategoryList}
                                                     onSuggestionsFetchRequested={({value}) => this.reactAutosuggestControls.onSuggestionsFetchRequested({value}, PROD_CATEG)}
@@ -1102,7 +1102,7 @@ class AddStock extends Component {
                                                     ref = {(domElm) => { this.domElmns[PROD_CATEG] = domElm?domElm.input:domElm; }}
                                                 />
                                             </Col>
-                                            <Col xs={{span:3}} className="no-padding">
+                                            <Col xs={{span:3}} className="no-padding item-category1-input-col">
                                                 <ReactAutosuggest
                                                     suggestions={this.state.autoSuggestions.filteredItemSubCategoryList}
                                                     onSuggestionsFetchRequested={({value}) => this.reactAutosuggestControls.onSuggestionsFetchRequested({value}, PROD_SUB_CATEG)}

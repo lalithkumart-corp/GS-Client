@@ -259,17 +259,19 @@ class CustomerPortal extends Component {
                 {/* <Col xs={12} md={12} style={{textAlign: 'center', marginBottom: '10px', color: 'lightgrey', fontSize: '12px'}}><span>(OR)</span></Col> */}
                 <Col xs={4} md={4} style={{padding: 0}} className="cust-id-input-col">
                     <div style={{display: 'inline-block'}}><span>/</span></div>
-                    <FormGroup>
-                        <FormControl
-                            type="text"
-                            className="autosuggestion-box"
-                            placeholder="CustId"
-                            onChange={(e) => this.inputControls.onChange(null, e.target.value, 'custId')} 
-                            //onKeyUp={(e) => this.handleKeyUp(e, {currElmKey: 'moreCustomerDetailValue', isToAddMoreDetail: true, traverseDirection: 'backward'})} 
-                            value={this.state.filters.hashKey}
-                        />
-                        <FormControl.Feedback />
-                    </FormGroup>
+                    <div style={{width: '90%', display: 'inline-block'}}>
+                        <FormGroup>
+                            <FormControl
+                                type="text"
+                                className="autosuggestion-box"
+                                placeholder="CustId"
+                                onChange={(e) => this.inputControls.onChange(null, e.target.value, 'custId')} 
+                                //onKeyUp={(e) => this.handleKeyUp(e, {currElmKey: 'moreCustomerDetailValue', isToAddMoreDetail: true, traverseDirection: 'backward'})} 
+                                value={this.state.filters.hashKey}
+                            />
+                            <FormControl.Feedback />
+                        </FormGroup>
+                    </div>
                 </Col>
             </Row>
         )

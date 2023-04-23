@@ -13,6 +13,9 @@
         width: calc(100% - 30px);
         padding-right: 0;
     }
+    .calc {
+        width: auto;
+    }
 }
 .calc.operator{
     line-height: 70px;

@@ -831,13 +831,18 @@ class BillCreation extends Component {
     // Use your imagination to render suggestions.
     renderSuggestion = (suggestion, identifier) => {
         let theDom;
+        const getMobileNo = (suggestion) => {
+            if(suggestion.mobile && suggestion.mobile !== "null")
+                return <span> , &nbsp; &nbsp; &nbsp; {suggestion.mobile} </span>;
+            return '';
+        }
         switch(identifier) {
             case 'cname':
                 theDom = (
                     <div className="customer-list-item" id={suggestion.hashKey + 'parent'}>
                         <div id={suggestion.hashKey+ '1'}><span className='customer-list-item-maindetail'>{suggestion.name}  <span  className='customer-list-item-maindetail' style={{"fontSize":"8px"}}>&nbsp;c/of &nbsp;&nbsp;</span> {suggestion.gaurdianName}</span></div>
                         <div id={suggestion.hashKey+ '2'}><span className='customer-list-item-subdetail'>{suggestion.address}</span></div>
-                        <div id={suggestion.hashKey+ '3'}><span className='customer-list-item-subdetail'>{suggestion.place}, {suggestion.city} - {suggestion.pincode}</span></div>
+                        <div id={suggestion.hashKey+ '3'}><span className='customer-list-item-subdetail'>{suggestion.place}, {suggestion.city} - {suggestion.pincode} {getMobileNo(suggestion)} </span></div>
                     </div>
                 );
                 break;

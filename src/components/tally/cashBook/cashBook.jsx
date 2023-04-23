@@ -910,7 +910,7 @@ export default class CashBook extends Component {
                         <Col xs={12} md={7} sm={7}>
                             <Row>
                                 {/* <Col xs={3} md={3} style={{textAlign: 'center'}}> */}
-                                <div>
+                                <div style={{display: 'inline-block', width: 'auto'}}>
                                     <Popover
                                         containerClassName="cashbook-filter-popover"
                                         padding={0}
@@ -968,7 +968,7 @@ export default class CashBook extends Component {
                                         </>
                                     </Popover>
                                 </div>
-                                <div style={{display: 'inline-block'}}>
+                                <div style={{display: 'inline-block', width: 'auto'}}>
                                     <span 
                                         className={`gs-icon export-btn action-btn`}
                                         onClick={this.onExportClick}

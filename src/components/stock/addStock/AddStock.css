@@ -115,7 +115,12 @@
 } */
 
 .add-stock-container .react-autosuggest__suggestions-container {
-    top: 33px;
+    width: 300px;
+}
+
+.add-stock-container .item-category1-input-col .react-autosuggest__suggestions-container,
+.add-stock-container .item-category2-input-col .react-autosuggest__suggestions-container {
+    top: 99px;
 }
 
 /* .add-stock-container input {

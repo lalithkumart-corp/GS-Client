@@ -212,7 +212,7 @@
     padding-right: 0;
 }
 .bill-remarks-adder-dom {
-    margin-top: 15px;
+    margin-top: 15px !important;
 }
 
 .submit-container {

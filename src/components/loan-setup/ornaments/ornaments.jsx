@@ -72,14 +72,14 @@ class Ornaments extends Component {
                 if(anItem.title.toLowerCase().indexOf(this.state.orn.searchVal.toLowerCase()) !== -1) {
                     buffer.push(
                         <Row style={{padding: '5px'}} onClick={(e) => this.onOrnClick(e, anItem)} className={((anItem.selected == true)?'selected':'') + ' an-orn'}>
-                            {anItem.category + " " + anItem.title}
+                            <Col xs={12}>{anItem.category + " " + anItem.title}</Col>
                         </Row>
                     )
                 }
             } else {
                 buffer.push(
                     <Row style={{padding: '5px'}} onClick={(e) => this.onOrnClick(e, anItem)} className={((anItem.selected == true)?'selected':'') + ' an-orn'}>
-                        {anItem.category + " " + anItem.title}
+                        <Col xs={12}>{anItem.category + " " + anItem.title}</Col>
                     </Row>
                 )
             }

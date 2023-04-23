@@ -58,6 +58,10 @@
         display: inline-block;
         vertical-align: top;
         padding-left: 40px;
+        width: 200px;
+        .custom-control-label {
+            padding-left: 4px;
+        }
     }
     .consolidate-transactions-table {
         // max-height: 300px;

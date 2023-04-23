@@ -276,6 +276,12 @@ div[validationstate="error"] {
 input[type=checkbox], input[type=radio] {
   margin-left: -1.25rem;
 }
+a.nav-link:focus,
+a.nav-link:hover,
+a.dropdown-item:hover,
+a.dropdown-item:focus {
+  text-decoration: none;
+}
 /* END: ootstrap issue (due to different versions exist among diff npm */
 
 .gold-color {

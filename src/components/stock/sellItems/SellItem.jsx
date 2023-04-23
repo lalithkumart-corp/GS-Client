@@ -1487,21 +1487,23 @@ class SellItem extends Component {
                 <p style={{fontSize: '20px'}}>Sum: ₹ {formatNo(this.state.paymentFormData.sum, 2)}</p>
                 <div className="pymnt-mode-input-div">
                     <span className="field-name payment-mode">Payment Mode:</span>
-                    <Form.Group>
-                        <Form.Control as="select"
-                            onChange={(e) => this.onDropdownChange(e, PAYMENT_MODE)} 
-                            value={this.state.paymentFormData.paymentMode}
-                            style={{ height: "26px", padding: 0 }}
-                            // onKeyUp={(e) => this.handleKeyUp(e, {currElmKey: PAYMENT_MODE})}
-                            // ref= {(domElm) => {this.domElmns[PAYMENT_MODE] = domElm; }}
-                            >
-                                <option key="key-cash" value="cash">CASH</option>
-                                <option key="key-cheque" value="cheque">CHEQUE</option>
-                                <option key="key-upi" value="upi">UPI</option>
-                                <option key="key-paytm" value="paytm">Paytm</option>
-                                <option key="key-gpay" value="gpay">GPay</option>
-                        </Form.Control>
-                    </Form.Group>
+                    <div style={{display: 'inline-block'}}>
+                        <Form.Group>
+                            <Form.Control as="select"
+                                onChange={(e) => this.onDropdownChange(e, PAYMENT_MODE)} 
+                                value={this.state.paymentFormData.paymentMode}
+                                style={{ height: "26px", paddingLeft: '5px' }}
+                                // onKeyUp={(e) => this.handleKeyUp(e, {currElmKey: PAYMENT_MODE})}
+                                // ref= {(domElm) => {this.domElmns[PAYMENT_MODE] = domElm; }}
+                                >
+                                    <option key="key-cash" value="cash">CASH</option>
+                                    <option key="key-cheque" value="cheque">CHEQUE</option>
+                                    <option key="key-upi" value="upi">UPI</option>
+                                    <option key="key-paytm" value="paytm">Paytm</option>
+                                    <option key="key-gpay" value="gpay">GPay</option>
+                            </Form.Control>
+                        </Form.Group>
+                    </div>
                 </div>
                 <div>
                     <span className="field-name amount-paid">Amout Paid: ₹ </span>
@@ -1549,9 +1551,7 @@ class SellItem extends Component {
                                         <Form.Group>
                                             <Form.Label>Invoice No</Form.Label>
                                             <InputGroup>
-                                                <InputGroup.Prepend>
-                                                    <InputGroup.Text id="invoice-no-addon">{this.state.invoiceSeries}</InputGroup.Text>
-                                                </InputGroup.Prepend>
+                                                <InputGroup.Text id="invoice-no-addon">{this.state.invoiceSeries}</InputGroup.Text>
                                                 <FormControl
                                                     type="text"
                                                     value={this.state.invoiceNo}
@@ -1591,9 +1591,7 @@ class SellItem extends Component {
                                         <Form.Group>
                                             <Form.Label>Retail Rate</Form.Label>
                                             <InputGroup>
-                                                <InputGroup.Prepend>
-                                                    <InputGroup.Text id="rupee-no-addon">₹</InputGroup.Text>
-                                                </InputGroup.Prepend>
+                                                <InputGroup.Text id="rupee-no-addon">₹</InputGroup.Text>
                                                 <FormControl
                                                     type="number"
                                                     value={this.state.retailPrice}
@@ -1652,11 +1650,11 @@ class SellItem extends Component {
                                 <input type="button" className="gs-button bordered" style={{width: '100%'}} value="Submit" onClick={this.submit}/>
                             </Col>
                         </Row>
-                        <Row>
+                        {/* <Row>
                             <Col xs={12} style={{border: '1px solid lightgrey', marginTop: '20px', marginLeft: '5px', paddingTop: '5px'}}>
                                 <WastageCalculator />
                             </Col>
-                        </Row>
+                        </Row> */}
                     </Col>
                 </Row>
                 <Row>
