@@ -93,6 +93,12 @@
 	&:focus {
 		color: #2196f3;
 	}
+	// &.orn-categ-gold {
+	// 	border-left: 5px solid gold;
+	// }
+	// &.orn-categ-silver {
+	// 	border-left: 5px solid silver;
+	// }
 }
 .my-pledgebook-table {
 	.inner-header {
@@ -117,6 +123,27 @@
 		color: darkgrey;
 		text-decoration: line-through;
 	}
+	.pb-billno-col {
+		&.gold-item{
+			border-left: 5px solid gold;
+		}
+		&.silver-item{
+			border-left: 5px solid silver;
+		}
+	}
+	// .orn-category-identifier {
+	// 	width: 10px;
+	// 	height: 10px;
+	// 	display: inline-block;
+	// 	border-radius: 50%;
+	// 	margin-left: 3px;
+	// 	&.dot-gold {
+	// 		background-color: gold;
+	// 	}
+	// 	&.dot-silver {
+	// 		background-color: silver;
+	// 	}
+	// }
 }
 .orn-display-dom {
 	width: 60%;

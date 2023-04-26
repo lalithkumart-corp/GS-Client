@@ -490,9 +490,7 @@ class Redeem extends Component {
                             <Row style={{height: '24px'}}>
                                 <Col xs={4} className='no-padding'>
                                     <InputGroup>
-                                        <InputGroup.Prepend>
-                                            <InputGroup.Text className="int-amt-per-mon-addon" >₹</InputGroup.Text>
-                                        </InputGroup.Prepend>
+                                        <InputGroup.Text className="int-amt-per-mon-addon" >₹</InputGroup.Text>
                                         <FormControl
                                             type="number"
                                             value={selectedBillData._interestPerMonth}
@@ -524,9 +522,7 @@ class Redeem extends Component {
                                 </Col>
                                 <Col xs={6}>
                                     <InputGroup>
-                                        <InputGroup.Prepend>
-                                            <InputGroup.Text className="discount-amt-per-mon-addon" >₹</InputGroup.Text>
-                                        </InputGroup.Prepend>
+                                        <InputGroup.Text className="discount-amt-per-mon-addon" >₹</InputGroup.Text>
                                         <FormControl
                                             type="number"
                                             value={selectedBillData._discountValue}
@@ -686,9 +682,7 @@ class Redeem extends Component {
                         <Col>
                             <Form.Group>
                                 <InputGroup>
-                                    <InputGroup.Prepend>
-                                        <InputGroup.Text>Bill Notes</InputGroup.Text>
-                                    </InputGroup.Prepend>
+                                    <InputGroup.Text>Bill Notes</InputGroup.Text>
                                     <FormControl as="textarea" 
                                         placeholder="Type here..." 
                                         value={this.state.selectedBillData._billRemarks} 
@@ -860,6 +854,7 @@ class Redeem extends Component {
         } catch(e) {
             //TODO: Remove this alert after completing development
             alert("Exception occured in transferring focus...check console for more error info");
+            console.log(`currentElmKey: ${currentElmKey}, nextElm`, nextElm);
             console.log(e);
         }
     }

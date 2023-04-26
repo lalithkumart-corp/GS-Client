@@ -266,12 +266,25 @@ class Pledgebook extends Component {
                     displayText: 'Bill No',
                     isFilterable: true,
                     filterCallback: this.filterCallbacks.billNo,
-                    className: 'pb-billno-col',
+                    // className: `pb-billno-col orn-categ-${dotColor}`,
+                    tdClassNameGetter: (column, columnIndex, row, rowIndex) => {
+                        let clsName = 'pb-billno-col gold-item';
+                        if(row['OrnCategory'] == 'S')
+                            clsName = 'pb-billno-col silver-item';
+                        return clsName;
+                    },
                     formatter: (column, columnIndex, row, rowIndex) => {
+                        // let dotColor = 'gold';
+                        // if(row['OrnCategory'] == 'S') dotColor = 'silver';
                         return (
-                            <span className='bill-no-cell' onClick={(e) => this.cellClickCallbacks.onBillNoClick({column, columnIndex, row, rowIndex}, e)}>
-                                <b>{row[column.id]}</b>
-                            </span>
+                            <>
+                                <span className={`bill-no-cell`} onClick={(e) => this.cellClickCallbacks.onBillNoClick({column, columnIndex, row, rowIndex}, e)}>
+                                    <b>{row[column.id]}</b>
+                                </span>
+                                {/* <span className={`orn-category-identifier dot-${dotColor}`}>
+
+                                </span> */}
+                            </>
                         )
                     },
                     width: '7%'

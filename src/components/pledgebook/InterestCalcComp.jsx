@@ -23,7 +23,7 @@ export const InterestCalcComp = ({pledgedDate, closingDate, amount, roi, ornType
     }
     
 
-    useEffect(async ()=> {
+    useEffect(()=> {
         doCalc();
     }, []);
 
@@ -64,9 +64,7 @@ export const InterestCalcComp = ({pledgedDate, closingDate, amount, roi, ornType
                         <Row style={{height: '24px'}}>
                             <Col xs={4} className='no-padding'>
                                 <InputGroup>
-                                    <InputGroup.Prepend>
-                                        <InputGroup.Text className="int-amt-per-mon-addon" >₹</InputGroup.Text>
-                                    </InputGroup.Prepend>
+                                    <InputGroup.Text className="int-amt-per-mon-addon" >₹</InputGroup.Text>
                                     <FormControl
                                         type="number"
                                         value={obj._interestPerMonth}
@@ -97,9 +95,7 @@ export const InterestCalcComp = ({pledgedDate, closingDate, amount, roi, ornType
                             </Col>
                             <Col xs={6}>
                                 <InputGroup>
-                                    <InputGroup.Prepend>
-                                        <InputGroup.Text className="discount-amt-per-mon-addon" >₹</InputGroup.Text>
-                                    </InputGroup.Prepend>
+                                    <InputGroup.Text className="discount-amt-per-mon-addon" >₹</InputGroup.Text>
                                     <FormControl
                                         type="number"
                                         value={obj._discountValue}

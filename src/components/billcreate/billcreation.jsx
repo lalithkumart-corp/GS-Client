@@ -1104,8 +1104,8 @@ class BillCreation extends Component {
         }
     }
 
-    toggleMoreInputs() {
-        this.setState({showMoreInputs: !this.state.showMoreInputs});
+    async toggleMoreInputs() {
+        await this.setState({showMoreInputs: !this.state.showMoreInputs});
     }
 
     toggleInterestDom() {
@@ -1188,14 +1188,14 @@ class BillCreation extends Component {
     handleChange(identifier, params ) {
         
     }
-    handleClick(e, options) {
+    async handleClick(e, options) {
         if(options) {
             if(options.currElmKey == 'moreDetailsHeader') {            
                 if(this.state.showMoreInputs)
                     this.updateDomList('disableMoreDetailsInputElmns');                
                 else if(!this.isExistingCustomer())
                     this.updateDomList('enableMoreDetailsInputElmns');
-                this.toggleMoreInputs();
+                await this.toggleMoreInputs();
                 this.transferFocus(e, options.currElmKey);
             } else if(options.currElmKey == 'interestCollapsibleBody') {
                 this.toggleInterestDom();
@@ -1692,24 +1692,26 @@ class BillCreation extends Component {
                 <tr key={serialNo+'-row'}>
                     <td className='serial-no-col'>{serialNo}</td>
                     <td>
-                        <ReactAutosuggest
-                            suggestions={this.state.formData.orn.limitedList}
-                            onSuggestionsFetchRequested={({value}) => this.reactAutosuggestControls.onSuggestionsFetchRequested({value}, 'ornItem')}
-                            // onSuggestionsClearRequested={this.reactAutosuggestControls.onSuggestionsClearRequested}
-                            getSuggestionValue={(suggestion, e) => this.getSuggestionValue(suggestion, 'ornItem')}
-                            renderSuggestion={(suggestion) => this.renderSuggestion(suggestion, 'ornItem')}
-                            onSuggestionSelected={(event, { suggestion, suggestionValue, suggestionIndex, sectionIndex, method}) => this.reactAutosuggestControls.onSuggestionSelected(event, { suggestion, suggestionValue, suggestionIndex, sectionIndex, method }, 'ornItem', {serialNo: serialNo})}
-                            inputProps={{
-                                placeholder: 'Type Orn name',
-                                value: this.state.formData.orn.inputs[serialNo].ornItem,
-                                onChange: (e, {newValue, method}) => this.reactAutosuggestControls.onChange(e, {newValue, method}, 'ornItem', {serialNo: serialNo}),
-                                onKeyUp: (e) => this.reactAutosuggestControls.onKeyUp(e, {currElmKey: 'ornItem'+ serialNo, isOrnItemInput: true,  serialNo: serialNo}),
-                                className: "react-autosuggest__input orn gs-input-cell",
-                                readOnly: this.props.billCreation.loading,
-                                disabled: this.props.billCreation.loading
-                            }}
-                            ref = {(domElm) => { this.domElmns.orn['ornItem'+ serialNo] = domElm?domElm.input:domElm; }}
-                        />
+                        <div style={{position: 'relative'}}>
+                            <ReactAutosuggest
+                                suggestions={this.state.formData.orn.limitedList}
+                                onSuggestionsFetchRequested={({value}) => this.reactAutosuggestControls.onSuggestionsFetchRequested({value}, 'ornItem')}
+                                // onSuggestionsClearRequested={this.reactAutosuggestControls.onSuggestionsClearRequested}
+                                getSuggestionValue={(suggestion, e) => this.getSuggestionValue(suggestion, 'ornItem')}
+                                renderSuggestion={(suggestion) => this.renderSuggestion(suggestion, 'ornItem')}
+                                onSuggestionSelected={(event, { suggestion, suggestionValue, suggestionIndex, sectionIndex, method}) => this.reactAutosuggestControls.onSuggestionSelected(event, { suggestion, suggestionValue, suggestionIndex, sectionIndex, method }, 'ornItem', {serialNo: serialNo})}
+                                inputProps={{
+                                    placeholder: 'Type Orn name',
+                                    value: this.state.formData.orn.inputs[serialNo].ornItem,
+                                    onChange: (e, {newValue, method}) => this.reactAutosuggestControls.onChange(e, {newValue, method}, 'ornItem', {serialNo: serialNo}),
+                                    onKeyUp: (e) => this.reactAutosuggestControls.onKeyUp(e, {currElmKey: 'ornItem'+ serialNo, isOrnItemInput: true,  serialNo: serialNo}),
+                                    className: "react-autosuggest__input orn gs-input-cell",
+                                    readOnly: this.props.billCreation.loading,
+                                    disabled: this.props.billCreation.loading
+                                }}
+                                ref = {(domElm) => { this.domElmns.orn['ornItem'+ serialNo] = domElm?domElm.input:domElm; }}
+                            />
+                        </div>
                     </td>
                     <td>
                         <input 
@@ -1748,24 +1750,26 @@ class BillCreation extends Component {
                             />
                     </td>
                     <td>
-                        <ReactAutosuggest
-                            suggestions={this.state.formData.orn.specLimitedList}
-                            onSuggestionsFetchRequested={({value}) => this.reactAutosuggestControls.onSuggestionsFetchRequested({value}, 'ornSpec')}
-                            // onSuggestionsClearRequested={this.reactAutosuggestControls.onSuggestionsClearRequested}
-                            getSuggestionValue={(suggestion, e) => this.getSuggestionValue(suggestion, 'ornSpec')}
-                            renderSuggestion={(suggestion) => this.renderSuggestion(suggestion, 'ornSpec')}
-                            onSuggestionSelected={(event, { suggestion, suggestionValue, suggestionIndex, sectionIndex, method}) => this.reactAutosuggestControls.onSuggestionSelected(event, { suggestion, suggestionValue, suggestionIndex, sectionIndex, method }, 'ornSpec', {serialNo: serialNo})}
-                            inputProps={{
-                                placeholder: '',
-                                value: this.state.formData.orn.inputs[serialNo].ornSpec,
-                                onChange: (e, {newValue, method}) => this.reactAutosuggestControls.onChange(e, {newValue, method}, 'ornSpec', {serialNo: serialNo}),
-                                onKeyUp: (e) => this.reactAutosuggestControls.onKeyUp(e, {currElmKey: 'ornSpec'+ serialNo, isOrnSpecsInput: true, nextSerialNo: serialNo+1}),
-                                className: "react-autosuggest__input orn spec gs-input-cell",
-                                readOnly: this.props.billCreation.loading,
-                                disabled: this.props.billCreation.loading
-                            }}
-                            ref = {(domElm) => { this.domElmns.orn['ornSpec' + serialNo] = domElm?domElm.input:domElm; }}
-                        />                            
+                        <div style={{position: 'relative'}}>
+                            <ReactAutosuggest
+                                suggestions={this.state.formData.orn.specLimitedList}
+                                onSuggestionsFetchRequested={({value}) => this.reactAutosuggestControls.onSuggestionsFetchRequested({value}, 'ornSpec')}
+                                // onSuggestionsClearRequested={this.reactAutosuggestControls.onSuggestionsClearRequested}
+                                getSuggestionValue={(suggestion, e) => this.getSuggestionValue(suggestion, 'ornSpec')}
+                                renderSuggestion={(suggestion) => this.renderSuggestion(suggestion, 'ornSpec')}
+                                onSuggestionSelected={(event, { suggestion, suggestionValue, suggestionIndex, sectionIndex, method}) => this.reactAutosuggestControls.onSuggestionSelected(event, { suggestion, suggestionValue, suggestionIndex, sectionIndex, method }, 'ornSpec', {serialNo: serialNo})}
+                                inputProps={{
+                                    placeholder: '',
+                                    value: this.state.formData.orn.inputs[serialNo].ornSpec,
+                                    onChange: (e, {newValue, method}) => this.reactAutosuggestControls.onChange(e, {newValue, method}, 'ornSpec', {serialNo: serialNo}),
+                                    onKeyUp: (e) => this.reactAutosuggestControls.onKeyUp(e, {currElmKey: 'ornSpec'+ serialNo, isOrnSpecsInput: true, nextSerialNo: serialNo+1}),
+                                    className: "react-autosuggest__input orn spec gs-input-cell",
+                                    readOnly: this.props.billCreation.loading,
+                                    disabled: this.props.billCreation.loading
+                                }}
+                                ref = {(domElm) => { this.domElmns.orn['ornSpec' + serialNo] = domElm?domElm.input:domElm; }}
+                            />
+                        </div>
                     </td>
                 </tr>
             )

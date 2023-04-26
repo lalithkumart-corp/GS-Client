@@ -23,7 +23,7 @@ import { CashIn } from '../tally/cashManager/cashIn';
 import {Tooltip} from 'react-tippy';
 import { PaymentSelectionCard } from '../payment/paymentSelectionCard';
 import _ from 'lodash';
-import { CASH_TRNS_GIRVI, DEFAULT_PAYMENT_OBJ_FOR_CASH_IN, DEFAULT_PAYMENT_OBJ_FOR_CASH_OUT, LOAN_BILL_EXPIRY_DAYS } from '../../constants';
+import { CASH_TRNS_GIRVI, DEFAULT_PAYMENT_OBJ_FOR_CASH_IN, DEFAULT_PAYMENT_OBJ_FOR_CASH_OUT, LOAN_BILL_EXPIRY_DAYS, IN, OUT } from '../../constants';
 import { InterestInputComponent } from './InterestInputComponent';
 import { InterestCalcComp } from './InterestCalcComp';
 class PledgebookModal extends Component {
@@ -717,9 +717,7 @@ export const RenewalScreen = (props) => {
                                 <Row>
                                     <Col xs={{span: 6, offset: 6}} md={{span: 6, offset: 6}}>
                                         <InputGroup>
-                                            <InputGroup.Prepend>
-                                                <InputGroup.Text className="new-principal-amt-addon" >₹</InputGroup.Text>
-                                            </InputGroup.Prepend>
+                                            <InputGroup.Text className="new-principal-amt-addon" >₹</InputGroup.Text>
                                             <FormControl
                                                 type="number"
                                                 value={newPrincipal}
@@ -747,7 +745,7 @@ export const RenewalScreen = (props) => {
                                 <h4>Due Amount</h4>
                             </Col>
                             <Col xs={4}>
-                                <PaymentSelectionCard paymentMode={'cash'} onChange={(obj) => onChangePaymentInputs(obj)}/>
+                                <PaymentSelectionCard paymentFlow={getMoneyDiff()>0?IN:OUT} paymentMode={'cash'} onChange={(obj) => onChangePaymentInputs(obj)}/>
                             </Col>
                             <Col xs={{span:6, offset: 1}}>
                                 <Row>
@@ -755,10 +753,12 @@ export const RenewalScreen = (props) => {
                                         (()=>{
                                             let dom = [];
                                             let bal = getMoneyDiff();
+
                                             let customerPayInAmounts = tableData.reduce((sum, aRowData)=> sum+aRowData._amt, 0);
                                             let balDetail = `( ${theBillData.Amount} + ${theBillData._totalInterestValue - theBillData._discountValue} `;
                                             if(customerPayInAmounts != 0) balDetail += `- ${customerPayInAmounts} `;
-                                            balDetail += `- ${newPrincipal} + ${newInterestValue} )`;
+                                                balDetail += `- ${newPrincipal} + ${newInterestValue} )`;
+                                            
                                             dom.push(<Col xs={8} md={8} className='no-padding'>
                                                         <span> {balDetail} </span>
                                                     </Col>);

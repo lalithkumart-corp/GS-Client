@@ -1,10 +1,11 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { fetchMyAccountsList, fetchAllBanksList } from '../../utilities/apiUtils';
 import { Collapse } from 'react-collapse';
 import { Container, Row, Col, Form, FormGroup, FormLabel, FormControl, HelpBlock, InputGroup, Button, Glyphicon } from 'react-bootstrap';
 import { DEFAULT_PAYMENT_OBJ_FOR_CASH_IN, DEFAULT_PAYMENT_OBJ_FOR_CASH_OUT, IN, OUT } from '../../constants';
 
 export const PaymentSelectionCard = (props) => {
+    const [defaultAccObj, setDefaultAccObj] = useState(null);
     const [paymentInputDivView, setPaymentInputDivView] = useState(false);
     const [accountsList, setAccountsList] = useState([]);
     const [allBanksList, setAllBanksList] = useState([]);
@@ -23,28 +24,41 @@ export const PaymentSelectionCard = (props) => {
         fetchAccountDroddownList();
     }, []);
 
+    useEffect(()=>{
+        setPaymentFlow(props.paymentFlow);
+    }, [props.paymentFlow]);
+
+    useEffect(()=> {
+        updateAccountIdsWithDefault();
+    }, [paymentFlow, defaultAccObj]);
+
     const fetchAccountDroddownList = async () => {
         let list = await fetchMyAccountsList();
         let theAllBanksList = await fetchAllBanksList();
+        let _defaultFundAcc;
         if(list && list.length > 0) {
-            let defaultFundAcc = list.filter((aFundAcc)=> {
+            _defaultFundAcc = list.filter((aFundAcc)=> {
                 if(aFundAcc.is_default)
                     return aFundAcc;
             });
-
-            if(defaultFundAcc && defaultFundAcc.length > 0) {
-                setDefaultAccountId(defaultFundAcc[0].id);
-                let tt = {...paymentObj};
-                _.each(['cash', 'cheque', 'online'], (aMode) => {
-                    if(paymentFlow == IN) tt[aMode].toAccountId = defaultFundAcc[0].id;
-                    else tt[aMode].fromAccountId = defaultFundAcc[0].id;
-                });
-                setPaymentObj(tt);
-                props.onChange(tt);
-            } 
+            await setDefaultAccObj(_defaultFundAcc[0]);
+            updateAccountIdsWithDefault();
         }
         setAccountsList(list);
         setAllBanksList(theAllBanksList);
+    }
+
+    const updateAccountIdsWithDefault = () => {
+        if(defaultAccObj) {
+            setDefaultAccountId(defaultAccObj.id);
+            let tt = {...paymentObj};
+            _.each(['cash', 'cheque', 'online'], (aMode) => {
+                if(paymentFlow == IN) tt[aMode].toAccountId = defaultAccObj.id;
+                else tt[aMode].fromAccountId = defaultAccObj.id;
+            });
+            setPaymentObj(tt);
+            props.onChange(tt);
+        }
     }
 
     const onCardHeadClick = (e) => {

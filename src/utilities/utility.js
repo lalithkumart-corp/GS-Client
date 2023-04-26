@@ -113,7 +113,7 @@ export const convertToLocalTime = (theDate, options) => {
     options = options || {};
 
     if(theDate.length == 24) // Ex: 2021-01-02T12:17:57.000Z
-        theDate = theDate.replace('T', ' ').slice(0,23);
+        theDate = theDate.replace('T', ' '); //.slice(0,23);
 
     const twoDigitFormat = (val) => {
         val = parseInt(val);
@@ -121,7 +121,7 @@ export const convertToLocalTime = (theDate, options) => {
             val = '0'+val;
         return val;
     };        
-    let localDateObj = new Date(theDate + ' UTC');
+    let localDateObj = new Date(theDate);
     let dd = twoDigitFormat(localDateObj.getDate());
     let mm = twoDigitFormat(localDateObj.getMonth() + 1);        
     let yyyy = localDateObj.getFullYear();
