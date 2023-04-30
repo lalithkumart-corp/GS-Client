@@ -839,10 +839,15 @@ class BillCreation extends Component {
         switch(identifier) {
             case 'cname':
                 theDom = (
-                    <div className="customer-list-item" id={suggestion.hashKey + 'parent'}>
-                        <div id={suggestion.hashKey+ '1'}><span className='customer-list-item-maindetail'>{suggestion.name}  <span  className='customer-list-item-maindetail' style={{"fontSize":"8px"}}>&nbsp;c/of &nbsp;&nbsp;</span> {suggestion.gaurdianName}</span></div>
-                        <div id={suggestion.hashKey+ '2'}><span className='customer-list-item-subdetail'>{suggestion.address}</span></div>
-                        <div id={suggestion.hashKey+ '3'}><span className='customer-list-item-subdetail'>{suggestion.place}, {suggestion.city} - {suggestion.pincode} {getMobileNo(suggestion)} </span></div>
+                    <div className="customer-list-item" id={suggestion.hashKey + 'parent'} style={{display: 'flex'}}>
+                        <div style={{width: '70%', display: 'inline-block'}}>
+                            <div id={suggestion.hashKey+ '1'}><span className='customer-list-item-maindetail'>{suggestion.name}  <span  className='customer-list-item-maindetail' style={{"fontSize":"8px"}}>&nbsp;c/of &nbsp;&nbsp;</span> {suggestion.gaurdianName}</span></div>
+                            <div id={suggestion.hashKey+ '2'}><span className='customer-list-item-subdetail'>{suggestion.address}</span></div>
+                            <div id={suggestion.hashKey+ '3'}><span className='customer-list-item-subdetail'>{suggestion.place}, {suggestion.city} - {suggestion.pincode} {getMobileNo(suggestion)} </span></div>
+                        </div>
+                        <div style={{width: '30%', display: 'inline-block'}}>
+                            <img src={suggestion.userImagePath} style={{height: '60px'}}/>
+                        </div>
                     </div>
                 );
                 break;
@@ -1692,7 +1697,7 @@ class BillCreation extends Component {
                 <tr key={serialNo+'-row'}>
                     <td className='serial-no-col'>{serialNo}</td>
                     <td>
-                        <div style={{position: 'relative'}}>
+                        <div style={{position: 'relative'}} className='custom-autosuggest-wrapper'>
                             <ReactAutosuggest
                                 suggestions={this.state.formData.orn.limitedList}
                                 onSuggestionsFetchRequested={({value}) => this.reactAutosuggestControls.onSuggestionsFetchRequested({value}, 'ornItem')}

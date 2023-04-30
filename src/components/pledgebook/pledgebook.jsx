@@ -480,13 +480,14 @@ class Pledgebook extends Component {
     }
 
     handleClose(params) {
-        this.setState({PBmodalIsOpen: false, currentBillData: null, currRowIndex: null});
-        if(params && params.showPledgebookInitialPage) {
-            this.resetUserSelections(() => {
-                this.refresh();
-            });
-            this.myEvt.once('fetchedPledgebookData', this.afterBillFetchListener);
-        }
+        this.setState({PBmodalIsOpen: false, currentBillData: null, currRowIndex: null}, () => {
+            if(params && params.showPledgebookInitialPage) {
+                this.resetUserSelections(() => {
+                    this.refresh();
+                });
+                this.myEvt.once('fetchedPledgebookData', this.afterBillFetchListener);
+            }
+        });
     }
 
     resetUserSelections(cb) {

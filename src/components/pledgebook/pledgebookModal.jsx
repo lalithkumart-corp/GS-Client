@@ -527,8 +527,8 @@ export const RenewalScreen = (props) => {
         setInterestRates(rates);
     }
 
-    const goBack = () => {
-        props.showMainScreen({showPledgebookInitialPage: true});
+    const goBack = (options) => {
+        props.showMainScreen(options);
     }
 
     const fetchPaymentsListByBill = async () => {
@@ -627,7 +627,7 @@ export const RenewalScreen = (props) => {
             if(res && res.data) {
                 if(res.data.STATUS == "success") {
                     toast.success("Renewed the bill");
-                    goBack();
+                    goBack({showPledgebookInitialPage: true});
                 } else if(res.data.STATUS == "error")
                     toast.error("Error received from server");
                 else

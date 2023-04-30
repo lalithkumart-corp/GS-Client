@@ -1,9 +1,12 @@
 .jewellery-gst-bill-paper.template2 {
     display: none;
-    font-size: 16px;
+    font-size: 17px;
     width: 1050px;
     min-height: 685px;
     max-height: 685px;
+    .store-name {
+        color: red;
+    }
 }
 
 .gst-bill-preview .jewellery-gst-bill-paper.template2.has-printcontent {
@@ -22,7 +25,12 @@
     }
     .jewellery-gst-bill-paper.template2 {
         display: block;
-        min-height: 685px;
-        max-height: 685px;
+        font-size: 17px;
+        width: 1195px;
+        min-height: 765px;
+        max-height: 765px;
+        .store-name {
+            color: red !important;
+        }
     }
 }

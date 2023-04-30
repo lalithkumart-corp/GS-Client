@@ -397,6 +397,7 @@ export default class Customer extends Component {
                     <Col xs={3}>
                         <Form.Group
                             validationState= {this.state.formData.cname.hasError ? "error" :null}
+                            style={{position: 'relative'}}
                             >
                             <Form.Label>Customer Name {(this.state.selectedCustomer && this.state.selectedCustomer.name)?'':'  (New Customer)'} </Form.Label>
                             <ReactAutosuggest
@@ -419,7 +420,8 @@ export default class Customer extends Component {
                         </Form.Group>
                     </Col>
                     <Col xs={3}>
-                        <Form.Group>
+                        <Form.Group
+                            style={{position: 'relative'}}>
                             <Form.Label>Father/Husband/Guardian Name</Form.Label>
                             <ReactAutosuggest 
                                 suggestions={this.state.formData.gaurdianName.limitedList}
@@ -440,7 +442,8 @@ export default class Customer extends Component {
                         </Form.Group>
                     </Col>
                     <Col xs={3}>
-                        <Form.Group>
+                        <Form.Group
+                            style={{position: 'relative'}}>
                             <Form.Label>Address</Form.Label>
                             <ReactAutosuggest 
                                     suggestions={this.state.formData.address.limitedList}
@@ -461,7 +464,8 @@ export default class Customer extends Component {
                         </Form.Group>
                     </Col>
                     <Col xs={3}>
-                        <Form.Group>
+                        <Form.Group
+                            style={{position: 'relative'}}>
                             <Form.Label>Place</Form.Label>
                             <ReactAutosuggest 
                                 suggestions={this.state.formData.place.limitedList}
@@ -485,7 +489,8 @@ export default class Customer extends Component {
                 </Row>
                 <Row style={{paddingTop: '20px'}}>
                     <Col xs={3}>
-                        <Form.Group>
+                        <Form.Group
+                        style={{position: 'relative'}}>
                             <Form.Label>City</Form.Label>
                             <ReactAutosuggest 
                                 suggestions={this.state.formData.city.limitedList}
@@ -506,8 +511,9 @@ export default class Customer extends Component {
                         </Form.Group>
                     </Col>
                     <Col xs={3}>
-                        <Form.Label>Pincode</Form.Label>
-                        <Form.Group>
+                        <Form.Group
+                            style={{position: 'relative'}}>
+                            <Form.Label>Pincode</Form.Label>
                             <ReactAutosuggest 
                                 suggestions={this.state.formData.pincode.limitedList}
                                 onSuggestionsFetchRequested={({value}) => this.reactAutosuggestControls.onSuggestionsFetchRequested({value}, 'pincode')}
@@ -527,7 +533,8 @@ export default class Customer extends Component {
                         </Form.Group>
                     </Col>
                     <Col xs={3}>
-                        <Form.Group>
+                        <Form.Group
+                        style={{position: 'relative'}}>
                             <Form.Label>Mobile</Form.Label>
                             <ReactAutosuggest 
                                 suggestions={this.state.formData.mobile.limitedList}

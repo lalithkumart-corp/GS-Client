@@ -80,6 +80,7 @@ function GstBillingDemo() {
             huid: '',
             div: '',
             wst: '',
+            wstVal: '',
             mc: '',
             qty: '',
             gwt: '',
@@ -94,6 +95,7 @@ function GstBillingDemo() {
             huid: '',
             div: '',
             wst: '',
+            wstVal: '',
             mc: '',
             qty: '',
             gwt: '',
@@ -108,6 +110,7 @@ function GstBillingDemo() {
             huid: '',
             div: '',
             wst: '',
+            wstVal: '',
             mc: '',
             qty: '',
             gwt: '',
@@ -122,6 +125,7 @@ function GstBillingDemo() {
             huid: '',
             div: '',
             wst: '',
+            wstVal: '',
             mc: '',
             qty: '',
             gwt: '',
@@ -221,16 +225,16 @@ function GstBillingDemo() {
             case 'nwt':
                 if(options) {
                     let newOrnData = {...ornData};
-                    newOrnData[options.row][options.col] = numberFormatter(val, 3);
+                    newOrnData[options.row][options.col] = !isNaN(val)?numberFormatter(val, 3):'';
                     if(identifier == 'gwt') 
-                        newOrnData[options.row]['nwt'] = numberFormatter(val, 3);
+                        newOrnData[options.row]['nwt'] = !isNaN(val)?numberFormatter(val, 3):'';
                     setOrnaments(newOrnData);
                 };
                 break;
             case 'mc':
                 if(options) {
                     let newOrnData = {...ornData};
-                    newOrnData[options.row][options.col] = numberFormatter(val, 2);
+                    newOrnData[options.row][options.col] = !isNaN(val)?numberFormatter(val, 2):'';
                     setOrnaments(newOrnData);
                 };
                 break;
@@ -238,7 +242,7 @@ function GstBillingDemo() {
                 if(options) {
                     let newOrnData = {...ornData};
                     newOrnData[options.row][options.col] = val;
-                    newOrnData[options.row]['wstVal'] = numberFormatter((ornData[options.row].nwt*val)/100, 3);
+                    newOrnData[options.row]['wstVal'] = !isNaN(val)?numberFormatter((ornData[options.row].nwt*val)/100, 3):'';
                     setOrnaments(newOrnData);
                 };
                 break;
@@ -246,7 +250,7 @@ function GstBillingDemo() {
                 if(options) {
                     let newOrnData = {...ornData};
                     newOrnData[options.row][options.col] = val;
-                    newOrnData[options.row]['wst'] = numberFormatter((val*100)/ornData[options.row].nwt, 3);
+                    newOrnData[options.row]['wst'] = !isNaN(val)?numberFormatter((val*100)/ornData[options.row].nwt, 3):'';
                     setOrnaments(newOrnData);
                 };
                 break;
@@ -254,7 +258,7 @@ function GstBillingDemo() {
             case 'sgst':
                 if(options) {
                     let newOrnData = {...ornData};
-                    newOrnData[options.row][options.col] = numberFormatter(val, 1);
+                    newOrnData[options.row][options.col] = !isNaN(val)?numberFormatter(val, 1):'';
                     setOrnaments(newOrnData);
                 }
                 break;

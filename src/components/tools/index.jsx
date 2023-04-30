@@ -7,7 +7,7 @@ export default function Tools() {
     return (
         <Container>
             <Row>
-                <Col xs={6} className="tools card">
+                <Col xs={7} className="tools card">
                     <WastageCalculator />
                 </Col>
             </Row>

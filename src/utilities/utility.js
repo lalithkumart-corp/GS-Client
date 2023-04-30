@@ -246,9 +246,12 @@ export const addNos = (float1, float2) => {
 // Expected: 10.12
 // Solution: below meth
 // Usage:   formatNo(8.05+2.07, 2)
-export const formatNo = (number, decimals) => {
+export const formatNo = (number, decimals, options) => {
     var newnumber = new Number(number+'').toFixed(parseInt(decimals));
-    return parseFloat(newnumber); 
+    if(options && options.returnType == 'string') // this is to prevent cases like "2.000" => 2.0, so simplay returning "2.000"
+        return newnumber;
+    else
+        return parseFloat(newnumber); 
 }
 
 export const addDays = (dateVal, days) => {

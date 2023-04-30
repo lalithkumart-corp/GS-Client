@@ -1545,7 +1545,7 @@ class SellItem extends Component {
                                     </Row>
                                 }
                             </Col>
-                            <Col xs={9} style={{border: '1px solid lightGray'}}>
+                            <Col xs={9} style={{border: '1px solid lightGray', paddingTop: '5px', paddingBottom: '10px'}}>
                                 <Row>
                                     <Col xs={3} className="invoice-number-col">
                                         <Form.Group>
