@@ -1,6 +1,7 @@
 import _ from 'lodash';
 import { getAccessToken } from '../../core/storage';
 import { getRequestParams } from '../redeem/helper';
+import { imageUrlCorrection } from '../../utilities/utility';
 export const getPendingBillArgs = (thatState) => {
     //TODO:
 }
@@ -10,6 +11,8 @@ export const parseResponse = (responseList) => {
     _.each(responseList, (aBill, index) => {
         aBill.SNo = index++;
         aBill.rowNumber = index;
+        aBill.UserImagePath = imageUrlCorrection(aBill.UserImagePath);
+        aBill.OrnImagePath = imageUrlCorrection(aBill.OrnImagePath);
         parsedResponse.push(aBill); // Right now just pushing the raw response
     });
     return parsedResponse;

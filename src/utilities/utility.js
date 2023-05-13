@@ -259,3 +259,12 @@ export const addDays = (dateVal, days) => {
     y.setDate(y.getDate() + parseInt(days));
     return y;
 }
+
+export const imageUrlCorrection = (urlFromServer) => {
+    if(!urlFromServer) return urlFromServer;
+
+    if(process.env.REACT_APP_ENV == "offlineprod")
+        urlFromServer.replace('localhost', `${config.hostName}`);
+    
+    return urlFromServer;
+}

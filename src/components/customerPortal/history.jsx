@@ -3,7 +3,7 @@ import { Container, Row, Col, FormGroup, FormLabel, FormControl, HelpBlock, Inpu
 import GSTable from '../gs-table/GSTable';
 import _ from 'lodash';
 import ImageZoom from 'react-medium-image-zoom';
-import { convertToLocalTime } from '../../utilities/utility';
+import { convertToLocalTime, imageUrlCorrection } from '../../utilities/utility';
 import './history.css';
 
 class History extends Component {
@@ -113,10 +113,13 @@ class History extends Component {
             pendingBills: []
         };
         _.each(billHistory, (aBillObj, index) => {
-            if(aBillObj.Status)
-                parsedBillHistory.pendingBills.push(aBillObj);
+            let obj = aBillObj;
+            obj.UserImagePath = imageUrlCorrection(obj.UserImagePath);
+            obj.OrnImagePath = imageUrlCorrection(obj.OrnImagePath);
+            if(obj.Status)
+                parsedBillHistory.pendingBills.push(obj);
             else
-                parsedBillHistory.closedBills.push(aBillObj);
+                parsedBillHistory.closedBills.push(obj);
         });
         return parsedBillHistory;
     }
@@ -125,7 +128,7 @@ class History extends Component {
         renderer: (row) => {
             let ornData = JSON.parse(row.Orn) || {};
             return (
-                <div>
+                <div style={{display: 'flex'}}>
                     <div className="orn-display-dom">
                         <table>
                             <colgroup>
@@ -168,13 +171,15 @@ class History extends Component {
                             </tbody>
                         </table>                   
                     </div>
-                    {row.OrnImagePath &&
-                        <ImageZoom>
-                            <img src={row.OrnImagePath}
-                                alt='Ornament image not found'
-                                className='pledgebook-orn-display-in-row' />
-                        </ImageZoom>
-                    }
+                    <div style={{display: 'inline-block'}}>
+                        {row.OrnImagePath &&
+                            <ImageZoom>
+                                <img src={row.OrnImagePath}
+                                    alt='Ornament image not found'
+                                    className='pledgebook-orn-display-in-row' />
+                            </ImageZoom>
+                        }
+                    </div>
                 </div>
             )
         },
