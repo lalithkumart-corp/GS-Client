@@ -24,7 +24,6 @@ export const CashIn = (props) => {
     let [myDefaultFundAccount, setMyDefaultFundAccId] = useState(null);
     let [customer, setCustomerObj] = useState(null);
     let [isCustomerSelectionModalOpen, setCustomerModalVisibility] = useState(false);
-
     let datePickerRef = useRef(null);
     let getDateValues = () => {
         return {
@@ -274,7 +273,7 @@ export const CashIn = (props) => {
                                 />
                             </Form.Group>
                         </Col>
-                        <Col xs={6} md={6} cm={6}>
+                        <Col xs={6} md={6} cm={6} className="customer-selection-div">
                             <Form.Group>
                                 <Form.Label>Customer</Form.Label>
                                 {(customer && customer.customerId) ? 

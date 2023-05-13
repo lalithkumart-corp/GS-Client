@@ -31,3 +31,6 @@
     color: white !important;
     border-radius: 50% !important;
 }
+.login-container .row+.row {
+    margin-top: 10px;
+}

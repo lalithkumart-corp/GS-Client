@@ -132,6 +132,9 @@ class BillCreation extends Component {
                     list: ['Loading...'],
                     limitedList: ['Loading...']
                 },
+                gaurdianRelationship: {
+                    inputVal: 'c/o',
+                },
                 gaurdianName: {
                     inputVal: '',
                     hasError: false,
@@ -2069,11 +2072,22 @@ class BillCreation extends Component {
                                 />
                             </Form.Group>
                         </Col>
+                        {/* <Col xs={2} md={2}>
+                            <Form.Group>
+                                <Form.Check id='billstatus-11' type='radio' name='billstatus' checked={this.state.formData.gaurdianRelationship.inputVal=='c/o'} value='all' label='All'/>
+                            </Form.Group>
+                            <Form.Group>
+                                <Form.Check id='billstatus-22' type='radio' name='billstatus' checked={this.state.formData.gaurdianRelationship.inputVal=='s/o'} value='pending' label='Pending'/>
+                            </Form.Group>
+                            <Form.Group>
+                                <Form.Check id='billstatus-33' type='radio' name='billstatus' checked={this.state.formData.gaurdianRelationship.inputVal=='/o'} value='closed' label='Closed'/>
+                            </Form.Group>
+                        </Col> */}
                         <Col xs={6} md={6} className='r-a-s-dropdown'>
                             <Form.Group
                                 validationState= {this.state.formData.gaurdianName.hasError ? "error" :null}
                                 >
-                                <Form.Label>Guardian Name</Form.Label>                                
+                                <Form.Label>Guardian Name</Form.Label>
                                 <ReactAutosuggest 
                                     suggestions={this.state.formData.gaurdianName.limitedList}
                                     onSuggestionsFetchRequested={({value}) => this.reactAutosuggestControls.onSuggestionsFetchRequested({value}, 'gaurdianName')}
@@ -2316,7 +2330,7 @@ class BillCreation extends Component {
                             <div className="interest-component">
                                 <div className='interest-component-header'>
                                     <div
-                                        className='interest-collapsipla-span'
+                                        className='interest-collapsible-span'
                                         ref= {(domElm) => {this.domElmns.interestCollapsibleBody = domElm; }}
                                         // onKeyUp = { (e)=> {this.handleKeyUp(e, {currElmKey: 'interestCollapsibleBody'})} }
                                         onClick={(e) => {this.handleClick(e, {currElmKey: 'interestCollapsibleBody'})}}

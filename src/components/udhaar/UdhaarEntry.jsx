@@ -15,6 +15,7 @@ import axiosMiddleware from '../../core/axios';
 import { GET_LAST_UDHAAR_SERIAL_NO, CREATE_UDHAAR, UPDATE_UDHAAR } from '../../core/sitemap';
 import { toast } from 'react-toastify';
 import UdhaarHistory from './UdhaarHistory';
+import { InterestInputComponent } from '../pledgebook/InterestInputComponent';
 
 function UdhaarEntry(props) {
     let domElmns = {};
@@ -25,6 +26,8 @@ function UdhaarEntry(props) {
     let [billSeries, setBillSeries] = useState('');
     let [billNo, setBillNo] = useState('');
     let [amount, setAmount] = useState('');
+    let [interestVal, setInterestVal] = useState('');
+    let [interestPct, setInterestPct] = useState(2);
     let [notes, setNotes] = useState('');
     let [selectedCustomer, setSelectedCustomer] = useState(null);
     let [myDefaultFundAccount, setMyDefaultFundAccId] = useState(null);
@@ -74,7 +77,9 @@ function UdhaarEntry(props) {
                 setUdhaarUid(udhaarDetail.udhaarUid);
                 setDates({dateVal: new Date(udhaarDetail.udhaarDate),_dateVal: udhaarDetail.udhaarDate});
                 setAmount(udhaarDetail.udhaarAmt);
+                setInterestPct(udhaarDetail.udhaarInterestPct);
                 setNotes(udhaarDetail.udhaarNotes);
+                setInterestVal(udhaarDetail.udhaarInterestVal);
                 setReadOnlyMode(true);
             }
         }
@@ -147,6 +152,7 @@ function UdhaarEntry(props) {
 
     let onChangeAmt = (val) => {
         setAmount(val);
+        setInterestVal((val * interestPct)/100);
     }
 
     let onChangeDate = (e, fullDateVal) => {
@@ -193,7 +199,10 @@ function UdhaarEntry(props) {
             paymentMode: paymentDetail.mode,
             destinationAccountDetail: paymentDetail.mode=='cash'?{}:paymentDetail.online,
             customerId: selectedCustomer.customerId,
-            notes: notes
+            notes: notes,
+            interestPct,
+            interestVal,
+            landedCost: amount-interestVal
         }
         triggerApi(params); 
     }
@@ -213,6 +222,9 @@ function UdhaarEntry(props) {
             destinationAccountDetail: paymentDetail.mode=='cash'?{}:paymentDetail.online,
             customerId: selectedCustomer.customerId,
             notes: notes,
+            interestPct,
+            interestVal,
+            landedCost: amount-interestVal,
             udhaarUid: udhaarUid
         }
         triggerUpdateApi(params);
@@ -262,6 +274,15 @@ function UdhaarEntry(props) {
 
     let setHistoryRefreshFlag = (flag) => {
         setRefreshHistFlag(flag);
+    }
+
+    let onUpdateInterestVal = (val) => {
+        // setNewInterestVal
+    }
+
+    let onUpdateInterestPct = (pct) => {
+        setInterestPct(pct);
+        if(amount) setInterestVal((amount*pct)/100);
     }
 
     return (
@@ -354,9 +375,19 @@ function UdhaarEntry(props) {
                                         </Form.Group>
                                     </Col>
                                 </Row>
-                                <Row>
-                                    <Col xs={8} md={8} style={{marginTop: '10px'}}>
+                                <Row style={{marginRight: 0}}>
+                                    <Col xs={7} md={7} style={{marginTop: '10px'}}>
                                         <CashOutAccPicker myDefaultAccId={myDefaultFundAccount} myFundAccList={myFundAccountsList} setPaymentData={setPaymentDetail} readOnlyMode={readOnlyMode}/>
+                                    </Col>
+                                    <Col xs={5} md={5} style={{marginTop: '10px'}}>
+                                        <InterestInputComponent 
+                                            principal={amount} 
+                                            percent={interestPct} 
+                                            value={interestVal}
+                                            onChangeVal={(newVal) => onUpdateInterestVal(newVal)}
+                                            onChangePercent= {(newPercent) => onUpdateInterestPct(newPercent)}
+                                            isOpen={true}
+                                        />
                                     </Col>
                                 </Row>
                                 <Row style={{marginRight: 0, marginTop: '15px'}}>

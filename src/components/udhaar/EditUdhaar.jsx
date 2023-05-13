@@ -11,6 +11,8 @@ import { FETCH_UDHAAR_DETAIL, CASH_IN_FOR_BILL, GET_FUND_TRN_LIST_BY_BILL, MARK_
 import { convertToLocalTime } from '../../utilities/utility';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { deleteTransactions } from '../tally/cashBook/helper';
+import LoanOverviewCard from '../loanOverviewCard/LoanOverviewCard';
+import moment from 'moment';
 
 function EditUdhaar(props) {
 
@@ -20,10 +22,24 @@ function EditUdhaar(props) {
     let [loading, setLoading] = useState(false);
     let [modified, setUdhaarModifiedFlag] = useState(false);
     let [canRefreshPaymentList, setRefreshPaymentList] = useState(false);
-
+    const [paymentsListByBill, setPaymentsListByBill] = useState([]);
+    const [refreshPaymentList, setRefreshPaymentListFlag ] = useState(false);
+    const [ loanOverviewData, setLoanOverviewData ] = useState(null);
+    
     useEffect(() => {
         fetchUdharDetail();
     }, [props.content.udhaarUid]);
+
+    useEffect(() => {
+        fetchPaymentsListByBill();
+    }, [udhaarDetail]);
+
+    useEffect(() => {
+        if(refreshPaymentList) {
+            fetchPaymentsListByBill();
+            setRefreshPaymentListFlag(false);
+        }
+    }, [refreshPaymentList]);
 
     let fetchUdharDetail = async () => {
         try {
@@ -34,6 +50,7 @@ function EditUdhaar(props) {
             setUdhaarModifiedFlag(false);
             if(resp && resp.data && resp.data.RESP) {
                 setUdhaarDetail(resp.data.RESP.detail);
+                constructAndSetLoanOverviewData(resp.data.RESP.detail);
                 return resp.data.RESP.detail;
             }
             return;
@@ -43,6 +60,16 @@ function EditUdhaar(props) {
             setLoading(false);
             return;
         }
+    }
+
+    const constructAndSetLoanOverviewData = (udhaarDetail) => {
+        let loanOverviewData = {
+            principal: udhaarDetail.udhaarAmt,
+            loanDate: udhaarDetail.udhaarDate,
+            currentDate: moment().format('DD/MM/YYYY'),
+            interestPct: udhaarDetail.udhaarInterestPct || 1,
+        }; 
+        setLoanOverviewData(loanOverviewData);
     }
 
     let paymentCallback = async () => {
@@ -72,6 +99,29 @@ function EditUdhaar(props) {
         setRefreshPaymentList(flag);
     }
 
+    const fetchPaymentsListByBill = async () => {
+        try {
+            let at = getAccessToken();
+            if(udhaarDetail) {
+                let uids = [udhaarDetail.udhaarUid];
+                let resp = await axiosMiddleware.get(`${GET_FUND_TRN_LIST_BY_BILL}?access_token=${at}&uids=${JSON.stringify(uids)}`);
+                if(resp.data.STATUS == 'SUCCESS') {
+                    // setTableData(resp.data.RESP);
+                    setPaymentsListByBill(resp.data.RESP);
+                    return resp.data.RESP;
+                }
+                else {toast.error('Error! Could not fetch payment list for this bill')}
+            } else {
+                console.log('udhaar detail is not found, so not making api call');
+            }
+            return null;
+        } catch(e) {
+            console.log(e);
+            toast.error('Error while fetching he payments list');
+            return null;
+        }
+    }
+
     return (
         <div>
             <Row>
@@ -82,15 +132,20 @@ function EditUdhaar(props) {
             <Row>
                 <UdhaarEntry mode={'edit'} udhaarDetail={udhaarDetail} setUdhaarModifiedFlag={updateModifiedFlag}/>
             </Row>
-
-            <PaymentCard udhaarDetail={udhaarDetail} paymentCallback={paymentCallback} refreshFlag={canRefreshPaymentList} setRefreshFlag={setRefreshFlagRegPaymentList} setUdhaarModifiedFlag={updateModifiedFlag}/>
+            <LoanOverviewCard loanDetail={loanOverviewData} paymentsListByBill={paymentsListByBill} secClassName={"edit-udhaar"} />
+            <PaymentCard 
+                udhaarDetail={udhaarDetail} 
+                paymentsListByBill={paymentsListByBill} 
+                paymentCallback={paymentCallback} 
+                setRefreshPaymentListFlag={setRefreshPaymentListFlag}
+                setUdhaarModifiedFlag={updateModifiedFlag}/>
 
         </div>
     )
 }
 
 function PaymentCard(props) {
-    let [tableData, setTableData] = useState([]);
+    let [tableData, setTableData] = useState(props.paymentsListByBill);
     let [cashInEditMode, setCashInEditMode] = useState(false);
     let [editContentForCashIn, setEditContentForCashIn] = useState(null);
 
@@ -108,6 +163,10 @@ function PaymentCard(props) {
             id: 'fund_house_name',
             displayText: 'Account',
             width: '5%'
+        },{
+            id: 'category',
+            displayText: 'Category',
+            width: '10%'
         },{
             id: 'remarks',
             displayText: 'Notes',
@@ -157,41 +216,17 @@ function PaymentCard(props) {
     ];
 
     useEffect(() => {
-        fetchPaymentsListByBill();
-    }, [props.udhaarDetail]);
+        setTableData(props.paymentsListByBill);
+    }, [props.paymentsListByBill]);
 
     useEffect(() => {
-        console.log('Paymentcard - RefreshFlag Update:', props.refreshFlag);
-        if(props.refreshFlag) {
-            fetchPaymentsListByBill();
-            props.setRefreshFlag(false);
-        }
-    }, [props.refreshFlag]);
+        // fetchPaymentsListByBill();
+    }, [props.udhaarDetail]);
 
-    const fetchPaymentsListByBill = async () => {
-        try {
-            let at = getAccessToken();
-            if(props.udhaarDetail) {
-                let uids = [props.udhaarDetail.udhaarUid];
-                let resp = await axiosMiddleware.get(`${GET_FUND_TRN_LIST_BY_BILL}?access_token=${at}&uids=${JSON.stringify(uids)}`);
-                if(resp.data.STATUS == 'SUCCESS') {
-                    setTableData(resp.data.RESP);
-                    return resp.data.RESP;
-                }
-                else {toast.error('Error! Could not fetch payment list for this bill')}
-            } else {
-                console.log('udhaar detail is not found, so not making api call');
-            }
-            return null;
-        } catch(e) {
-            console.log(e);
-            toast.error('Error while fetching he payments list');
-            return null;
-        }
-    }
+
 
     const refreshPaymentList = () => {
-        fetchPaymentsListByBill();
+        props.setRefreshPaymentListFlag(true);
     }
 
     const getCustId = (paymentData) => {

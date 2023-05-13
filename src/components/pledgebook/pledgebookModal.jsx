@@ -26,6 +26,7 @@ import _ from 'lodash';
 import { CASH_TRNS_GIRVI, DEFAULT_PAYMENT_OBJ_FOR_CASH_IN, DEFAULT_PAYMENT_OBJ_FOR_CASH_OUT, LOAN_BILL_EXPIRY_DAYS, IN, OUT } from '../../constants';
 import { InterestInputComponent } from './InterestInputComponent';
 import { InterestCalcComp } from './InterestCalcComp';
+import LoanOverviewCard from '../loanOverviewCard/LoanOverviewCard';
 class PledgebookModal extends Component {
     constructor(props) {
         super(props);
@@ -34,7 +35,9 @@ class PledgebookModal extends Component {
             cancelMode: true,
             mainScreen: true,
             paymentScreenVisibility: false,
-            renewalScreenVisibility: false
+            renewalScreenVisibility: false,
+            loanOverviewData: null,
+            fundTransByBill: []
         }
         this.canShowBtn = this.canShowBtn.bind(this);
         this.onPrintClick = this.onPrintClick.bind(this);
@@ -44,10 +47,43 @@ class PledgebookModal extends Component {
 
     componentDidMount() {
         this.props.enableReadOnlyMode();
+        this.constructLoanOverviewData();
+        this.fetchPaymentsListByBill();
     }
 
-    componentWillReceiveProps(nextProps) {
-        
+    componentDidUpdate(prevProps) {
+        if(prevProps.BillNo !== this.props.currentBillData.BillNo) {
+            this.constructLoanOverviewData();
+            this.fetchPaymentsListByBill();
+        }
+    }
+
+    async fetchPaymentsListByBill() {
+        try {
+            let at = getAccessToken();
+            let uids = [this.props.currentBillData.UniqueIdentifier];
+            if(this.props.currentBillData.uid)
+                uids.push(this.props.currentBillData.uid);
+            let resp = await axiosMiddleware.get(`${GET_FUND_TRN_LIST_BY_BILL}?access_token=${at}&uids=${JSON.stringify(uids)}`);
+            if(resp.data.STATUS == 'SUCCESS') {
+                let newState = {...this.state};
+                newState.fundTransByBill = resp.data.RESP;
+                this.setState(newState);
+            }
+            else {toast.error('Error! Could not fetch payment list for this bill')}
+        } catch(e) {
+            toast.error('Error');
+        }
+    }
+
+    constructLoanOverviewData() {
+        let loanOverviewData = {
+            principal: this.props.currentBillData.Amount,
+            loanDate: this.props.currentBillData.Date,
+            currentDate: moment().format('DD/MM/YYYY'),
+            interestPct: this.props.currentBillData.IntPercent || 1,
+        };
+        this.state.loanOverviewData = loanOverviewData;
     }
 
     getPrintModel() {
@@ -310,7 +346,12 @@ class PledgebookModal extends Component {
                                 />
                         </Col>
                     </Row>
-                
+                    
+                    {this.props.currentBillData.Status ? <>
+                        <LoanOverviewCard loanDetail={this.state.loanOverviewData} paymentsListByBill={this.state.fundTransByBill} secClassName={"pledgebook"}/>
+                        </>: <></>
+                    }
+
                     {!this.props.currentBillData.Status && 
                         <RedeemPreview currentBillData={this.props.currentBillData} />
                     }
@@ -465,7 +506,7 @@ function PaymentScreen(props) {
     }
 
     return (
-        <div className="payment-screen">
+        <div className="payment-screen inside-pledgebook-modal">
             <>
                 <Row>
                     <Col xs={{span: 12}} md={{span: 12}} style={{marginBottom: '15px'}}>

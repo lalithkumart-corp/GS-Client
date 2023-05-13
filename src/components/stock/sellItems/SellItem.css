@@ -147,3 +147,8 @@
     color: #2196f3;
     cursor: pointer;
 }
+
+.react-autosuggest__input.tagid+.react-autosuggest__suggestions-container,
+.react-autosuggest__input.huid+.react-autosuggest__suggestions-container {
+    top: 52px;
+}

@@ -155,8 +155,9 @@ class Redeem extends Component {
                         let selectedBillData = successResp.data.billDetails[0];
                         selectedBillData = this.parseResponse(selectedBillData);
                         let paymentInfo = this.parsePaymentInfo(selectedBillData);
-                        this.setState({loading: false, selectedBillData: selectedBillData, billNotFound: false, formData: {...this.state.formData, payment: paymentInfo} });
-                        this.transferFocus(null, 'billInputBox');
+                        this.setState({loading: false, selectedBillData: selectedBillData, billNotFound: false, formData: {...this.state.formData, payment: paymentInfo} }, () => {
+                            this.transferFocus(null, 'billInputBox');
+                        });
                     }else{
                         this.setState({loading: false, selectedBillData: null, billNotFound: true});
                         toast.error(`${billNo} Bill Data not found or might be redeemed already`);
@@ -825,7 +826,7 @@ class Redeem extends Component {
         let currNode = domList.findNode(currElmKey);
         let nextNode = currNode.next;
         if(nextNode && !nextNode.enabled)
-            nextNode = this.getNextElm(nextNode.key);        
+            nextNode = this.getNextElm(nextNode.key);
         return nextNode;
     }
 
@@ -884,7 +885,7 @@ class Redeem extends Component {
                             className="gs-input-cell2"
                         />
                     </Col>
-                    <Col xs={2}>
+                    <Col xs={2} style={{position: 'relative'}}>
                         {/* <Autosuggest
                             datalist={this.state.filteredBillNoList}
                             placeholder="Bill No"
@@ -910,7 +911,7 @@ class Redeem extends Component {
                                 value: this.state.formData.billNo.inputVal || '',
                                 onChange: (e, {newValue, method}) => this.reactAutosuggestControls.onChange(e, {newValue, method}, 'billno'),//this.setState({billno: e.target.value}),
                                 onKeyUp: (e) => this.reactAutosuggestControls.handleKeyUp(e, {currElmKey: 'billno'}),
-                                className: "react-autosuggest__input gs-input-cell2"
+                                className: "react-autosuggest__input gs-input-cell2 redeem-input"
                             }}
                             ref = {(domElm) => { this.domElmns.billInputBox = domElm?domElm.input:domElm; }}
                         />

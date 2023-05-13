@@ -169,13 +169,11 @@ class History extends Component {
                         </table>                   
                     </div>
                     {row.OrnImagePath &&
-                        <ImageZoom
-                            image={{
-                                src: row.OrnImagePath,
-                                alt: 'Ornament Imamge',
-                                className: 'pledgebook-orn-display-in-row',                            
-                            }}
-                        />
+                        <ImageZoom>
+                            <img src={row.OrnImagePath}
+                                alt='Ornament image not found'
+                                className='pledgebook-orn-display-in-row' />
+                        </ImageZoom>
                     }
                 </div>
             )

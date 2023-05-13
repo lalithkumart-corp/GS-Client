@@ -6,12 +6,23 @@ import { useEffect } from "react";
 
 export const InterestInputComponent = (props) => {
     const [percent, setPercent] = useState(props.percent);
-    const  [inputDivVisibility, setInputDivVisibility] = useState(false);
+    const [intVal, setIntValue] = useState(props.value);
+    const  [inputDivVisibility, setInputDivVisibility] = useState(props.isOpen||false);
+
+    useEffect(() => {
+        setIntValue(props.value);
+    }, [props.value]);
 
     useEffect(()=>{
-        console.log('Percent changed', props.percent);
         setPercent(props.percent);
     }, [props.percent]);
+
+    useEffect(()=>{
+        if(props.principal && props.percent) {
+            let intVal = (props.principal * props.percent)/100;
+            setIntValue(intVal);
+        }
+    }, [props.principal]);
 
     const onChangePercent = (val) => {
         setPercent(val);
@@ -21,13 +32,13 @@ export const InterestInputComponent = (props) => {
         <div className="interest-component">
             <div className='interest-component-header'>
                 <div
-                    className='interest-collapsipla-span'
+                    className='interest-collapsible-span'
                     onClick={(e) => {setInputDivVisibility(!inputDivVisibility)}}
                 >
                     <span> Interest </span>
 
                     <span>
-                        { format(props.value, {code: 'INR'}) } 
+                        { format(intVal, {code: 'INR'}) } 
                     </span>
                 </div>
             </div>

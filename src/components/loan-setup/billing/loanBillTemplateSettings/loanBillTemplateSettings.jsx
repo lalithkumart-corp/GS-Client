@@ -315,13 +315,9 @@ export default class LoanBillTemplateSettings extends Component {
             templatesContainer.push(
                 <Col xs={3} md={3}>
                     <div className="screenshot-prview-container">
-                        <ImageZoom
-                            image={{
-                                src: theUrl,
-                                alt: 'Image Not Found',
-                                className: 'template-image-viewer',
-                            }}
-                        />
+                        <ImageZoom>
+                            <img src={theUrl} alt='Image not found' className='template-image-viewer'/>
+                        </ImageZoom>
                     </div>
                     <div className="screenshot-radio-btn-label">
                         <input type="radio" id={`loan-bill-body-template-id-${index}`} name="loan-bill-body-template" onChange={(e)=>this.onChangeTemplateSelection(e, aTemplate.template_id)} value={aTemplate.template_id} checked={checked}/>

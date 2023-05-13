@@ -199,8 +199,7 @@ class SellItem extends Component {
                 newState.prodId.inputVal = newState.currSelectedItem.prod_id;
             if(identifier == 'prodid') // If TAG is entered, then set the HUID input field
                 newState.huid.inputVal = newState.currSelectedItem.huid;
-            this.setState(newState);
-            this.calculateSellingPrice();
+            this.setState(newState, () => this.calculateSellingPrice());
         } catch(e) {
             console.log(e);
         }
@@ -728,9 +727,9 @@ class SellItem extends Component {
         let wt = newState.currSelectedItem.formData.netWt;
         let rate = newState.retailPrice;
         let percents = newState.currSelectedItem.formData.cgstPercent + newState.currSelectedItem.formData.sgstPercent;
-        let total = sellingPriceVal;
+        let total = sellingPriceVal - parseFloat(newState.currSelectedItem.formData.discount || 0);
         let {wsgPercent, wsgVal} = wastageCalc(wt, rate, percents, total);
-        
+        console.log(`wt: ${wt}, discount: ${newState.currSelectedItem.formData.discount}, rate: ${rate}, total: ${total}`);
         //calc wastage percent and value
         newState.currSelectedItem.formData.wastage = wsgPercent;
         newState.currSelectedItem.formData.wastageVal = wsgVal;
@@ -802,7 +801,7 @@ class SellItem extends Component {
     getInputElems() {
         return (
             <Row style={{marginTop: "25px"}}>
-                <Col xs={3}>
+                <Col xs={3} style={{position: 'relative'}}>
                     <Form.Group>
                         {/* <Form.Label>TagId</Form.Label> */}
                         TagId: <ReactAutosuggest    
@@ -823,7 +822,7 @@ class SellItem extends Component {
                         />
                     </Form.Group>
                 </Col>
-                <Col xs={3}>
+                <Col xs={3} style={{position: 'relative'}}>
                     <Form.Group>
                         HUID: <ReactAutosuggest 
                             suggestions={this.state.huid.limitedHuidList}

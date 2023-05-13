@@ -1,4 +1,7 @@
 .udhaar-list-page {
+    .row+.row {
+        margin-top: 10px;
+    }
     .udhaar-list-table {
         table-layout: fixed;
     

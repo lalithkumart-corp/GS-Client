@@ -80,10 +80,13 @@ export const getRequestParams = (billData, thatState) => {
 }
 
 export const calculateData = (selectedBillData, options) => {
-    let todayDate = options.date; 
+    let todayDate = options.date;
     let pledgedDate = moment.utc(selectedBillData.Date).local().format('DD/MM/YYYY');
-    let diffInMonths = calcMonthDiff(pledgedDate, todayDate);        
-    let roi = getRateOfInterest(options.interestRates, selectedBillData.Amount, {orn: selectedBillData.Orn, interestDuringBillCreation: selectedBillData.IntPercent});
+    let diffInMonths = calcMonthDiff(pledgedDate, todayDate);
+    let roi = 0;
+    if(options.interestRates) roi = getRateOfInterest(options.interestRates, selectedBillData.Amount, {orn: selectedBillData.Orn, interestDuringBillCreation: selectedBillData.IntPercent});
+    else if(options.interestPercent) roi = options.interestPercent;
+    
     let interestPerMonth = getInterestPerMonth(selectedBillData.Amount, roi);
 
     selectedBillData._interestPerMonth = interestPerMonth;

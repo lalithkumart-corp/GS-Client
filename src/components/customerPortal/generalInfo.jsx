@@ -308,7 +308,7 @@ class GeneralInfo extends Component {
         }        
 
         return (
-            <span>
+            <span style={{marginTop: '10px'}}>
                 <div className='add-more-header'>
                     <input type='text' 
                         className='show-more'
@@ -555,7 +555,7 @@ class GeneralInfo extends Component {
                     </Col>
                 </Row>
                 <Row>
-                    <Col xsOffset={4} xs={3} md={3} mdOffset={4}>
+                    <Col xs={{span: 4, offset: 4}} md={{span: 4, offset: 4}} lg={{span: 4, offset: 4}}>
                         <input 
                             type="button"
                             className='gs-button update-detail-btn'

@@ -286,9 +286,28 @@ class CustomerPortal extends Component {
                 color = 'green';
             buffer.push(
                 <Row className={(isSelected?'isSelected ':'') +'a-customer-card' } onClick={(e) => this.onCardClick(e, aCust, index)}>
-                    <Col xs={12} md={12} id={index+ '1'} style={{color: color}}><span> <b>{aCust.name}</b>  <span style={{"fontSize":"8px"}}>c/of</span> <b>{aCust.gaurdianName}</b></span></Col>
-                    <Col xs={12} md={12} id={index+ '2'}><span>{aCust.address}</span></Col>
-                    <Col xs={12} md={12} id={index+ '3'}><span>{aCust.place}, {aCust.city} - {aCust.pincode}</span></Col>
+                    <Col xs={9} md={9}>
+                        <Row>
+                            <Col xs={12} md={12} id={index+ '1'} style={{color: color}}>
+                                <span> 
+                                    <b>{aCust.name}</b>
+                                    {aCust.gaurdianName && <>
+                                    <span style={{"fontSize":"8px"}}>c/of</span> 
+                                    <b>{aCust.gaurdianName}</b></>}
+                                </span></Col>
+                            <Col xs={12} md={12} id={index+ '2'}><span>{aCust.address}</span></Col>
+                            <Col xs={12} md={12} id={index+ '3'}>
+                                <span>
+                                    <>{aCust.place}</>
+                                    {aCust.city && <>, {aCust.city}</>}
+                                    {aCust.pincode && <>  - {aCust.pincode} </>}
+                                </span>
+                            </Col>
+                        </Row>
+                    </Col>
+                    <Col xs={3} md={3}>
+                        <img src={aCust.userImagePath} style={{height: '60px'}}/>
+                    </Col>
                 </Row>
             )
         });
@@ -322,13 +341,13 @@ class CustomerPortal extends Component {
         return (
             <Container className="customer-detail-container">
                 <Row>
-                    <Col className="left-pane" xs={3} md={3}>
-                        {this.getPagination()}
+                    <Col className="left-pane" xs={4} md={4}>
                         {this.addNewCustomerOption()}
                         {this.getSearchBox()}
                         {this.getCustomerListView()}
+                        {this.getPagination()}
                     </Col>
-                    <Col className="right-pane" xs={9} md={9}>
+                    <Col className="right-pane" xs={8} md={8}>
                         {this.getDetailView()}
                     </Col>
                     <CommonModal modalOpen={this.state.customerSelectionModalOpen} handleClose={this.closeCustomerModal} secClass="create-customer-modal">

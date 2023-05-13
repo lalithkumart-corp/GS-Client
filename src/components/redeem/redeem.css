@@ -1,3 +1,6 @@
+.bill-closing-container .row+.row {
+    margin-top: 10px;
+}
 .bill-closing-container .bill-display-container{
     margin-top: 25px;
 }
@@ -12,6 +15,7 @@
 }
 .bill-closing-container .bill-data-container .orn-section {
     margin-top: 10px;
+    margin-left: 10px;
 }
 .bill-closing-container .bill-data-container .amount-field {
     font-size: 20px;
@@ -91,4 +95,7 @@
     outline: none;
     border-color: #ced4da;
     border-bottom: 2px solid #0acfee;
+}
+.gs-input-cell2.redeem-input+.react-autosuggest__suggestions-container {
+    top: 33px;
 }

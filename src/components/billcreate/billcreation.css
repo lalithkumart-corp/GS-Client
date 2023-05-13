@@ -1,3 +1,6 @@
+.bill-creation-container .row+.row {
+    margin-top: 10px;
+}
 .bill-series {
     width: 10px;
 }
@@ -392,6 +395,7 @@
 .misc-inputs-component-body-content {
     margin-top: 10px;
     margin-bottom: 10px;
+    padding-left: 10px;
 }
 
 

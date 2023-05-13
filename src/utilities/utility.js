@@ -167,7 +167,7 @@ export const convertDateObjToStr = (dateObj, options) => {
 
 export const currencyFormatter = (val) => {
     if(!val)
-        return;
+        return val;
     while( /(\d+)(\d{3})/.test( val.toString() ) ){
       val = val.toString().replace(/(\d+)(\d{3})/, '$1'+','+'$2');
     }

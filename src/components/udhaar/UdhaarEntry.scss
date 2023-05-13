@@ -1,4 +1,7 @@
 .udhaar-entry-container {
+    .row+.row {
+        margin-top: 10px;
+    }
     .entry-side-card {
         border: 1px solid lightgrey;
         box-shadow: 1px 0px 14px 2px rgba(165,156,156,0.75);
@@ -32,6 +35,7 @@
     }
     .cash-out-acc-picker {
         padding-top: 10px;
+        padding-bottom: 10px;
         border: 1px solid lightgray;
         border-radius: 5px;
         padding-left: 7px;

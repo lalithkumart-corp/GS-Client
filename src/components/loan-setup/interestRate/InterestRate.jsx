@@ -83,7 +83,7 @@ class InterestRates extends Component {
         try {
             let apiParams = {
                 accessToken: getAccessToken(),
-                metal: this.state.formData.metal.selected,
+                metal: this.state.formData.metal.selected.toLowerCase(),
                 rangeFrom: this.state.formData.rangeFrom.inputVal,
                 rangeTo: this.state.formData.rangeTo.inputVal,
                 interestVal: this.state.formData.interestVal.inputVal,

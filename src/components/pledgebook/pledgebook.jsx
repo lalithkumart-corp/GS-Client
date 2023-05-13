@@ -1052,14 +1052,13 @@ class Pledgebook extends Component {
                     </Col>
                     <Col xs={{span: 2}}>
                         {row.OrnImagePath &&
-                            <ImageZoom
-                                image={{
-                                src: row.OrnImagePath,
-                                alt: 'Ornament Imamge',
-                                className: 'pledgebook-orn-display-in-row',
-                                // style: { width: '50em' }
-                                }}
-                            />
+                            <ImageZoom>
+                                <img 
+                                    alt="Ornament Image not found"
+                                    src={row.OrnImagePath}
+                                    className='pledgebook-orn-display-in-row'
+                                />
+                            </ImageZoom>
                         }
                     </Col>
                     <Col xs={{span: 1, offset: 2}}>
