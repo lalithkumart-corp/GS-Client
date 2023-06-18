@@ -727,7 +727,8 @@ class SellItem extends Component {
         let wt = newState.currSelectedItem.formData.netWt;
         let rate = newState.retailPrice;
         let percents = newState.currSelectedItem.formData.cgstPercent + newState.currSelectedItem.formData.sgstPercent;
-        let total = sellingPriceVal - parseFloat(newState.currSelectedItem.formData.discount || 0);
+        let mc = newState.labour || 0;
+        let total = sellingPriceVal - parseFloat(newState.currSelectedItem.formData.discount || 0) - mc;
         let {wsgPercent, wsgVal} = wastageCalc(wt, rate, percents, total);
         console.log(`wt: ${wt}, discount: ${newState.currSelectedItem.formData.discount}, rate: ${rate}, total: ${total}`);
         //calc wastage percent and value

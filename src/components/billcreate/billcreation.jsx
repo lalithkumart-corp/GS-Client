@@ -183,7 +183,7 @@ class BillCreation extends Component {
                     },
                     list: ['Loading...'],
                     limitedList: ['Loading...'],
-                    specList: ['Damage', 'Bend', 'Tread', 'w/o Thiruvani', 'w/o Stone', 'Full Stone'], //TODO: Map with Database
+                    specList: ['Broken', 'w/o hook', 'Damage', 'Bend', 'Tread', 'w/o Thiruvani', 'w/o Stone', 'Full Stone'], //TODO: Map with Database
                     validCategoryList: ['G', 'S', 'B'],
                     category: 'U', //unknown
                     totalWeight: 0.00,
@@ -972,8 +972,8 @@ class BillCreation extends Component {
             }
         } catch(e) {
             //TODO: Remove this alert after completing development
-            alert(`ERROR Occured (${currentElmKey} - ${nextElm.key}) . Let me refresh.`);
-            window.location.reload(false);
+            alert(`ERROR Occured (${currentElmKey} - ${nextElm.key}). Manually click the cell to focus`); //Let me refresh.
+            // window.location.reload(false);
             console.log(e);
             console.log(currentElmKey, nextElm.key, direction);
         }
@@ -1758,7 +1758,7 @@ class BillCreation extends Component {
                             />
                     </td>
                     <td>
-                        <div style={{position: 'relative'}}>
+                        <div style={{position: 'relative'}} className='custom-autosuggest-wrapper'>
                             <ReactAutosuggest
                                 suggestions={this.state.formData.orn.specLimitedList}
                                 onSuggestionsFetchRequested={({value}) => this.reactAutosuggestControls.onSuggestionsFetchRequested({value}, 'ornSpec')}

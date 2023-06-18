@@ -330,10 +330,11 @@ function GstBillingDemo() {
     const calcWastageBySellingPrice = (newOrnData, options) => {
         let wt = newOrnData[options.row].nwt;
         let rate = goldRatePerGm;
+        let mcVal = newOrnData[options.row].mc || 0;
         if(categ == 'silver')
             rate = silverRatePerGm;
         let percents = newOrnData[options.row].cgst + newOrnData[options.row].sgst;
-        let total = newOrnData[options.row].price;
+        let total = newOrnData[options.row].price - mcVal;
         let {wsgPercent, wsgVal } = wastageCalc(wt, rate, percents, total);
         newOrnData[options.row].wst = wsgPercent;
         newOrnData[options.row].wstVal = wsgVal;
@@ -341,7 +342,7 @@ function GstBillingDemo() {
         //calc priceOfOrn
         let wtVal = newOrnData[options.row].nwt + (newOrnData[options.row].nwt*wsgPercent)/100; 
         let gramPrice = goldRatePerGm;
-        let mcVal = newOrnData[options.row].mc || 0;
+        
         if(categ == 'silver')
             gramPrice = silverRatePerGm;
         newOrnData[options.row].priceOfOrn = numberFormatter( (wtVal*gramPrice) + parseFloat(mcVal), 2); //without tax
@@ -580,42 +581,46 @@ function GstBillingDemo() {
                             </Col>
                         </Row>
                     </Col>
-                    <Col xs={6}>
+                    <Col xs={4}>
                         <Row>
-                            <Col xs={{span: 2, offset: 1}} className="no-padding">
+                            <Col xs={{span: 3}} className="no-padding">
                                 <input type="number" className="gs-input" value={ornData[i].wst} onChange={(e) => onChange(parseFloat(e.target.value), 'wst', {row:i, col: 'wst'} )} style={{width: '100%'}}
                                     ref= {(domElm) => {domElmns["wst"+i] = domElm; }}
                                     onKeyUp = {(e) => handleKeyUp(e, {currElmKey: "wst"+i}) }/>
                             </Col>
-                            <Col xs={2} className="no-padding">
+                            <Col xs={3} className="no-padding">
                                 <input type="number" className="gs-input" value={ornData[i].wstVal} onChange={(e) => onChange(parseFloat(e.target.value), 'wstVal', {row:i, col: 'wstVal'} )} style={{width: '100%'}}
                                     ref= {(domElm) => {domElmns["wstVal"+i] = domElm; }}
                                     onKeyUp = {(e) => handleKeyUp(e, {currElmKey: "wstVal"+i}) }/>
                             </Col>
-                            <Col xs={1} className="no-padding">
+                            <Col xs={2} className="no-padding">
                                 <input type="number" className="gs-input" value={ornData[i].mc} onChange={(e) => onChange(parseFloat(e.target.value), 'mc', {row:i, col: 'mc'} )} style={{width: '100%'}}
                                     ref= {(domElm) => {domElmns["mc"+i] = domElm; }}
                                     onKeyUp = {(e) => handleKeyUp(e, {currElmKey: "mc"+i}) }/>
                             </Col>
-                            <Col xs={1} className="no-padding">
+                            <Col xs={2} className="no-padding">
                                 <input type="number" className="gs-input" value={ornData[i].cgst} onChange={(e) => onChange(parseFloat(e.target.value), 'cgst', {row:i, col: 'cgst'} )} style={{width: '100%'}}
                                     ref= {(domElm) => {domElmns["cgst"+i] = domElm; }}
                                     onKeyUp = {(e) => handleKeyUp(e, {currElmKey: "cgst"+i}) }/>
                             </Col>
-                            <Col xs={1} className="no-padding">
+                            <Col xs={2} className="no-padding">
                                 <input type="number" className="gs-input" value={ornData[i].sgst} onChange={(e) => onChange(parseFloat(e.target.value), 'sgst', {row:i, col: 'sgst'} )} style={{width: '100%'}}
                                     ref= {(domElm) => {domElmns["sgst"+i] = domElm; }}
                                     onKeyUp = {(e) => handleKeyUp(e, {currElmKey: "sgst"+i}) }/>
                             </Col>
-                            <Col xs={2} className="no-padding">
+                        </Row>
+                    </Col>
+                    <Col xs={2} className='no-padding' style={{textAlign: 'center'}}>
+                        <Row>
+                            <Col xs={8} className="no-padding">
                                 <input type="number" className="gs-input" value={ornData[i].price} onFocus={(e)=>onFocusPriceVal(i)} onChange={(e) => onChange(e.target.value, 'price', {row:i, col: 'price'} )} style={{width: '100%'}}
                                     ref= {(domElm) => {domElmns["price"+i] = domElm; }}
                                     onKeyUp = {(e) => handleKeyUp(e, {currElmKey: "price"+i}) }/>
                             </Col>
-                            <Col xs={1} className='no-padding' style={{textAlign: 'center'}}>
+                            <Col xs={2}>
                                 <span className="calc-refresh-icon" style={{cursor: 'pointer', color: '#2196f3'}}
-                                    onClick={(e) => onCalcRefreshClick(i)}
-                                    title={"Refresh action to caculate the Price value considering the rounded wastage value."}>
+                                onClick={(e) => onCalcRefreshClick(i)}
+                                title={"Refresh action to caculate the Price value considering the rounded wastage value."}>
                                     <MdRefresh />    
                                 </span> 
                             </Col>
@@ -648,21 +653,25 @@ function GstBillingDemo() {
                         </Col>
                     </Row>
                 </Col>
-                <Col xs={6}>
+                <Col xs={4}>
                     <Row>
-                        <Col xs={{span: 2, offset: 1}} className="no-padding">
+                        <Col xs={{span: 3}} className="no-padding">
                             {/* <input type="number" className="gs-input" value={totalsCalc.wst} readOnly style={{width: '100%'}}/> */}
                         </Col>
-                        <Col xs={2} className="no-padding">
+                        <Col xs={3} className="no-padding">
                         </Col>
-                        <Col xs={1} className="no-padding">
+                        <Col xs={2} className="no-padding">
                             <input type="number" className="gs-input" value={totalsCalc.mc} readOnly style={{width: '100%'}}/>
                         </Col>
-                        <Col xs={1} className="no-padding">
-                        </Col>
-                        <Col xs={1} className="no-padding">
+                        <Col xs={2} className="no-padding">
                         </Col>
                         <Col xs={2} className="no-padding">
+                        </Col>
+                    </Row>
+                </Col>
+                <Col xs={2} className='no-padding' style={{textAlign: 'center'}}>
+                    <Row>
+                        <Col xs={8} className="no-padding">
                             <input type="number" className="gs-input" value={totalsCalc.price} readOnly style={{width: '100%'}}/>
                         </Col>
                     </Row>
@@ -744,7 +753,7 @@ function GstBillingDemo() {
                             </FormGroup>
                         </Col>
                     </Row>
-                    <Row>
+                    <Row style={{marginTop: '10px'}}>
                         <Col xs={2} md={2}>
                             <FormGroup>
                                 <FormLabel>Bill Series</FormLabel>
@@ -774,7 +783,7 @@ function GstBillingDemo() {
                             </FormGroup>
                         </Col>
                     </Row>
-                    <Row>   
+                    <Row style={{marginTop: '10px'}}>
                         <Col xs={3} md={3}>
                             <FormGroup>
                                 <FormLabel>Customer Name</FormLabel>
@@ -818,7 +827,7 @@ function GstBillingDemo() {
                             </FormGroup>
                         </Col>
                     </Row>
-                    <Row style={{padding: '0 15px'}}>
+                    <Row style={{padding: '0 15px', marginTop: '10px'}}>
                         <Col xs={12}>
                             <Row>
                                 <Col xs={6}>
@@ -843,24 +852,28 @@ function GstBillingDemo() {
                                         </Col>
                                     </Row>
                                 </Col>
-                                <Col xs={6}>
+                                <Col xs={4}>
                                     <Row>
-                                        <Col xs={{span: 2, offset: 1}} className="no-padding">
+                                        <Col xs={{span: 3}} className="no-padding">
                                             <span> Wsg % </span>
                                         </Col>
-                                        <Col xs={2} className="no-padding">
+                                        <Col xs={3} className="no-padding">
                                             <span> Wsg(gm) </span>
                                         </Col>
-                                        <Col xs={1} className="no-padding">
+                                        <Col xs={2} className="no-padding">
                                             <span> M.C </span>
                                         </Col>
-                                        <Col xs={1} className="no-padding">
+                                        <Col xs={2} className="no-padding">
                                             <span>CGST</span>
                                         </Col>
-                                        <Col xs={1} className="no-padding">
+                                        <Col xs={2} className="no-padding">
                                             <span>SGST</span>
                                         </Col>
-                                        <Col xs={2} className="no-padding">
+                                    </Row>
+                                </Col>
+                                <Col xs={2}>
+                                    <Row>
+                                        <Col xs={8} className="no-padding">
                                             <span> price </span>
                                         </Col>
                                     </Row>

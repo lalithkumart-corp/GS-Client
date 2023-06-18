@@ -1,6 +1,7 @@
 import { getInterestRates, setInterestRates, clearInterestRates, getAccessToken, getSession } from '../core/storage';
 import { SERVER_ASSETS_URL_PATH , GET_INTEREST_RATES } from '../core/sitemap';
 import axios from 'axios';
+import { config } from '../core/sitemap';
 
 export const getDateInUTC = (theDate, options) => {
     options = options || {};

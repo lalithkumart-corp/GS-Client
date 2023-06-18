@@ -4,10 +4,10 @@ import { Collapse } from 'react-collapse';
 //import Autosuggest, { ItemAdapter } from 'react-bootstrap-autosuggest';
 import * as ReactAutosuggest from 'react-autosuggest';
 import { DoublyLinkedList } from '../../utilities/doublyLinkedList';
-import { getDateInUTC } from '../../utilities/utility';
+import { getDateInUTC, convertToLocalTime } from '../../utilities/utility';
 //import DatePicker from 'react-16-bootstrap-date-picker';
 import DatePicker from 'react-datepicker';
-import { GET_PENDING_BILL_NOS, GET_BILL_DETAILS, REDEEM_PENDING_BILLS } from '../../core/sitemap';
+import { GET_PENDING_BILL_NOS, GET_BILL_DETAILS, REDEEM_PENDING_BILLS, GET_FUND_TRN_LIST_BY_BILL } from '../../core/sitemap';
 import { getAccessToken } from '../../core/storage';
 import axios from 'axios';
 import { toast } from 'react-toastify';
@@ -66,12 +66,30 @@ class Redeem extends Component {
         this.autuSuggestionControls.onChange = this.autuSuggestionControls.onChange.bind(this);
         this.reactAutosuggestControls.onSuggestionsFetchRequested = this.reactAutosuggestControls.onSuggestionsFetchRequested.bind(this);
         this.togglePaymentDom = this.togglePaymentDom.bind(this);
+        this.fetchPaymentsListByBill = this.fetchPaymentsListByBill.bind(this);
     }
     async componentDidMount() {
         this.getBillNos();
         let rates = await getInterestRate();
         this.fetchAccountDroddownList();
         this.setState({interestRates: rates});
+    }
+
+    async fetchPaymentsListByBill() {
+        try {
+            let at = getAccessToken();
+            let uids = [this.state.selectedBillData.UniqueIdentifier];
+            let resp = await axiosMiddleware.get(`${GET_FUND_TRN_LIST_BY_BILL}?access_token=${at}&uids=${JSON.stringify(uids)}`);
+            if(resp.data.STATUS == 'SUCCESS') {
+                let newState = {...this.state};
+                newState.fundTransByBill = resp.data.RESP;
+                this.setState(newState);
+            }
+            else {toast.error('Error! Could not fetch payment list for this bill')}
+        } catch(e) {
+            console.log(e);
+            toast.error('Error');
+        }
     }
 
     getToAccountDropdown(key) {
@@ -145,14 +163,27 @@ class Redeem extends Component {
                 }
             )
     }
+
+    getUUID(billNo) {
+        let uuid = null;
+        _.each(this.state.totalBillNoList, (anObj) => {
+            if(anObj.BillNo == billNo) uuid = anObj.UniqueIdentifier;
+        });
+        return uuid;
+    }
+
     fetchBillData(billNo) {
         let accessToken = getAccessToken();
         let billNoArr = [billNo];
-        axios.get(GET_BILL_DETAILS+'?access_token='+accessToken+'&bill_nos='+ JSON.stringify(billNoArr) + '&fetch_only_pending=true')
+        let uuid = this.getUUID(billNo);
+        let arrOfObj = [{ billNo, uuid }];
+        axios.get(GET_BILL_DETAILS+'?access_token='+accessToken+'&bill_nos='+ JSON.stringify(billNoArr)
+            + '&bill_no_with_uuid=' + JSON.stringify(arrOfObj)
+            + '&fetch_only_pending=true' + '&fetch_fund_trns=true')
             .then(
                 (successResp) => {
-                    if(successResp.data && successResp.data && successResp.data.billDetails && successResp.data.billDetails[0]){
-                        let selectedBillData = successResp.data.billDetails[0];
+                    if(successResp.data && successResp.data && successResp.data.billDetails){
+                        let selectedBillData = successResp.data.billDetails;
                         selectedBillData = this.parseResponse(selectedBillData);
                         let paymentInfo = this.parsePaymentInfo(selectedBillData);
                         this.setState({loading: false, selectedBillData: selectedBillData, billNotFound: false, formData: {...this.state.formData, payment: paymentInfo} }, () => {
@@ -190,14 +221,14 @@ class Redeem extends Component {
             let currListSize = 0;
 
             newState.filteredBillNoList = [];
-            _.each(newState.totalBillNoList, (aBillNo, index) => {                
-                let lowercaseBillNo = aBillNo || '';
+            _.each(newState.totalBillNoList, (aRow, index) => {
+                let lowercaseBillNo = aRow.BillNo || '';
                 lowercaseBillNo = lowercaseBillNo.toLowerCase();
                 let inputVal = val;
                 inputVal = inputVal.toLowerCase();
 
                 if(lowercaseBillNo.indexOf(inputVal) == 0 && currListSize < limit) {                    
-                    newState.filteredBillNoList.push(aBillNo);
+                    newState.filteredBillNoList.push(aRow);
                     currListSize++;
                 }
             });
@@ -213,15 +244,15 @@ class Redeem extends Component {
             this.autuSuggestionControls.onBillNoSearch(value);
         },
         onSuggestionSelected: (event, { suggestion, suggestionValue, suggestionIndex, sectionIndex, method }, identifier, options) => {
-            this.autuSuggestionControls.onChange(suggestion, identifier);
+            this.autuSuggestionControls.onChange(suggestion.BillNo, identifier);
         },
         getSuggestionValue: (suggestion, identifier) => {
-            return suggestion;
+            return suggestion.BillNo;
         },
         renderSuggestion: (suggestion, identifier) => {
             let theDom = (
                 <div className='react-auto-suggest-list-item'>
-                    <span>{suggestion}</span>
+                    <span>{suggestion.BillNo}</span>
                 </div>
             );
             return theDom;
@@ -246,11 +277,12 @@ class Redeem extends Component {
                     newState.selectedBillData._interestPerMonth = val;
                     newState.selectedBillData._roi = calculateInterestBasedOnRate(val, newState.selectedBillData.Amount);
                     newState.selectedBillData._totalInterestValue = newState.selectedBillData._interestPerMonth*newState.selectedBillData._monthDiff;
-                    newState.selectedBillData._totalValue = newState.selectedBillData.Amount + newState.selectedBillData._totalInterestValue - newState.selectedBillData._discountValue;
+                    newState.selectedBillData._totalValue = newState.selectedBillData.Amount + newState.selectedBillData._totalInterestValue - newState.selectedBillData._discountValue - this.getCustomerPayIn();
                     break;
                 case 'discount':
                     newState.selectedBillData._discountValue = val;
-                    newState.selectedBillData._totalValue = newState.selectedBillData.Amount + newState.selectedBillData._totalInterestValue - newState.selectedBillData._discountValue;
+                    newState.selectedBillData._totalValue = newState.selectedBillData.Amount + newState.selectedBillData._totalInterestValue - newState.selectedBillData._discountValue - this.getCustomerPayIn();
+
                     break;
                 case 'paymentMode':
                     newState.selectedBillData._paymentMode = val;
@@ -325,12 +357,18 @@ class Redeem extends Component {
         if(options) {
             if(options.currElmKey == 'paymentCollapsibleDiv') {
                 this.togglePaymentDom();
+            } else if(options.currElmKey == 'customerPaymentsCollapsibleDiv') {
+                this.toggleCustomerPayments();
             }
         }
     }
 
     togglePaymentDom() {
         this.setState({openPaymentInputDiv: !this.state.openPaymentInputDiv});
+    }
+
+    toggleCustomerPayments() {
+        this.setState({openCustomerPaymentsDiv: !this.state.openCustomerPaymentsDiv});
     }
     
     onClickSubmit() {
@@ -456,7 +494,7 @@ class Redeem extends Component {
                             }
                         </Row>
                         <Row className='tail-section'>
-                            <Col xs={6} className='font-family-monospace gram-field'><b>{this.getTotalNWt(billData.Orn)}</b>&nbsp;gm</Col>
+                            <Col xs={6} className='gram-field'><b>{this.getTotalNWt(billData.Orn)}</b>&nbsp;gm</Col>
                             <Col xs={6} className='amount-field text-align-right'>{format(billData.Amount, {code: 'INR'})}</Col>
                         </Row>
                     </Col>
@@ -466,6 +504,52 @@ class Redeem extends Component {
                 </Row>
             </Col>
         )
+    }
+
+    getCustomerPayIn(selectedBillData) {
+        let totals = 0;
+        let data = selectedBillData?selectedBillData:this.state.selectedBillData;
+        _.each(data.fundTrns, (obj, index) => {
+            if(!obj.is_internal)
+                totals += obj.cash_in;
+        });
+        return totals;
+    }
+
+    getCustomerPayInDom() { 
+        let theDom = [];
+        let totals = 0;
+        _.each(this.state.selectedBillData.fundTrns, (obj, index) => {
+            if(!obj.is_internal) {
+                totals += obj.cash_in;
+                theDom.push(
+                    <Row>
+                        <Col xs={4} md={4}>
+                            {convertToLocalTime(obj.modified_date, {excludeTime: true})}
+                        </Col>
+                        <Col xs={4} md={4}>
+                            {obj.category}
+                        </Col>
+                        <Col xs={4} md={4}>
+                            {obj.cash_in}
+                        </Col>
+                    </Row>
+                )
+            }
+        });
+        if(totals) {
+            return <div className='customer-payment-component'>
+                        <div className="customer-payment-component-header"
+                            onClick={(e) => {this.handleClick(e, {currElmKey: 'customerPaymentsCollapsibleDiv'})}}>                                
+                            Customer Payments: {totals}
+                        </div>
+                        <Collapse isOpened={this.state.openCustomerPaymentsDiv} className="customer-payment-component-body">
+                            {theDom}
+                        </Collapse>
+                    </div>;
+        } else {
+            return <></>
+        }
     }
 
     getCalculationDom() {
@@ -478,13 +562,13 @@ class Redeem extends Component {
                     <Row>
                         <Col xs={6} style={{fontSize: "13px"}}>
                             <Row>
-                                <Col sm={5} xs={5} style={{paddingBottom: "5px"}}>Pledged Date: </Col><Col sm={7} xs={7}>{selectedBillData._pledgedDate}</Col>
+                                <Col sm={4} xs={4} style={{paddingBottom: "5px", fontWeight: 'bold'}}>Pledged Date: </Col><Col sm={7} xs={7}>{selectedBillData._pledgedDate}</Col>
                             </Row>
                             <Row>
-                                <Col sm={5} xs={5} style={{paddingBottom: "5px"}}>Redeem Date: </Col><Col sm={7} xs={7}>{selectedBillData._todayDate}</Col>
+                                <Col sm={4} xs={4} style={{paddingBottom: "5px", fontWeight: 'bold'}}>Redeem Date: </Col><Col sm={7} xs={7}>{selectedBillData._todayDate}</Col>
                             </Row>
                             <Row>
-                                <Col sm={5} xs={5} style={{paddingBottom: "5px"}}>Int. Rate</Col> <Col sm={7} xs={7}>{selectedBillData._roi}% per/month</Col>
+                                <Col sm={4} xs={4} style={{paddingBottom: "5px", fontWeight: 'bold'}}>Int. Rate</Col> <Col sm={7} xs={7}>{selectedBillData._roi}% per/month</Col>
                             </Row>
                         </Col>
                         <Col xs={6}>
@@ -536,6 +620,14 @@ class Redeem extends Component {
                                     {/* <input className='discount-value-input' type='text' value={selectedBillData._discountValue} onChange={(e) => this.inputControls.onChange(e, e.target.value, 'discount')}/> */}
                                 </Col>
                             </Row>
+                        </Col>
+                    </Row>
+                    <Row>
+                        <Col xs={7} md={7}>
+                            
+                        </Col>
+                        <Col xs={5} md={5}>
+                            {this.getCustomerPayInDom()}
                         </Col>
                     </Row>
                     <Row>
@@ -749,6 +841,7 @@ class Redeem extends Component {
 
     parseResponse(selectedBillData) {
         selectedBillData = this.calculateData(selectedBillData);
+        selectedBillData._totalValue = selectedBillData._totalValue - this.getCustomerPayIn(selectedBillData);
 
         selectedBillData._picture = {
             holder: {}
@@ -802,7 +895,6 @@ class Redeem extends Component {
             if(aMode !== paymentModeAtBillCreation)
                 tt[aMode].toAccountId = defaultFundAcc;
         });
-        
         return tt;
     }
 

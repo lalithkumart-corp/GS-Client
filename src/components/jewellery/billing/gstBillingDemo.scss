@@ -34,7 +34,7 @@
         }
     }
     .round-off-selector {
-        color: '#2196f3';
+        color: #2196f3;
         cursor: pointer;
         font-size: 14px;
     }
@@ -43,4 +43,8 @@
     width: 57px;
     border: 1px solid lightgray;
     outline: none;
+}
+
+.jewellery-gst-bill-demo.container .row+.row {
+    // margin-top: 10px;
 }

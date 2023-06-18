@@ -52,10 +52,10 @@ class PledgebookModal extends Component {
     }
 
     componentDidUpdate(prevProps) {
-        if(prevProps.BillNo !== this.props.currentBillData.BillNo) {
-            this.constructLoanOverviewData();
-            this.fetchPaymentsListByBill();
-        }
+        // if(prevProps.BillNo !== this.props.currentBillData.BillNo) {
+        //     this.constructLoanOverviewData();
+        //     this.fetchPaymentsListByBill();
+        // }
     }
 
     async fetchPaymentsListByBill() {
@@ -582,17 +582,18 @@ export const RenewalScreen = (props) => {
             if(resp.data.STATUS == 'SUCCESS') {
                 let filteredList = [];
                 _.each(resp.data.RESP, (aRow, index) => {
-                    let clr = 'green';
-                    let cashFlow = 'in';
-                    if(aRow.cash_out > aRow.cash_in) {
-                        clr = 'red';
-                        cashFlow = 'out';
-                    }
-                    let val = aRow['cash_'+cashFlow];
-                    aRow._cashFlow = cashFlow;
-                    aRow._amt = val;
-                    if(aRow.category !== CASH_TRNS_GIRVI)
+                    if(!aRow.is_internal) {
+                        let clr = 'green';
+                        let cashFlow = 'in';
+                        if(aRow.cash_out > aRow.cash_in) {
+                            clr = 'red';
+                            cashFlow = 'out';
+                        }
+                        let val = aRow['cash_'+cashFlow];
+                        aRow._cashFlow = cashFlow;
+                        aRow._amt = val;
                         filteredList.push(aRow);
+                    }
                 })
                 setTableData(filteredList);
             }

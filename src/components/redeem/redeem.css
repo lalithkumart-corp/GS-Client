@@ -19,7 +19,7 @@
 }
 .bill-closing-container .bill-data-container .amount-field {
     font-size: 20px;
-    padding-right: 39px;
+    padding-right: 60px;
 }
 .bill-closing-container .bill-data-container .tail-section {
     margin-top: 10px;
@@ -98,4 +98,14 @@
 }
 .gs-input-cell2.redeem-input+.react-autosuggest__suggestions-container {
     top: 33px;
+}
+.bill-closing-container .customer-payment-component {
+    border: 1px solid lightgray;
+}
+.bill-closing-container .customer-payment-component-header {
+    border-bottom: 1px solid lightgray;
+    padding-left: 5px;
+    padding-top: 5px;
+    padding-bottom: 5px;
+    cursor: pointer;
 }
