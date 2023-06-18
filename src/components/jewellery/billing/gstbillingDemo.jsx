@@ -14,6 +14,8 @@ import WastageCalculator from '../../tools/wastageCalculator';
 import { wastageCalc } from '../../tools/wastageCalculator/wastageCalculator';
 import { Collapse } from 'react-collapse';
 import { MdRefresh } from 'react-icons/md';
+import axiosMiddleware from '../../../core/axios';
+import { ANALYTICS } from '../../../core/sitemap';
 
 // import GstBillTemplate1 from '../../../templates/jewellery-gstBill/template1/Template1';
 const ENTER_KEY = 13;
@@ -171,6 +173,7 @@ function GstBillingDemo() {
     useEffect(() => {
         if(printFlag && templateContent) {
             btnRef.handlePrint();
+            axiosMiddleware.post(ANALYTICS, {module: 'GST_BILL_DEMO'});
             setPrintFlag(false);
         };
     }, [printFlag]);

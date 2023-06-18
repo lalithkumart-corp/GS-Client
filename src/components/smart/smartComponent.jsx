@@ -99,7 +99,7 @@ class SmartComponent extends Component {
         yy = yy.replaceAll('GS_', '');
         yy = yy.replaceAll('MAK_', '');
         yy = yy.replaceAll('INTER', '');
-        if(true) {// yy == "-1844838684" // temporarily making as tru for development mode
+        if(yy == "1473218116") {// yy == "-1844838684" // temporarily making as tru for development mode
             if(this.props.auth.isAuthenticated) {
                 if(!this.props.auth.isActivated) {
                     return (
@@ -156,7 +156,7 @@ class SmartComponent extends Component {
                                     <Route path= "/sell-item" element={<SellItem />} />
                                     <Route path= "/jewellery-cust-invoices" element={<JewelleryCustomerInvoicesList />} />
                                     <Route path= "/stock-setup" element={<StockSetup />} />
-                                    <Route path="/tag-setup" element={<TagSetup />} />
+                                    {/* <Route path="/tag-setup" element={<TagSetup />} /> */}
                                     <Route path= "/tag-demo" element={<TagDemo />} />
                                     <Route path="/tag-v2" element={<CustomTag />} />
                                     <Route path="/label-generator" element={<CustomLabel />} />
