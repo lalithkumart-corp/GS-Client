@@ -88,6 +88,7 @@ export default function TemplateSetup(props) {
                         <ImageZoom>
                             <img
                                 src={theUrl}
+                                style={{ maxHeight: '250px' }} 
                                 alt="Image not found"
                                 className='template-image-viewer' />
                         </ImageZoom>
