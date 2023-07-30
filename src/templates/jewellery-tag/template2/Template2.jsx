@@ -1,6 +1,6 @@
-import './Template1.scss';
+import './Template2.scss';
 
-const Template1 = ({
+const Template2 = ({
     storeName, division, 
     grams, size, itemName, huid, config
 }) => {
@@ -13,27 +13,30 @@ const Template1 = ({
     grams = grams?parseFloat(grams).toFixed(3):'';
 
     const storeNameStyles = {
-        width: '45px',
+        width: '8mm',
         fontSize: 20,
         fontWeight: 'bold'
     };
     const itemDivStyles = {
         textAlign: 'center',
-        width: '70px',
+        width: '8mm',
         fontSize: '17px',
         fontWeight: 'bold'
     };
     const hallmarkLogoSpanStyles = {
         height: '19px',
-        width: '24px',
+        width: '6mm',
         display: config.showBis?'inline-block':'none'
     };
     const hallmarkLogoStyles = {
         height: '100%',
         marginTop: '-6px'
     };
-    const weightStyles = {
-        fontSize: '22px',
+    const weightLabelStyles = {
+        fontSize: '17px'
+    }
+    const weightValueStyles = {
+        fontSize: '17px',
         fontWeight: 'bold'
     };
     const itemNameStyles = {
@@ -45,10 +48,11 @@ const Template1 = ({
     const huidStyles = {
         display: showHuid?'inline-block':'none',
         fontWeight: 'bold',
-        fontSize: '17px'
+        fontSize: '17px',
+        width: '18mm'
     };
     const itemSizeStyles = {
-        width: '34px',
+        width: '8mm',
         fontSize: '16px',
         fontWeight: 'bold',
         display: showSize?'inline-block':'none'
@@ -56,9 +60,9 @@ const Template1 = ({
 
     return (
         <>
-            <div className="jewellery-tag-template-1-label">
+            <div className="jewellery-tag-template-2-label">
                 <div  className='label-content-section'>
-                    <div className='section-1'>
+                    <div className='section-1' style={{paddingLeft: '3mm'}}>
                         <div className='row-1'>
                             <span className='store-name-abbr' style={storeNameStyles}>{storeName}</span>
                             <span className='item-division' style={itemDivStyles}>{division}</span>
@@ -68,8 +72,8 @@ const Template1 = ({
                         </div>
                         <div className='row-2'>
                             <span style={{fontWeight: 'bold'}}>
-                                <span style={{fontSize: '22px'}}>wt: </span>
-                                <span style={weightStyles}>{grams}</span>
+                                <span style={weightLabelStyles}>wt: </span>
+                                <span style={weightValueStyles}>{grams}</span>
                             </span>
                         </div>
                     </div>
@@ -81,8 +85,8 @@ const Template1 = ({
                         </div>
                         <div className='row-2'>
                             <span style={{fontWeight: 'bold', paddingLeft: '3px'}}>
-                                <span style={{fontSize: '22px'}}>wt: </span>
-                                <span style={weightStyles}>{grams}</span>
+                                <span style={weightLabelStyles}>wt: </span>
+                                <span style={weightValueStyles}>{grams}</span>
                             </span>
                         </div>
                     </div>
@@ -92,4 +96,4 @@ const Template1 = ({
     )
 }
 
-export default Template1;
+export default Template2;

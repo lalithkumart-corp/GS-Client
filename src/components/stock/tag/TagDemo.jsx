@@ -27,8 +27,8 @@ export default class TagDemo extends Component {
                 storeName: {
                     expand: false,
                     styles: {
-                        width: 45,
-                        fontSize: 20,
+                        width: 25,
+                        fontSize: 15,
                         fontWeight: 'bold'
                     }
                 },
@@ -46,7 +46,7 @@ export default class TagDemo extends Component {
                 touch: {
                     expand: false,
                     styles: {
-                        fontSize: 17,
+                        fontSize: 14,
                         fontWeight: 'bold'
                     }
                 },
@@ -58,8 +58,8 @@ export default class TagDemo extends Component {
                 size: {
                     expand: false,
                     styles: {
-                        width: 34,
-                        fontSize: 16,
+                        width: 17,
+                        fontSize: 13,
                         fontWeight: 'bold'
                     }
                 },
@@ -72,14 +72,14 @@ export default class TagDemo extends Component {
                     label: 'MC:',
                     expand: false,
                     styles: {
-                        width: 33,
+                        width: 16,
                         fontWeight: 'normal',
-                        fontSize: 16,
+                        fontSize: 13,
                     },
                     labelStyles: {
-                        width: 33,
+                        width: 16,
                         fontWeight: 'normal',
-                        fontSize: 16
+                        fontSize: 13
                     }
                 },
                 wstDiv: {
@@ -90,8 +90,8 @@ export default class TagDemo extends Component {
                 wst: {
                     expand: false,
                     styles: {
-                        width: 35,
-                        fontSize: 16,
+                        width: 17,
+                        fontSize: 14,
                         fontWeight: 'normal'
                     }
                 },
@@ -103,15 +103,15 @@ export default class TagDemo extends Component {
                 itemName: {
                     expand: false,
                     styles: {
-                        fontSize: 17,
+                        fontSize: 15,
                         fontWeight: 'normal',
-                        width: 35
+                        width: 18
                     }
                 },
                 wt: {
                     expand: false,
                     styles: {
-                        fontSize: 22,
+                        fontSize: 16,
                         fontWeight: 'bold'
                     }
                 }
@@ -501,6 +501,7 @@ class Tag extends Component {
         const mcDivStyles = {
             display: this.props.form.mcDiv.styles.display, 
             paddingLeft: '3px',
+            lineHeight: 1,
         }
         const mcLabelStyles = {
             width: this.props.form.mc.labelStyles.width + 'px',
@@ -536,23 +537,23 @@ class Tag extends Component {
             outline: this.props.inspectElements?'1px solid':'none'
         }
         return (
-            <div style={{height: '60px', width: '425px', paddingLeft: '15px', fontFamily: 'monospace'}}>
-                <div style={{width: '302px', display: "inline-block", height: '65px', backgroundColor: 'lightgray', paddingTop: '6px'}}>
-                    <div style={{width: '150px', display: "inline-block"}}>
-                        <div style={{height: '20px', paddingLeft: '4px'}}>
+            <div style={{height: '12mm', width: '80mm', fontFamily: 'monospace', backgroundColor: 'lightgray', display: 'inline-block'}}>
+                <div style={{width: '54mm', display: "inline-block", height: '12mm'}}>
+                    <div style={{width: '27mm', display: "inline-block", paddingLeft: '5px'}}>
+                        <div style={{height: '6mm', paddingLeft: '4px'}}>
                             <span style={storeNameStyles}>{this.props.storeName}</span>
                             <span style={touchStyles}>{this.props.touch}</span>
-                            <span style={{marginLeft: '58px', height: '12px'}}><img style={imgStyles} src='/images/bis.jpg' /></span>
+                            <span style={{marginLeft: '42px', height: '12px'}}><img style={imgStyles} src='/images/bis.jpg' /></span>
                         </div>
-                        <div style={{height: '30px', paddingLeft: '4px'}}>
+                        <div style={{height: '6mm', paddingLeft: '4px'}}>
                             <span style={{fontWeight: 'bold'}}>
-                                <span style={{fontSize: '22px'}}>wt: </span>
+                                <span style={{fontSize: '15px'}}>wt: </span>
                                 <span style={weightStyles}>{this.props.wtContent}</span>
                             </span>
                         </div>
                     </div>
-                    <div style={{width: '150px', display: "inline-block", height: '50px'}}>
-                        <div style={{height: '20px', fontSize: '16px'}}>
+                    <div style={{width: '27mm', display: "inline-block", height: '12mm', paddingLeft: '2px'}}>
+                        <div style={{height: '6mm', fontSize: '16px', display: 'flex'}}>
                             <span style={mcDivStyles}>
                                 <span style={mcLabelStyles}>{this.props.form.mc.label}</span>
                                 <span style={mcStyles}>{this.props.makingCharge}</span>
@@ -561,9 +562,9 @@ class Tag extends Component {
                             <span style={wstStyles}>{this.props.wastage}</span>
                             <span style={itemNameStyles}>{this.props.itemName}</span>
                         </div>
-                        <div style={{height: '30px'}}>
+                        <div style={{height: '6mm'}}>
                             <span style={{fontWeight: 'bold', paddingLeft: '3px'}}>
-                                <span style={{fontSize: '22px'}}>wt: </span>
+                                <span style={{fontSize: '15px'}}>wt: </span>
                                 <span style={weightStyles}>{this.props.wtContent}</span>
                             </span>
                         </div>
