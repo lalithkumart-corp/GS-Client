@@ -13,30 +13,32 @@ const Template2 = ({
     grams = grams?parseFloat(grams).toFixed(3):'';
 
     const storeNameStyles = {
-        width: '8mm',
+        width: '25px',
         fontSize: 20,
         fontWeight: 'bold'
     };
     const itemDivStyles = {
         textAlign: 'center',
-        width: '8mm',
+        width: '57px',
         fontSize: '17px',
         fontWeight: 'bold'
     };
     const hallmarkLogoSpanStyles = {
-        height: '19px',
-        width: '6mm',
-        display: config.showBis?'inline-block':'none'
+        height: '16px',
+        display: config.showBis?'inline-block':'none',
+        position: 'absolute',
+        marginLeft: '-10px',
+        marginTop: '4px'
     };
     const hallmarkLogoStyles = {
         height: '100%',
         marginTop: '-6px'
     };
     const weightLabelStyles = {
-        fontSize: '17px'
+        fontSize: '14px'
     }
     const weightValueStyles = {
-        fontSize: '17px',
+        fontSize: '15px',
         fontWeight: 'bold'
     };
     const itemNameStyles = {
@@ -48,12 +50,12 @@ const Template2 = ({
     const huidStyles = {
         display: showHuid?'inline-block':'none',
         fontWeight: 'bold',
-        fontSize: '17px',
-        width: '18mm'
+        fontSize: '14px',
+        width: '60px'
     };
     const itemSizeStyles = {
-        width: '8mm',
-        fontSize: '16px',
+        width: '31px',
+        fontSize: '14px',
         fontWeight: 'bold',
         display: showSize?'inline-block':'none'
     };
