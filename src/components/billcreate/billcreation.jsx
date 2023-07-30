@@ -183,7 +183,7 @@ class BillCreation extends Component {
                     },
                     list: ['Loading...'],
                     limitedList: ['Loading...'],
-                    specList: ['Broken', 'w/o hook', 'Damage', 'Bend', 'Tread', 'w/o Thiruvani', 'w/o Stone', 'Full Stone'], //TODO: Map with Database
+                    specList: ['Bend', 'Broken', 'w/o hook', 'Damage', 'Tread', 'w/o Thiruvani', 'w/o Stone', 'Full Stone'], //TODO: Map with Database
                     validCategoryList: ['G', 'S', 'B'],
                     category: 'U', //unknown
                     totalWeight: 0.00,
