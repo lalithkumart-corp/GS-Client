@@ -559,9 +559,9 @@ class AddStock extends Component {
             fd.productITouch = fd.productPureTouch;
         if(fd.metalPrice && fd.metalPricePerGm && fd.productQty && fd.productNWt) {
             if(fd.productPureTouch)
-                fd.productPWt = ((fd.productNWt * fd.productPureTouch)/100).toFixed(3);
+                fd.productPWt = ((fd.productNWt * fd.productPureTouch)/100).toFixed(5);
             if(fd.productITouch)
-                fd.productIWt = ((fd.productNWt * fd.productITouch)/100).toFixed(3);
+                fd.productIWt = ((fd.productNWt * fd.productITouch)/100).toFixed(5);
             if(fd.productIWt)
                 fd.calcAmtUptoIWt = fd.metalPricePerGm * fd.productIWt;
             if(fd.productLabourCalcUnit && fd.productLabourCharges) {

@@ -8,7 +8,7 @@ import _ from 'lodash';
 import { toast } from 'react-toastify';
 import { getAccessToken, getStockListPageFilters, setStockListPageFilters } from '../../../core/storage';
 import ReactPaginate from 'react-paginate';
-import { convertToLocalTime, dateFormatter } from '../../../utilities/utility';
+import { convertToLocalTime, dateFormatter, displayNo } from '../../../utilities/utility';
 import DateRangePicker from '../../dateRangePicker/dataRangePicker';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {Popover, ArrowContainer} from 'react-tiny-popover';
@@ -166,7 +166,7 @@ export default class ViewStock extends Component {
                     formatter: (column, columnIndex, row, rowIndex) => {
                         return (
                             <span className='product-touch-cell'>
-                                {row[column.id]}
+                                {displayNo(row[column.id],1)}
                             </span>
                         )
                     },
@@ -180,7 +180,7 @@ export default class ViewStock extends Component {
                     formatter: (column, columnIndex, row, rowIndex) => {
                         return (
                             <span className='i-touch-cell'>
-                                {row[column.id]}
+                                {displayNo(row[column.id], 1)}
                             </span>
                         )
                     },
@@ -207,7 +207,7 @@ export default class ViewStock extends Component {
                     formatter: (column, columnIndex, row, rowIndex) => {
                         return (
                             <span className='product-gross-wt-cell'>
-                                {row[column.id]}
+                                {displayNo(row[column.id], 3)}
                             </span>
                         )
                     },
@@ -220,13 +220,13 @@ export default class ViewStock extends Component {
                     formatter: (column, columnIndex, row, rowIndex) => {
                         return (
                             <span className='product-net-wt-cell'>
-                                {row[column.id]}
+                                {displayNo(row[column.id], 3)}
                             </span>
                         )
                     },
                     width: '5%',
                     footerClassName: 'stock-net-wt-footer-cell',
-                    footerFormatter: () => <span>{this.state?this.state.totals.netWt:''}</span>
+                    footerFormatter: () => <span>{this.state?displayNo(this.state.totals.netWt,3):''}</span>
                 },
                 {
                     id: 'pureWt',
@@ -237,7 +237,7 @@ export default class ViewStock extends Component {
                     formatter: (column, columnIndex, row, rowIndex) => {
                         return (
                             <span className='product-pure-wt-cell'>
-                                {row[column.id]}
+                                {displayNo(row[column.id],3)}
                             </span>
                         )
                     },
@@ -277,13 +277,13 @@ export default class ViewStock extends Component {
                     formatter: (column, columnIndex, row, rowIndex) => {
                         return (
                             <span className='product-sold-net-wt-cell'>
-                                {row[column.id]}
+                                {displayNo(row[column.id],3)}
                             </span>
                         )
                     },
                     width: '5%',
                     footerClassName: 'stock-sold-net-wt-footer-cell',
-                    footerFormatter: () => <span>{this.state?this.state.totals.soldNetWt:''}</span>
+                    footerFormatter: () => <span>{this.state?displayNo(this.state.totals.soldNetWt,3):''}</span>
                 },
                 // {
                 //     id: 'soldPWt',
@@ -333,13 +333,13 @@ export default class ViewStock extends Component {
                     formatter: (column, columnIndex, row, rowIndex) => {
                         return (
                             <span className='product-avl-net-wt-cell'>
-                                {row[column.id]}
+                                {displayNo(row[column.id],3)}
                             </span>
                         )
                     },
                     width: '5%',
                     footerClassName: 'stock-avl-net-wt-footer-cell',
-                    footerFormatter: () => <span>{this.state?this.state.totals.avlNetWt:''}</span>
+                    footerFormatter: () => <span>{this.state?displayNo(this.state.totals.avlNetWt,3):''}</span>
                 },
                 // {
                 //     id: 'avlPWt',

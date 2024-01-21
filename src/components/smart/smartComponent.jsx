@@ -48,6 +48,7 @@ import UdhaarEntry from '../udhaar/UdhaarEntry';
 import UdhaarListComp from '../udhaar/UdhaarList';
 import ResetPassword from '../passwordReset/passwordReset';
 import GstBillingDemo from '../jewellery/billing/gstbillingDemo';
+import GirviAnalytics from '../girviAnalytics';
 import Tools from '../tools';
 import {LAL_M_AD_129} from '../../core/sitemap';
 import { saveLocation } from '../../utilities/apiUtils';
@@ -99,7 +100,7 @@ class SmartComponent extends Component {
         yy = yy.replaceAll('GS_', '');
         yy = yy.replaceAll('MAK_', '');
         yy = yy.replaceAll('INTER', '');
-        if(yy == "1473218116") {// yy == "-1844838684" // temporarily making as tru for development mode
+        if(true || yy == "-236375844") {// yy == "-1844838684" // temporarily making as tru for development mode
             if(this.props.auth.isAuthenticated) {
                 if(!this.props.auth.isActivated) {
                     return (
@@ -168,6 +169,7 @@ class SmartComponent extends Component {
                                     <Route path="/reset-pwd" element={<ResetPassword />} />
                                     <Route path="/gst-bill-generator" element={<GstBillingDemo />} />
                                     <Route path="/tools" element={<Tools />} />
+                                    <Route path="/girvi-analytics" element={<GirviAnalytics />} />
                                     </Routes>
                                 </div>
                                 {/* <div className="floating-right-side-bar"> */}

@@ -35,7 +35,7 @@ export default class TagDemo extends Component {
                 hallmarkLogo: {
                     expand: false,
                     styles: {
-                        size: 20
+                        size: 12
                     }
                 },
                 touchDiv: {
@@ -468,9 +468,12 @@ class Tag extends Component {
             width: this.props.form.storeName.styles.width + 'px',
             display: this.props.form.storeNameDiv.styles.display,
             fontSize: this.props.form.storeName.styles.fontSize + 'px',
-            lineHeight: '21px',
             fontWeight: this.props.form.storeName.styles.fontWeight
         }
+        const imgContainerStyles = {
+            marginLeft: '51px',
+            height: '12px'
+        };
         const imgStyles= {
             height: this.props.form.hallmarkLogo.styles.size + 'px',
             display: this.props.showHallmark?'inline':'none',
@@ -487,7 +490,6 @@ class Tag extends Component {
             paddingTop: '0px',
             fontSize: this.props.form.touch.styles.fontSize + 'px',
             fontWeight: this.props.form.touch.styles.fontWeight,
-            lineHeight: '21px',
             outline: this.props.inspectElements?'1px solid':'none'
         }
         const itemSizeStyles = {
@@ -501,7 +503,6 @@ class Tag extends Component {
         const mcDivStyles = {
             display: this.props.form.mcDiv.styles.display, 
             paddingLeft: '3px',
-            lineHeight: 1,
         }
         const mcLabelStyles = {
             width: this.props.form.mc.labelStyles.width + 'px',
@@ -533,27 +534,37 @@ class Tag extends Component {
         const weightStyles = {
             fontSize: this.props.form.wt.styles.fontSize + 'px',
             fontWeight: this.props.form.wt.styles.fontWeight,
-            lineHeight: '10px',
             outline: this.props.inspectElements?'1px solid':'none'
         }
+
+        const styles22 = {
+            fullTag: {height: '12mm', width: '80mm', fontFamily: 'monospace', backgroundColor: 'lightgray', display: 'inline-block', lineHeight: 1},
+            bodyPart: {width: '54mm', display: "inline-block", height: '12mm'},
+            leftPart: {width: '27mm', display: "inline-block", paddingLeft: '5px'},
+            rightPart: {width: '27mm', display: "inline-block", height: '12mm', paddingLeft: '2px'},
+            leftPartRow1: {height: '5mm', paddingLeft: '4px'},
+            leftPartRow2: {height: '5mm', paddingLeft: '4px'},
+            rightPartRow1: {height: '5mm', fontSize: '15px', display: 'flex'},
+            rightPartRow2: {height: '5mm'}
+        }
         return (
-            <div style={{height: '12mm', width: '80mm', fontFamily: 'monospace', backgroundColor: 'lightgray', display: 'inline-block'}}>
-                <div style={{width: '54mm', display: "inline-block", height: '12mm'}}>
-                    <div style={{width: '27mm', display: "inline-block", paddingLeft: '5px'}}>
-                        <div style={{height: '6mm', paddingLeft: '4px'}}>
+            <div style={styles22.fullTag}>
+                <div style={styles22.bodyPart}>
+                    <div style={styles22.leftPart}>
+                        <div style={styles22.leftPartRow1}>
                             <span style={storeNameStyles}>{this.props.storeName}</span>
                             <span style={touchStyles}>{this.props.touch}</span>
-                            <span style={{marginLeft: '42px', height: '12px'}}><img style={imgStyles} src='/images/bis.jpg' /></span>
+                            <span style={imgContainerStyles}><img style={imgStyles} src='/images/bis.jpg' /></span>
                         </div>
-                        <div style={{height: '6mm', paddingLeft: '4px'}}>
+                        <div style={styles22.leftPartRow2}>
                             <span style={{fontWeight: 'bold'}}>
                                 <span style={{fontSize: '15px'}}>wt: </span>
                                 <span style={weightStyles}>{this.props.wtContent}</span>
                             </span>
                         </div>
                     </div>
-                    <div style={{width: '27mm', display: "inline-block", height: '12mm', paddingLeft: '2px'}}>
-                        <div style={{height: '6mm', fontSize: '16px', display: 'flex'}}>
+                    <div style={styles22.rightPart}>
+                        <div style={styles22.rightPartRow1}>
                             <span style={mcDivStyles}>
                                 <span style={mcLabelStyles}>{this.props.form.mc.label}</span>
                                 <span style={mcStyles}>{this.props.makingCharge}</span>
@@ -562,7 +573,7 @@ class Tag extends Component {
                             <span style={wstStyles}>{this.props.wastage}</span>
                             <span style={itemNameStyles}>{this.props.itemName}</span>
                         </div>
-                        <div style={{height: '6mm'}}>
+                        <div style={styles22.rightPartRow2}>
                             <span style={{fontWeight: 'bold', paddingLeft: '3px'}}>
                                 <span style={{fontSize: '15px'}}>wt: </span>
                                 <span style={weightStyles}>{this.props.wtContent}</span>

@@ -1,25 +1,26 @@
 
 .jewellery-tag-template-2-label {
     width: 80mm;
-    height: 12mm;
+    height: 11.5mm;
     font-family: monospace;
     background-color: lightgray;
     display: inline-block;
+    line-height: 1;
     .label-content-section {
         width: 53mm;
-        height: 12mm;
+        height: 11.5mm;
         display: flex;
         .section-1, .section-2 {
-            width: 26mm;
-            height: 12mm;
+            width: 27mm;
+            height: 11.5mm;
             display: inline-block;
         }
         .section-1 {
             border-right: 1px dashed;
+            padding-left: 5px;
             .row-1 {
+                height: 5mm;
                 display: inline-block;
-                height: 6mm;
-                line-height: 1;
                 .store-name-abbr {
                     display: inline-block;
                 }
@@ -29,8 +30,6 @@
             }
             .row-2 {
                 display: inline-block;
-                height: 6mm;
-                line-height: 1;
                 .item-wt {
                     display: inline-block;
                 }
@@ -39,9 +38,8 @@
         .section-2 {
             padding-left: 4px;
             .row-1 {
-                height: 6mm;
+                height: 5mm;
                 display: inline-block;
-                line-height: 1;
                 .item-size {
                     display: inline-block;
                 }
@@ -50,9 +48,7 @@
                 }
             }
             .row-2 {
-                height: 6mm;
                 display: inline-block;
-                line-height: 1;
                 .item-wt {
                     display: inline-block;
                 }

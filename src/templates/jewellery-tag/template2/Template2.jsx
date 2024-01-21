@@ -14,21 +14,21 @@ const Template2 = ({
 
     const storeNameStyles = {
         width: '25px',
-        fontSize: 20,
+        fontSize: 15,
         fontWeight: 'bold'
     };
     const itemDivStyles = {
         textAlign: 'center',
         width: '57px',
-        fontSize: '17px',
+        fontSize: '14px',
         fontWeight: 'bold'
     };
     const hallmarkLogoSpanStyles = {
-        height: '16px',
+        height: '11px',
         display: config.showBis?'inline-block':'none',
         position: 'absolute',
-        marginLeft: '-10px',
-        marginTop: '4px'
+        marginLeft: '-4px',
+        marginTop: '3px'
     };
     const hallmarkLogoStyles = {
         height: '100%',
@@ -64,7 +64,7 @@ const Template2 = ({
         <>
             <div className="jewellery-tag-template-2-label">
                 <div  className='label-content-section'>
-                    <div className='section-1' style={{paddingLeft: '3mm'}}>
+                    <div className='section-1'>
                         <div className='row-1'>
                             <span className='store-name-abbr' style={storeNameStyles}>{storeName}</span>
                             <span className='item-division' style={itemDivStyles}>{division}</span>

@@ -48,6 +48,7 @@ class GSTable extends Component {
     }
 
     parseInputCollection(props) {
+        try {
         let parsedData = {
             columns: [],
             rowData: []
@@ -79,7 +80,7 @@ class GSTable extends Component {
                         id = "_onlySerialNo";
                         formatter = this.defaultFormatters.serialNo;
                     }
-
+                    
                     props.columns.unshift({
                         id: id,
                         displayText: '',
@@ -128,6 +129,9 @@ class GSTable extends Component {
         parsedData.rowClickListener = props.rowClickListener || null;
         parsedData.loading = props.loading || false;
         return parsedData;
+        } catch(e) {
+            console.log(e);
+        }
     }
     defaults = {
         isFilterable: false,

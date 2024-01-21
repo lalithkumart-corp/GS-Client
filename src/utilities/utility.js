@@ -269,3 +269,15 @@ export const imageUrlCorrection = (urlFromServer) => {
     
     return urlFromServer;
 }
+
+export const displayNo = (numericVal, decimalLen) => {
+    let displayVal;
+    if(typeof numericVal !== 'number' && decimalLen) {
+        numericVal = parseFloat(numericVal);
+    }
+    if(decimalLen)
+        displayVal = numericVal.toFixed(decimalLen);
+    else
+        displayVal = parseInt(numericVal);
+    return displayVal;
+}

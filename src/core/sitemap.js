@@ -92,6 +92,8 @@ export const TRASH_PLEDGEBOOK_BILLS = `${config.proxy_protocol}://${config.proxy
 export const RESTORE_TRASHED_PLEDGEBOOK_BILLS = `${config.proxy_protocol}://${config.proxy_api_host}:${config.proxy_api_port}/${config.restApiRoot}/Pledgebooks/restore-trashed-bills`;
 export const PERMANENTLY_DELETE_PLEDGEBOOK_BILLS = `${config.proxy_protocol}://${config.proxy_api_host}:${config.proxy_api_port}/${config.restApiRoot}/Pledgebooks/delete-bills`;
 export const RENEW_LOAN_BILL = `${config.proxy_protocol}://${config.proxy_api_host}:${config.proxy_api_port}/${config.restApiRoot}/Pledgebooks/renew-loan-bill`;
+export const GET_PLEDGEBOOK_ANALYTICS_DATA = `${config.proxy_protocol}://${config.proxy_api_host}:${config.proxy_api_port}/${config.restApiRoot}/Pledgebooks/analytics-data`;
+export const GET_PLEDGEBOOK_ANALYTICS_BY_CUSTOMER = `${config.proxy_protocol}://${config.proxy_api_host}:${config.proxy_api_port}/${config.restApiRoot}/Pledgebooks/analytics-data/group-by-customer`;
 
 export const ADD_NEW_INTEREST_RATE = `${config.proxy_protocol}://${config.proxy_api_host}:${config.proxy_api_port}/${config.restApiRoot}/Interests/add-new-interest-rate`;
 export const GET_INTEREST_RATES = `${config.proxy_protocol}://${config.proxy_api_host}:${config.proxy_api_port}/${config.restApiRoot}/Interests/get-interest-rates`;

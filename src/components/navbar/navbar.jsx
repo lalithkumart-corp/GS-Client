@@ -87,6 +87,7 @@ class NavbarComp extends Component {
                                 <NavDropdown.Item as={Link} to="/pledgebook">Ledger Book</NavDropdown.Item>
                                 <NavDropdown.Divider />
                                 <NavDropdown.Item as={Link} to="/loan-settings">Setup</NavDropdown.Item>
+                                <NavDropdown.Item as={Link} to='/girvi-analytics'>Analytics</NavDropdown.Item>
                             </NavDropdown>
                             }
                         </Nav>
