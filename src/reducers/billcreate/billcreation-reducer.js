@@ -11,7 +11,8 @@ export default function billCreationReducer(state=defaultState, action) {
         case 'BILL_UPDATED_SUCCESSFULLY':
             newState = {
                 ...newState,
-                loading: false
+                loading: false,
+                refreshPledbookList: true,
             }
             break;
         case 'NEW_BILL_INSERTION_ERROR':

@@ -407,14 +407,18 @@ class Pledgebook extends Component {
             newState.pendingBillList = parseResponse(nextProps.pledgeBook.list);
             newState.loadingList = false;
             newState.totalCount = nextProps.pledgeBook.totalCount;
-            if(newState.currRowIndex)
-                newState.currentBillData = newState.pendingBillList[newState.currRowIndex];
-            console.log('--Triggered event');
+            if(newState.selectedRowBillId) {
+                let matchingBills = newState.pendingBillList.filter((obj) => obj.UniqueIdentifier == newState.selectedRowBillId);
+                if(matchingBills && matchingBills.length > 0) {
+                    newState.currentBillData = matchingBills[0];
+                    console.log(newState.currentBillData);
+                }
+            }
             this.setState(newState);
             this.myEvt.emit('fetchedPledgebookData', newState);
         } else {
             this.setState(newState);
-        }        
+        }
     }
 
     componentWillUpdate(newProps, newState, newContext) {
@@ -480,7 +484,7 @@ class Pledgebook extends Component {
     }
 
     handleClose(params) {
-        this.setState({PBmodalIsOpen: false, currentBillData: null, currRowIndex: null}, () => {
+        this.setState({PBmodalIsOpen: false, currentBillData: null, currRowIndex: null, selectedRowBillId: null}, () => {
             if(params && params.showPledgebookInitialPage) {
                 this.resetUserSelections(() => {
                     this.refresh();
@@ -585,7 +589,7 @@ class Pledgebook extends Component {
     cellClickCallbacks = {
         onBillNoClick(params, e) {
             e.stopPropagation();
-            this.setState({PBmodalIsOpen: true, currentBillData: params.row, currRowIndex: params.rowIndex});
+            this.setState({PBmodalIsOpen: true, currentBillData: params.row, currRowIndex: params.rowIndex, selectedRowBillId: params.row.UniqueIdentifier});
         }
     }        
 
@@ -734,7 +738,6 @@ class Pledgebook extends Component {
 
     onClickAlertIcon(e, row) {
         let newState = {...this.state};
-        console.log(row.UniqueIdentifier);
         let id = row.UniqueIdentifier;
         if(newState.alertPopups[id]) {
             newState.alertPopups[id].isOpen = !newState.alertPopups[id].isOpen;
@@ -1062,9 +1065,9 @@ class Pledgebook extends Component {
                         }
                     </Col>
                     <Col xs={{span: 1, offset: 2}}>
-                        <span onClick={(e) => this.onClickAlertIcon(e, row)}>
+                        <span >
                             <Popover
-                                containerClassName="alert-popever"
+                                containerClassName="pledgebook-alert-popever"
                                 padding={0}
                                 isOpen={isPopoverVisible}
                                 position={'left'} // preferred position
@@ -1082,7 +1085,7 @@ class Pledgebook extends Component {
                                     )
                                 }}
                                 >
-                                <span className="alert-icon">
+                                <span className="pledgebook-alert-icon" onClick={(e) => this.onClickAlertIcon(e, row)}>
                                     {row.alertId && <MdNotifications/>}
                                     {!row.alertId && <MdNotificationsNone/>}
                                 </span>
@@ -1382,7 +1385,7 @@ class Pledgebook extends Component {
 
 const mapStateToProps = (state) => { 
     return {
-        pledgeBook: state.pledgeBook        
+        pledgeBook: state.pledgeBook
     };
 };
 

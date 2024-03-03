@@ -47,15 +47,16 @@ class PledgebookModal extends Component {
 
     componentDidMount() {
         this.props.enableReadOnlyMode();
-        this.constructLoanOverviewData();
+        this.state.loanOverviewData = this.constructLoanOverviewData();
         this.fetchPaymentsListByBill();
     }
 
     componentDidUpdate(prevProps) {
-        // if(prevProps.BillNo !== this.props.currentBillData.BillNo) {
-        //     this.constructLoanOverviewData();
-        //     this.fetchPaymentsListByBill();
-        // }
+        if(this.props.currentBillData && 
+            (prevProps.currentBillData.BillNo !== this.props.currentBillData.BillNo
+                || prevProps.currentBillData.Amount !== this.props.currentBillData.Amount)) {
+            this.setState({ loanOverviewData: this.constructLoanOverviewData() });
+        }
     }
 
     async fetchPaymentsListByBill() {
@@ -83,7 +84,7 @@ class PledgebookModal extends Component {
             currentDate: moment().format('DD/MM/YYYY'),
             interestPct: this.props.currentBillData.IntPercent || 1,
         };
-        this.state.loanOverviewData = loanOverviewData;
+        return loanOverviewData;
     }
 
     getPrintModel() {
@@ -356,7 +357,7 @@ class PledgebookModal extends Component {
                         <RedeemPreview currentBillData={this.props.currentBillData} />
                     }
 
-                    <BillCreation loadedInPledgebook={true} billData={this.props.currentBillData}/>
+                    <BillCreation loadedInPledgebook={true} billData={this.props.currentBillData} onUpdateCallback={this.props.refresh} />
 
                     <ReactToPrint
                         ref={(domElm) => {this.printBtn = domElm}}

@@ -90,10 +90,12 @@ class CustomerPortal extends Component {
     }*/
 
     async initiateFetchPledgebookAPI(cb) {
-        let customers = await this._fetchCustomers();     
-        await this.setState({customerList: customers.list, customersCount: customers.count, rawCustomerList: customers.list});
-        if(cb)
-            cb();
+        let customers = await this._fetchCustomers();
+        this.setState({customerList: customers.list, customersCount: customers.count, rawCustomerList: customers.list}, () => {
+            if(cb)
+                cb();
+            }
+        );
     }
 
     async _fetchCustomers() {
@@ -155,7 +157,7 @@ class CustomerPortal extends Component {
             } else
                 aCust.isSelected = false;
         });
-        this.fetchCustomerHistory(customerId);        
+        this.fetchCustomerHistory(customerId);
         this.setState({selectedCust: selectedCust, customerList: custList, billHistory: null, billHistoryLoading: true});
     }
 
@@ -171,7 +173,7 @@ class CustomerPortal extends Component {
             this.setState({billHistory: response.data.RESPONSE, billHistoryLoading: false});
         } catch(e) {
             alert(e);
-            console.log(e);            
+            console.log(e);
         }        
     }
 

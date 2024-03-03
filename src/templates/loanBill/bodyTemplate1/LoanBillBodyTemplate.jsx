@@ -112,6 +112,12 @@ export default class LoanBillBodyTemplate extends Component {
         if(!canDisplayImgDiv)
             colSpanVal = 12;
 
+        const addrStyles = {maxHeight: "110px", minHeight: "110px"};
+        let nameStrLen = this.state.billContent.cname?.length + this.state.billContent.gaurdianName?.length;    
+        if(nameStrLen > 25) {
+            addrStyles.minHeight = '90px';
+            addrStyles.maxHeight = '90px';
+        }
         return (
             <Row>
                 <Col xs={{span: colSpanVal}} md={{span: colSpanVal}} className={`cust-info-col`}>
@@ -134,7 +140,7 @@ export default class LoanBillBodyTemplate extends Component {
                             <Col xs={2} md={2}>
                                 <span className={`field-names font17`}>ADDRESS:</span>
                             </Col>
-                            <Col xs={10} md={10} className="addr-field" style={{maxHeight: "110px", minHeight: "110px"}}>
+                            <Col xs={10} md={10} className="addr-field" style={addrStyles}>
                                 <div>{this.state.billContent.address}</div>
                                 {this.state.billContent.place}, 
                                 &nbsp; {this.state.billContent.city}-{this.state.billContent.pinCode}

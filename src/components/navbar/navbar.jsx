@@ -54,6 +54,11 @@ class NavbarComp extends Component {
             title += ` ${session.username}`;
         return title;
     }
+    getExpiryStr() {
+        if(this.props.auth.daysToExpire && this.props.auth.daysToExpire < 15) {
+            return `Software License will Expire in ${this.props.auth.daysToExpire} days`
+        }
+    }
     onClickSideTrigger() {
         this.props.openSideBar();
     }
@@ -140,6 +145,9 @@ class NavbarComp extends Component {
                                 <NavDropdown.Item as={Link} to="/tools">Tools</NavDropdown.Item>
                                 <NavDropdown.Item as={Link} to="/settings">Settings</NavDropdown.Item>
                             </NavDropdown>
+                        </Nav>
+                        <Nav>
+                            <span style={{color: 'red'}}> {this.getExpiryStr()} &nbsp; &nbsp; &nbsp;</span> 
                         </Nav>
                         <Nav>
                             <span style={{lineHeight: '31px'}}>Status :  {this.props.common.isServerStable?

@@ -110,7 +110,7 @@
 	thead {
 		background-color: #f5f5f5;
 	}
-	.alert-icon {
+	.pledgebook-alert-icon {
 		font-size: 20px;
 		margin-right: 10px;
 		cursor: pointer;
@@ -315,7 +315,7 @@
 .alert-panel.read-mode {
 	
 }
-.alert-popever {
+.pledgebook-alert-popever {
 	@include popover-base-style;
 	overflow: visible !important;
 	.gs-input {

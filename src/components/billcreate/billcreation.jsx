@@ -21,7 +21,7 @@ import { Collapse } from 'react-collapse';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import sh from 'shorthash';
 import EditDetailsDialog from './editDetailsDialog';
-import { insertNewBill, updateBill, updateClearEntriesFlag, showEditDetailModal, hideEditDetailModal, getBillNoFromDB, disableReadOnlyMode, updateBillNoInStore } from '../../actions/billCreation';
+import { insertNewBill, updateBill, updateClearEntriesFlag, showEditDetailModal, hideEditDetailModal, getBillNoFromDB, disableReadOnlyMode, updateBillNoInStore, updateBillNew } from '../../actions/billCreation';
 import { DoublyLinkedList } from '../../utilities/doublyLinkedList';
 import { getGaurdianNameList, getAddressList, getPlaceList, getCityList, getPincodeList, getMobileList, buildRequestParams, buildRequestParamsForUpdate, updateBillNumber, resetState, defaultPictureState, defaultOrnPictureState, validateFormValues, fetchCustomerMetaData, fetchOrnList } from './helper';
 // import { getAccessToken } from '../../core/storage';
@@ -1324,13 +1324,21 @@ class BillCreation extends Component {
         return flag;
     }
 
-    handleUpdate() {
+    async handleUpdate() {
         let requestParams = buildRequestParamsForUpdate(this.state);        
         let validation = validateFormValues(requestParams);
         if(validation.errors.length)
             toast.error(`${validation.errors.join(' , ')} `);        
-        else
-            this.props.updateBill(requestParams);
+        else {
+            // this.props.updateBill(requestParams);
+            try {
+                await updateBillNew(requestParams);
+                if(this.props.loadedInPledgebook && this.props.onUpdateCallback)
+                    this.props.onUpdateCallback();
+            } catch(e) {
+                console.log('SOme error in updting the bil, so not refreshing');
+            }
+        }
     }
 
     onEditDetailIconClick(index) {
@@ -1975,7 +1983,7 @@ class BillCreation extends Component {
                                     >
                                     <Form.Label>
                                         Date
-                                        &nbsp; (<span onClick={(e) => this.onClickDateLiveLabel(e)}> <span style={dateLiveLabelStyles}></span> Live </span>)
+                                        &nbsp; (<span onClick={(e) => this.onClickDateLiveLabel(e)} className={this.state.formData.date.isLive?'live':'offline'}> <span style={dateLiveLabelStyles}></span> Live </span>)
                                     </Form.Label>
                                     <DatePicker
                                         popperClassName="billcreation-datepicker" 

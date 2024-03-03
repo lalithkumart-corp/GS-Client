@@ -56,6 +56,45 @@ export const insertNewBill = (requestParams) => {
     }
 }
 
+export const updateBillNew = (requestParams) => {
+    return new Promise((resolve, reject) => {
+        let accessToken = getAccessToken();
+        axiosMiddleware.post(PLEDGEBOOK_UPDATE_RECORD, {accessToken, requestParams})
+            .then(
+                (resp) => {
+                    if(resp.data.STATUS == 'ERROR') {
+                        let errorText;
+                        if(typeof resp.data.ERROR == 'string')
+                            errorText = resp.data.ERROR;
+                        else if(typeof resp.data.MSG == 'string')
+                            errorText = resp.data.MSG;
+                        else
+                            errorText = 'UNKNOWN';
+                        toast.error('Error in Updating the bill in pledgebook - ' + errorText);
+                        return reject(resp.data);
+                    } else {
+                        toast.success('Updated the bill successfully'); //TODO: Hide this msg automatically after some timeout
+                        return resolve(resp.data);
+                    }
+                },
+                (errResp) => {
+                    if(!errResp._IsDeterminedError)
+                        toast.error('Error response returned while updating the bill.');
+                    console.log(errResp);
+                    return resolve(resp.data);
+                }
+            )
+            .catch(
+                (exception) => {
+                    console.log(exception);
+                    return resolve(resp.data);
+                }
+            )
+    });
+}
+
+
+
 export const updateBill = (requestParams) => {
     return (dispatch) => {
         dispatch({
@@ -82,7 +121,7 @@ export const updateBill = (requestParams) => {
                         toast.success('Updated the bill successfully'); //TODO: Hide this msg automatically after some timeout
                         dispatch({
                             type: 'BILL_UPDATED_SUCCESSFULLY'
-                        });                        
+                        });
                     }
                     console.log(resp.data);
                 },

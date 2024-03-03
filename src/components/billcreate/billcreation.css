@@ -418,3 +418,11 @@
     padding: 0;
     height: auto;
 }
+
+.date-picker-container.bill-creation .live {
+    color: red;
+}
+
+.date-picker-container.bill-creation .offline {
+    color: lightgray;
+}

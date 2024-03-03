@@ -182,11 +182,11 @@ const GirviAnalytics = () => {
             )
         });
         return <div className="customer-wise-table">
-                <Row>
+                <Row style={{paddingBottom: '15px'}}>
                     <Col xs={2} md={2}>
                         <Form.Group>
                             <Form.Label>Sort By</Form.Label>
-                            <Form.Select aria-label="Default select example" value={topCustomerMetric}
+                            <Form.Select className="gs-select-compact" value={topCustomerMetric}
                                 onChange={(e) => onChangeCustListSortBy(e.target.value)}>
                                 <option key='billCount' value={'billCount'} selected={topCustomerMetric.toLowerCase()=='billCount'}>Bills Count</option>
                                 <option key='interestCollectedAmt' value={'interestCollectedAmt'} selected={topCustomerMetric.toLowerCase()=='interestCollectedAmt'}>Interest Collected Amount</option>
@@ -219,7 +219,7 @@ const GirviAnalytics = () => {
 
     return (
         <Container className="loan-analytics">
-            <Row>
+            <Row style={{paddingBottom: '15px'}}>
                 <Col xs={2} md={2}>
                     <DateRangePicker 
                         className = 'analytics-date-filter'
@@ -232,7 +232,7 @@ const GirviAnalytics = () => {
                 <Col xs={1}>
                     <Form.Group>
                         <Form.Label>Bill Status</Form.Label>
-                        <Form.Select aria-label="Default select example" value={selectedBillStatusDpn}
+                        <Form.Select className="gs-select-compact" value={selectedBillStatusDpn}
                             onChange={(e) => onChangeBillStatusDpd(e.target.value)}>
                             <option key='all' value={'all'} selected={selectedBillStatusDpn=='all'}>All</option>
                             <option key='pending' value={'pending'} selected={selectedBillStatusDpn=='pending'}>Pending</option>
@@ -244,12 +244,13 @@ const GirviAnalytics = () => {
             <Row>
                 <Col xs={4} md={4}>
                     {parsedAnalyticsData && 
-                    <>
-                        <Row>
+                    <div className="gs-card">
+                        <div className="gs-card-content">
+                        <Row style={{paddingBottom: '15px'}}>
                             <Col xs={4} md={4}>
                                 <Form.Group>
                                     <Form.Label>Time Frame</Form.Label>
-                                    <Form.Select aria-label="Default select example" value={groupBy}
+                                    <Form.Select className="gs-select-compact" value={groupBy}
                                         onChange={(e) => onChangeTimeFactor(e.target.value)}>
                                         <option key='date' value={'date'} selected={groupBy.toLowerCase()=='date'}>Day</option>
                                         <option key='year' value={'year'} selected={groupBy.toLowerCase()=='year'}>Yearly</option>
@@ -260,10 +261,15 @@ const GirviAnalytics = () => {
                         </Row>
                         
                         <MyBarChart data={parsedAnalyticsData.billsCount} selectedBillStatusDpn={selectedBillStatusDpn}/>
-                    </>}
+                        </div>
+                    </div>}
                 </Col>
                 <Col xs={8} md={8}>
-                    {constructCustomerWiseDom()}
+                    <div className="gs-card">
+                        <div className="gs-card-content">
+                            {constructCustomerWiseDom()}
+                        </div>
+                    </div>
                 </Col>
             </Row>
         </Container>

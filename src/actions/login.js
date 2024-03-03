@@ -112,26 +112,31 @@ export const logout = (accessToken) => {
 export const isAccountActive = () => {
     return async (dispatch) => {
         let isActive = false;
+        let daysToExpire = 0;
         try {
             let accessToken = getAccessToken();
             if(!accessToken)
                 return;
             let resp = await axiosMiddleware.get(`${GET_APP_STATUS}?access_token=${accessToken}`);
-            if(resp && resp.data && resp.data.isActive)
-                isActive = true;
+            if(resp && resp.data) {
+                if(resp.data.isActive)
+                    isActive = true;
+                if(typeof resp.data.daysToExpire !== 'undefined')
+                    daysToExpire = resp.data.daysToExpire;
+            }
             else if(resp && resp.data && resp.data.STATUS == 'ERROR') {
                 let msg = resp.data.MSG || 'SESSION EXPIRED / Do Logout+Login Again';
                 toast.error(msg);
             }
             dispatch({
-                type: 'APPLICATION_FLAG',
-                data: isActive
+                type: 'APPLICATION_DATA',
+                data: {isActive, daysToExpire}
             });
         } catch (e) {
             console.log(e);
             dispatch({
-                type: 'APPLICATION_FLAG',
-                data: isActive
+                type: 'APPLICATION_DATA',
+                data: {isActive, daysToExpire}
             });
         }
     }
