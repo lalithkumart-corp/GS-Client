@@ -81,7 +81,7 @@ export const buildRequestParams = (thatState = {}) => {
         amount: state.formData.amount.inputVal || 0,
         presentValue: thatState.formData.presentValue.inputVal || 0,
         cname: state.selectedCustomer.name || state.formData.cname.inputVal,
-        gaurdianRelationship: state.selectedCustomer.gaurdianRelationship || state.formData.gaurdianRelationship.inputVal,
+        guardianRelation: state.selectedCustomer.guardianRelation || state.formData.guardianRelation.inputVal,
         gaurdianName: state.selectedCustomer.gaurdianName || state.formData.gaurdianName.inputVal,
         address: state.selectedCustomer.address || state.formData.address.inputVal,
         place: !isNull(state.selectedCustomer.place)?(state.selectedCustomer.place):(state.formData.place.inputVal),
@@ -100,7 +100,10 @@ export const buildRequestParams = (thatState = {}) => {
         otherCharges: thatState.formData.interest.other,
         landedCost: thatState.formData.amount.landedCost,
         paymentMode: thatState.formData.payment.mode,
-        paymentDetails: state.formData.payment
+        paymentDetails: state.formData.payment,
+        pledgedForCustomerId: !isNull(state.formData.moreDetails.pledgedFor.customerObj)?state.formData.moreDetails.pledgedFor.customerObj.customerId:null,
+        secJewelRedeemerCustomerId: !isNull(state.formData.moreDetails.secJewelRedeemer.customerObj)?state.formData.moreDetails.secJewelRedeemer.customerObj.customerId:null
+
     };
     return params;
 }
@@ -122,7 +125,7 @@ export const buildRequestParamsForUpdate = (thatState = {}) => {
         amount: state.formData.amount.inputVal || 0,
         presentValue: state.formData.presentValue.inputVal || 0,
         cname: state.selectedCustomer.name || state.formData.cname.inputVal,
-        gaurdianRelationship: state.selectedCustomer.gaurdianRelationship || state.formData.gaurdianRelationship.inputVal,
+        guardianRelation: state.selectedCustomer.guardianRelation || state.formData.guardianRelation.inputVal,
         gaurdianName: state.selectedCustomer.gaurdianName || state.formData.gaurdianName.inputVal,
         address: state.selectedCustomer.address || state.formData.address.inputVal,
         place: !isNull(state.selectedCustomer.place)?(state.selectedCustomer.place):(state.formData.place.inputVal),
@@ -141,7 +144,9 @@ export const buildRequestParamsForUpdate = (thatState = {}) => {
         ornPicture: getOrnPicData(thatState),
         paymentMode: state.formData.payment.mode,
         paymentDetails: state.formData.payment,
-        uniqueIdentifier: state.uniqueIdentifier
+        uniqueIdentifier: state.uniqueIdentifier,
+        pledgedForCustomerId: !isNull(state.formData.moreDetails.pledgedFor.customerObj)?state.formData.moreDetails.pledgedFor.customerObj.customerId:null,
+        secJewelRedeemerCustomerId: !isNull(state.formData.moreDetails.secJewelRedeemer.customerObj)?state.formData.moreDetails.secJewelRedeemer.customerObj.customerId:null
     };
     return params;
 }
@@ -300,7 +305,11 @@ export const resetState = (nextProps, newState) => {
             anItem.totalWeight = 0.00;
         } else if(index == 'moreDetails') {
             anItem.currCustomerInputKey = anItem.currCustomerInputField = anItem.currCustomerInputVal = anItem.billRemarks = '';                
-            anItem.customerInfo = [];            
+            anItem.customerInfo = [];    
+            anItem.pledgedFor = {
+                inputVal: 'self',
+                customerObj: null
+            }
         } else if(index == 'interest') {
             anItem.percent = 0;
             anItem.value = 0;
@@ -388,11 +397,15 @@ export const fetchCustomerMetaData = () => {
     });
 }
 
-export const fetchCustomersList = () => {
+export const fetchCustomersList = (optionalFilters) => {
     return new Promise(async (resolve, reject) => {
         try {
             let at =  getAccessToken();
-            let resp = await axiosMiddleware.get(`${FETCH_CUSTOMERS_BASIC_LIST}?access_token=${at}&onlyIsActive=true`);
+            let params = {onlyIsActive: true};
+            if(optionalFilters && optionalFilters.customerIdArr) {
+                params.customerIdArr = optionalFilters.customerIdArr;
+            }
+            let resp = await axiosMiddleware.get(`${FETCH_CUSTOMERS_BASIC_LIST}?access_token=${at}&params=${JSON.stringify(params)}`);
             if(resp && resp.data && resp.data.RESP) {
                 let returnObj = {};
                 returnObj.cnameList = resp.data.RESP.list;

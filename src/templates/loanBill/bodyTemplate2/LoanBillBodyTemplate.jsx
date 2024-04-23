@@ -82,7 +82,7 @@ export default class LoanBillBodyTemplate extends Component {
                                 <p className="cust-name-section font19">
                                     <span style={{textTransform: "uppercase"}}>{this.state.billContent.cname}</span>
                                     &nbsp; 
-                                    <span className="font12">c/o</span> 
+                                    <span className="font12">{this.state.billContent.guardianRelation || 'c/o'}</span> 
                                     &nbsp; 
                                     <span style={{textTransform: "uppercase"}}>{this.state.billContent.gaurdianName}</span>
                                 </p>

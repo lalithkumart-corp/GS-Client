@@ -23,7 +23,7 @@ import sh from 'shorthash';
 import EditDetailsDialog from './editDetailsDialog';
 import { insertNewBill, updateBill, updateClearEntriesFlag, showEditDetailModal, hideEditDetailModal, getBillNoFromDB, disableReadOnlyMode, updateBillNoInStore, updateBillNew } from '../../actions/billCreation';
 import { DoublyLinkedList } from '../../utilities/doublyLinkedList';
-import { getGaurdianNameList, getAddressList, getPlaceList, getCityList, getPincodeList, getMobileList, buildRequestParams, buildRequestParamsForUpdate, updateBillNumber, resetState, defaultPictureState, defaultOrnPictureState, validateFormValues, fetchCustomerMetaData, fetchOrnList } from './helper';
+import { getGaurdianNameList, getAddressList, getPlaceList, getCityList, getPincodeList, getMobileList, buildRequestParams, buildRequestParamsForUpdate, updateBillNumber, resetState, defaultPictureState, defaultOrnPictureState, validateFormValues, fetchCustomerMetaData, fetchOrnList, fetchCustomersList } from './helper';
 // import { getAccessToken } from '../../core/storage';
 import { getDateInUTC, currencyFormatter, getInterestRate, convertToLocalTime, convertDateObjToStr, addDays } from '../../utilities/utility';
 import { getRateOfInterest } from '../redeem/helper';
@@ -41,6 +41,7 @@ import { getLoanDate, getLoanDateBehaviour, setLoanDate, setLoanDateBehaviour } 
 import { fetchMyAccountsList, fetchAllBanksList } from '../../utilities/apiUtils';
 import { format } from 'currency-formatter';
 import { PAYMENT_MODE, LOAN_BILL_EXPIRY_DAYS } from '../../constants';
+import CustomerPickerInput from '../customerPanel/CustomerPickerInput';
 
 const ENTER_KEY = 13;
 const SPACE_KEY = 32;
@@ -132,8 +133,9 @@ class BillCreation extends Component {
                     list: ['Loading...'],
                     limitedList: ['Loading...']
                 },
-                gaurdianRelationship: {
+                guardianRelation: {
                     inputVal: 'c/o',
+                    hasError: false,
                 },
                 gaurdianName: {
                     inputVal: '',
@@ -198,7 +200,14 @@ class BillCreation extends Component {
                     customerInfo: [],                    
                     billRemarks: '',
                     list: [], //['Aadhar card', 'Pan Card', 'License Number', 'SBI Bank Account Number', 'Email'],
-                    limitedList: []
+                    limitedList: [],
+                    pledgedFor: {
+                        inputVal: 'self',
+                        customerObj: null,
+                    },
+                    secJewelRedeemer: {
+                        customerObj: null,
+                    }
                 },
                 selectedCustomer: {},
                 paymentMode: 'cash',
@@ -239,18 +248,15 @@ class BillCreation extends Component {
             this.updateDomList('disableMoreDetailsInputElmns');
             this.domElmns["amount"].focus();
         } else {
-            this.updateFieldValuesInState(this.props.billData);
-            this.updateDomList('enableUpdateBtn');
-            this.updateDomList('resetOrnTableRows', this.state);
-            this.updateDomList('ornInputFields');
+            this.preWork();
         }
-        this.fetchAccountDroddownList()
+        this.fetchAccountDroddownList();
         this.setInterestRates();
     }
 
     componentWillReceiveProps(nextProps) {
         let newState = {...this.state};
-        if(!this.props.loadedInPledgebook) {            
+        if(!this.props.loadedInPledgebook) {
             newState = updateBillNumber(nextProps, newState);
         }
         if(nextProps.billCreation.clearEntries) {
@@ -267,7 +273,31 @@ class BillCreation extends Component {
         }
         this.setState(newState);
     }
+
+    async preWork() {
+        let custObjs = await this.fetchCustomerObj();
+        this.updateFieldValuesInState(this.props.billData, custObjs);
+        this.updateDomList('enableUpdateBtn');
+        this.updateDomList('resetOrnTableRows', this.state);
+        this.updateDomList('ornInputFields');
+    }
     /* END: Lifecycle methods */
+
+    async fetchCustomerObj() {
+        let customerIdArr = [];
+        if(this.props.billData.PledgedFor) customerIdArr.push(this.props.billData.PledgedFor);
+        if(this.props.billData.SecJewelRedemeer) customerIdArr.push(this.props.billData.SecJewelRedemeer);
+        let obj = await fetchCustomersList({customerIdArr});
+        let pledgedForCustObj = null;
+        let secJewelRedeemerObj = null;
+        if(this.props.billData.PledgedFor) {
+            pledgedForCustObj = obj.cnameList.filter((obj) => obj.customerId)[0];
+        }
+        if(this.props.billData.SecJewelRedemeer) {
+            secJewelRedeemerObj = obj.cnameList.filter((obj) => obj.customerId)[0];
+        }
+        return {pledgedForCustObj, secJewelRedeemerObj};
+    }
 
     populateFromLocalStorage(state) {
         try {
@@ -351,6 +381,11 @@ class BillCreation extends Component {
         this.handleCustomerEditModalClose = this.handleCustomerEditModalClose.bind(this);
         this.afterUpdateCustomerDetail = this.afterUpdateCustomerDetail.bind(this);
         this.onChangePaymentMode = this.onChangePaymentMode.bind(this);
+        this.onPledgeForInputChange = this.onPledgeForInputChange.bind(this);
+        this.onSelectOnBehalfCustomer = this.onSelectOnBehalfCustomer.bind(this);
+        this.onSelectSecJewelRedeemer = this.onSelectSecJewelRedeemer.bind(this);
+        this.clearPledgeForCustomer = this.clearPledgeForCustomer.bind(this);
+        this.clearSelectedJewelRedeemCustomer = this.clearSelectedJewelRedeemCustomer.bind(this);
     }
 
     /*async uploadImage(e) {
@@ -496,7 +531,7 @@ class BillCreation extends Component {
                     newState.formData.city.list = resp.cityList;
                     newState.formData.pincode.list = resp.pincodeList;
                     newState.formData.mobile.list = resp.mobileList;
-                    newState.formData.moreDetails.list = resp.moreDetailsList;
+                    newState.formData.moreDetails.list = [{key: 'select', value:'Select...'}, ...resp.moreDetailsList];
                     this.setState(newState);
                 }
             }
@@ -510,7 +545,7 @@ class BillCreation extends Component {
         newState.formData.city.inputVal = this.getDefaultFromStore('city') || '';
         newState.formData.pincode.inputVal = this.getDefaultFromStore('pincode') || '';
     }
-    updateFieldValuesInState(data) {
+    updateFieldValuesInState(data, customerObjs) {
         let newState = {...this.state};
         newState.formData.date.inputVal = new Date(data.Date);//convertToLocalTime(data.Date);
         newState.formData.date._inputVal = data.Date; //getDateInUTC(data.Date, {withSelectedTime: true});
@@ -594,7 +629,11 @@ class BillCreation extends Component {
             }
         }
         newState.formData.expiryDayLimit = this.getDateDiff(data.Date, data.ExpiryDate);
+        newState.formData.moreDetails.pledgedFor.customerObj = customerObjs.pledgedForCustObj;
+        newState.formData.moreDetails.pledgedFor.inputVal = customerObjs.pledgedForCustObj?'onbehalf':'self';
+        newState.formData.moreDetails.secJewelRedeemer.customerObj = customerObjs.secJewelRedeemerObj;
         this.setState(newState);
+        console.log('Updated state from props');
     }
     getDateDiff(date1, date2) {
         let defaultReturnVal = 0;
@@ -737,7 +776,7 @@ class BillCreation extends Component {
         return nextNode;
     }
 
-    getPrevElm(currElmKey) {        
+    getPrevElm(currElmKey) {
         let currNode = domList.findNode(currElmKey);
         let prevNode = currNode.prev;
         if(prevNode && !prevNode.enabled)
@@ -753,7 +792,7 @@ class BillCreation extends Component {
             returnVal = this.state.formData[identifier].inputVal;
         
         if(!this.state.formData[identifier].hasTextUpdated && this.state.selectedCustomer) {
-            
+            // console.log(`${identifier}: SelctedCUstomer = present, val = ${this.state.selectedCustomer[identifier]} or returnVal=${returnVal}`);
             if(identifier == 'cname') identifier = 'name';
             if(identifier == 'moreDetails') identifier = 'otherDetails';
 
@@ -764,6 +803,8 @@ class BillCreation extends Component {
             } catch(e) {
                 console.log(e);
             }            
+        } else {
+            // console.log(`${identifier}: SelctedCUstomer = NULL`);
         }
         return returnVal;
 
@@ -844,7 +885,7 @@ class BillCreation extends Component {
                 theDom = (
                     <div className="customer-list-item" id={suggestion.hashKey + 'parent'} style={{display: 'flex'}}>
                         <div style={{width: '70%', display: 'inline-block'}}>
-                            <div id={suggestion.hashKey+ '1'}><span className='customer-list-item-maindetail'>{suggestion.name}  <span  className='customer-list-item-maindetail' style={{"fontSize":"8px"}}>&nbsp;c/of &nbsp;&nbsp;</span> {suggestion.gaurdianName}</span></div>
+                            <div id={suggestion.hashKey+ '1'}><span className='customer-list-item-maindetail'>{suggestion.name}  <span  className='customer-list-item-maindetail' style={{"fontSize":"8px"}}>&nbsp;{suggestion.guardianRelation} &nbsp;&nbsp;</span> {suggestion.gaurdianName}</span></div>
                             <div id={suggestion.hashKey+ '2'}><span className='customer-list-item-subdetail'>{suggestion.address}</span></div>
                             <div id={suggestion.hashKey+ '3'}><span className='customer-list-item-subdetail'>{suggestion.place}, {suggestion.city} - {suggestion.pincode} {getMobileNo(suggestion)} </span></div>
                         </div>
@@ -1204,7 +1245,7 @@ class BillCreation extends Component {
                 else if(!this.isExistingCustomer())
                     this.updateDomList('enableMoreDetailsInputElmns');
                 await this.toggleMoreInputs();
-                this.transferFocus(e, options.currElmKey);
+                // this.transferFocus(e, options.currElmKey);
             } else if(options.currElmKey == 'interestCollapsibleBody') {
                 this.toggleInterestDom();
             } else if(options.currElmKey == 'paymentCollapsibleDiv') {
@@ -1661,6 +1702,47 @@ class BillCreation extends Component {
         this.setState(newState);
     }
 
+    onRelationIdChange(e) {
+        let val = e.target.value;
+        let newState = {...this.state};
+        newState.formData.guardianRelation.inputVal = val;
+        this.setState(newState);
+    }
+
+    onPledgeForInputChange(e) {
+        let newState = {...this.state};
+        newState.formData.moreDetails.pledgedFor.inputVal = e.target.value;
+        newState.formData.moreDetails.pledgedFor.customerObj = null;
+        this.setState(newState);
+    }
+
+    onSelectOnBehalfCustomer(custObj) {
+        let newState = {...this.state};
+        newState.formData.moreDetails.pledgedFor.customerObj = custObj;
+        this.setState(newState);
+    }
+
+    clearPledgeForCustomer() {
+        let newState = {...this.state};
+        newState.formData.moreDetails.pledgedFor.customerObj = null;
+        this.setState(newState);
+    }
+
+    onSelectSecJewelRedeemer(custObj) {
+        let newState = {...this.state};
+        newState.formData.moreDetails.secJewelRedeemer.customerObj = custObj;
+        this.setState(newState);
+    }
+
+    onDropdownChange(e, identifier) {
+        this.autuSuggestionControls.onChange(e.target.value, identifier);
+    }
+
+    clearSelectedJewelRedeemCustomer() {
+        let newState = {...this.state};
+        newState.formData.moreDetails.secJewelRedeemer.customerObj = null;
+        this.setState(newState);
+    }
     /* END: Action/Event listeners */    
 
 
@@ -1813,9 +1895,16 @@ class BillCreation extends Component {
         let getCustomerInforAdderDom = () => {
             return (                
                 <Row>
-                    <Col xs={12} className='font-weight-bold' style={{marginBottom: '5px'}}>Customer Information</Col>                    
+                    {/* <Col xs={12} className='font-weight-bold' style={{marginBottom: '5px'}}>ID</Col>                     */}
                     <Col xs={6} md={6}>
-                        <ReactAutosuggest
+                        <Form.Group>
+                            <Form.Control as="select" onChange={(e) => this.onDropdownChange(e, 'moreCustomerDetailsField')} value={this.state.formData.moreDetails.currCustomerInputField}>
+                                {this.state.formData.moreDetails.list.map((item) => {
+                                    return <option key={item.key} value={item.value}>{item.value}</option>
+                                })}
+                            </Form.Control>
+                        </Form.Group>
+                        {/* <ReactAutosuggest
                             suggestions={this.state.formData.moreDetails.limitedList}
                             onSuggestionsFetchRequested={({value}) => this.reactAutosuggestControls.onSuggestionsFetchRequested({value}, 'moreDetails')}
                             // onSuggestionsClearRequested={this.reactAutosuggestControls.onSuggestionsClearRequested}
@@ -1823,7 +1912,7 @@ class BillCreation extends Component {
                             renderSuggestion={(suggestion) => this.renderSuggestion(suggestion, 'moreCustomerDetailsField')}
                             onSuggestionSelected={(event, { suggestion, suggestionValue, suggestionIndex, sectionIndex, method}) => this.reactAutosuggestControls.onSuggestionSelected(event, { suggestion, suggestionValue, suggestionIndex, sectionIndex, method }, 'moreCustomerDetailsField')}
                             inputProps={{
-                                placeholder: '',
+                                placeholder: 'Enter ID',
                                 value: this.state.formData.moreDetails.currCustomerInputField,
                                 onChange: (e, {newValue, method}) => this.reactAutosuggestControls.onChange(e, {newValue, method}, 'moreCustomerDetailsField'),
                                 onKeyUp: (e) => this.reactAutosuggestControls.onKeyUp(e, {currElmKey: 'moreCustomerDetailField', isMoreDetailInputKey: true}),
@@ -1832,13 +1921,13 @@ class BillCreation extends Component {
                                 readOnly: this.props.billCreation.loading
                             }}
                             ref = {(domElm) => { this.domElmns.moreCustomerDetailField = domElm?domElm.input:domElm; }}
-                        />
+                        /> */}
                     </Col>
                     <Col xs={6} md={6}>
                         <Form.Group>
                             <Form.Control
                                 type="text"
-                                placeholder="Enter text"
+                                placeholder="Enter Value"
                                 onChange={(e) => this.inputControls.onChange(null, e.target.value, 'moreCustomerDetailsValue')} 
                                 onKeyUp={(e) => this.handleKeyUp(e, {currElmKey: 'moreCustomerDetailValue', isToAddMoreDetail: true, traverseDirection: 'backward'})} 
                                 value={this.state.formData.moreDetails.currCustomerInputVal}
@@ -1861,10 +1950,10 @@ class BillCreation extends Component {
                         for(let i=0; i<moreDetails.length; i++) {
                             rows.push(
                                 <Row className="customer-info-display-row" key={i}>
-                                    <Col xs={6} md={6}>
+                                    <Col xs={6} md={6} style={{paddingLeft: '10px'}}>
                                         {moreDetails[i]['field']}
                                     </Col>
-                                    <Col xs={5} md={5}>
+                                    <Col xs={5} md={5} style={{paddingLeft: '10px'}}>
                                         {moreDetails[i]['val']}
                                     </Col>
                                     { !this.isExistingCustomer() &&
@@ -1888,7 +1977,7 @@ class BillCreation extends Component {
                     <Col xs={12} md={12}>
                         <Form.Group>
                             <InputGroup>
-                                <InputGroup.Text>Bill Notes</InputGroup.Text>
+                                {/* <InputGroup.Text>Bill Notes</InputGroup.Text> */}
                                 <Form.Control as="textarea" 
                                     placeholder="Type here..." 
                                     value={this.state.formData.moreDetails.billRemarks} 
@@ -1899,6 +1988,89 @@ class BillCreation extends Component {
                         </Form.Group>
                     </Col>
                 </Row>
+            )
+        }
+
+        let getOnBehalfCustomerDetail = () => {
+            let cust =  this.state.formData.moreDetails.pledgedFor.customerObj;
+            if(cust) {
+                return <Row style={{margin: '14px 0 0 0'}}>
+                            <Col xs={5}>
+                                <p style={{fontWeight: 'bold', fontSize: '14px'}}>{cust.name} {cust.guardianRelation || 'c/o'} {cust.gaurdianName}</p>
+                                <p>{cust.address}</p>
+                                <p>{cust.place}</p>
+                                <p>{cust.city} - {cust.pinCode}</p>
+                                <p>{cust.mobile}</p>
+                            </Col>
+                            <Col xs={1}>
+                                <span className='close-icon gs-button rounded' onClick={this.clearPledgeForCustomer}><FontAwesomeIcon icon="times" /></span>
+                            </Col>
+                        </Row>
+            } else {
+                return <></>
+            }
+        }
+
+        let getJewelRedeemCustDetailDom = () => {
+            let cust =  this.state.formData.moreDetails.secJewelRedeemer.customerObj;
+            if(cust) {
+                return <Row style={{margin: '14px 0 0 0'}}>
+                            <Col xs={5}>
+                                <p style={{fontWeight: 'bold', fontSize: '14px'}}>{cust.name} {cust.guardianRelation || 'c/o'} {cust.gaurdianName}</p>
+                                <p>{cust.address}</p>
+                                <p>{cust.place}</p>
+                                <p>{cust.city} - {cust.pinCode}</p>
+                                <p>{cust.mobile}</p>
+                            </Col>
+                            <Col xs={1}>
+                                <span className='close-icon gs-button rounded' onClick={this.clearSelectedJewelRedeemCustomer}><FontAwesomeIcon icon="times" /></span>
+                            </Col>
+                        </Row>
+            } else {
+                return <></>
+            }
+        }
+
+        let pledgedForDom = () => {
+            return (
+                <>
+                    <Row>
+                        <Col xs={6} md={6}>
+                            <Form onChange={this.onPledgeForInputChange}>
+                                <Form.Group>
+                                    <Row>
+                                        <Col xs={6} md={6} style={{marginTop: '10px'}}>
+                                            <Form.Check className='gs-radio' id='pledged-for-self' type='radio' name='self' checked={this.state.formData.moreDetails.pledgedFor.inputVal=='self'} value='self' label='Self'/>
+                                        </Col>
+                                        <Col xs={6} md={6} style={{marginTop: '10px'}}>
+                                            <Form.Check className='gs-radio' id='pledged-on-behalf' type='radio' name='onbehalf' checked={this.state.formData.moreDetails.pledgedFor.inputVal=='onbehalf'} value='onbehalf' label='On Behalf Of'/>  
+                                        </Col>
+                                    </Row>
+                                </Form.Group>
+                            </Form>
+                        </Col>
+                        <Col xs={6} md={6}>
+                            <CustomerPickerInput onSelectCustomer={this.onSelectOnBehalfCustomer} hideLabel={true} 
+                                readOnlyMode={this.state.formData.moreDetails.pledgedFor.inputVal!=='onbehalf'}
+                                clearInputFieldOnSelect={true}/>
+                        </Col>
+                    </Row>
+                    {getOnBehalfCustomerDetail()}
+                </>
+            )
+        }
+
+        let secondaryJewelRedeemerDom = () => {
+            return (
+                <>
+                    <Row>
+                        <Col xs={6} md={6}>
+                            <CustomerPickerInput onSelectCustomer={this.onSelectSecJewelRedeemer} hideLabel={true}
+                            clearInputFieldOnSelect={true}/>
+                        </Col>
+                    </Row>
+                    {getJewelRedeemCustDetailDom()}
+                </>
             )
         }
 
@@ -1916,9 +2088,42 @@ class BillCreation extends Component {
                     <span className='horizontal-dashed-line'></span>
                 </div>
                 <Collapse isOpened={this.state.showMoreInputs}>
-                    {!this.isExistingCustomer() && getCustomerInforAdderDom()}
-                    {getCustomerInfoDisplayDom()}
-                    {getBillRemarksDom()}
+                    <Row>
+                        <Col xs={3} md={3} className='center-align-content'>
+                            Customer Information
+                        </Col>
+                        <Col xs={9} md={9}>
+                            {!this.isExistingCustomer() && getCustomerInforAdderDom()}
+                            {getCustomerInfoDisplayDom()}
+                        </Col>
+                    </Row>
+                    <Row>
+                        <div style={{width: '97%', margin: '7px auto', paddingTop: '7px', borderTop: '1px solid lightgrey'}}></div>
+                        <Col xs={3} md={3} className='center-align-content'>
+                            Bill Notes
+                        </Col>
+                        <Col>
+                            {getBillRemarksDom()}
+                        </Col>
+                    </Row>
+                    <Row>
+                        <div style={{width: '97%', margin: '7px auto', paddingTop: '7px', borderTop: '1px solid lightgrey'}}></div>
+                        <Col xs={3} md={3} className='center-align-content'>
+                            Pledged For
+                        </Col>
+                        <Col xs={9} md={9}>
+                            {pledgedForDom()}
+                        </Col>
+                    </Row>
+                    <Row>
+                        <div style={{width: '97%', margin: '7px auto', paddingTop: '7px', borderTop: '1px solid lightgrey'}}></div>
+                        <Col xs={3} md={3} className='center-align-content'>
+                            Secondary Jewel Redeemer
+                        </Col>
+                        <Col xs={9} md={9}>
+                            {secondaryJewelRedeemerDom()}
+                        </Col>
+                    </Row>
                 </Collapse>
             </Col>
         );
@@ -2050,7 +2255,7 @@ class BillCreation extends Component {
                         </Col>
                     </Row>
                     <Row className='second-row'>
-                        <Col xs={6} md={6} className="r-a-s-dropdown customer-name-field-container">
+                        <Col xs={5} md={5} className="r-a-s-dropdown customer-name-field-container">
                             <Form.Group
                                 validationState= {this.state.formData.cname.hasError ? "error" :null}
                                 >
@@ -2080,18 +2285,18 @@ class BillCreation extends Component {
                                 />
                             </Form.Group>
                         </Col>
-                        {/* <Col xs={2} md={2}>
+                        <Col xs={2} md={2}>
                             <Form.Group>
-                                <Form.Check id='billstatus-11' type='radio' name='billstatus' checked={this.state.formData.gaurdianRelationship.inputVal=='c/o'} value='all' label='All'/>
+                                <Form.Label>Relation</Form.Label>
+                                <Form.Control as="select" onChange={(e) => this.onRelationIdChange(e)} value={this.getInputValFromCustomSources('guardianRelation')}
+                                readOnly={(this.state.selectedCustomer && this.state.selectedCustomer.name)}>
+                                    <option key='son_of' value='s/o'>Son Of</option>
+                                    <option key='wife_of' value='w/o'>Wife Of</option>
+                                    <option key='care_of' value='c/o'>Care Of</option>
+                                </Form.Control>
                             </Form.Group>
-                            <Form.Group>
-                                <Form.Check id='billstatus-22' type='radio' name='billstatus' checked={this.state.formData.gaurdianRelationship.inputVal=='s/o'} value='pending' label='Pending'/>
-                            </Form.Group>
-                            <Form.Group>
-                                <Form.Check id='billstatus-33' type='radio' name='billstatus' checked={this.state.formData.gaurdianRelationship.inputVal=='/o'} value='closed' label='Closed'/>
-                            </Form.Group>
-                        </Col> */}
-                        <Col xs={6} md={6} className='r-a-s-dropdown'>
+                        </Col>
+                        <Col xs={5} md={5} className='r-a-s-dropdown'>
                             <Form.Group
                                 validationState= {this.state.formData.gaurdianName.hasError ? "error" :null}
                                 >

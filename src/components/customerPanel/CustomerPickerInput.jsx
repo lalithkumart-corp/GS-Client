@@ -17,7 +17,7 @@ function CustomerPickerInput(props) {
     }, []);
 
     let fetchList = async () => {
-        let res = await fetchCustomersList();
+        let res = await fetchCustomersList(); 
         if(res) {
             setList(res.cnameList);
         }
@@ -27,12 +27,22 @@ function CustomerPickerInput(props) {
     }
 
     let renderSuggestion = (suggestion) => {
+        const getMobileNo = (suggestion) => {
+            if(suggestion.mobile && suggestion.mobile !== "null")
+                return <span> , &nbsp; &nbsp; &nbsp; {suggestion.mobile} </span>;
+            return '';
+        }
         return (
-            <div className="customer-list-item" id={suggestion.hashKey + 'parent'}>
-                <div id={suggestion.hashKey+ '1'}><span className='customer-list-item-maindetail'>{suggestion.name}  <span  className='customer-list-item-maindetail' style={{"fontSize":"8px"}}>&nbsp;c/of &nbsp;&nbsp;</span> {suggestion.gaurdianName}</span></div>
+            <div className="customer-list-item" id={suggestion.hashKey + 'parent'} style={{display: 'flex'}}>
+            <div style={{width: '70%', display: 'inline-block'}}>
+                <div id={suggestion.hashKey+ '1'}><span className='customer-list-item-maindetail'>{suggestion.name}  <span  className='customer-list-item-maindetail' style={{"fontSize":"8px"}}>&nbsp;{suggestion.guardianRelation || 'c/o'} &nbsp;&nbsp;</span> {suggestion.gaurdianName}</span></div>
                 <div id={suggestion.hashKey+ '2'}><span className='customer-list-item-subdetail'>{suggestion.address}</span></div>
-                <div id={suggestion.hashKey+ '3'}><span className='customer-list-item-subdetail'>{suggestion.place}, {suggestion.city} - {suggestion.pincode}</span></div>
+                <div id={suggestion.hashKey+ '3'}><span className='customer-list-item-subdetail'>{suggestion.place}, {suggestion.city} - {suggestion.pincode} {getMobileNo(suggestion)} </span></div>
             </div>
+            <div style={{width: '30%', display: 'inline-block'}}>
+                <img src={suggestion.userImagePath} style={{height: '60px'}}/>
+            </div>
+        </div>
         )
     }
 
@@ -70,6 +80,8 @@ function CustomerPickerInput(props) {
     let onSuggestionSelected = (event, { suggestion, suggestionValue, suggestionIndex, sectionIndex, method }) => {
         setSelectedCustomer(suggestion);
         props.onSelectCustomer(suggestion);
+        if(props.clearInputFieldOnSelect)
+            setCname('');
     }
 
     let onChange = (e, {newValue, method}) => {
@@ -79,11 +91,11 @@ function CustomerPickerInput(props) {
     return (
         <div>
             <Row>
-                <Col xs={12} md={12}>
+                <Col xs={12} md={12} className={props.hideLabel?'react-autosuggest-without-label':''}>
                     <Form.Group
                         validationState= {cnameInputError ? "error" :null}
                         >
-                        <Form.Label>Customer Name </Form.Label>
+                        {props.hideLabel ? <></> : <Form.Label>Customer Name </Form.Label>}
                         <ReactAutosuggest
                             suggestions={limitedList}
                             onSuggestionsFetchRequested={({value}) => onSuggestionsFetchRequested({value})}
@@ -96,6 +108,7 @@ function CustomerPickerInput(props) {
                                 onChange: (e, {newValue, method}) => onChange(e, {newValue, method}),
                                 // onKeyUp: (e) => onKeyUp(e, {currElmKey: 'cname'}),
                                 readOnly: loading||props.readOnlyMode,
+                                disabled: props.readOnlyMode,
                                 autocomplete:"no"
                             }}
                         />

@@ -254,7 +254,8 @@ html {
   overflow-x: hidden;
   width: calc(100% - 25px);
 }
-.custom-autosuggest-wrapper .react-autosuggest__suggestions-container--open {
+.custom-autosuggest-wrapper .react-autosuggest__suggestions-container--open,
+.react-autosuggest-without-label .react-autosuggest__suggestions-container--open {
   top: 35px;
 }
 

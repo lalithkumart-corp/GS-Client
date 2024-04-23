@@ -215,7 +215,7 @@
     padding-right: 0;
 }
 .bill-remarks-adder-dom {
-    margin-top: 15px !important;
+    /* margin-top: 15px !important; */
 }
 
 .submit-container {
@@ -425,4 +425,10 @@
 
 .date-picker-container.bill-creation .offline {
     color: lightgray;
+}
+
+.center-align-content {
+    align-items: center;
+    justify-content: center;
+    display: flex;
 }

@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Container, Row, Col, FormGroup, FormLabel, FormControl, HelpBlock, InputGroup, Button, Glyphicon, Tabs, Tab } from 'react-bootstrap';
+import { Container, Row, Col, FormGroup, FormLabel, FormControl, HelpBlock, InputGroup, Button, Glyphicon, Tabs, Tab, Dropdown } from 'react-bootstrap';
 import { DoublyLinkedList } from '../../utilities/doublyLinkedList';
 import { defaultPictureState, getPicData } from '../billcreate/helper';
 import { SAVE_BASE64_IMAGE_AND_GET_ID, SAVE_BINARY_IMAGE_AND_GET_ID, DEL_IMAGE_BY_ID } from '../../core/sitemap';
@@ -17,7 +17,7 @@ import { Collapse } from 'react-collapse';
 import sh from 'shorthash';
 import DetailsEditDialog from '../billcreate/detailsEditDialog';
 import CommonModal from '../common-modal/commonModal.jsx';
-
+// import GsDropdown from '../gs-dropdown';
 const ENTER_KEY = 13;
 const SPACE_KEY = 32;
 
@@ -76,7 +76,7 @@ class GeneralInfo extends Component {
                     let newState = {...this.state};
                     let results = successResp.data;
                     results.otherDetails = results.otherDetails || [];
-                    newState.formData.moreDetails.list = results.otherDetails.map((anItem) => {return {key: anItem.key, value: anItem.displayText}});
+                    newState.formData.moreDetails.list = [{key: 'select', value:'Select...'}, ...results.otherDetails.map((anItem) => {return {key: anItem.key, value: anItem.displayText}})];
                     this.setState(newState);
                 },
                 (errResp) => {
@@ -123,7 +123,7 @@ class GeneralInfo extends Component {
         onChange: (val, identifier, options) => {
             let newState = {...this.state};
             if(identifier == 'moreDetails') {
-                let anObj = this.parseCustomerDetailsVal(val);                
+                let anObj = this.parseCustomerDetailsVal(val);
                 newState.formData.moreDetails.currCustomerInputField = anObj.value;
                 newState.formData.moreDetails.currCustomerInputKey = anObj.key;
             }
@@ -232,6 +232,10 @@ class GeneralInfo extends Component {
         }
     }
 
+    onDropdownChange = (e, identifier) => {
+        this.autuSuggestionControls.onChange(e.target.value, identifier);
+    }
+
     getMoreElmnsContainer() {
         let getCustomerInforAdderDom = () => {
             return (                
@@ -246,8 +250,19 @@ class GeneralInfo extends Component {
                             value={this.state.formData.moreDetails.currCustomerInputField}
                             onChange={ (val) => this.autuSuggestionControls.onChange(val, 'moreCustomerDetailsField') }
                         /> */}
-
-                        <ReactAutosuggest
+                        {/* <GsDropdown searchable={true}>
+                            {this.state.formData.moreDetails.list.map((item, index) => {
+                                <Dropdown.Item>{item}</Dropdown.Item>
+                            })}
+                        </GsDropdown> */}
+                        <FormGroup>
+                            <FormControl as="select" onChange={(e) => this.onDropdownChange(e, 'moreDetails')} value={this.state.formData.moreDetails.currCustomerInputField}>
+                                {this.state.formData.moreDetails.list.map((item) => {
+                                    return <option key={item.key} value={item.value}>{item.value}</option>
+                                })}
+                            </FormControl>
+                        </FormGroup>
+                        {/* <ReactAutosuggest
                             suggestions={this.state.formData.moreDetails.limitedList}
                             onSuggestionsFetchRequested={({value}) => this.reactAutosuggestControls.onSuggestionsFetchRequested({value})}
                             // onSuggestionsClearRequested={this.reactAutosuggestControls.onSuggestionsClearRequested}
@@ -261,7 +276,7 @@ class GeneralInfo extends Component {
                                 //onKeyUp: (e) => this.reactAutosuggestControls.onKeyUp(e, {currElmKey: 'moreDetails'}),
                                 className: "react-autosuggest__input"
                             }}
-                        />
+                        /> */}
                     </Col>
                     <Col xs={6} md={6}>
                         <FormGroup>
@@ -392,6 +407,7 @@ class GeneralInfo extends Component {
         let apiParams = {
             customerId: thatState.custDetail.customerId,
             cname: thatState.custDetail.name,
+            guardianRelation: thatState.custDetail.guardianRelation,
             gaurdianName: thatState.custDetail.gaurdianName,
             address: thatState.custDetail.address,
             place: thatState.custDetail.place,
@@ -411,6 +427,15 @@ class GeneralInfo extends Component {
             toast.error(response.data.MSG);
         }
     }    
+
+    onRelationIdChange(e) {
+        let val = e.target.value;
+        let newState = {...this.state};
+        newState.custDetail.guardianRelation = val;
+        newState.dataAltered = true;
+        this.setState(newState);
+    }
+
 
     render() {
         return (
@@ -435,7 +460,17 @@ class GeneralInfo extends Component {
                             </Col>
                         </Row>
                         <Row>
-                            <Col xs={12} md={12}>
+                            <Col xs={3} md={3}>
+                                <FormGroup>
+                                    <FormLabel>Relation</FormLabel>
+                                    <FormControl as="select" onChange={(e) => this.onRelationIdChange(e)} value={this.state.custDetail.guardianRelation}>
+                                        <option key='son_of' value='s/o'>Son Of</option>
+                                        <option key='wife_of' value='w/o'>Wife Of</option>
+                                        <option key='care_of' value='c/o'>Care Of</option>
+                                    </FormControl>
+                                </FormGroup>
+                            </Col>
+                            <Col xs={9} md={9}>
                                 <FormGroup>
                                     <FormLabel>Father/Husband/Guardian Name</FormLabel>
                                     <FormControl

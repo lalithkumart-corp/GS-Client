@@ -109,3 +109,12 @@ body {
 .gs-select-compact {
     padding: 0 30px 0 4px;
 }
+
+.gs-radio {
+    .form-check-input[type=radio] {
+        border-color: black;
+    }
+    label {
+        font-weight: normal;
+    }
+}

@@ -294,7 +294,7 @@ class CustomerPortal extends Component {
                                 <span> 
                                     <b>{aCust.name}</b>
                                     {aCust.gaurdianName && <>
-                                    <span style={{"fontSize":"8px"}}>c/of</span> 
+                                    <span style={{"fontSize":"8px"}}>{aCust.guardianRelation || 'c/o'}</span> 
                                     <b>{aCust.gaurdianName}</b></>}
                                 </span></Col>
                             <Col xs={12} md={12} id={index+ '2'}><span>{aCust.address}</span></Col>
