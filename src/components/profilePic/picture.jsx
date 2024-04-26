@@ -37,6 +37,7 @@ class Picture extends Component {
         this.picture.helpers.canShowClearBtn = this.picture.helpers.canShowClearBtn.bind(this);
         this.picture.helpers.canShowCancelBtn = this.picture.helpers.canShowCancelBtn.bind(this);
         this.picture.helpers.canshowSaveBtn = this.picture.helpers.canshowSaveBtn.bind(this);
+        this.onCaptionUpdate = this.onCaptionUpdate.bind(this);
     }
 
     getUploadMethod() {
@@ -247,11 +248,31 @@ class Picture extends Component {
         const imageSrc = this.webcam.getScreenshot();
         this.setState({imageSrc: imageSrc});
     }
+    onCaptionUpdate(e) {
+        let val = e.target.value;
+        let newState = {...this.state};
+        newState.picture.caption.inputVal = val;
+        this.setState(newState);
+        this.props.updatePictureData(newState.picture, 'caption');
+    }
     render() {        
         return (
             <div>
                <Row>
                     <Col xs={12} md={12}>
+                        {
+                            this.state.picture.caption?.show && 
+                            <FormGroup
+                                className='caption-input-box'>
+                                <FormControl
+                                    type="text"
+                                    placeholder="Enter Image caption"
+                                    onChange={(e) => this.onCaptionUpdate(e)} 
+                                    value={this.state.picture.caption.inputVal}
+                                    style={{margin: '0 auto 5px auto', width: '90%'}}
+                                />
+                            </FormGroup>
+                        }
                         {
                             this.state.picture.holder.show &&
                             <ImageZoom>
@@ -301,7 +322,7 @@ class Picture extends Component {
                                     className={'gs-button rounded icon ' + (this.picture.helpers.canShowClearBtn()? '': 'hidden-btn')}
                                     onClick={(e) => this.picture.eventListeners.handleClick('clear')}
                                     title='Clear picture'>
-                                    <FontAwesomeIcon icon="broom" />
+                                    <FontAwesomeIcon icon="trash" />
                                 </span>
                                 <span
                                     className={'gs-button rounded icon ' + (this.picture.helpers.canShowSpinner()? '': 'hidden-btn')}                                    

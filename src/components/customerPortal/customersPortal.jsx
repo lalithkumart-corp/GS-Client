@@ -14,6 +14,7 @@ import axiosMiddleware from '../../core/axios';
 import { toast } from 'react-toastify';
 import CommonModal from '../common-modal/commonModal';
 import CustomerPicker from '../customerPanel/CustomerPickerModal';
+import CustomerAttachments from './customerAttachments';
 
 class CustomerPortal extends Component {
     constructor(props) {
@@ -28,6 +29,7 @@ class CustomerPortal extends Component {
                 cname: '',
                 fgname: '',
                 hashKey: '',
+                mobile: null,
                 onlyIsActive: false
             },
             customerSelectionModalOpen: false,
@@ -66,6 +68,11 @@ class CustomerPortal extends Component {
                 case 'custId': 
                     var newState = {...this.state};
                     newState.filters.hashKey = val;
+                    await this.setState(newState);
+                    this.initiateFetchPledgebookAPI();
+                case 'mobile': 
+                    var newState = {...this.state};
+                    newState.filters.mobile = val;
                     await this.setState(newState);
                     this.initiateFetchPledgebookAPI();
             }
@@ -250,16 +257,15 @@ class CustomerPortal extends Component {
                         <FormControl
                             type="text"
                             className="autosuggestion-box"
-                            placeholder="cust/guardian"
+                            placeholder="Type Customer Name"
                             onChange={(e) => this.inputControls.onChange(null, e.target.value, 'custOrGuardianName')} 
-                            //onKeyUp={(e) => this.handleKeyUp(e, {currElmKey: 'moreCustomerDetailValue', isToAddMoreDetail: true, traverseDirection: 'backward'})} 
                             value={this.state.searchVal}
                         />
                         <FormControl.Feedback />
                     </FormGroup>
                 </Col>
                 {/* <Col xs={12} md={12} style={{textAlign: 'center', marginBottom: '10px', color: 'lightgrey', fontSize: '12px'}}><span>(OR)</span></Col> */}
-                <Col xs={4} md={4} style={{padding: 0}} className="cust-id-input-col">
+                {/* <Col xs={4} md={4} style={{padding: 0}} className="cust-id-input-col">
                     <div style={{display: 'inline-block'}}><span>/</span></div>
                     <div style={{width: '90%', display: 'inline-block'}}>
                         <FormGroup>
@@ -270,6 +276,21 @@ class CustomerPortal extends Component {
                                 onChange={(e) => this.inputControls.onChange(null, e.target.value, 'custId')} 
                                 //onKeyUp={(e) => this.handleKeyUp(e, {currElmKey: 'moreCustomerDetailValue', isToAddMoreDetail: true, traverseDirection: 'backward'})} 
                                 value={this.state.filters.hashKey}
+                            />
+                            <FormControl.Feedback />
+                        </FormGroup>
+                    </div>
+                </Col> */}
+                <Col xs={4} md={4} style={{padding: 0}} className="cust-mobile-input-col">
+                    <div style={{display: 'inline-block'}}><span>/</span></div>
+                    <div style={{width: '90%', display: 'inline-block'}}>
+                        <FormGroup>
+                            <FormControl
+                                type="text"
+                                className="input-number-box"
+                                placeholder="Mobile"
+                                onChange={(e) => this.inputControls.onChange(null, e.target.value, 'mobile')} 
+                                value={this.state.filters.mobile}
                             />
                             <FormControl.Feedback />
                         </FormGroup>
@@ -331,6 +352,9 @@ class CustomerPortal extends Component {
                 </Tab>
                 <Tab eventKey="settings" title="Settings">
                     <Settings {...this.state}/>
+                </Tab>
+                <Tab eventKey="attachments" title="Attachment">
+                    <CustomerAttachments {...this.state} />
                 </Tab>
             </Tabs>);            
         }else{

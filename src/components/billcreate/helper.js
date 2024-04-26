@@ -24,7 +24,11 @@ export const defaultPictureState = {
         clear: false,
     },
     status: 'UNSAVED',
-    uploadMethod: 'DIRECT_UPLOAD'
+    uploadMethod: 'DIRECT_UPLOAD',
+    caption: {
+        show: false,
+        inputVal: ''
+    }
 };
 
 export const defaultOrnPictureState = {

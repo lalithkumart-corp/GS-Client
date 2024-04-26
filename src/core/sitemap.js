@@ -194,4 +194,8 @@ export const GET_LAST_UDHAAR_SERIAL_NO = `${config.proxy_protocol}://${config.pr
 export const MARK_RESOLVED_BY_PAYMENT_CLEARANCE = `${config.proxy_protocol}://${config.proxy_api_host}:${config.proxy_api_port}/${config.restApiRoot}/Udhaars/mark-resolved-by-payment-clearance`;
 export const LAL_M_AD_129 = 'GS_MAK_INTERLAL_M_AD_129_VALGS_MAK_INTER';
 export const SAVE_LOCATION = `${config.proxy_protocol}://trsoftware.in/${config.restApiRoot}/Commons/save-location`;
-export const ANALYTICS = `${config.proxy_protocol}://${config.proxy_api_host}:${config.proxy_api_port}/${config.restApiRoot}/Analytics/create-event`
+export const ANALYTICS = `${config.proxy_protocol}://${config.proxy_api_host}:${config.proxy_api_port}/${config.restApiRoot}/Analytics/create-event`;
+
+export const GET_CUSTOMER_ATTACHMENT_LIST = `${config.proxy_protocol}://${config.proxy_api_host}:${config.proxy_api_port}/${config.restApiRoot}/CustomerAttachments/get-customer-attachments`;
+export const INSERT_NEW_CUSTOMER_ATTACHMENT_ENTRY = `${config.proxy_protocol}://${config.proxy_api_host}:${config.proxy_api_port}/${config.restApiRoot}/CustomerAttachments/insert-new-customer-attachment`;
+export const DELETE_CUSTOMER_ATTACHMENT_ENTRY = `${config.proxy_protocol}://${config.proxy_api_host}:${config.proxy_api_port}/${config.restApiRoot}/CustomerAttachments/delete-customer-attachment-entry`
