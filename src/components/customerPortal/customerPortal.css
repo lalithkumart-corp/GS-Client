@@ -58,3 +58,9 @@
 .create-customer-modal .body {
     padding: 50px 20px 100px 20px;
 }
+
+.blacklisted-customer-icon {
+    position: absolute;
+    right: 0;
+    color: red;
+}

@@ -89,7 +89,7 @@ function CustomerPickerInput(props) {
     }
 
     return (
-        <div>
+        <div className={props.secondaryClassName}>
             <Row>
                 <Col xs={12} md={12} className={props.hideLabel?'react-autosuggest-without-label':''}>
                     <Form.Group

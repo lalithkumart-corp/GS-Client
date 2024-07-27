@@ -61,9 +61,9 @@ class GeneralInfo extends Component {
         this.onEditDetailIconClick = this.onEditDetailIconClick.bind(this);
         this.handleEditModalClose = this.handleEditModalClose.bind(this);
         this.updateDetail = this.updateDetail.bind(this);
-        this.onDeleteDetailIconClick = this.onDeleteDetailIconClick.bind(this);        
-    }   
-  
+        this.onDeleteDetailIconClick = this.onDeleteDetailIconClick.bind(this);
+    }
+
     componentWillReceiveProps(nextProps) {
         this.setState({custDetail: {...nextProps.selectedCust}, dataAltered: false, userPicture: JSON.parse(JSON.stringify(defaultPictureState))});
     }
@@ -90,14 +90,13 @@ class GeneralInfo extends Component {
             this.handleEnterKeyPress(e, identifier, options);        
         else if(e.keyCode == SPACE_KEY)
             this.handleSpaceKeyPress(e, identifier, options);
-
     }
 
     handleEnterKeyPress(e, identifier, options) {
         let newState = {...this.state};
 
         switch(identifier) {
-            case 'addDetail':                
+            case 'addDetail':
                 let obj = {
                     uniq: Date.now(),
                     key: newState.formData.moreDetails.currCustomerInputKey,
@@ -320,11 +319,11 @@ class GeneralInfo extends Component {
                 }
                 </span>
             )
-        }        
+        }
 
         return (
             <span style={{marginTop: '10px'}}>
-                <div className='add-more-header'>
+                <div className='add-more-header' style={{marginTop: '10px'}}>
                     <input type='text' 
                         className='show-more'
                         value={this.state.showMoreInputs ? 'Show Less' : 'Add More '}
@@ -467,6 +466,7 @@ class GeneralInfo extends Component {
                                         <option key='son_of' value='s/o'>Son Of</option>
                                         <option key='wife_of' value='w/o'>Wife Of</option>
                                         <option key='care_of' value='c/o'>Care Of</option>
+                                        <option key='daughter_of' value='d/o'>Daughter Of</option>
                                     </FormControl>
                                 </FormGroup>
                             </Col>

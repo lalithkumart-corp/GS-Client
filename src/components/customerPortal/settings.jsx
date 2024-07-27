@@ -1,12 +1,13 @@
 import React, { Component } from 'react';
 import { Container, Row, Col, FormGroup, FormLabel, FormControl, HelpBlock, InputGroup, Button, Glyphicon, Tabs, Tab } from 'react-bootstrap';
-import { PLEDGEBOOK_METADATA, UPDATE_CUSTOMER_BY_MERGING, UPDATE_CUSTOMER_STATUS } from '../../core/sitemap';
+import { PLEDGEBOOK_METADATA, UPDATE_CUSTOMER_BY_MERGING, UPDATE_CUSTOMER_STATUS, UPDATE_CUSTOMER_BLACKLIST } from '../../core/sitemap';
 import { getAccessToken } from '../../core/storage';
 import axios from 'axios';
 import './settings.css';
 import { toast } from 'react-toastify';
 import _ from 'lodash';
 import GSCheckbox from '../ui/gs-checkbox/checkbox';
+import axiosMiddleware from '../../core/axios';
 
 export default class Settings extends Component {
     constructor(props) {
@@ -15,6 +16,7 @@ export default class Settings extends Component {
             custDetail: this.props.selectedCust || null,
             mergetoCustomerHashkey: '',
             disableCheckcboxTicked: false,
+            isBlacklistCustomer: false,
         };
         this.fetchCustomerData = this.fetchCustomerData.bind(this);
         this.onConfirmUpdate = this.onConfirmUpdate.bind(this);
@@ -22,9 +24,13 @@ export default class Settings extends Component {
     
     componentWillReceiveProps(nextProps) {
         let disableCheckcboxTicked = this.state.disableCheckcboxTicked;
-        if(nextProps.selectedCust)
+        let isBlacklistCustomer = this.state.isBlacklistCustomer;
+        if(nextProps.selectedCust) {
             disableCheckcboxTicked = nextProps.selectedCust.custStatus?false:true;
-        this.setState({disableCheckcboxTicked: disableCheckcboxTicked, billHistory: nextProps.billHistory, custDetail: nextProps.selectedCust, mergetoCustomerHashkey: '', mergeToCustomerInfo: ''});
+            isBlacklistCustomer = nextProps.selectedCust.isBlacklisted==0?false:true;
+        }
+        this.setState({disableCheckcboxTicked, billHistory: nextProps.billHistory, custDetail: nextProps.selectedCust, 
+            mergetoCustomerHashkey: '', mergeToCustomerInfo: '', isBlacklistCustomer});
     }
     
     onCustomerHashKeyChange(e) {
@@ -57,10 +63,12 @@ export default class Settings extends Component {
             let accessToken = getAccessToken();
             let resp = await axios.post(UPDATE_CUSTOMER_BY_MERGING, {accessToken: accessToken, custHashkeyForMerge: this.state.custDetail.hashKey, custHashkeyForMergeInto: this.state.mergetoCustomerHashkey});
             let msg = resp.data.message;
-            if(resp.data.STATUS == 'success')
+            if(resp.data.STATUS == 'success') {
+                this.props.afterUpdate(this.state.custDetail.customerId);
                 toast.success(msg);
-            else
+            } else {
                 toast.error(msg);
+            }
         } catch(e) {
             console.log(e);
             toast.error('Error occured while merging');
@@ -94,6 +102,7 @@ export default class Settings extends Component {
                     (successResp) => {
                         if(successResp.data.STATUS == 'success') {
                             toast.success(successResp.data.MSG);
+                            this.props.afterUpdate(this.state.custDetail.customerId);
                         } else {
                             toast.error(successResp.data.MSG);
                         }
@@ -109,8 +118,30 @@ export default class Settings extends Component {
                         toast.error('Exception while updating customer status');
                     }
                 )
-        
+    }
 
+    updateBlackListStatus() {
+        axiosMiddleware.post(UPDATE_CUSTOMER_BLACKLIST, {custId: this.state.custDetail.customerId, isBlacklistCustomer: this.state.isBlacklistCustomer})
+            .then(
+                (successResp) => {
+                    if(successResp.data.STATUS == 'success') {
+                        toast.success(successResp.data.MSG);
+                        this.props.afterUpdate(this.state.custDetail.customerId);
+                    } else {
+                        toast.error(successResp.data.MSG);
+                    }
+                },
+                (errResp) => {
+                    toast.error('Could not update the blacklist ');
+                    console.log(errResp);
+                }
+            )
+            .catch(
+                (e) => {
+                    console.log(e);
+                    toast.error('Exception while updating blacklist');
+                }
+            )
     }
 
     parseBillHistory(billHistory) {
@@ -127,11 +158,37 @@ export default class Settings extends Component {
         return parsedBillHistory;
     }
 
-    canDisableApplyBtn() {
-        let custStatus = this.state.custDetail.custStatus?true:false;
-        if(this.state.disableCheckcboxTicked !== custStatus)
-            return true;
-        return false;
+    canDisableApplyBtn(identifier) {
+        let flag = false;
+        switch(identifier) {
+            case 'status':
+                let custStatus = this.state.custDetail.custStatus?true:false;
+                if(this.state.disableCheckcboxTicked !== custStatus)
+                    flag = true;
+                break;
+            case 'blacklist':
+                let isBlacklisted = this.state.custDetail.isBlacklisted?true:false;
+                if(this.state.isBlacklistCustomer == isBlacklisted)
+                    flag = true;
+                break;
+        }
+        return flag;
+    }
+
+    onClickCheckbox(e, identifier) {
+        switch(identifier) {
+            case 'blacklist':
+                this.setState({isBlacklistCustomer: e.target.checked});
+                break;
+        }
+    }
+
+    onBlacklistOptionSaveClick(e) {
+        let msg = 'Sure to add this customer to BlackList';
+        if(!this.state.isBlacklistCustomer)
+            msg = 'Sure to remove this customer to BlackList';
+        if(window.confirm(msg))
+            this.updateBlackListStatus();
     }
 
     render() {
@@ -230,7 +287,27 @@ export default class Settings extends Component {
                                         onChangeListener = {(e) => {this.updateDisableButtonTick(e)}} />
                                 </Col>
                                 <Col>
-                                    <input type='button' className='gs-button' value='Apply' disabled={this.canDisableApplyBtn()} onClick={(e) => this.onDisableUpdateApply()}/>
+                                    <input type='button' className='gs-button' value='Apply' disabled={this.canDisableApplyBtn('status')} onClick={(e) => this.onDisableUpdateApply()}/>
+                                </Col>
+                            </Row>
+                        </div>
+                    </div>
+
+                    <div className='gs-card'>
+                        <div className='gs-card-content'>
+                            <h4 style={{marginBottom: '40px'}}>BLACKLIST</h4>
+                            <Row>
+                                <Col xs={3} md={3}>
+                                    Blacklist the Customer: 
+                                </Col>
+                                <Col xs={3} md={3}>
+                                    {/* <input type='checkbox' className='gs-checkbox' checked={this.state.disableCheckcboxTicked} onClick={(e) => this.updateDisableButtonTick(e)}/> */}
+                                    <GSCheckbox labelText="" 
+                                        checked={this.state.isBlacklistCustomer} 
+                                        onChangeListener = {(e) => {this.onClickCheckbox(e, 'blacklist')}} />
+                                </Col>
+                                <Col>
+                                    <input type='button' className='gs-button' value='Apply' disabled={this.canDisableApplyBtn('blacklist')} onClick={(e) => this.onBlacklistOptionSaveClick(e)}/>
                                 </Col>
                             </Row>
                         </div>

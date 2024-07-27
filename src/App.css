@@ -435,3 +435,8 @@ a.dropdown-item:focus {
 .react-datepicker-popper {
   z-index: 3;
 }
+
+.form-check-input:checked[type=checkbox]:focus,
+.form-check-input:checked[type=radio]:focus {
+  outline: none;
+}

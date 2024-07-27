@@ -59,14 +59,14 @@ class ActivationPage extends Component {
         console.log(resp);
     }
     async verifyActivationKey() {
-        let apiParams = {status: 1, plan: 'custom', accessToken: getAccessToken(), key: this.state.activationKeyVal};
+        let apiParams = {status: 1, plan: 'custom', accessToken: getAccessToken(), activationKey: this.state.activationKeyVal};
         let resp = await axiosMiddleware.post(UPDATE_APP_STATUS, apiParams);
         if(resp && resp.data) {
             if(resp.data.STATUS == 'SUCCESS') {
                 toast.success('SUCCESS!');
                 this.props.updateAccountStatus(true);
             } else {
-                toast.error('ERROR!');
+                toast.error(resp.data.MSG || resp.data.ERROR || 'ERROR!');
             }
         }
         console.log(resp);

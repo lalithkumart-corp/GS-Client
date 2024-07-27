@@ -15,6 +15,7 @@ import { toast } from 'react-toastify';
 import CommonModal from '../common-modal/commonModal';
 import CustomerPicker from '../customerPanel/CustomerPickerModal';
 import CustomerAttachments from './customerAttachments';
+import { FaBan } from 'react-icons/fa';
 
 class CustomerPortal extends Component {
     constructor(props) {
@@ -61,6 +62,7 @@ class CustomerPortal extends Component {
                     newState.filters.cname = splits[0];
                     newState.filters.fgname = splits[1] || 0;
                     newState.searchVal = val;
+                    newState.selectedPageIndex = 0;
                     await this.setState(newState);
                     this.initiateFetchPledgebookAPI();
                     //this.filterCustomerList(val);
@@ -68,11 +70,13 @@ class CustomerPortal extends Component {
                 case 'custId': 
                     var newState = {...this.state};
                     newState.filters.hashKey = val;
+                    newState.selectedPageIndex = 0;
                     await this.setState(newState);
                     this.initiateFetchPledgebookAPI();
                 case 'mobile': 
                     var newState = {...this.state};
                     newState.filters.mobile = val;
+                    newState.selectedPageIndex = 0;
                     await this.setState(newState);
                     this.initiateFetchPledgebookAPI();
             }
@@ -312,20 +316,29 @@ class CustomerPortal extends Component {
                     <Col xs={9} md={9}>
                         <Row>
                             <Col xs={12} md={12} id={index+ '1'} style={{color: color}}>
+                                {aCust.isBlacklisted ? <span className="blacklisted-customer-icon">
+                                        <FaBan />
+                                    </span>: ''}
                                 <span> 
                                     <b>{aCust.name}</b>
                                     {aCust.gaurdianName && <>
-                                    <span style={{"fontSize":"8px"}}>{aCust.guardianRelation || 'c/o'}</span> 
+                                    <span style={{"fontSize":"8px"}}>&nbsp;&nbsp;{aCust.guardianRelation || 'c/o'}&nbsp;&nbsp;</span> 
                                     <b>{aCust.gaurdianName}</b></>}
-                                </span></Col>
-                            <Col xs={12} md={12} id={index+ '2'}><span>{aCust.address}</span></Col>
-                            <Col xs={12} md={12} id={index+ '3'}>
-                                <span>
-                                    <>{aCust.place}</>
-                                    {aCust.city && <>, {aCust.city}</>}
-                                    {aCust.pincode && <>  - {aCust.pincode} </>}
                                 </span>
                             </Col>
+                            <div style={{fontSize: '12px', padding: 0}}>
+                                <Col xs={12} md={12} id={index+ '2'}><span>{aCust.address}</span></Col>
+                                <Col xs={12} md={12} id={index+ '3'}>
+                                    <span>
+                                        <>{aCust.place}</>
+                                        {aCust.city && <>, {aCust.city}</>}
+                                        {aCust.pincode && <>  - {aCust.pincode} </>}
+                                    </span>
+                                </Col>
+                                <Col xs={12} md={12}>
+                                    <span> Mobile: {aCust.mobile} </span>
+                                </Col>
+                            </div>
                         </Row>
                     </Col>
                     <Col xs={3} md={3}>
@@ -351,7 +364,7 @@ class CustomerPortal extends Component {
                     <Notes {...this.state}/>
                 </Tab>
                 <Tab eventKey="settings" title="Settings">
-                    <Settings {...this.state}/>
+                    <Settings {...this.state} afterUpdate={this.afterUpdate}/>
                 </Tab>
                 <Tab eventKey="attachments" title="Attachment">
                     <CustomerAttachments {...this.state} />

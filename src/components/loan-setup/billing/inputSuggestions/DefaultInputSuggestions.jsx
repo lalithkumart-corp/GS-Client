@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import { Row, Col, FormGroup, FormControl } from 'react-bootstrap';
+import { Row, Col, FormGroup, FormControl, Form } from 'react-bootstrap';
 import axiosMiddleware from '../../../../core/axios';
 import { UPDATE_USER_PREFERENCES } from '../../../../core/sitemap';
 import { getAccessToken } from '../../../../core/storage';
@@ -19,6 +19,9 @@ class DefaultInputSuggestions extends Component {
             },
             pincode: {
                 inputVal: this.getValueFromStore('pincode')
+            },
+            alertOfflineDate: {
+                inputVal: this.getValueFromStore('alertOfflineDate')
             }
         }
         this.bindMethods();
@@ -42,12 +45,18 @@ class DefaultInputSuggestions extends Component {
                 if(this.props.auth && this.props.auth.userPreferences)
                     val = this.props.auth.userPreferences.bill_create_pincode_default || '';
                 break;
+            case 'alertOfflineDate':
+                if(this.props.auth && typeof this.props.auth.userPreferences)
+                    val = this.props.auth.userPreferences.bill_create_alert_offline_date || false;
+                break;
         }
         return val;
     }
     onChange(e, identifier) {
         let val = e.target.value;
         let newState = {...this.state};
+        if(identifier == 'alertOfflineDate')
+            val = !newState[identifier].inputVal;
         newState[identifier].inputVal = val;
         this.setState(newState);
     }
@@ -69,7 +78,8 @@ class DefaultInputSuggestions extends Component {
         return {
             place: this.state.place.inputVal,
             city: this.state.city.inputVal,
-            pincode: this.state.pincode.inputVal
+            pincode: this.state.pincode.inputVal,
+            alertOfflineDate: this.state.alertOfflineDate.inputVal,
         }
     }
     render() {
@@ -80,7 +90,7 @@ class DefaultInputSuggestions extends Component {
                         <Col>
                             <h3 style={{marginBottom: '30px'}}>Bill Creation - Defaults</h3>
                             <Row>
-                                <Col xs={4}>
+                                <Col xs={3}>
                                     <Row>
                                         <Col xs={12}>Place:</Col>
                                         <Col xs={12}>
@@ -96,7 +106,7 @@ class DefaultInputSuggestions extends Component {
                                         </Col>
                                     </Row>
                                 </Col>
-                                <Col xs={4}>
+                                <Col xs={3}>
                                     <Row>
                                         <Col xs={12}>City:</Col>
                                         <Col xs={12}>
@@ -112,7 +122,7 @@ class DefaultInputSuggestions extends Component {
                                         </Col>
                                     </Row>
                                 </Col>
-                                <Col xs={4}>
+                                <Col xs={3}>
                                     <Row>
                                         <Col xs={12}>Pincode:</Col>
                                         <Col xs={12}>
@@ -125,6 +135,16 @@ class DefaultInputSuggestions extends Component {
                                                 />
                                                 <FormControl.Feedback />
                                             </FormGroup>
+                                        </Col>
+                                    </Row>
+                                </Col>
+                                <Col xs={3}>
+                                    <Row>
+                                        <Col xs={12}>Live Date Alert:</Col>
+                                        <Col xs={12}>
+                                            <Form.Group>
+                                                <Form.Check id='bill-creatoin-live-date-alert' type='checkbox' checked={this.state.alertOfflineDate.inputVal} label='Show Alert if Date is not live' onChange={(e)=>this.onChange(e, 'alertOfflineDate')}/>
+                                            </Form.Group>
                                         </Col>
                                     </Row>
                                 </Col>

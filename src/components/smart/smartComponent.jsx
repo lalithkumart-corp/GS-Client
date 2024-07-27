@@ -170,6 +170,7 @@ class SmartComponent extends Component {
                                     <Route path="/gst-bill-generator" element={<GstBillingDemo />} />
                                     <Route path="/tools" element={<Tools />} />
                                     <Route path="/girvi-analytics" element={<GirviAnalytics />} />
+                                    <Route path= "/license" element={<ActivationPage />} />
                                     </Routes>
                                 </div>
                                 {/* <div className="floating-right-side-bar"> */}

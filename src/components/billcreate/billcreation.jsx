@@ -34,7 +34,7 @@ import {Popover} from 'react-tiny-popover';
 import BillTemplate from './billTemplate2';
 import LoanBillMainTemplate from '../../templates/loanBill/LoanBillMainTemplate';
 import ReactToPrint from 'react-to-print';
-import { FaEdit } from 'react-icons/fa';
+import { FaEdit, FaBan } from 'react-icons/fa';
 import CommonModal from '../common-modal/commonModal';
 import GeneralInfo from '../customerPortal/generalInfo';
 import { getLoanDate, getLoanDateBehaviour, setLoanDate, setLoanDateBehaviour } from '../../core/storage';
@@ -59,8 +59,6 @@ domList.add('city', {type: 'rautosuggest', enabled: true});
 domList.add('pincode', {type: 'rautosuggest', enabled: true});
 domList.add('mobile', {type: 'rautosuggest', enabled: true});
 domList.add('moreDetailsHeader', {type: 'defaultInput', enabled: true});
-domList.add('moreCustomerDetailField', {type: 'rautosuggest', enabled: false});
-domList.add('moreCustomerDetailValue', {type: 'formControl', enabled: false});
 domList.add('ornItem1', {type: 'rautosuggest', enabled: true});
 domList.add('ornNos1', {type: 'defaultInput', enabled: true});
 domList.add('ornGWt1', {type: 'defaultInput', enabled: true});
@@ -310,6 +308,8 @@ class BillCreation extends Component {
                     _inputVal: dateVal,
                     isLive: (loanDateBehaviour == 'static')?false: true
                 };
+            } else  {
+                state.formData.date.isLive = (loanDateBehaviour == 'static')?false: true;
             }
         } catch(e) {
             console.log(e);
@@ -549,6 +549,7 @@ class BillCreation extends Component {
         let newState = {...this.state};
         newState.formData.date.inputVal = new Date(data.Date);//convertToLocalTime(data.Date);
         newState.formData.date._inputVal = data.Date; //getDateInUTC(data.Date, {withSelectedTime: true});
+        newState.formData.date.isLive = false;
         let splits = data.BillNo.split('.');
         if(splits.length > 1){
             newState.formData.billseries.inputVal = data.BillNo.split('.')[0];
@@ -560,6 +561,7 @@ class BillCreation extends Component {
         newState.formData.amount.inputVal = data.Amount;
         newState.formData.presentValue.inputVal = data.PresentValue;
         newState.formData.cname.inputVal = data.Name;
+        newState.formData.guardianRelation.inputVal = data.GuardianRelation;
         newState.formData.gaurdianName.inputVal = data.GaurdianName;
         newState.formData.address.inputVal = data.Address;
         newState.formData.place.inputVal = data.Place;
@@ -885,6 +887,7 @@ class BillCreation extends Component {
                 theDom = (
                     <div className="customer-list-item" id={suggestion.hashKey + 'parent'} style={{display: 'flex'}}>
                         <div style={{width: '70%', display: 'inline-block'}}>
+                            {suggestion.isBlacklisted ? <span className="bill-creation blacklisted-customer-icon"><FaBan /></span> : ''}
                             <div id={suggestion.hashKey+ '1'}><span className='customer-list-item-maindetail'>{suggestion.name}  <span  className='customer-list-item-maindetail' style={{"fontSize":"8px"}}>&nbsp;{suggestion.guardianRelation} &nbsp;&nbsp;</span> {suggestion.gaurdianName}</span></div>
                             <div id={suggestion.hashKey+ '2'}><span className='customer-list-item-subdetail'>{suggestion.address}</span></div>
                             <div id={suggestion.hashKey+ '3'}><span className='customer-list-item-subdetail'>{suggestion.place}, {suggestion.city} - {suggestion.pincode} {getMobileNo(suggestion)} </span></div>
@@ -924,20 +927,20 @@ class BillCreation extends Component {
     /* START: Helpers */
     updateDomList(identifier, options) {
         switch(identifier) {
-            case 'enableMoreDetailsInputElmns':
-                domList.enable('moreCustomerDetailField');
-                domList.enable('moreCustomerDetailValue');
-                break;
-            case 'disableMoreDetailsInputElmns':
-                domList.disable('moreCustomerDetailField');
-                domList.disable('moreCustomerDetailValue');
-                break;
-            case 'disableMoreDetailValueDom':
-                domList.disable('moreCustomerDetailValue');
-                break;
-            case 'enableMoreDetailValueDom':
-                domList.enable('moreCustomerDetailValue');
-                break;
+            // case 'enableMoreDetailsInputElmns':
+            //     domList.enable('moreCustomerDetailField');
+            //     domList.enable('moreCustomerDetailValue');
+            //     break;
+            // case 'disableMoreDetailsInputElmns':
+            //     domList.disable('moreCustomerDetailField');
+            //     domList.disable('moreCustomerDetailValue');
+            //     break;
+            // case 'disableMoreDetailValueDom':
+            //     domList.disable('moreCustomerDetailValue');
+            //     break;
+            // case 'enableMoreDetailValueDom':
+            //     domList.enable('moreCustomerDetailValue');
+            //     break;
             case 'enableUpdateBtn':
                 domList.disable('submitBtn');
                 domList.enable('updateBtn');
@@ -1315,6 +1318,16 @@ class BillCreation extends Component {
     }
 
     async handleSubmit() {
+        if(this.state.selectedCustomer.isBlacklisted) {
+            alert('This Customer is Blacklisted, Visit "CustomerPortal -> Settings" to unblock this customer, and check related "Notes" for more reference if any');
+            return;
+        }
+
+        if(this.props.auth.userPreferences.bill_create_alert_offline_date && !this.state.formData.date.isLive) {
+            if(!window.confirm('Date is not Live, Are you sure to proceed with non-live date?'))
+                return;
+        }
+
         let requestParams = buildRequestParams(this.state);
         let validation = validateFormValues(requestParams);
         if(validation.errors.length) {
@@ -1893,7 +1906,7 @@ class BillCreation extends Component {
 
     getMoreElmnsContainer() {
         let getCustomerInforAdderDom = () => {
-            return (                
+            return (
                 <Row>
                     {/* <Col xs={12} className='font-weight-bold' style={{marginBottom: '5px'}}>ID</Col>                     */}
                     <Col xs={6} md={6}>
@@ -2052,7 +2065,8 @@ class BillCreation extends Component {
                         <Col xs={6} md={6}>
                             <CustomerPickerInput onSelectCustomer={this.onSelectOnBehalfCustomer} hideLabel={true} 
                                 readOnlyMode={this.state.formData.moreDetails.pledgedFor.inputVal!=='onbehalf'}
-                                clearInputFieldOnSelect={true}/>
+                                clearInputFieldOnSelect={true}
+                                secondaryClassName={'pledge-for-customer-picker'}/>
                         </Col>
                     </Row>
                     {getOnBehalfCustomerDetail()}
@@ -2066,7 +2080,7 @@ class BillCreation extends Component {
                     <Row>
                         <Col xs={6} md={6}>
                             <CustomerPickerInput onSelectCustomer={this.onSelectSecJewelRedeemer} hideLabel={true}
-                            clearInputFieldOnSelect={true}/>
+                            clearInputFieldOnSelect={true} secondaryClassName={'secondary-jewel-redeem-customer-picker'}/>
                         </Col>
                     </Row>
                     {getJewelRedeemCustDetailDom()}
@@ -2151,10 +2165,12 @@ class BillCreation extends Component {
             border: `3px solid ${this.state.formData.date.isLive?'red':'grey'}`,
             borderRadius: "50%",
             display: "inline-block",
-            marginLeft: '5px'
+            marginLeft: '5px',
+            marginRight: '5px',
+            boxShadow: this.state.formData.date.isLive?'0px 0px 6px 2px rgb(237 0 0 / 54%)':'none'
         }
         return(
-            <Container className="bill-creation-container">
+            <Container className={this.props.billCreation.loading?'loading-flag readonly-mode bill-creation-container':'bill-creation-container'}>
                 <Form>
                 <Row>
                 <Col className="left-pane" xs={8} md={8}>
@@ -2188,7 +2204,13 @@ class BillCreation extends Component {
                                     >
                                     <Form.Label>
                                         Date
-                                        &nbsp; (<span onClick={(e) => this.onClickDateLiveLabel(e)} className={this.state.formData.date.isLive?'live':'offline'}> <span style={dateLiveLabelStyles}></span> Live </span>)
+                                        &nbsp; (<span 
+                                                    onClick={(e) => this.onClickDateLiveLabel(e)} 
+                                                    className={this.state.formData.date.isLive?'live':'offline'}
+                                                    > 
+                                                    <span style={dateLiveLabelStyles}></span> 
+                                                    Live 
+                                                </span>)
                                     </Form.Label>
                                     <DatePicker
                                         popperClassName="billcreation-datepicker" 
@@ -2289,10 +2311,12 @@ class BillCreation extends Component {
                             <Form.Group>
                                 <Form.Label>Relation</Form.Label>
                                 <Form.Control as="select" onChange={(e) => this.onRelationIdChange(e)} value={this.getInputValFromCustomSources('guardianRelation')}
-                                readOnly={(this.state.selectedCustomer && this.state.selectedCustomer.name)}>
+                                readOnly={(this.state.selectedCustomer && this.state.selectedCustomer.name) || (this.props.billCreation.loading)}
+                                disabled={(this.state.selectedCustomer && this.state.selectedCustomer.name) || (this.props.billCreation.loading)}>
                                     <option key='son_of' value='s/o'>Son Of</option>
                                     <option key='wife_of' value='w/o'>Wife Of</option>
                                     <option key='care_of' value='c/o'>Care Of</option>
+                                    <option key='daughter_of' value='d/o'>Daughter Of</option>
                                 </Form.Control>
                             </Form.Group>
                         </Col>

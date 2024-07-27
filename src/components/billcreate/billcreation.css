@@ -148,7 +148,9 @@
 .react-autosuggest__input.pincode:focus,
 .react-autosuggest__input.mobile:focus,
 .react-autosuggest__input.morecustdetail:focus,
-.ornament-dom-container .form-control:focus {
+.ornament-dom-container .form-control:focus,
+.pledge-for-customer-picker .react-autosuggest__input:focus,
+.secondary-jewel-redeem-customer-picker .react-autosuggest__input:focus {
     border-color: rgb(204, 204, 204);
     border-bottom: 2px solid #0acfee;
     box-shadow: none;
@@ -164,7 +166,9 @@
 .react-autosuggest__input.pincode[readonly]:focus,
 .react-autosuggest__input.mobile[readonly]:focus,
 .react-autosuggest__input.morecustdetail[readonly]:focus,
-.ornament-dom-container .form-control[readonly]:focus {
+.ornament-dom-container .form-control[readonly]:focus,
+.pledge-for-customer-picker .react-autosuggest__input[readonly]:focus,
+.secondary-jewel-redeem-customer-picker .react-autosuggest__input[readonly]:focus {
     border: none;
     box-shadow: none;
     outline: none;
@@ -261,12 +265,14 @@
 }
 /* END: Picture */
 
-.bill-creation-container input[readonly]{
+.bill-creation-container input[readonly],
+.bill-creation-container select[readonly] {
     background-color: transparent;
     opacity: 1;
     border: none;
     box-shadow: none;
     outline: none;
+    cursor: default;
 }
 
 .bill-creation-container .autosuggest .show-all:after{
@@ -431,4 +437,15 @@
     align-items: center;
     justify-content: center;
     display: flex;
+}
+
+.bill-creation.blacklisted-customer-icon {
+    position: absolute;
+    right: 30%;
+    color: red;
+}
+
+.bill-creation-container.readonly-mode .react-datepicker-wrapper {
+    border: none;
+    box-shadow: none;
 }

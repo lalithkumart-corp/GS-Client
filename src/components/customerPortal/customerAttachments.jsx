@@ -79,13 +79,14 @@ const CustomerAttachments = (props) => {
             picture.id = uploadedImageDetail.data.ID;
             picture.url = uploadedImageDetail.data.URL;
             await insertCustomerAttachmentEntry(picture);
-            setPicData(defaultImageState);
+            setPicData(JSON.parse(JSON.stringify(defaultImageState)));
             refreshAttachmentList();
         } else if (action == 'del') {
             if (imageId) {
                 picture.loading = true;
                 setPicData(picture);
                 await axiosMiddleware.delete(DEL_IMAGE_BY_ID, { data: { imageId: imageId } });
+                deleteCustomerAttachmentEntry(picture);
             }
             picture.loading = false;
             picture.id = null;
@@ -93,7 +94,6 @@ const CustomerAttachments = (props) => {
             picture.caption.inputVal = '';
             picture.holder = JSON.parse(JSON.stringify(defaultImageState.holder));
             setPicData(picture);
-            deleteCustomerAttachmentEntry(picture);
         } else if (action == 'caption') {
             setPicData(picture);
         }
@@ -128,13 +128,14 @@ const CustomerAttachments = (props) => {
             </Col>
         );
         _.each(attachmentsList, (obj, i) => {
-            console.log(JSON.stringify(obj._));
             dom.push(
-                <Col xs={3} md={3} key={'img-attachment-col-key-' + i}>
+                <Col xs={3} md={3} key={'img-attachment-col-key-' + i} style={{marginTop: '10px', marginBottom: '15px'}}>
                     {/* <input type='text' value={obj.imageCaption} readOnly={obj._.captionEditable?'':'readonly'} onChange={(e) => onChangeCaption(e, i)} /> */}
                     <p>{obj.imageCaption}</p>
                     <img src={obj.imagePath} style={{ width: '100%' }} key={'img-key-' + i} />
-                    <span onClick={(e) => onClickTrashAttachment(e, i, { imageId: obj.imageId, customerId: obj.customerId })}>
+                    <span className='gs-icon' onClick={(e) => onClickTrashAttachment(e, i, { imageId: obj.imageId, customerId: obj.customerId })}
+                        style={{position: 'absolute', top: 0, right: '15px'}}
+                    >
                         <FaTrash />
                     </span>
                     {/* <div>
