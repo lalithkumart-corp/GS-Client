@@ -180,7 +180,7 @@ export const PaymentSelectionCard = (props) => {
                                         <Form.Label>FROM</Form.Label>
                                         <Form.Control
                                             as="select"
-                                            value={paymentObj.cash.toAccountId}
+                                            value={paymentObj.cash.fromAccountId}
                                             onChange={(e) => onChangePaymentInputs(e.target.value, 'cash-from-acc')}
                                         >
                                             {getMyAccListDOM('cash')}
@@ -214,7 +214,7 @@ export const PaymentSelectionCard = (props) => {
                                             <Form.Label>FROM</Form.Label>
                                             <Form.Control
                                                 as="select"
-                                                value={paymentObj.cheque.toAccountId}
+                                                value={paymentObj.cheque.fromAccountId}
                                                 onChange={(e) => onChangePaymentInputs(e.target.value, 'cheque-from-acc')}
                                             >
                                                 {getMyAccListDOM('cheque')}
@@ -233,7 +233,7 @@ export const PaymentSelectionCard = (props) => {
                                         <Form.Label>TO</Form.Label>
                                         <Form.Control
                                             as="select"
-                                            value={paymentObj.online.toAccountId.toAccountId}
+                                            value={paymentObj.online.toAccountId}
                                             onChange={(e) => onChangePaymentInputs(e.target.value, 'online-to-acc')}
                                         >
                                             {getMyAccListDOM('online')}
@@ -248,7 +248,7 @@ export const PaymentSelectionCard = (props) => {
                                                 <Form.Label>FROM</Form.Label>
                                                 <Form.Control
                                                     as="select"
-                                                    value={paymentObj.online.toAccountId.toAccountId}
+                                                    value={paymentObj.online.fromAccountId}
                                                     onChange={(e) => onChangePaymentInputs(e.target.value, 'online-from-acc')}
                                                 >
                                                     {getMyAccListDOM('online')}
@@ -260,7 +260,7 @@ export const PaymentSelectionCard = (props) => {
                                                 <Form.Label>TO</Form.Label>
                                                 <Form.Control
                                                     as="select"
-                                                    value={paymentObj.online.fromAccountId}
+                                                    value={paymentObj.online.toAccount.toAccountId}
                                                     onChange={(e) => onChangePaymentInputs(e.target.value, 'online-to-acc-platform')}
                                                 >
                                                     {getAllBankListDOM('online')}
@@ -268,25 +268,25 @@ export const PaymentSelectionCard = (props) => {
                                             </Form.Group>
                                         </Col>
                                         <Col xs={12}>
-                                            {paymentObj.online.fromAccount.fromAccountId == '19' &&
+                                            {paymentObj.online.toAccount.toAccountId == '19' &&
                                                 <Form.Group>
                                                     <Form.Label>{'UPI-ID'}</Form.Label>
                                                     <Form.Control
                                                         type="text"
-                                                        value={paymentObj.online.fromAccount.upiId}
+                                                        value={paymentObj.online.toAccount.upiId}
                                                         onChange={(e) => onChangePaymentInputs(e.target.value, 'online-to-acc-upiid')}
                                                         >
                                                     </Form.Control>
                                                 </Form.Group>
                                             }
 
-                                            {paymentObj.online.fromAccount.fromAccountId !== '19' &&
+                                            {paymentObj.online.toAccount.toAccountId !== '19' &&
                                                 <>
                                                 <Form.Group>
                                                     <Form.Label>Acc No</Form.Label>
                                                     <Form.Control
                                                         type="text"
-                                                        value={paymentObj.online.fromAccount.accNo}
+                                                        value={paymentObj.online.toAccount.accNo}
                                                         onChange={(e) => onChangePaymentInputs(e.target.value, 'online-to-acc-no')}
                                                         >
                                                     </Form.Control>
@@ -296,7 +296,7 @@ export const PaymentSelectionCard = (props) => {
                                                     <Form.Label>IFSC</Form.Label>
                                                     <Form.Control
                                                         type="text"
-                                                        value={paymentObj.online.fromAccount.ifscCode}
+                                                        value={paymentObj.online.toAccount.ifscCode}
                                                         onChange={(e) => onChangePaymentInputs(e.target.value, 'online-to-acc-ifsc')}
                                                         >
                                                     </Form.Control>

@@ -22,7 +22,7 @@ import { toast } from 'react-toastify';
 import GSCheckbox from '../ui/gs-checkbox/checkbox';
 import { getSession, getPledgebookFilters, setPledgebookFilter } from '../../core/storage';
 import BillTemplate from '../billcreate/billTemplate2';
-import { MdNotifications, MdNotificationsActive, MdNotificationsNone, MdNotificationsOff, MdNotificationsPaused, MdBorderColor } from 'react-icons/md';
+import { MdNotifications, MdNotificationsActive, MdNotificationsNone, MdNotificationsOff, MdNotificationsPaused, MdBorderColor, MdInfoOutline } from 'react-icons/md';
 import axiosMiddleware from '../../core/axios';
 import { ARCHIVE_PLEDGEBOOK_BILLS, UNARCHIVE_PLEDGEBOOK_BILLS, TRASH_PLEDGEBOOK_BILLS, PERMANENTLY_DELETE_PLEDGEBOOK_BILLS, RESTORE_TRASHED_PLEDGEBOOK_BILLS } from '../../core/sitemap';
 import AlertComp from '../alert/Alert';
@@ -1010,90 +1010,108 @@ class Pledgebook extends Component {
             let ornData = JSON.parse(row.Orn) || {};
             let isPopoverVisible = this.getAlertPopoverVisibility(row.UniqueIdentifier);
             return (
-                <Row>
-                    <Col xs={{span: 6}} className="orn-display-dom">
-                        <table>
-                            <colgroup>
-                                <col style={{width: "40%"}}></col>
-                                <col style={{width: "10%"}}></col>
-                                <col style={{width: "10%"}}></col>
-                                <col style={{width: "20%"}}></col>
-                                <col style={{width: "20%"}}></col>
-                            </colgroup>
-                            <thead>
-                                <tr>
-                                    <td>Orn Name</td>
-                                    <td>G-Wt</td>
-                                    <td>N-Wt</td>
-                                    <td>Specs</td>
-                                    <td>Qty</td>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {
-                                    ( () => {
-                                        let rows = [];
-                                        _.each(ornData, (anOrnItem, index) => {
-                                            let className = "even";
-                                            if(index && index%2 !== 0)
-                                                className = "odd";
-                                            rows.push(
-                                                <tr className={className}>
-                                                    <td>{anOrnItem.ornItem}</td>
-                                                    <td>{anOrnItem.ornGWt}</td>
-                                                    <td>{anOrnItem.ornNWt}</td>
-                                                    <td>{anOrnItem.ornSpec}</td>
-                                                    <td>{anOrnItem.ornNos}</td>
-                                                </tr>
-                                            )
-                                        });
-                                        return rows;
-                                    })()
-                                }
-                            </tbody>
-                        </table>                   
-                    </Col>
-                    <Col xs={{span: 2}}>
-                        {row.OrnImagePath &&
-                            <ImageZoom>
-                                <img 
-                                    alt="Ornament Image not found"
-                                    src={row.OrnImagePath}
-                                    className='pledgebook-orn-display-in-row'
-                                />
-                            </ImageZoom>
+                <>
+                    <Row>
+                        <Col xs={{span: 6}} className="orn-display-dom">
+                            <table>
+                                <colgroup>
+                                    <col style={{width: "40%"}}></col>
+                                    <col style={{width: "10%"}}></col>
+                                    <col style={{width: "10%"}}></col>
+                                    <col style={{width: "20%"}}></col>
+                                    <col style={{width: "20%"}}></col>
+                                </colgroup>
+                                <thead>
+                                    <tr>
+                                        <td>Orn Name</td>
+                                        <td>G-Wt</td>
+                                        <td>N-Wt</td>
+                                        <td>Specs</td>
+                                        <td>Qty</td>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {
+                                        ( () => {
+                                            let rows = [];
+                                            _.each(ornData, (anOrnItem, index) => {
+                                                let className = "even";
+                                                if(index && index%2 !== 0)
+                                                    className = "odd";
+                                                rows.push(
+                                                    <tr className={className}>
+                                                        <td>{anOrnItem.ornItem}</td>
+                                                        <td>{anOrnItem.ornGWt}</td>
+                                                        <td>{anOrnItem.ornNWt}</td>
+                                                        <td>{anOrnItem.ornSpec}</td>
+                                                        <td>{anOrnItem.ornNos}</td>
+                                                    </tr>
+                                                )
+                                            });
+                                            return rows;
+                                        })()
+                                    }
+                                </tbody>
+                            </table>                   
+                        </Col>
+                        <Col xs={{span: 2}}>
+                            {row.OrnImagePath &&
+                                <ImageZoom>
+                                    <img 
+                                        alt="Ornament Image not found"
+                                        src={row.OrnImagePath}
+                                        className='pledgebook-orn-display-in-row'
+                                    />
+                                </ImageZoom>
+                            }
+                        </Col>
+                        <Col xs={{span: 1, offset: 2}}>
+                            <span >
+                                <Popover
+                                    containerClassName="pledgebook-alert-popever"
+                                    padding={0}
+                                    isOpen={isPopoverVisible}
+                                    position={'left'} // preferred position
+                                    // onClickOutside={() => this.closePopover(row.UniqueIdentifier)}
+                                    content={({ position, targetRect, popoverRect }) => {
+                                        return (
+                                            <AlertComp 
+                                                closePopover={this.closePopover} 
+                                                row={row} 
+                                                refreshCallback={this.refresh}
+                                                getCreateAlertParams = {getCreateAlertParams}
+                                                getUpdateAlertParams = {getUpdateAlertParams}
+                                                getDeleteAlertParams = {getDeleteAlertParams}
+                                                />
+                                        )
+                                    }}
+                                    >
+                                    <span className="pledgebook-alert-icon" onClick={(e) => this.onClickAlertIcon(e, row)}>
+                                        {row.alertId && <MdNotifications/>}
+                                        {!row.alertId && <MdNotificationsNone/>}
+                                    </span>
+                                </Popover>
+                                {/* <FaPencilAlt /> */}
+                            </span>
+                        </Col>
+                    </Row>
+                    <Row>
+                        {row.IsRenewalBill ?
+                            <Col xs={12} md={12} style={{paddingLeft: '2%'}}>
+                                <span style={{fontSize: '18px'}}><MdInfoOutline /></span>
+                                <span style={{fontSize: '1rem', fontWeight: 500, paddingLeft: '3px'}}>This is Renewal of Bill: {row.IsRenewalOfBillNo}</span>
+                            </Col>
+                            : <></>
                         }
-                    </Col>
-                    <Col xs={{span: 1, offset: 2}}>
-                        <span >
-                            <Popover
-                                containerClassName="pledgebook-alert-popever"
-                                padding={0}
-                                isOpen={isPopoverVisible}
-                                position={'left'} // preferred position
-                                // onClickOutside={() => this.closePopover(row.UniqueIdentifier)}
-                                content={({ position, targetRect, popoverRect }) => {
-                                    return (
-                                        <AlertComp 
-                                            closePopover={this.closePopover} 
-                                            row={row} 
-                                            refreshCallback={this.refresh}
-                                            getCreateAlertParams = {getCreateAlertParams}
-                                            getUpdateAlertParams = {getUpdateAlertParams}
-                                            getDeleteAlertParams = {getDeleteAlertParams}
-                                            />
-                                    )
-                                }}
-                                >
-                                <span className="pledgebook-alert-icon" onClick={(e) => this.onClickAlertIcon(e, row)}>
-                                    {row.alertId && <MdNotifications/>}
-                                    {!row.alertId && <MdNotificationsNone/>}
-                                </span>
-                            </Popover>
-                            {/* <FaPencilAlt /> */}
-                        </span>
-                    </Col>
-                </Row>
+                        {row.Renewed ? 
+                            <Col xs={12} md={12} style={{paddingLeft: '2%'}}>
+                                <span style={{fontSize: '18px'}}><MdInfoOutline /></span>
+                                <span style={{fontSize: '1rem', fontWeight: 500, paddingLeft: '3px'}}>This bill has been renewed. New Bill : {row.RenewedNewBillNo}</span>
+                            </Col>
+                            : <></>
+                        }
+                    </Row>
+                </>
             )
         },
         // showIndicator: true,

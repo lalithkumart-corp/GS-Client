@@ -192,6 +192,7 @@ class PledgebookModal extends Component {
             date: this.props.currentBillData.Date,
             expiryDate: this.props.currentBillData.LoanExpiryDate,
             cname: this.props.currentBillData.Name,
+            guardianRelation: this.props.currentBillData.GuardianRelation,
             gaurdianName: this.props.currentBillData.GaurdianName,
             address: this.props.currentBillData.Address,
             place: this.props.currentBillData.Place,
@@ -545,7 +546,8 @@ export const RenewalScreen = (props) => {
     const [ newPrincipal, setNewPrincipal ] = useState(theBillData.Amount);
     const [ newInterestPercent, setNewInterestPercent ] = useState(theBillData.IntPercent);
     const [ newInterestValue, setNewInterestVal ] = useState((newPrincipal*theBillData.IntPercent)/100);
-    const [ paymentObj, setPaymentObj ] = useState(null);
+    const [ paymentInObj, setPaymentInObj ] = useState(null);
+    const [ paymentOutObj, setPaymentOutObj ] = useState(null);
 
     const billSeries = useSelector((state) => {return state.billCreation.billSeries});
     const billNumber = useSelector((state) => state.billCreation.billNumber);
@@ -626,11 +628,16 @@ export const RenewalScreen = (props) => {
         return custAmt;
     }
 
-    const onChangePaymentInputs = (obj) => {
-        setPaymentObj(obj);
+    const onChangePaymentInInputs = (obj) => {
+        setPaymentInObj(obj);
+    }
+
+    const onChangePaymentOutInputs = (obj) => {
+        setPaymentOutObj(obj);
     }
 
     const renewBill = async () => {
+        const newUID = (+ new Date())-10; //minor change in time, as there is another (+new Date()) in "RedeemParams.redeemUID"
         let redeemParams = {
             redeemUID: (+new Date()),
             customerId: theBillData.CustomerId,
@@ -647,12 +654,15 @@ export const RenewalScreen = (props) => {
             discountValue: theBillData._discountValue,
             paidAmount: theBillData._totalValue,
             handedTo: theBillData.Name,
-            paymentMode: paymentObj?paymentObj.mode:DEFAULT_PAYMENT_OBJ_FOR_CASH_IN.mode,
-            paymentDetails: paymentObj||DEFAULT_PAYMENT_OBJ_FOR_CASH_IN,
-            billRemarks: ''
+            paymentMode: paymentInObj?paymentInObj.mode:DEFAULT_PAYMENT_OBJ_FOR_CASH_IN.mode,
+            paymentDetails: paymentInObj||DEFAULT_PAYMENT_OBJ_FOR_CASH_IN,
+            billRemarks: '',
+            isRenewal: true,
+            redemmedNewBillNo: billSeries?`${billSeries}.${billNumber}`:billNumber,
+            redeemedNewBillUid: newUID
         };
         let newBillParams = {
-            uniqueIdentifier: theBillData.UniqueIdentifier,
+            uniqueIdentifier: newUID,
             billNo: billNumber,
             billSeries: billSeries,
             amount: parseInt(newPrincipal),
@@ -661,9 +671,12 @@ export const RenewalScreen = (props) => {
             expiryDate: addDays(new Date(), LOAN_BILL_EXPIRY_DAYS).toISOString().replace('T', ' ').slice(0,23),
             interestPercent: newInterestPercent,
             interestValue: newInterestValue,
-            paymentMode: paymentObj?paymentObj.paymentMode:DEFAULT_PAYMENT_OBJ_FOR_CASH_OUT,
-            paymentDetails: paymentObj||DEFAULT_PAYMENT_OBJ_FOR_CASH_OUT,
-            billRemarks: '',
+            paymentMode: paymentOutObj?paymentOutObj.mode:DEFAULT_PAYMENT_OBJ_FOR_CASH_OUT.mode,
+            paymentDetails: paymentOutObj||DEFAULT_PAYMENT_OBJ_FOR_CASH_OUT,
+            billRemarks: '',//`Renewal of ${theBillData.BillNo}`,
+            isRenewal: true,
+            isRenewalOfBillNo: theBillData.BillNo,
+            isRenewalOfUID: theBillData.UniqueIdentifier
         }
         try {
             let res = await axiosMiddleware.post(RENEW_LOAN_BILL, {redeemParams, newBillParams});
@@ -787,9 +800,9 @@ export const RenewalScreen = (props) => {
                             <Col xs={12} md={12} style={{marginBottom: '15px'}}>
                                 <h4>Due Amount</h4>
                             </Col>
-                            <Col xs={4}>
+                            {/* <Col xs={4}>
                                 <PaymentSelectionCard paymentFlow={getMoneyDiff()>0?IN:OUT} paymentMode={'cash'} onChange={(obj) => onChangePaymentInputs(obj)}/>
-                            </Col>
+                            </Col> */}
                             <Col xs={{span:6, offset: 1}}>
                                 <Row>
                                     {
@@ -814,7 +827,21 @@ export const RenewalScreen = (props) => {
                                 </Row>
                             </Col>
                         </Row>
-
+                        <Row style={{marginBottom: '15px'}}>
+                            <Col xs={12} md={12}>
+                                <p>Renewal process = Closing the existing bill and creating new bill with new principal and today's date value</p>
+                                <Row>
+                                    <Col xs={5} md={5}>
+                                        <p>For Closing Bill - Amount Rs: {theBillData.Amount + theBillData._totalInterestValue - theBillData._discountValue}</p>
+                                        <PaymentSelectionCard paymentFlow={IN} paymentMode={'cash'} onChange={(obj) => onChangePaymentInInputs(obj)}/>
+                                    </Col>
+                                    <Col xs={5} md={5}>
+                                        <p>For New Bill - Amount Rs: {newPrincipal-newInterestValue}</p>
+                                        <PaymentSelectionCard paymentFlow={OUT} paymentMode={'cash'} onChange={(obj) => onChangePaymentOutInputs(obj)}/>  
+                                    </Col>
+                                </Row>
+                            </Col>
+                        </Row>
                         <Row>
                             <input type="button" value="Renew" className="gs-button bordered" onClick={renewBill} />
                         </Row>
