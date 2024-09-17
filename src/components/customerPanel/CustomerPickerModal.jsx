@@ -88,6 +88,7 @@ export default class Customer extends Component {
     bindMethods() {
         this.onClickSelectBtn = this.onClickSelectBtn.bind(this);
         this.onClickCreateBtn = this.onClickCreateBtn.bind(this);
+        this.createNewCustomer = this.createNewCustomer.bind(this);
     }
 
     fetchMetaData() {
@@ -316,9 +317,8 @@ export default class Customer extends Component {
                 toast.error('Error in creating new customer. Please contact admin');
             } else {
                 await this.setState({selectedCustomer: resp.data.CUSTOMER_ROW});
-                let rr = constructCreateCustParams(this.state);
+                let rr = constructCreateCustParams({selectedCustomer: resp.data.CUSTOMER_ROW});
                 this.props.onSelectCustomer(rr);
-                console.log(resp);
             }
         } catch(e) {
             console.log(e);

@@ -141,9 +141,17 @@ export default class LoanBillBodyTemplate extends Component {
                                 <span className={`field-names font17`}>ADDRESS:</span>
                             </Col>
                             <Col xs={10} md={10} className="addr-field" style={addrStyles}>
+                                {this.state.billContent.address?.length > 35 ?
+                                 <div>{this.state.billContent.address},
+                                    &nbsp;{this.state.billContent.place}, 
+                                    &nbsp;{this.state.billContent.city}-{this.state.billContent.pinCode}
+                                 </div>
+                                :<>
                                 <div>{this.state.billContent.address}</div>
                                 {this.state.billContent.place}, 
-                                &nbsp; {this.state.billContent.city}-{this.state.billContent.pinCode}
+                                &nbsp; {this.state.billContent.city}-{this.state.billContent.pinCode}</>
+                                }
+                               
                             </Col>
                         </Row>
                     </div>
@@ -259,43 +267,96 @@ export default class LoanBillBodyTemplate extends Component {
         if(this.state.billContent.orn && Object.keys(this.state.billContent.orn).length > 0) {
             let list = [];
             let totalOrnLength = Object.keys(this.state.billContent.orn).length;
-            _.each(this.state.billContent.orn, (anOrn, index) => {
-                footer.count++;
-                footer.wt = parseFloat((footer.wt  + parseFloat(anOrn.ornNWt || 0)).toFixed(3));
-                footer.qty += parseInt(anOrn.ornNos) || 0;
-                this._totalWt = footer.wt;
-                if(anOrn.ornSpec && anOrn.ornSpec.length > 0) anOrn.ornSpec = `${anOrn.ornSpec.trim()}`;
-                if(list.length >= 9) {
-                    if(totalOrnLength > 10 && list.length == 9) {
-                        list.push(
-                            <Row>
-                                <Col xs={{span: 1}} md={{span: 1}} className="orn-table-body-cell sno">{index}</Col>
-                                <Col xs={{span: 9}} md={{span: 9}} className="orn-table-body-cell item">Others</Col>
-                                <Col xs={{span: 2}} md={{span: 2}} className="orn-table-body-cell nos"></Col>
-                                {/* <Col xs={{span: 2}} md={{span: 2}} className="orn-table-body-cell wt"></Col> */}
-                            </Row>
-                        );
-                    } else if(totalOrnLength <= 10) {
-                        list.push(
-                            <Row>
-                                <Col xs={{span: 1}} md={{span: 1}} className="orn-table-body-cell sno">{index}</Col>
-                                <Col xs={{span: 9}} md={{span: 9}} className="orn-table-body-cell item">{this.enhanceOrnItemName(anOrn.ornItem, anOrn.ornNos)} {`${anOrn.ornSpec?(anOrn.ornSpec):''}`} </Col>
-                                <Col xs={{span: 2}} md={{span: 2}} className="orn-table-body-cell nos">{anOrn.ornNos}</Col>
-                                {/* <Col xs={{span: 2}} md={{span: 2}} className="orn-table-body-cell wt">{anOrn.ornNWt}</Col> */}
-                            </Row>
-                        );
-                    }
-                } else {
+            let rows = 0;
+            let index = 1;
+            while(rows < 10) {
+                let anOrn = this.state.billContent.orn[index];
+                console.log(anOrn);
+                if(anOrn) {
+                    footer.count++;
+                    footer.wt = parseFloat((footer.wt  + parseFloat(anOrn.ornNWt || 0)).toFixed(3));
+                    footer.qty += parseInt(anOrn.ornNos) || 0;
+                    this._totalWt = footer.wt;
+                    if(anOrn.ornSpec && anOrn.ornSpec.length > 0) anOrn.ornSpec = `${anOrn.ornSpec.trim()}`;
+    
+                    let theItemName = `${this.enhanceOrnItemName(anOrn.ornItem, anOrn.ornNos)} ${anOrn.ornSpec?`(${anOrn.ornSpec})`:''}`;
                     list.push(
                         <Row>
                             <Col xs={{span: 1}} md={{span: 1}} className="orn-table-body-cell sno">{index}</Col>
-                            <Col xs={{span: 9}} md={{span: 9}} className="orn-table-body-cell item">{this.enhanceOrnItemName(anOrn.ornItem, anOrn.ornNos)} {anOrn.ornSpec?`(${anOrn.ornSpec})`:''}</Col>
+                            <Col xs={{span: 9}} md={{span: 9}} className="orn-table-body-cell item">{theItemName}</Col>
                             <Col xs={{span: 2}} md={{span: 2}} className="orn-table-body-cell nos">{anOrn.ornNos}</Col>
-                            {/* <Col xs={{span: 2}} md={{span: 2}} className="orn-table-body-cell wt">{anOrn.ornNWt}</Col> */}
                         </Row>
                     );
+                    rows++;
+    
+    
+                    if(theItemName.length > 42) {
+                        console.log('theItemName is greater than 40');
+                        list.push(<Row>
+                            <Col xs={{span: 1}} md={{span: 1}} className="orn-table-body-cell sno"></Col>
+                            <Col xs={{span: 9}} md={{span: 9}} className="orn-table-body-cell item"></Col>
+                            <Col xs={{span: 2}} md={{span: 2}} className="orn-table-body-cell nos"></Col>
+                        </Row>)
+                        rows++;
+                    }
+                } else {
+                    console.log('Orn value is empty, so adding empty row');
+                    list.push(<Row>
+                        <Col xs={{span: 1}} md={{span: 1}} className="orn-table-body-cell sno"></Col>
+                        <Col xs={{span: 9}} md={{span: 9}} className="orn-table-body-cell item"></Col>
+                        <Col xs={{span: 2}} md={{span: 2}} className="orn-table-body-cell nos"></Col>
+                    </Row>)
+                    rows++;
                 }
-            });
+                index++;
+                
+            }
+
+            // _.each(this.state.billContent.orn, (anOrn, index) => {
+            //     footer.count++;
+            //     footer.wt = parseFloat((footer.wt  + parseFloat(anOrn.ornNWt || 0)).toFixed(3));
+            //     footer.qty += parseInt(anOrn.ornNos) || 0;
+            //     this._totalWt = footer.wt;
+            //     if(anOrn.ornSpec && anOrn.ornSpec.length > 0) anOrn.ornSpec = `${anOrn.ornSpec.trim()}`;
+            //     if(list.length >= 9) {
+            //         if(totalOrnLength > 10 && list.length == 9) {
+            //             list.push(
+            //                 <Row>
+            //                     <Col xs={{span: 1}} md={{span: 1}} className="orn-table-body-cell sno">{index}</Col>
+            //                     <Col xs={{span: 9}} md={{span: 9}} className="orn-table-body-cell item">Others</Col>
+            //                     <Col xs={{span: 2}} md={{span: 2}} className="orn-table-body-cell nos"></Col>
+            //                     {/* <Col xs={{span: 2}} md={{span: 2}} className="orn-table-body-cell wt"></Col> */}
+            //                 </Row>
+            //             );
+            //         } else if(totalOrnLength <= 10) {
+            //             list.push(
+            //                 <Row>
+            //                     <Col xs={{span: 1}} md={{span: 1}} className="orn-table-body-cell sno">{index}</Col>
+            //                     <Col xs={{span: 9}} md={{span: 9}} className="orn-table-body-cell item">{this.enhanceOrnItemName(anOrn.ornItem, anOrn.ornNos)} {`${anOrn.ornSpec?(anOrn.ornSpec):''}`} </Col>
+            //                     <Col xs={{span: 2}} md={{span: 2}} className="orn-table-body-cell nos">{anOrn.ornNos}</Col>
+            //                     {/* <Col xs={{span: 2}} md={{span: 2}} className="orn-table-body-cell wt">{anOrn.ornNWt}</Col> */}
+            //                 </Row>
+            //             );
+            //         }
+            //     } else {
+            //         let itemName = this.enhanceOrnItemName(anOrn.ornItem, anOrn.ornNos)} {anOrn.ornSpec?`(${anOrn.ornSpec})`:'';
+            //         list.push(
+            //             <Row>
+            //                 <Col xs={{span: 1}} md={{span: 1}} className="orn-table-body-cell sno">{index}</Col>
+            //                 <Col xs={{span: 9}} md={{span: 9}} className="orn-table-body-cell item">{itemName}</Col>
+            //                 <Col xs={{span: 2}} md={{span: 2}} className="orn-table-body-cell nos">{anOrn.ornNos}</Col>
+            //                 {/* <Col xs={{span: 2}} md={{span: 2}} className="orn-table-body-cell wt">{anOrn.ornNWt}</Col> */}
+            //             </Row>
+            //         );
+            //         if(itemName.length > 40) {
+            //             list.push(<Row>
+            //                 <Col xs={{span: 1}} md={{span: 1}} className="orn-table-body-cell sno"></Col>
+            //                 <Col xs={{span: 9}} md={{span: 9}} className="orn-table-body-cell item"></Col>
+            //                 <Col xs={{span: 2}} md={{span: 2}} className="orn-table-body-cell nos"></Col>
+            //             </Row>)
+            //         }
+            //     }
+            // });
 
             // If list is less than 10
             while(list.length <10) {
