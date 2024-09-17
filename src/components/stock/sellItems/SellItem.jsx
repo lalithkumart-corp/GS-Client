@@ -495,17 +495,6 @@ class SellItem extends Component {
         if(validation.flag) {
             try {
                 let apiParams = constructApiParams(this.state, this.props);
-
-                // //TEMP
-                // let tt = constructPrintContent(this.state, this.props);
-                // console.log(tt);
-                // this.setState({printContent: tt});
-                // setTimeout(() => {
-                //     this.printBtn.handlePrint();
-                // }, 300);
-
-                // return;
-                //TEMP END
                 console.log(apiParams);
                 let printContent = constructPrintContent(this.state, this.props);
                 apiParams.invoiceData = printContent;
@@ -513,21 +502,6 @@ class SellItem extends Component {
 
                 console.log(printContent);
                 this.triggerPrint(printContent);
-
-                // let resp = await axiosMiddleware.post(SALE_ITEM, {apiParams});
-                // if(resp.data && resp.data.STATUS == "SUCCESS") {
-                //     let printContent = constructPrintContent(this.state, this.props);
-                //     console.log(printContent);
-                //     this.triggerPrint(printContent);
-                //     toast.success('Success!');
-                //     let newState = {...this.state};
-                //     newState = resetPageState(newState);
-                //     this.setState(newState);
-                //     //TODO: reset the UI form data
-                // } else {
-                //     let msg = resp.data.ERROR || 'ERROR';
-                //     toast.error(msg);
-                // }
 
             } catch(e) {
                 console.log(e);
@@ -1121,65 +1095,6 @@ class SellItem extends Component {
                         <td>
                             <span onClick={(e) => this.deleteItemFromPurchaseItemPreview(anItem.prod_id)}><FontAwesomeIcon icon="backspace"/></span>
                             <span onClick={(e) => this.enableEditView(index)} style={{paddingLeft: '10px'}}><FontAwesomeIcon icon="edit"/></span>                             
-
-                            {/* <Popover
-                                    className='status-popover'
-                                    padding={0}
-                                    isOpen={this.state[stateKey]}
-                                    position={'right'} // preferred position
-                                    onClickOutside={() => this.closePopover(stateKey)}
-                                    content={({ position, targetRect, popoverRect }) => {
-                                        let tempFormData = anItem.tempFormData;
-                                        return (
-                                            <Container className="edit-item-in-purchase-panel-container" style={{width: '200px', backgroundColor: 'navajowhite', padding: '10px'}}>
-                                                <Row>
-                                                    Avl Qty: {anItem.avl_qty}
-                                                    Wt: {anItem.gross_wt}
-                                                </Row>
-                                                <Row>
-                                                    <Col xs={6}>
-                                                        Quantity:
-                                                        <input type="text" value={tempFormData.qty} onChange={(e) => {this.onChangeInPurchasePreview('qty', anItem.prod_id, e.target.value)}} />
-                                                    </Col>
-                                                    <Col xs={6}>
-                                                        Wt:
-                                                        <input type="text" value={tempFormData.wt} onChange={(e) => {this.onChangeInPurchasePreview('wt', anItem.prod_id, e.target.value)}} />
-                                                    </Col>
-                                                    <Col xs={6}>
-                                                        Labour:
-                                                        <input type="text" value={tempFormData.wastage} onChange={(e) => {this.onChangeInPurchasePreview('wastage', anItem.prod_id, e.target.value)}} />
-                                                    </Col>
-                                                    <Col xs={6}>
-                                                        wastage:
-                                                        <input type="text" value={tempFormData.labour} onChange={(e) => {this.onChangeInPurchasePreview('labour', anItem.prod_id, e.target.value)}} />
-                                                    </Col>
-                                                    <Col xs={6}>
-                                                        CGST:
-                                                        <input type="text" value={tempFormData.cgstPercent} onChange={(e) => {this.onChangeInPurchasePreview('cgstPercent', anItem.prod_id, e.target.value)}} />
-                                                    </Col>
-                                                    <Col xs={6}>
-                                                        SGST:
-                                                        <input type="text" value={tempFormData.sgstPercent} onChange={(e) => {this.onChangeInPurchasePreview('sgstPercent', anItem.prod_id, e.target.value)}} />
-                                                    </Col>
-                                                    <Col xs={6}>
-                                                        Discount:
-                                                        <input type="text" value={tempFormData.dicsount} onChange={(e) => {this.onChangeInPurchasePreview('dicsount', anItem.prod_id, e.target.value)}} />
-                                                    </Col>
-                                                    <Col xs={6}>
-                                                        Price:
-                                                        <input type="text" readOnly value={tempFormData.dicsount} />
-                                                    </Col>
-                                                </Row>
-                                                <Row>
-                                                    <input type="button" className="gs-button" value="SAVE" onClick={(e) => this.onSaveBtn1Click(index)}/>
-                                                </Row>
-                                            </Container>
-                                            )
-                                    }
-                                }                                                                 
-                                >
-                                    <span onClick={(e) => this.showPopover(stateKey)} style={{paddingLeft: '10px'}}><FontAwesomeIcon icon="edit"/></span>                             
-                                </Popover> */}
                         </td>
                     </tr> 
                 );
@@ -1356,44 +1271,6 @@ class SellItem extends Component {
                             </tr>
                         </tbody>
                     </table>
-                    {/* <Col xs={1} style={{padding: 0}}>
-                        <Form.Group>
-                            Metal:
-                            <Form.Control as="select"
-                                onChange={(e) => this.onDropdownChange(e, EX_METAL)} 
-                                value={this.state.exchangeItemFormData[EX_METAL]}
-                                style={{display: "inline-block", width: "50px"}}
-                                // onKeyUp={(e) => this.handleKeyUp(e, {currElmKey: EX_METAL})}
-                                // ref= {(domElm) => {this.domElmns[EX_METAL] = domElm; }}
-                                >
-                                    <option key="key-gold" value="G">GOLD</option>
-                                    <option key="key-silver" value="S">SILVER</option>
-                            </Form.Control>
-                        </Form.Group>
-                    </Col>
-                    <Col xs={2}>
-                        GrossWt:
-                        <input type="number" className="gs-input" value={this.state.exchangeItemFormData[EX_GROSS_WT]} onChange={(e)=>this.onInputValChange(e, EX_GROSS_WT)} />
-                    </Col>
-                    <Col xs={2}>
-                        NetWt:
-                        <input type="number" className="gs-input" value={this.state.exchangeItemFormData[EX_NET_WT]} onChange={(e)=>this.onInputValChange(e, EX_NET_WT)} />
-                    </Col>
-                    <Col xs={2}>
-                        Wastage:
-                        <input type="number" className="gs-input" value={this.state.exchangeItemFormData[EX_WASTAGE]} onChange={(e)=>this.onInputValChange(e, EX_WASTAGE)} />
-                    </Col>
-                    <Col xs={2}>
-                        Old Rate:
-                        <input type="number" className="gs-input" value={this.state.exchangeItemFormData[EX_OLD_RATE]} onChange={(e)=>this.onInputValChange(e, EX_OLD_RATE)} />
-                    </Col>
-                    <Col xs={2}>
-                        Price:
-                        <input type="number" className="gs-input" value={this.state.exchangeItemFormData[EX_PRICE]} onChange={(e)=>this.onInputValChange(e, EX_PRICE)} />
-                    </Col> */}
-                    {/* <Col xs={1}> */}
-                        {/* <input type="button" className="gs-button" value="ADD" onClick={this.onClickExAddButton}/> */}
-                    {/* </Col> */}
                 </Col>
                 <Col xs={2}>
                     <input type="button" className="gs-button" value="ADD" onClick={this.onClickExAddButton}
@@ -1421,18 +1298,6 @@ class SellItem extends Component {
                 </tr>
             )
         });
-        // if(rows.length == 0) { //if empty
-        //     rows.push(
-        //         <tr style={{height: "26px"}}>
-        //             <td></td>
-        //             <td></td>
-        //             <td></td>
-        //             <td></td>
-        //             <td></td>
-        //             <td></td>
-        //         </tr>
-        //     )
-        // }
         if(this.state.exchangeItemsTotals) {
             footer.push(
                 <tr>
