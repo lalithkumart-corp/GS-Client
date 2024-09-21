@@ -1,3 +1,14 @@
 .cust-inv-container.full-screen {
     max-width: 95%;
 }
+.my-customer-invoices-list-table {
+    input[type="text"] {
+        width: 100%;
+    }
+    table-layout: fixed;
+    .invoice-customer-address {
+        text-overflow: ellipsis;
+        overflow: hidden;
+        white-space: nowrap;
+    }
+}

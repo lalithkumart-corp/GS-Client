@@ -36,6 +36,8 @@ export default class JewelleryCustomerInvoicesList extends Component {
             previewVisibility: false,
             timeOut: 400,
             pageLimit: 10,
+            offsetStart: 0,
+            offsetEnd: 10,
             selectedPageIndex: 0,
             invoiceUpdateMode: false,
             rawInvoiceData: null,
@@ -48,15 +50,20 @@ export default class JewelleryCustomerInvoicesList extends Component {
             },
             columns: [
                 {
-                    id: 'createdDate',
+                    id: 'invoiceDate',
                     displayText: 'Inv. Date',
                     isFilterable: false,
                     width: '10%',
                     formatter: (column, columnIndex, row, rowIndex) => {
                         return (
-                            <span>{convertToLocalTime(row[column.id], {excludeTime: true})}</span>
+                            <Tooltip title={convertToLocalTime(row[column.id])}
+                                    position="top"
+                                    trigger="mouseenter">
+                                <span>{convertToLocalTime(row[column.id], {excludeTime: true} )} </span>
+                            </Tooltip>
                         )
-                    }
+                    },
+                    width: '5%'
                 },
                 {
                     id: 'invoiceNo',
@@ -84,20 +91,59 @@ export default class JewelleryCustomerInvoicesList extends Component {
                             <span>{row[column.id]}</span>
                         )
                     },
-                    width: '5%'
+                    width: '12%'
+                },
+                {
+                    id: 'customerGaurdianName',
+                    displayText: 'Gaurdian Name',
+                    isFilterable: true,
+                    filterCallback: this.filterCallbacks.customerGaurdianName,
+                    className: 'invoice-customer-gaurdian-name',
+                    formatter: (column, columnIndex, row, rowIndex) => {
+                        return (
+                            <span>{row[column.id]}</span>
+                        )
+                    },
+                    width: '10%'
+                },
+                {
+                    id: 'customerAddr',
+                    displayText: 'Address',
+                    isFilterable: true,
+                    filterCallback: this.filterCallbacks.customerAddress,
+                    className: 'invoice-customer-address',
+                    formatter: (column, columnIndex, row, rowIndex) => {
+                        return (
+                            <span>{row[column.id]}</span>
+                        )
+                    },
+                    width: '20%'
                 },
                 {
                     id: 'prodIds',
                     displayText: 'Tag IDS',
-                    // isFilterable: true,
-                    // filterCallback: this.filterCallbacks.prodIds,
+                    isFilterable: true,
+                    filterCallback: this.filterCallbacks.prodId,
                     className: 'invoice-prod-ids',
                     formatter: (column, columnIndex, row, rowIndex) => {
                         return (
                             <span>{row[column.id]}</span>
                         )
                     },
-                    width: '5%'
+                    width: '9%'
+                },
+                {
+                    id: 'huids',
+                    displayText: 'HUID',
+                    isFilterable: true,
+                    filterCallback: this.filterCallbacks.huid,
+                    className: 'invoice-huid-ids',
+                    formatter: (column, columnIndex, row, rowIndex) => {
+                        return (
+                            <span>{row[column.id]}</span>
+                        )
+                    },
+                    width: '10%'
                 },
                 {
                     id: 'customerMobile',
@@ -136,7 +182,7 @@ export default class JewelleryCustomerInvoicesList extends Component {
                             </span>
                         )
                     },
-                    width: '3%'
+                    width: '4%'
                 }
             ],
             filters: {
@@ -146,8 +192,10 @@ export default class JewelleryCustomerInvoicesList extends Component {
                 },
                 invoiceNo: null,
                 prodIds: null,
-                customerName: null,
-                customerMobile: null
+                custName: null,
+                customerGaurdianName: null,
+                customerMobile: null,
+                customerAddress: null,
             }
         }
         this.bindMethods();
@@ -156,12 +204,14 @@ export default class JewelleryCustomerInvoicesList extends Component {
         this.handlePreviewClose = this.handlePreviewClose.bind(this);
         this.goToInvoiceListScreen = this.goToInvoiceListScreen.bind(this);
         this.onClickPrint = this.onClickPrint.bind(this);
+        this.handlePageClick = this.handlePageClick.bind(this);
     }
     filterCallbacks = {
         date: async (startDate, endDate) => {
             let newState = {...this.state};
             newState.filters.date.startDate = new Date(startDate);
             newState.filters.date.endDate = new Date(endDate);
+            newState.selectedPageIndex = 0;
             await this.setState(newState);
             this.refresh();
             setJewelleryCustInvoicesPageFilters(newState.filters);
@@ -170,35 +220,63 @@ export default class JewelleryCustomerInvoicesList extends Component {
             let val = e.target.value;
             let newState = {...this.state};
             newState.filters.invoiceNo = val;
+            newState.selectedPageIndex = 0;
             await this.setState(newState);
-            this.refresh({fetchOnlyRows: true});
+            this.refresh();//{fetchOnlyRows: true}
         },
         custName: async (e, col, colIndex) => {
             let val = e.target.value;
             let newState = {...this.state};
-            newState.filters.custName = val;
+            newState.filters.customerName = val;
+            newState.selectedPageIndex = 0;
             await this.setState(newState);
-            this.refresh({fetchOnlyRows: true});
+            this.refresh();//{fetchOnlyRows: true}
         },
-        // prodIds: async (e, col, colIndex) => {
-        //     let val = e.target.value;
-        //     let newState = {...this.state};
-        //     newState.filters.prodIds = val;
-        //     await this.setState(newState);
-        //     this.refresh({fetchOnlyRows: true});
-        // },
+        customerGaurdianName: async (e, col, colIndex) => {
+            let val = e.target.value;
+            let newState = {...this.state};
+            newState.filters.customerGaurdianName = val;
+            newState.selectedPageIndex = 0;
+            await this.setState(newState);
+            this.refresh();
+        },
+        customerAddress: async (e, col, colIndex) => {
+            let val = e.target.value;
+            let newState = {...this.state};
+            newState.filters.customerAddress = val;
+            newState.selectedPageIndex = 0;
+            await this.setState(newState);
+            this.refresh();
+        },
+        prodId: async (e, col, colIndex) => {
+            let val = e.target.value;
+            let newState = {...this.state};
+            newState.filters.prodId = val;
+            newState.selectedPageIndex = 0;
+            await this.setState(newState);
+            this.refresh();//{fetchOnlyRows: true}
+        },
+        huid: async (e, col, colIndex) => {
+            let val = e.target.value;
+            let newState = {...this.state};
+            newState.filters.huid = val;
+            newState.selectedPageIndex = 0;
+            await this.setState(newState);
+            this.refresh();//{fetchOnlyRows: true}
+        },
         customerMobile: async (e, col, colIndex) => {
             let val = e.target.value;
             let newState = {...this.state};
             newState.filters.customerMobile = val;
             await this.setState(newState);
-            this.refresh({fetchOnlyRows: true});
+            this.refresh();//{fetchOnlyRows: true}
         },
     }
     cellClickCallbacks = {
         onInvoiceNoClick: (params, e) => {
             e.stopPropagation();
-            this.setState({currentScreen:2, invoiceUpdateMode: true, invoiceDataForUpdate: params.row});
+            // TODO: DISABLING THIS EDIT INVOICE FEATURE TEMPORARILY.
+            // this.setState({currentScreen:2, invoiceUpdateMode: true, invoiceDataForUpdate: params.row});
         }
     }
     componentDidMount() {
@@ -220,11 +298,21 @@ export default class JewelleryCustomerInvoicesList extends Component {
     async fetchInvoicesPerPage() {
         try {
             let args = getFilterParams(this.state);
+            let offsets = this.getOffsets();
+            args.offsetStart = offsets[0] || 0;
+            args.offsetEnd = offsets[1] || 10;
             let resp = await axiosMiddleware.get(`${FETCH_JWL_CUST_INVOICES_LIST}?access_token=${getAccessToken()}&filters=${JSON.stringify(args)}`);
             this.setState({customerInvoiceList: resp.data.CUST_INV_LIST});
         } catch(e) {
             console.log(e);
         }
+    }
+
+    getOffsets() {        
+        let pageNumber = parseInt(this.state.selectedPageIndex);
+        let offsetStart = pageNumber * parseInt(this.state.pageLimit);
+        let offsetEnd = offsetStart + parseInt(this.state.pageLimit);
+        return [offsetStart, offsetEnd];
     }
 
     onInvoiceClick(e, row) {
@@ -292,7 +380,7 @@ export default class JewelleryCustomerInvoicesList extends Component {
             rowObj: [],
             indexes: [],
         }});        
-        this.refresh({fetchOnlyRows: true});
+        this.refresh();
     }
     getPageCount() {
         return this.state.totals.invoices/this.state.pageLimit;
@@ -306,9 +394,21 @@ export default class JewelleryCustomerInvoicesList extends Component {
         this.printBtn.handlePrint();
     }
 
+    expandRow = {
+        renderer: (row) => {
+            return (
+                <>
+                    <div>Invoice Date: {convertToLocalTime(row.invoiceDate)}</div>
+                    <div>Entry Date: {row.createdDate.replace('T',' ').replace('Z','').substring(0,19)}</div>
+                    <div>Updated Date: {row.modifiedDate.replace('T',' ').replace('Z','').substring(0,19)}</div>
+                </>
+            )
+        }
+    }
+
     render() {
         return (
-            <Container className={`cust-inv-container ${this.state.currentScreen==2?'full-screen':''}`}>
+            <Container className={`cust-inv-container full-screen`}>
                 <GsScreen showScreen={this.state.currentScreen==1?true:false} isMainScreen={true}>
                     <Row>
                         <Col xs={3} md={3}>
@@ -341,8 +441,10 @@ export default class JewelleryCustomerInvoicesList extends Component {
                     <Row>
                         <Col xs={12}>
                             <GSTable 
+                                className= {"my-customer-invoices-list-table"}
                                 columns={this.state.columns}
                                 rowData={this.state.customerInvoiceList}
+                                expandRow = { this.expandRow }
                             />
                         </Col>
                     </Row>

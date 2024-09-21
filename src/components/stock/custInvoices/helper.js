@@ -23,5 +23,23 @@ export const getFilterParams = (stateObj) => {
             endDate: dateFormatter(endDate)
         }
     }
+    if(stateObj.filters.invoiceNo)
+        filters.invoiceNo = stateObj.filters.invoiceNo;
+
+    if(stateObj.filters.customerName)
+        filters.custName = stateObj.filters.customerName;
+
+    if(stateObj.filters.customerGaurdianName)
+        filters.custGarudianName = stateObj.filters.customerGaurdianName;
+
+    if(stateObj.filters.customerAddress)
+        filters.custAddr = stateObj.filters.customerAddress;
+
+    if(stateObj.filters.prodId)
+        filters.prodId = stateObj.filters.prodId;
+
+    if(stateObj.filters.huid)
+        filters.huid = stateObj.filters.huid;
+
     return filters;
 }

@@ -282,9 +282,11 @@ const MyBarChart = (props) => {
           return (
             <div className="custom-tooltip" style={{backgroundColor: 'white', color: "black", padding: '15px'}}>
               <span>Year: {payload[0].payload.year}, Month: {payload[0].payload.month}</span> <br/>
+              <span>Date: {payload[0].payload.xAxisName}</span> <br/>
+              <hr/>
               <span>{`Total Bills: ${payload[0].payload.bills}`}</span> <br/>
+              <span>{`Closed Bills: ${payload[0].payload.bills_closed || 0}`}</span> <br/>
               <span>{`Pending Bills: ${payload[0].payload.bills_pending}`}</span> <br/>
-              <span>{`Closed Bills: ${payload[0].payload.bills_closed}`}</span> <br/>
             </div>
           );
         }
