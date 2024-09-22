@@ -8,9 +8,8 @@ import moment from 'moment';
 import { getDateInUTC } from '../../../utilities/utility';
 import _ from 'lodash';
 import { DoublyLinkedList } from '../../../utilities/doublyLinkedList';
-import axios from '../../../core/axios';
 import { getAccessToken } from '../../../core/storage';
-import { FETCH_ORN_LIST_JEWELLERY, INSERT_NEW_STOCK_ITEM, FETCH_TOUCH_LIST, UPDATE_STOCK_ITEM } from '../../../core/sitemap';
+import { FETCH_ORN_LIST_JEWELLERY, INSERT_NEW_STOCK_ITEM, FETCH_TOUCH_LIST, UPDATE_STOCK_ITEM, ANALYTICS } from '../../../core/sitemap';
 import * as ReactAutosuggest from 'react-autosuggest';
 import axiosMiddleware from '../../../core/axios';
 import { constructItemObj, resetFormData } from './helper';
@@ -158,13 +157,21 @@ class AddStock extends Component {
         } else {
             this.updateDomList('enableAddBtn');
         }
-
+        this.createEvent();
     }
 
     componentWillReceiveProps(nextProps) {
         console.log('=======================', nextProps);
         if(nextProps.mode == "update" && nextProps.rowData) {
             // this.populateDataFromProps(nextProps);
+        }
+    }
+
+    createEvent() {
+        try {
+            axiosMiddleware.post(ANALYTICS, {module: 'JEWELLERY_ITEMS_ADD_TO_STOCK_PAGE_VISIT'});
+        } catch(e) {
+            console.log(e);
         }
     }
 
@@ -596,7 +603,7 @@ class AddStock extends Component {
     async fetchOrnAutoSuggestionList() {
         try {
             let at = getAccessToken();
-            let resp = await axios.get(`${FETCH_ORN_LIST_JEWELLERY}?access_token=${at}`);
+            let resp = await axiosMiddleware.get(`${FETCH_ORN_LIST_JEWELLERY}?access_token=${at}`);
             let list = resp.data.RESPONSE;
             let itemCodeList = [], itemNameList = [], itemCategoryList = [], itemSubCategoryList = [], itemDimentionList = [];
             _.each(list, (anObj, index) => {
@@ -629,7 +636,7 @@ class AddStock extends Component {
     async fetchTouchList() {
         try {
             let at = getAccessToken();
-            let resp = await axios.get(`${FETCH_TOUCH_LIST}?access_token=${at}`);
+            let resp = await axiosMiddleware.get(`${FETCH_TOUCH_LIST}?access_token=${at}`);
             let list = resp.data.RESPONSE;
             let newState = {...this.state};
             newState.autoSuggestions = newState.autoSuggestions || {};

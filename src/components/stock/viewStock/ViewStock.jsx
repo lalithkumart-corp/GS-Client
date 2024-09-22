@@ -3,7 +3,7 @@ import { Container, Row, Col, Form, Dropdown } from 'react-bootstrap';
 import axios from '../../../core/axios';
 import GSTable from '../../gs-table/GSTable';
 import './ViewStock.css';
-import { FETCH_STOCK_LIST, FETCH_STOCK_TOTALS } from '../../../core/sitemap';
+import { FETCH_STOCK_LIST, FETCH_STOCK_TOTALS, ANALYTICS } from '../../../core/sitemap';
 import _ from 'lodash';
 import { toast } from 'react-toastify';
 import { getAccessToken, getStockListPageFilters, setStockListPageFilters } from '../../../core/storage';
@@ -424,6 +424,14 @@ export default class ViewStock extends Component {
         this.fetchTotals();
         this.fetchStockListPerPage();
         this.fetchJewelleryTagSettings();
+        this.createEvent();
+    }
+    createEvent() {
+        try {
+            axios.post(ANALYTICS, {module: 'JEWELLERY_ITEMS_VIEW_STOCK_LIST_PAGE_VISIT'});
+        } catch(e) {
+            console.log(e);
+        }
     }
     filterCallbacks = {
         date: async (startDate, endDate) => {

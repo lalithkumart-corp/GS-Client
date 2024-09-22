@@ -173,7 +173,7 @@ function GstBillingDemo() {
     useEffect(() => {
         if(printFlag && templateContent) {
             btnRef.handlePrint();
-            axiosMiddleware.post(ANALYTICS, {module: 'GST_BILL_DEMO'});
+            axiosMiddleware.post(ANALYTICS, {module: 'GST_BILL_DEMO', ctx1: templateContent.billNo});
             setPrintFlag(false);
         };
     }, [printFlag]);

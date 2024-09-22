@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { Container, Row, Col } from 'react-bootstrap';
 import axiosMiddleware from '../../../core/axios';
-import { FETCH_JWL_CUST_INVOICES_LIST, FETCH_JWL_CUST_INVOICES_LIST_COUNT, FETCH_INVOICE_DATA, DELETE_JWL_INVOICE } from '../../../core/sitemap';
+import { FETCH_JWL_CUST_INVOICES_LIST, FETCH_JWL_CUST_INVOICES_LIST_COUNT, FETCH_INVOICE_DATA, DELETE_JWL_INVOICE, ANALYTICS } from '../../../core/sitemap';
 import { getAccessToken, getJewelleryCustInvoicesPageFilters, setJewelleryCustInvoicesPageFilters, getJewelleryGstBillTemplateSettings } from '../../../core/storage';
 import { getFilterParams, getDataFromStorageRespObj } from './helper';
 import DateRangePicker from '../../dateRangePicker/dataRangePicker';
@@ -206,6 +206,13 @@ export default class JewelleryCustomerInvoicesList extends Component {
         this.onClickPrint = this.onClickPrint.bind(this);
         this.handlePageClick = this.handlePageClick.bind(this);
     }
+    createEvent() {
+        try {
+            axiosMiddleware.post(ANALYTICS, {module: 'JEWELLERY_CUSTOMER_INVOICES_PAGE_VISIT'});
+        } catch(e) {
+            console.log(e);
+        }
+    }
     filterCallbacks = {
         date: async (startDate, endDate) => {
             let newState = {...this.state};
@@ -283,6 +290,7 @@ export default class JewelleryCustomerInvoicesList extends Component {
         this.fetchTotals();
         this.fetchInvoicesPerPage();
         this.setTemplateId();
+        this.createEvent();
     }
     async fetchTotals() {
         try {

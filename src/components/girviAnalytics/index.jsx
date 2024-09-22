@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { Container, Row, Col, Form } from 'react-bootstrap';
 import axiosMiddleware from "../../core/axios";
-import { GET_PLEDGEBOOK_ANALYTICS_DATA, GET_PLEDGEBOOK_ANALYTICS_BY_CUSTOMER } from '../../core/sitemap';
+import { GET_PLEDGEBOOK_ANALYTICS_DATA, GET_PLEDGEBOOK_ANALYTICS_BY_CUSTOMER, ANALYTICS } from '../../core/sitemap';
 import { useState } from "react";
 import { dateFormatter } from "../../utilities/utility";
 import DateRangePicker from '../dateRangePicker/dataRangePicker';
@@ -33,6 +33,10 @@ const GirviAnalytics = () => {
     const [customerWiseAnalyiticsData, setCustomerWiseAnalyiticsData] = useState(null);
 
     useEffect(() => {
+        createEvent();
+    }, []);
+
+    useEffect(() => {
         console.log('INITIAL: useEfect')
         fetchAnalytisData();
         fetchCustomerWiseAnalytics();
@@ -46,6 +50,14 @@ const GirviAnalytics = () => {
     useEffect(() => {
         fetchCustomerWiseAnalytics();
     }, [topCustomerMetric, custWiseTblOffset, selectedPageIndex]);
+
+    const createEvent = () => {
+        try {
+            axiosMiddleware.post(ANALYTICS, {module: 'LOAN_ANALYTICS_PAGE_VISIT'});
+        } catch(e) {
+            console.log(e);
+        }
+    };
 
     const refresh = () => {
         fetchAnalytisData();

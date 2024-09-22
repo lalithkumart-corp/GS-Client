@@ -24,7 +24,7 @@ import { getSession, getPledgebookFilters, setPledgebookFilter } from '../../cor
 import BillTemplate from '../billcreate/billTemplate2';
 import { MdNotifications, MdNotificationsActive, MdNotificationsNone, MdNotificationsOff, MdNotificationsPaused, MdBorderColor, MdInfoOutline } from 'react-icons/md';
 import axiosMiddleware from '../../core/axios';
-import { ARCHIVE_PLEDGEBOOK_BILLS, UNARCHIVE_PLEDGEBOOK_BILLS, TRASH_PLEDGEBOOK_BILLS, PERMANENTLY_DELETE_PLEDGEBOOK_BILLS, RESTORE_TRASHED_PLEDGEBOOK_BILLS } from '../../core/sitemap';
+import { ARCHIVE_PLEDGEBOOK_BILLS, UNARCHIVE_PLEDGEBOOK_BILLS, TRASH_PLEDGEBOOK_BILLS, PERMANENTLY_DELETE_PLEDGEBOOK_BILLS, RESTORE_TRASHED_PLEDGEBOOK_BILLS, ANALYTICS } from '../../core/sitemap';
 import AlertComp from '../alert/Alert';
 import {Tooltip} from 'react-tippy';
 import EventEmitter from 'events';
@@ -398,6 +398,7 @@ class Pledgebook extends Component {
     componentDidMount() {
         this.initiateFetchPledgebookAPI();
         this.setAllowanceOfActions();
+        this.createEvent();
     }
 
     componentWillReceiveProps(nextProps) {
@@ -427,7 +428,15 @@ class Pledgebook extends Component {
     
     componentDidUpdate(prevProps, prevState){
         
-    }    
+    }
+    createEvent() {
+        try {
+            axiosMiddleware.post(ANALYTICS, {module: 'PLEDGEBOOK_PAGE_VISIT'});
+        } catch(e) {
+            console.log(e);
+        }
+    }
+
     // START: Listeners
     customFilters = {
         onChange: (e, val, identifier) => {

@@ -6,7 +6,7 @@ import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 
 import { getBillNoFromDB, storeSellingDataInDb, setClearEntriesFlag } from '../../../actions/invoice';
-import { FETCH_PROD_IDS, FETCH_STOCKS_BY_PRODID, FETCH_STOCKS_BY_ID, SALE_ITEM, FETCH_JEWELLERY_BILLING_AUTO_SUGGESTIONS } from '../../../core/sitemap';
+import { FETCH_PROD_IDS, FETCH_STOCKS_BY_PRODID, FETCH_STOCKS_BY_ID, SALE_ITEM, FETCH_JEWELLERY_BILLING_AUTO_SUGGESTIONS, ANALYTICS } from '../../../core/sitemap';
 import axiosMiddleware from '../../../core/axios';
 import { getAccessToken } from '../../../core/storage';
 import CustomerPicker from '../../customerPanel/CustomerPickerModal';
@@ -147,6 +147,7 @@ class SellItem extends Component {
             this.props.getBillNoFromDB();
         }
         this.fetchAutoSuggestions();
+        this.createEvent();
     }
     componentWillReceiveProps(nextProps) {
         if(nextProps.invoice.gstInvoiceNo !== this.state.invoiceNo) {
@@ -163,6 +164,13 @@ class SellItem extends Component {
             let newState = {...this.state};
             newState = {...newState, ...this.props.constructedPageDataForUpdate}; 
             this.state = newState;
+        }
+    }
+    createEvent() {
+        try {
+            axiosMiddleware.post(ANALYTICS, {module: 'JEWELLERY_ITEMS_SELL_BILLING_PAGE_VISIT'});
+        } catch(e) {
+            console.log(e);
         }
     }
     async fetchAutoSuggestions() {
