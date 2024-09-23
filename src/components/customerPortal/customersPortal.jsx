@@ -380,13 +380,13 @@ class CustomerPortal extends Component {
         return (
             <Container className="customer-detail-container">
                 <Row>
-                    <Col className="left-pane" xs={4} md={4}>
+                    <Col className="left-pane" xs={3} md={3}>
                         {this.addNewCustomerOption()}
                         {this.getSearchBox()}
                         {this.getCustomerListView()}
                         {this.getPagination()}
                     </Col>
-                    <Col className="right-pane" xs={8} md={8}>
+                    <Col className="right-pane" xs={9} md={9}>
                         {this.getDetailView()}
                     </Col>
                     <CommonModal modalOpen={this.state.customerSelectionModalOpen} handleClose={this.closeCustomerModal} secClass="create-customer-modal">

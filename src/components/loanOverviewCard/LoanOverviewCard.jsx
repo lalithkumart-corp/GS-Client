@@ -73,7 +73,8 @@ const LoanOverviewCard = (props) => {
                 </Col>
                 <Col xs={3}>
                     <h4>Interest</h4>
-                    <span>₹: {calcDetail?currencyFormatter(calcDetail._totalInterestValue):0}</span>
+                    <span>{calcDetail?calcDetail._monthDiff:''} * {calcDetail?calcDetail._interestPerMonth:''} =</span>
+                    <span>&nbsp;₹: {calcDetail?currencyFormatter(calcDetail._totalInterestValue):0}</span>
                 </Col>
                 <Col xs={3}>
                     <h4>Payments-Made</h4>

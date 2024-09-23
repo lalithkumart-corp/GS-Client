@@ -1,3 +1,6 @@
+.customer-detail-container {
+    max-width: 95%;
+}
 .customer-detail-container .head-section {
     -webkit-box-shadow: -7px 5px 10px -6px #d3c5c5;
        -moz-box-shadow: -7px 5px 10px -6px #d3c5c5;

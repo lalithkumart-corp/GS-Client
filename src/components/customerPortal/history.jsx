@@ -3,8 +3,10 @@ import { Container, Row, Col, FormGroup, FormLabel, FormControl, HelpBlock, Inpu
 import GSTable from '../gs-table/GSTable';
 import _ from 'lodash';
 import ImageZoom from 'react-medium-image-zoom';
-import { convertToLocalTime, imageUrlCorrection } from '../../utilities/utility';
+import { convertToLocalTime, imageUrlCorrection, currencyFormatter } from '../../utilities/utility';
 import './history.css';
+import { calculateData } from '../redeem/helper';
+import moment from 'moment';
 
 class History extends Component {
     constructor(props) {
@@ -39,7 +41,12 @@ class History extends Component {
                 id: 'Amount',
                 displayText: 'Amount',
                 width: '10%',
-                className: 'pb-amount-col'
+                className: 'pb-amount-col',
+                formatter: (column, columnIndex, row, rowIndex) => {                    
+                    return (
+                        <span>{currencyFormatter(row[column.id])}</span>
+                    )
+                }
             }, {
                 id: 'Name',
                 displayText: 'Customer Name',
@@ -127,16 +134,35 @@ class History extends Component {
     expandRow = {
         renderer: (row) => {
             let ornData = JSON.parse(row.Orn) || {};
+            let calculatedResp;
+            if(row.Status) {
+                calculatedResp = calculateData({
+                    Date: row.Date,
+                    Amount: row.Amount,
+                }, {
+                    date: moment().format('DD/MM/YYYY'),
+                    interestPercent: row.IntPercent,
+                });
+            } else {
+                calculatedResp = {
+                    _roi: row.rate_of_interest,
+                    _interestPerMonth: row.int_rupee_per_month,
+                    _monthDiff: row.no_of_month,
+                    _totalInterestValue: row.interest_amt,
+                    _totalValue: row.paid_amt
+                }
+            }
+
             return (
-                <div style={{display: 'flex'}}>
-                    <div className="orn-display-dom">
+                <Row>
+                    <Col xs={6} md={6} className="orn-display-dom">
                         <table>
                             <colgroup>
                                 <col style={{width: "40%"}}></col>
+                                <col style={{width: "15%"}}></col>
+                                <col style={{width: "15%"}}></col>
+                                <col style={{width: "25%"}}></col>
                                 <col style={{width: "10%"}}></col>
-                                <col style={{width: "10%"}}></col>
-                                <col style={{width: "20%"}}></col>
-                                <col style={{width: "20%"}}></col>
                             </colgroup>
                             <thead>
                                 <tr>
@@ -170,8 +196,8 @@ class History extends Component {
                                 }
                             </tbody>
                         </table>                   
-                    </div>
-                    <div style={{display: 'inline-block'}}>
+                    </Col>
+                    <Col xs={2} md={2} style={{display: 'inline-block'}}>
                         {row.OrnImagePath &&
                             <ImageZoom>
                                 <img src={row.OrnImagePath}
@@ -179,8 +205,31 @@ class History extends Component {
                                     className='pledgebook-orn-display-in-row' />
                             </ImageZoom>
                         }
-                    </div>
-                </div>
+                    </Col>
+                    <Col xs={4} md={4} style={{paddingTop: '15px'}}>
+                        <Row className="compact">
+                            <Col xs={7} md={7}>Rate of Interest:</Col>
+                            <Col className='no-padding' xs={4} md={4}>{calculatedResp._roi} %</Col>
+                        </Row>
+                        <Row className="compact">
+                            <Col xs={7} md={7}>Interest Per Month:</Col>
+                            <Col className='no-padding' xs={4} md={4}>₹: {currencyFormatter(calculatedResp._interestPerMonth)}</Col>
+                        </Row>
+                        <Row className="compact">
+                            <Col xs={7} md={7}>Months:</Col>
+                            <Col className='no-padding' xs={4} md={4}>{calculatedResp._monthDiff}</Col>
+                        </Row>
+                        <Row className="compact">
+                            <Col xs={7} md={7}>Interest:</Col>
+                            <Col className='no-padding' xs={4} md={4}>₹: {currencyFormatter(calculatedResp._totalInterestValue)}</Col>
+                        </Row>
+                        <Row className="compact" style={{paddingBottom: '30px'}}>
+                            <Col xs={7} md={7} style={{borderBottom: '1px dashed grey', borderTop: '1px dashed grey'}}> Total:</Col>
+                            <Col className='no-padding' xs={4} md={4} style={{borderBottom: '1px dashed grey', borderTop: '1px dashed grey'}}>₹: {currencyFormatter(calculatedResp._totalValue)}</Col>
+                        </Row>
+                        
+                    </Col>
+                </Row>
             )
         },
         showIndicator: true,
@@ -205,7 +254,7 @@ class History extends Component {
     }
     render() {        
         return (
-            <Container>
+            <Container className="customer-portal-history-panel">
                 <Row>
                     <span className='total-bill-count-span'>Total Bills: <b>{this.state.totalBillCount}</b></span>                
                     <Tabs defaultActiveKey="pending" variant='pills'>

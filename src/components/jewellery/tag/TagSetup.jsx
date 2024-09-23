@@ -54,7 +54,7 @@ const TagSetup = () => {
 
     const onClickUpdate = async () => {
         try {
-            let resp = await axiosMiddleware.put(UPDATE_JEWELLERY_TAG_SETTINGS, {selectedTemplateId});
+            let resp = await axiosMiddleware.put(UPDATE_JEWELLERY_TAG_SETTINGS, {selectedTemplateId, storeNameAbbr: storeName});
             if(resp && resp.data && resp.data.STATUS == 'SUCCESS') toast.success('Updated Successfully');
             else {
                 console.log(e);
