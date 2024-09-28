@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 // import { connect } from 'react-redux';
 import { Container, Row, Col, Dropdown, DropdownButton } from 'react-bootstrap';
 import axios from '../../../core/axios';
-import { getAccessToken, getJewelleryGstBillTemplateSettings, getStockSoldListPageFilters, setStockSoldListPageFilters } from '../../../core/storage';
+import { getAccessToken, getJewelleryBillTemplateSettings, getStockSoldListPageFilters, setStockSoldListPageFilters } from '../../../core/storage';
 import { toast } from 'react-toastify';
 import { FETCH_STOCK_SOLD_ITEM_TOTALS, FETCH_STOCK_SOLD_OUT_LIST, FETCH_INVOICE_DATA } from '../../../core/sitemap';
 import GSTable from '../../gs-table/GSTable';
@@ -308,12 +308,9 @@ export default class SoldItems extends Component {
         }, this.timeOut);
     }
     setTemplateId() {
-        let allSettings = getJewelleryGstBillTemplateSettings();
+        let allSettings = getJewelleryBillTemplateSettings();
         let gstSettingsObj = null;
-        _.each(allSettings, (aSetting, index) => {
-            if(aSetting.category == 'gst')
-                gstSettingsObj = aSetting;
-        });
+        if(allSettings.gst) gstSettingsObj = allSettings.gst;
         if(!gstSettingsObj)
             toast.error('GST Template Settings not found');
         this.setState({gstTemplateSettings: gstSettingsObj});

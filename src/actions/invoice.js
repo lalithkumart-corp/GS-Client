@@ -10,9 +10,15 @@ export const getBillNoFromDB = () => {
         axiosMiddleware.get(GET_JEWELLERY_BILL_SETTINGS+`?access_token=${accessToken}`)
             .then(
                 (successResp) => {
+                    let gstRecord = successResp.data.RESP.filter((a) => a.category=='gst');
                     dispatch({
                         type: 'UPDATE_GST_INVOICE_NO_SERIES',
-                        data: {gstInvoiceSeries: successResp.data.RESP.billSeries, gstInvoiceNo: successResp.data.RESP.billNo}
+                        data: {gstInvoiceSeries: gstRecord[0].billSeries, gstInvoiceNo: gstRecord[0].billNo, selectedGstTemplate: gstRecord[0].selectedTemplate}
+                    });
+                    let estimateRecord = successResp.data.RESP.filter((a) => a.category=='estimate');
+                    dispatch({
+                        type: 'UPDATE_ESTIMATE_INVOICE_NO_SERIES',
+                        data: {estimateInvoiceSeries: estimateRecord[0].billSeries, estimateInvoiceNo: estimateRecord[0].billNo, selectedEstimateTemplate: estimateRecord[0].selectedTemplate}
                     });
                 },
                 (errResp) => {
@@ -37,7 +43,7 @@ export const storeSellingDataInDb = (apiParams) => {
                 data: resp.data
             });
             dispatch({
-                type: 'INCR_INVOICE_NO',
+                type: 'INCR_GST_INVOICE_NO',
                 data: null
             });
             dispatch({
@@ -62,6 +68,7 @@ export const setClearEntriesFlag = (flag) => {
 }
 
 export const updateBillNoInStore = (billSeries, billNo) => {
+    debugger;
     return (dispatch) => {
         dispatch({
             type: 'UPDATE_GST_INVOICE_NO_SERIES',

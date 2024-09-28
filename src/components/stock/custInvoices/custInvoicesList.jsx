@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { Container, Row, Col } from 'react-bootstrap';
 import axiosMiddleware from '../../../core/axios';
 import { FETCH_JWL_CUST_INVOICES_LIST, FETCH_JWL_CUST_INVOICES_LIST_COUNT, FETCH_INVOICE_DATA, DELETE_JWL_INVOICE, ANALYTICS } from '../../../core/sitemap';
-import { getAccessToken, getJewelleryCustInvoicesPageFilters, setJewelleryCustInvoicesPageFilters, getJewelleryGstBillTemplateSettings } from '../../../core/storage';
+import { getAccessToken, getJewelleryCustInvoicesPageFilters, setJewelleryCustInvoicesPageFilters, getJewelleryBillTemplateSettings } from '../../../core/storage';
 import { getFilterParams, getDataFromStorageRespObj } from './helper';
 import DateRangePicker from '../../dateRangePicker/dataRangePicker';
 import GSTable from '../../gs-table/GSTable';
@@ -359,12 +359,9 @@ export default class JewelleryCustomerInvoicesList extends Component {
     }
 
     setTemplateId() {
-        let allSettings = getJewelleryGstBillTemplateSettings();
+        let allSettings = getJewelleryBillTemplateSettings();
         let gstSettingsObj = null;
-        _.each(allSettings, (aSetting, index) => {
-            if(aSetting.category == 'gst')
-                gstSettingsObj = aSetting;
-        });
+        if(allSettings.gst) gstSettingsObj = allSettings.gst;
         if(!gstSettingsObj)
             toast.error('GST Template Settings not found');
         this.setState({gstTemplateSettings: gstSettingsObj});

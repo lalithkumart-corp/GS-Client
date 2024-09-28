@@ -14,7 +14,7 @@ const keys = {
     cashManagerFilters: 'cashManagerFilters',
     loanBillTemplate: 'loanBillTemplate',
     jewelleryTagTemplateData: 'jewelleryTagTemplateData',
-    jewelleryGstBillTemplateData: 'jewelleryGstBillTemplateData',
+    jewelleryBillTemplateData: 'jewelleryBillTemplateData',
     stockListPageFilters: 'stockListPageFilters',
     stockSoldListPageFilters: 'stockSoldListPageFilters',
     jewelleryInvoiceListPageFilters: 'jewelleryInvoiceListPageFilters',
@@ -35,7 +35,7 @@ const keyMaps = {
         keys.pledgebookFilters,
         keys.cashManagerFilters,
         keys.loanBillTemplate,
-        keys.jewelleryGstBillTemplateData,
+        keys.jewelleryBillTemplateData,
         keys.myFundAccountsList,
         keys.allFundList,
         keys.stockListPageFilters,
@@ -325,17 +325,17 @@ export const clearLoanBillTemplateSettings = () => {
     _clear(keys.loanBillTemplate);
 }
 
-export const saveJewelleryGstBillTemplateSettings = (data) => {
-    _save(keys.jewelleryGstBillTemplateData, data);
+export const saveJewelleryBillTemplateSettings = (data) => {
+    _save(keys.jewelleryBillTemplateData, data);
 }
 
-export const getJewelleryGstBillTemplateSettings = () => {
-    let templateData = _read(keys.jewelleryGstBillTemplateData);
+export const getJewelleryBillTemplateSettings = () => {
+    let templateData = _read(keys.jewelleryBillTemplateData);
     return templateData;
 }
 
-export const clearJewelleryGstBillTemplateSettings = () => {
-    _clear(keys.jewelleryGstBillTemplateData);
+export const clearJewelleryBillTemplateSettings = () => {
+    _clear(keys.jewelleryBillTemplateData);
 }
 
 export const saveJewelleryTagTemplateSettings = (data) => {

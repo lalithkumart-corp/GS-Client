@@ -88,6 +88,7 @@ class SellItem extends Component {
             selectedCustomer: null,
             invoiceSeries: props.invoice.gstInvoiceSeries,
             invoiceNo: props.invoice.gstInvoiceNo,
+            selectedGstTemplateId: props.invoice.selectedGstTemplate,
             date: {
                 inputVal: new Date(), //moment().format('DD-MM-YYYY'),
                 _inputVal: getCurrentDateTimeInUTCForDB(),
@@ -193,8 +194,8 @@ class SellItem extends Component {
             newState.currSelectedItem = resp.data.ITEMS[0];
             newState.currSelectedItem.formData = {
                 qty: newState.currSelectedItem.avl_qty || 1,
-                grossWt: newState.currSelectedItem.avl_g_wt,
-                netWt: newState.currSelectedItem.avl_n_wt,
+                grossWt: parseFloat(newState.currSelectedItem.avl_g_wt),
+                netWt: parseFloat(newState.currSelectedItem.avl_n_wt),
                 wastage: "",
                 wastageVal: "",
                 labour: "",
@@ -498,6 +499,22 @@ class SellItem extends Component {
         this.setState(newState);
     }
 
+    // async generateEstimateBill() {
+    //     let validation = validate(this.state, this.props);
+    //     if(validation.flag) {
+    //         try {
+    //             let printContent = constructPrintContent(this.state, this.props);
+    //             this.triggerPrint(printContent);
+    //             resetPageState({...this.state});
+    //         } catch(e) {
+    //             console.log(e);
+    //             toast.error('ERROR');
+    //         }
+    //     } else {
+    //         toast.error(validation.msg.join(' , '));
+    //     }
+    // }
+
     async submit() {
         let validation = validate(this.state, this.props);
         if(validation.flag) {
@@ -687,7 +704,6 @@ class SellItem extends Component {
                     taxVal = cgstVal + sgstVal; // (price * (percents/100));
                     price = price + taxVal;
                 }
-                
                 price =  price - discount;
 
                 newState.currSelectedItem.formData.wastageVal = wastageVal;
@@ -1365,7 +1381,7 @@ class SellItem extends Component {
                             <Form.Control as="select"
                                 onChange={(e) => this.onDropdownChange(e, PAYMENT_MODE)} 
                                 value={this.state.paymentFormData.paymentMode}
-                                style={{ height: "26px", paddingLeft: '5px' }}
+                                style={{ height: "26px", padding: '0 5px' }}
                                 // onKeyUp={(e) => this.handleKeyUp(e, {currElmKey: PAYMENT_MODE})}
                                 // ref= {(domElm) => {this.domElmns[PAYMENT_MODE] = domElm; }}
                                 >
@@ -1537,14 +1553,14 @@ class SellItem extends Component {
                         content={() => this.componentRef}
                         className="print-hidden-btn"
                     />
-                    <TemplateRenderer ref={(el) => (this.componentRef = el)} templateId={2} content={this.state.printContent}/>
+                    <TemplateRenderer ref={(el) => (this.componentRef = el)} templateId={this.state.selectedGstTemplateId} content={this.state.printContent}/>
                 </Row>
             </Container>
         )
     }
 }
 
-const mapStateToProps = (state) => { 
+const mapStateToProps = (state) => {
     return {
         rate: state.rate,
         storeDetail: state.storeDetail,
