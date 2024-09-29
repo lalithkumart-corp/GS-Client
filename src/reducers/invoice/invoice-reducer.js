@@ -10,9 +10,6 @@ export default function invoiceReducer(state=defaultState, action) {
             };
             if(action.data.selectedGstTemplate)
                 newState.selectedGstTemplate = action.data.selectedGstTemplate;
-            else {
-                debugger;
-            }
             break;
         case 'UPDATE_ESTIMATE_INVOICE_NO_SERIES':
             newState = {

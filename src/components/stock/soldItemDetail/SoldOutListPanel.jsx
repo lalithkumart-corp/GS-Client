@@ -1,12 +1,12 @@
 import React, { Component } from 'react';
-// import { connect } from 'react-redux';
+import { connect } from 'react-redux';
 import { Container, Row, Col, Dropdown, DropdownButton } from 'react-bootstrap';
 import axios from '../../../core/axios';
 import { getAccessToken, getJewelleryBillTemplateSettings, getStockSoldListPageFilters, setStockSoldListPageFilters } from '../../../core/storage';
 import { toast } from 'react-toastify';
 import { FETCH_STOCK_SOLD_ITEM_TOTALS, FETCH_STOCK_SOLD_OUT_LIST, FETCH_INVOICE_DATA } from '../../../core/sitemap';
 import GSTable from '../../gs-table/GSTable';
-import { convertToLocalTime, dateFormatter } from '../../../utilities/utility';
+import { convertToLocalTime, dateFormatter, convertDateObjToStr } from '../../../utilities/utility';
 import DateRangePicker from '../../dateRangePicker/dataRangePicker';
 import './SoldOutListPanel.scss';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -18,7 +18,7 @@ import { getDataFromStorageRespObj } from './helper';
 import SellItemEditMode from '../sellItems/SellItemEditMode';
 import { GsScreen } from '../../gs-screen/GsScreen';
 import axiosMiddleware from '../../../core/axios';
-export default class SoldItems extends Component {
+class SoldItems extends Component {
     constructor(props) {
         super(props);
         let todaysDate = new Date();
@@ -405,11 +405,27 @@ export default class SoldItems extends Component {
         this.fetchInvoices([row.InvoiceRef]);
     }
 
+    injectStoreMetaData(invoiceRespArr) {
+        for(let i in invoiceRespArr) {
+            invoiceRespArr[i].gstNumber = this.props.storeDetail.gstNo;
+            invoiceRespArr[i].storeName = this.props.storeDetail.storeName;
+            invoiceRespArr[i].address = this.props.storeDetail.address;
+            invoiceRespArr[i].place = this.props.storeDetail.place;
+            invoiceRespArr[i].city = this.props.storeDetail.city;
+            invoiceRespArr[i].pinCode = this.props.storeDetail.pincode;
+            invoiceRespArr[i].storeMobile1 = this.props.storeDetail.mobile;
+            invoiceRespArr[i].hsCode = 7113;
+            invoiceRespArr[i].dateVal = convertDateObjToStr(new Date(invoiceRespArr[i].dateVal), {excludeTime: true});
+        }
+        return invoiceRespArr;
+    }
+
     async fetchInvoices(invoicesRefArr) {
         try {
             let at = getAccessToken();
             let resp = await axios.get(`${FETCH_INVOICE_DATA}?access_token=${at}&invoice_keys=${JSON.stringify(invoicesRefArr)}`);
             if(resp && resp.data && resp.data.STATUS == 'SUCCESS') {
+                this.injectStoreMetaData(resp.data.RESP);
                 this.setState({printContents: resp.data.RESP, previewVisibility: true});
             }
         } catch(e) {
@@ -555,12 +571,10 @@ export default class SoldItems extends Component {
     }
 }
 
-// const mapStateToProps = (state) => { 
-//     return {
-//         rate: state.rate,
-//         storeDetail: state.storeDetail,
-//         invoice: state.invoice
-//     };
-// };
+const mapStateToProps = (state) => { 
+    return {
+        storeDetail: state.storeDetail
+    };
+};
 
-// export default connect(mapStateToProps, {})(SoldItems);
+export default connect(mapStateToProps, {})(SoldItems);

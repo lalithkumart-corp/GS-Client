@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import { connect } from 'react-redux';
 import { Container, Row, Col } from 'react-bootstrap';
 import axiosMiddleware from '../../../core/axios';
 import { FETCH_JWL_CUST_INVOICES_LIST, FETCH_JWL_CUST_INVOICES_LIST_COUNT, FETCH_INVOICE_DATA, DELETE_JWL_INVOICE, ANALYTICS } from '../../../core/sitemap';
@@ -6,7 +7,7 @@ import { getAccessToken, getJewelleryCustInvoicesPageFilters, setJewelleryCustIn
 import { getFilterParams, getDataFromStorageRespObj } from './helper';
 import DateRangePicker from '../../dateRangePicker/dataRangePicker';
 import GSTable from '../../gs-table/GSTable';
-import { convertToLocalTime } from '../../../utilities/utility';
+import { convertToLocalTime, convertDateObjToStr } from '../../../utilities/utility';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {Tooltip} from 'react-tippy';
 import TemplateRenderer from '../../../templates/jewellery-gstBill/templateRenderer';
@@ -17,7 +18,7 @@ import { GsScreen } from '../../gs-screen/GsScreen';
 import SellItemEditMode from '../sellItems/SellItemEditMode';
 import './custInvoicesList.scss';
 import { toast } from 'react-toastify';
-export default class JewelleryCustomerInvoicesList extends Component {
+class JewelleryCustomerInvoicesList extends Component {
     constructor(props) {
         super(props);
 
@@ -351,11 +352,27 @@ export default class JewelleryCustomerInvoicesList extends Component {
             let at = getAccessToken();
             let resp = await axiosMiddleware.get(`${FETCH_INVOICE_DATA}?access_token=${at}&invoice_keys=${JSON.stringify(invoicesRefArr)}`);
             if(resp && resp.data && resp.data.STATUS == 'SUCCESS') {
+                this.injectStoreMetaData(resp.data.RESP);
                 this.setState({printContents: resp.data.RESP, previewVisibility: true});
             }
         } catch(e) {
             console.log(e);
         }
+    }
+
+    injectStoreMetaData(invoiceRespArr) {
+        for(let i in invoiceRespArr) {
+            invoiceRespArr[i].gstNumber = this.props.storeDetail.gstNo;
+            invoiceRespArr[i].storeName = this.props.storeDetail.storeName;
+            invoiceRespArr[i].address = this.props.storeDetail.address;
+            invoiceRespArr[i].place = this.props.storeDetail.place;
+            invoiceRespArr[i].city = this.props.storeDetail.city;
+            invoiceRespArr[i].pinCode = this.props.storeDetail.pincode;
+            invoiceRespArr[i].storeMobile1 = this.props.storeDetail.mobile;
+            invoiceRespArr[i].hsCode = 7113;
+            invoiceRespArr[i].dateVal = convertDateObjToStr(new Date(invoiceRespArr[i].dateVal), {excludeTime: true});
+        }
+        return invoiceRespArr;
     }
 
     setTemplateId() {
@@ -415,6 +432,9 @@ export default class JewelleryCustomerInvoicesList extends Component {
         return (
             <Container className={`cust-inv-container full-screen`}>
                 <GsScreen showScreen={this.state.currentScreen==1?true:false} isMainScreen={true}>
+                    <Row>
+                        <h4>Customer Invoices</h4>
+                    </Row>
                     <Row>
                         <Col xs={3} md={3}>
                             <DateRangePicker 
@@ -483,3 +503,11 @@ export default class JewelleryCustomerInvoicesList extends Component {
         )
     }
 }
+
+const mapStateToProps = (state) => {
+    return {
+        storeDetail: state.storeDetail
+    };
+};
+
+export default connect(mapStateToProps, {})(JewelleryCustomerInvoicesList);

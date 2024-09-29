@@ -214,7 +214,6 @@ const CustomTag = () => {
 
     const importProfileJSON = (json) => {
         try {
-            debugger;
             let obj = json || JSON.parse(inputCSSJson);
             setTagHeight(obj.tagHeight);
             setTagBodyWidth(obj.tagBodyWidth);

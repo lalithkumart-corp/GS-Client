@@ -36,7 +36,7 @@ const SELL_LABOUR = 'labour';
 const SELL_CGST = 'cgstPercent';
 const SELL_SGST = 'sgstPercent';
 const SELL_DISCOUNT = 'discount';
-const SELL_PRICE = 'price';
+const SELL_PRICE = 'finalPrice';
 const RETAIL_PRICE = 'retailPrice';
 const EX_METAL = 'exMetal';
 const EX_GROSS_WT = 'exGrossWt';
@@ -112,8 +112,8 @@ class SellItem extends Component {
             exchangeItems: {},
             exchangeItemsTotals: {},
             paymentFormData: {
-                totalPurchasePrice: 0,
-                totalExchangePrice: 0,
+                totalPurchaseFinalPrice: 0,
+                totalExchangeFinalPrice: 0,
                 sum: 0,
                 paymentMode: 'cash',
                 paymentDetails: {},
@@ -259,6 +259,7 @@ class SellItem extends Component {
                 break;
             case SELL_PRICE:
                 newState.currSelectedItem.formData[identifier] = parseFloat(e.target.value);
+                newState.currSelectedItem.formData[SELL_DISCOUNT] = 0;
                 newState = this.calculateWastageDetailsBySellingPrice(e.target.value, newState, true);
                 newState.showCalcRefreshIcon = true;
                 break;
@@ -390,7 +391,7 @@ class SellItem extends Component {
         let newState = {...this.state};
         newState.purchaseItemPreview = newState.purchaseItemPreview || {};
         newState.purchaseItemPreview[this.state.currSelectedItem.prod_id] = JSON.parse(JSON.stringify(this.state.currSelectedItem));
-        newState.purchaseItemPreview[this.state.currSelectedItem.prod_id].tempFormData = {...newState.purchaseItemPreview[this.state.currSelectedItem.prod_id].formData};
+        // newState.purchaseItemPreview[this.state.currSelectedItem.prod_id].tempFormData = {...newState.purchaseItemPreview[this.state.currSelectedItem.prod_id].formData};
         newState.prodId.inputVal = "";
         newState.huid.inputVal = "";
         newState.purchaseTotals = calcPurchaseTotals(newState.purchaseItemPreview);
@@ -687,8 +688,8 @@ class SellItem extends Component {
                 }
                 let labour = this.state.currSelectedItem.formData.labour || 0;
                 let discount = this.state.currSelectedItem.formData.discount || 0;
-                let priceOfOrn = ( ( ( wt + wastageVal ) * retailPrice) + labour );
-                let price = priceOfOrn;
+                let initialPrice = ( ( ( wt + wastageVal ) * retailPrice) + labour );
+                let finalPrice = initialPrice - discount;
 
                 let cgstPercent = this.state.currSelectedItem.formData.cgstPercent || 0;
                 let sgstPercent = this.state.currSelectedItem.formData.sgstPercent || 0;
@@ -699,20 +700,20 @@ class SellItem extends Component {
                 let taxVal = 0;
 
                 if(percents > 0) {
-                    if(cgstPercent) cgstVal = formatNo(price * (cgstPercent/100), 2);
-                    if(sgstPercent) sgstVal = formatNo(price * (sgstPercent/100), 2);
-                    taxVal = cgstVal + sgstVal; // (price * (percents/100));
-                    price = price + taxVal;
+                    if(cgstPercent) cgstVal = formatNo(finalPrice * (cgstPercent/100), 2);
+                    if(sgstPercent) sgstVal = formatNo(finalPrice * (sgstPercent/100), 2);
+                    taxVal = cgstVal + sgstVal; // (finalPrice * (percents/100));
+                    finalPrice = finalPrice + taxVal;
                 }
-                price =  price - discount;
+                finalPrice =  finalPrice;
 
                 newState.currSelectedItem.formData.wastageVal = wastageVal;
                 newState.currSelectedItem.formData.cgstVal = cgstVal;
                 newState.currSelectedItem.formData.sgstVal = sgstVal;
-                newState.currSelectedItem.formData.priceOfOrn = formatNo(priceOfOrn, 2);
-                newState.currSelectedItem.formData.price = formatNo(price, 2);
+                newState.currSelectedItem.formData.initialPrice = formatNo(initialPrice, 2);
+                newState.currSelectedItem.formData.finalPrice = formatNo(finalPrice, 2);
     
-                // newState.totalSellingPrice = price; //for multiple selling items
+                // newState.totalSellingPrice = finalPrice; //for multiple selling items
 
                 newState.showCalcRefreshIcon = false;
 
@@ -733,18 +734,18 @@ class SellItem extends Component {
         newState.currSelectedItem.formData.wastage = wsgPercent;
         newState.currSelectedItem.formData.wastageVal = wsgVal;
 
-        //calc priceOfOrn
-        let _priceOfOrn = parseFloat(wt*rate);
-        _priceOfOrn = formatNo((_priceOfOrn + (_priceOfOrn*wsgPercent)/100), 2);
-        newState.currSelectedItem.formData.priceOfOrn = _priceOfOrn
+        //calc initialPrice
+        let _initialPrice = parseFloat(wt*rate);
+        _initialPrice = formatNo((_initialPrice + (_initialPrice*wsgPercent)/100), 2);
+        newState.currSelectedItem.formData.initialPrice = _initialPrice
 
         //calc gst values
         let cgstPercent = newState.currSelectedItem.formData.cgstPercent || 0;
         let sgstPercent = newState.currSelectedItem.formData.sgstPercent || 0;
         if(cgstPercent)
-            newState.currSelectedItem.formData.cgstVal = formatNo(_priceOfOrn * (cgstPercent/100), 2);
+            newState.currSelectedItem.formData.cgstVal = formatNo(_initialPrice * (cgstPercent/100), 2);
         if(sgstPercent)
-            newState.currSelectedItem.formData.sgstVal = formatNo(_priceOfOrn * (sgstPercent/100), 2);
+            newState.currSelectedItem.formData.sgstVal = formatNo(_initialPrice * (sgstPercent/100), 2);
 
         if(cb) return newState;
         else this.setState(newState);
@@ -937,7 +938,7 @@ class SellItem extends Component {
             formData.cgstPercent = this.state.currSelectedItem.formData.cgstPercent || null;
             formData.sgstPercent = this.state.currSelectedItem.formData.sgstPercent || null;
             formData.discount = this.state.currSelectedItem.formData.discount || null;
-            formData.price = this.state.currSelectedItem.formData.price || null;
+            formData.finalPrice = this.state.currSelectedItem.formData.finalPrice || null;
         }    
         let isReadOnly = !this.isCurrSelectedItemExits();
         return (
@@ -953,7 +954,6 @@ class SellItem extends Component {
                                 <col style={{width: "12%"}}></col>
                                 <col style={{width: "12%"}}></col>
                                 <col style={{width: "12%"}}></col>
-                                <col style={{width: "12%"}}></col>
                             </colgroup>
                             <thead>
                                 <tr>
@@ -963,8 +963,7 @@ class SellItem extends Component {
                                     <th>Wst(%)</th>
                                     <th>Wst(Gm)</th>
                                     <th>Labour</th>
-                                    <th>CGST%</th>
-                                    <th>SGST%</th>
+                                    <th>Discount</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -1000,14 +999,9 @@ class SellItem extends Component {
                                                                 ref= {(domElm) => {this.domElmns.labour1 = domElm;}} />
                                     </td>
                                     <td>
-                                        <input type="number" className="gs-input" value={formData.cgstPercent} onChange={(e)=>this.onInputValChange(e, 'cgstPercent')} readOnly={isReadOnly}
-                                                                onKeyUp = {(e) => this.onKeyUp(e, {currElmKey: 'cgstPercent1'})}
-                                                                ref= {(domElm) => {this.domElmns.cgstPercent1 = domElm;}} />
-                                    </td>
-                                    <td>
-                                        <input type="number" className="gs-input" value={formData.sgstPercent} onChange={(e)=>this.onInputValChange(e, 'sgstPercent')} readOnly={isReadOnly}
-                                                                onKeyUp = {(e) => this.onKeyUp(e, {currElmKey: 'sgstPercent1'})}
-                                                                ref= {(domElm) => {this.domElmns.sgstPercent1 = domElm;}} />
+                                        <input type="number" className="gs-input" value={formData.discount || ""} onChange={(e) => this.onInputValChange(e, 'discount')} readOnly={isReadOnly}
+                                            onKeyUp = {(e) => this.onKeyUp(e, {currElmKey: 'discount1'})}
+                                            ref= {(domElm) => {this.domElmns.discount1 = domElm;}} />
                                     </td>
                                 </tr>
                             </tbody>
@@ -1019,11 +1013,13 @@ class SellItem extends Component {
                         <table className="table3">
                             <colgroup>
                                 <col style={{width: "10%"}}></col>
+                                <col style={{width: "10%"}}></col>
                                 <col style={{width: "20%"}}></col>
                             </colgroup>
                             <thead>
                                 <tr>
-                                    <th>Discount</th>
+                                    <th>CGST%</th>
+                                    <th>SGST%</th>
                                     <th>
                                         <span>Price
                                             {this.state.showCalcRefreshIcon && 
@@ -1039,16 +1035,22 @@ class SellItem extends Component {
                             </thead>
                             <tbody>
                                 <tr className="selling-detail">
+                              
                                     <td>
-                                        <input type="number" className="gs-input" value={formData.discount} onChange={(e) => this.onInputValChange(e, 'discount')} readOnly={isReadOnly}
-                                            onKeyUp = {(e) => this.onKeyUp(e, {currElmKey: 'discount1'})}
-                                            ref= {(domElm) => {this.domElmns.discount1 = domElm;}} />
+                                        <input type="number" className="gs-input" value={formData.cgstPercent} onChange={(e)=>this.onInputValChange(e, 'cgstPercent')} readOnly={isReadOnly}
+                                                                onKeyUp = {(e) => this.onKeyUp(e, {currElmKey: 'cgstPercent1'})}
+                                                                ref= {(domElm) => {this.domElmns.cgstPercent1 = domElm;}} />
                                     </td>
                                     <td>
-                                    <input type="number" className="gs-input" value={formData.price} onChange={(e) => this.onInputValChange(e, 'price')} readOnly={isReadOnly}
-                                            onKeyUp = {(e) => this.onKeyUp(e, {currElmKey: 'price1'})}
-                                            ref= {(domElm) => {this.domElmns.price1 = domElm;}} />
-                                        {/* <span className="selling-price-val">{formData.price}</span> */}
+                                        <input type="number" className="gs-input" value={formData.sgstPercent} onChange={(e)=>this.onInputValChange(e, 'sgstPercent')} readOnly={isReadOnly}
+                                                                onKeyUp = {(e) => this.onKeyUp(e, {currElmKey: 'sgstPercent1'})}
+                                                                ref= {(domElm) => {this.domElmns.sgstPercent1 = domElm;}} />
+                                    </td>
+                                    <td>
+                                        <input type="number" className="gs-input" value={formData.finalPrice} onChange={(e) => this.onInputValChange(e, 'finalPrice')} readOnly={isReadOnly}
+                                                onKeyUp = {(e) => this.onKeyUp(e, {currElmKey: 'price1'})}
+                                                ref= {(domElm) => {this.domElmns.price1 = domElm;}} />
+                                            {/* <span className="selling-price-val">{formData.price}</span> */}
                                     </td>
                                 </tr>
                             </tbody>
@@ -1115,7 +1117,7 @@ class SellItem extends Component {
                         <td>{formatNo(anItem.formData.cgstPercent,2)}</td>
                         <td>{formatNo(anItem.formData.sgstPercent,2)}</td>
                         <td>{formatNo(anItem.formData.discount,2)}</td>
-                        <td>{formatNo(anItem.formData.price,2)}</td>
+                        <td>{formatNo(anItem.formData.finalPrice,2)}</td>
                         <td>
                             <span onClick={(e) => this.deleteItemFromPurchaseItemPreview(anItem.prod_id)}><FontAwesomeIcon icon="backspace"/></span>
                             <span onClick={(e) => this.enableEditView(index)} style={{paddingLeft: '10px'}}><FontAwesomeIcon icon="edit"/></span>                             
@@ -1171,7 +1173,7 @@ class SellItem extends Component {
                             <td></td>
                             <td></td>
                             <td>{this.state.purchaseTotals.discount}</td>
-                            <td>{this.state.purchaseTotals.price}</td>
+                            <td>{this.state.purchaseTotals.finalPrice}</td>
                             <td></td>
                         </tr>
                     </tfoot>
@@ -1189,7 +1191,7 @@ class SellItem extends Component {
         if(this.canEnableItemSellInput()) {
             let total = 0;
             _.each(this.state.purchaseItemPreview, (aList, index) => {
-                total += aList.formData.price;
+                total += aList.formData.finalPrice;
             });
             total = total.toFixed(3);
             return (
@@ -1370,8 +1372,8 @@ class SellItem extends Component {
     getPaymentContainer() {
         return (
             <Col className="payment-column">
-                <p>New Item Price: ₹ {this.state.paymentFormData.totalPurchasePrice}</p>
-                <p>Old Item Price: ₹ {this.state.paymentFormData.totalExchangePrice}</p>
+                <p>New Item Price: ₹ {this.state.paymentFormData.totalPurchaseFinalPrice}</p>
+                <p>Old Item Price: ₹ {this.state.paymentFormData.totalExchangeFinalPrice}</p>
                 <p>Round Off: ₹ {this.state.paymentFormData.roundOffVal} &nbsp; &nbsp; <span className="round-off-selector" onClick={this.onClickRoundOffRange}> By {this.state.roundOffRangeSel}</span></p>
                 <p style={{fontSize: '20px'}}>Sum: ₹ {formatNo(this.state.paymentFormData.sum, 2)}</p>
                 <div className="pymnt-mode-input-div">

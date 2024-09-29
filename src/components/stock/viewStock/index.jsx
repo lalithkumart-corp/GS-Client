@@ -15,11 +15,14 @@ export default class StockViewTabLayout extends Component {
         }
     }
     onTabSelected(e) {
-        history.push(`?tab=${e}`);
+        history.push(`stock-view?tab=${e}`);
     }
     render() {
         return (
             <Container className="stock-view-tab-layout">
+                <Row>
+                    <h4>Jewellery Stock</h4>
+                </Row>
                 <Tabs defaultActiveKey={this.state.tab} className="gs-tabs" onSelect={(e) => this.onTabSelected(e)}>
                     <Tab eventKey="report" title="View">
                         <ViewStock />

@@ -68,7 +68,6 @@ export const setClearEntriesFlag = (flag) => {
 }
 
 export const updateBillNoInStore = (billSeries, billNo) => {
-    debugger;
     return (dispatch) => {
         dispatch({
             type: 'UPDATE_GST_INVOICE_NO_SERIES',

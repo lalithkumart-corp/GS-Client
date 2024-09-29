@@ -11,7 +11,7 @@ const DEFAULT_TEMPLATE_STRUC = {
     oldOrnaments: {},
     calculations: {
         totalMakingCharge: 0,
-        totalNetAmount: 0,
+        totalInitialPrice: 0,
         cgstAvgPercent: 0,
         sgstAvgPercent: 0,
         totalCgstVal: 0,
@@ -178,7 +178,7 @@ function GstBillTemplate2(props) {
                                 N.Wt(gm)
                             </Col>
                             <Col xs={spans.wastage} className="no-padding">
-                                W.A(gm)
+                                V.A(gm)
                             </Col>
                             <Col xs={spans.rate} className="no-padding">
                                 Rate(₹)
@@ -232,7 +232,7 @@ function GstBillTemplate2(props) {
                                 {currencyFormatter(formatNo(anOrn.pricePerGm,2))}
                             </Col>
                             <Col xs={spans.makingCharge} className="no-padding">
-                                {currencyFormatter(formatNo(anOrn.makingCharge))}
+                                {currencyFormatter(formatNo(anOrn.makingCharge||''))}
                             </Col>
                             {/* <Col xs={spans.amt} className="no-padding">
                                 {anOrn.amount}
@@ -241,7 +241,7 @@ function GstBillTemplate2(props) {
                                 {anOrn.discount}
                             </Col> */}
                             <Col xs={spans.netAmt} className="no-padding">
-                                {currencyFormatter(formatNo(anOrn.priceOfOrn, 2, {returnType: 'string'}))}
+                                {currencyFormatter(formatNo(anOrn.initialPrice, 2, {returnType: 'string'}))}
                             </Col>
                         </Row>
                     </Col>
@@ -274,7 +274,7 @@ function GstBillTemplate2(props) {
                                 {formatNo(totalNetWt||0, 3, {returnType: 'string'})}
                             </Col>
                             <Col xs={{span: spans.netAmt, offset: 6}} className="no-padding">
-                                ₹: {currencyFormatter(formatNo(printContent.calculations.totalNetAmount,2, {returnType: 'string'}))}
+                                ₹: {currencyFormatter(formatNo(printContent.calculations.totalInitialPrice,2, {returnType: 'string'}))}
                             </Col>
                         </Row>
                     </Col>
@@ -319,7 +319,20 @@ function GstBillTemplate2(props) {
 
     const _constructPricingDom = () => {
         return <div style={{fontSize: '16px', minHeight: '130px'}}>
-            <Row>
+                {printContent.calculations.totalDiscount ? 
+                <Row>
+                    <Col xs={{span: 6}} className="no-padding">
+                        (-) Less:
+                    </Col>
+                    <Col xs={2} style={{textAlign: 'right'}}>
+                        ₹:
+                    </Col>
+                    <Col xs={{span: 4}} className="no-padding">
+                        {currencyFormatter(formatNo(printContent.calculations.totalDiscount,2, {returnType: 'string'}))}
+                    </Col>
+                </Row>
+                : <></>}
+                <Row>
                     <Col xs={{span: 6}} className="no-padding">
                         SGST 1.5%
                     </Col>
@@ -341,7 +354,7 @@ function GstBillTemplate2(props) {
                         {currencyFormatter(formatNo(printContent.calculations.totalCgstVal,2, {returnType: 'string'}))}
                     </Col>
                 </Row>
-                {printContent.calculations.oldNetAmt ? <Row>
+                {printContent.calculations.totalExchangeFinalPrice ? <Row>
                     <Col xs={{span: 6}} className="no-padding">
                         (-) Old Gold:
                     </Col>
@@ -349,22 +362,9 @@ function GstBillTemplate2(props) {
                         ₹:
                     </Col>
                     <Col xs={{span: 4}} className="no-padding">
-                        {currencyFormatter(formatNo(printContent.calculations.oldNetAmt,2, {returnType: 'string'}))}
+                        {currencyFormatter(formatNo(printContent.calculations.totalExchangeFinalPrice,2, {returnType: 'string'}))}
                     </Col>
                 </Row>:<></>}
-                {printContent.calculations.totalDiscount ? 
-                <Row>
-                    <Col xs={{span: 6}} className="no-padding">
-                        (-) Less:
-                    </Col>
-                    <Col xs={2} style={{textAlign: 'right'}}>
-                        ₹:
-                    </Col>
-                    <Col xs={{span: 4}} className="no-padding">
-                        {currencyFormatter(formatNo(printContent.calculations.totalDiscount,2, {returnType: 'string'}))}
-                    </Col>
-                </Row>
-                : <></>}
                 {printContent.calculations.roundedOffVal ?
                 <Row>
                     <Col xs={{span: 6}} className="no-padding">

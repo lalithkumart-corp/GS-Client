@@ -11,7 +11,7 @@ const DEFAULT_TEMPLATE_STRUC = {
     oldOrnaments: {},
     calculations: {
         totalMakingCharge: 0,
-        totalNetAmount: 0,
+        totalInitialPrice: 0,
         cgstAvgPercent: 0,
         sgstAvgPercent: 0,
         totalCgstVal: 0,
@@ -273,7 +273,7 @@ function EstimateBillTemplate3(props) {
                                 {formatNo(totalNetWt||0, 3, {returnType: 'string'})}
                             </Col>
                             <Col xs={{span: spans.netAmt, offset: 6}} className="no-padding">
-                                ₹: {currencyFormatter(formatNo(printContent.calculations.totalNetAmount,2, {returnType: 'string'}))}
+                                ₹: {currencyFormatter(formatNo(printContent.calculations.totalInitialPrice,2, {returnType: 'string'}))}
                             </Col>
                         </Row>
                     </Col>
@@ -340,7 +340,7 @@ function EstimateBillTemplate3(props) {
                         {currencyFormatter(formatNo(printContent.calculations.totalCgstVal,2, {returnType: 'string'}))}
                     </Col>
                 </Row>
-                {printContent.calculations.oldNetAmt ? <Row>
+                {printContent.calculations.totalExchangeFinalPrice ? <Row>
                     <Col xs={{span: 6}} className="no-padding">
                         (-) Old Gold:
                     </Col>
@@ -348,7 +348,7 @@ function EstimateBillTemplate3(props) {
                         ₹:
                     </Col>
                     <Col xs={{span: 4}} className="no-padding">
-                        {currencyFormatter(formatNo(printContent.calculations.oldNetAmt,2, {returnType: 'string'}))}
+                        {currencyFormatter(formatNo(printContent.calculations.totalExchangeFinalPrice,2, {returnType: 'string'}))}
                     </Col>
                 </Row>:<></>}
                 {printContent.calculations.totalDiscount ? 
