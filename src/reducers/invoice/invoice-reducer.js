@@ -17,7 +17,7 @@ export default function invoiceReducer(state=defaultState, action) {
                 estimateInvoiceSeries: action.data.estimateInvoiceSeries,
                 estimateInvoiceNo: action.data.estimateInvoiceNo
             };
-            if(action.data.selectedGstTemplate)
+            if(action.data.selectedEstimateTemplate)
                 newState.selectedEstimateTemplate = action.data.selectedEstimateTemplate;
         case 'SET_CLEAR_ENTRIES_FLAG':
             newState = {

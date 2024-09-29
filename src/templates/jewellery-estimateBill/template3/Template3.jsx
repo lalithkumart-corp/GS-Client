@@ -546,7 +546,7 @@ function EstimateBillTemplate3(props) {
     }
 
     return (
-        <div className={`jewellery-gst-bill-paper template2 ${printContent?'has-printcontent':''}`}>
+        <div className={`jewellery-gst-bill-paper template3 ${printContent?'has-printcontent':''}`}>
             <Row className="inner-section">
                 <Col xs={12}>
                     {getDom()}

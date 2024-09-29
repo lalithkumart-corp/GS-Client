@@ -54,3 +54,6 @@ export const DEFAULT_PAYMENT_OBJ_FOR_CASH_IN = {
         toAccountId: ''
     }
 }
+
+export const ORIGINAL_BILLING = 'original';
+export const ESTIMATE_BILLING = 'estimate';

@@ -101,7 +101,7 @@ export const template2 = {
         totalMakingCharge: 125,
         // cgst: 1.5,
         // sgst: 1.5,
-        totalNetAmount: 25568.51,
+        totalInitialPrice: 25568.51,
         totalCgstVal: 72.825,
         totalSgstVal: 72.825,
         totalDiscount: 205,
@@ -159,7 +159,7 @@ export const template3 = {
 	},
 	"calculations": {
 		"totalMakingCharge": 100,
-		"totalNetAmount": 10624.294,
+		"totalInitialPrice": 10624.294,
 		"cgstAvgPercent": 1.5,
 		"sgstAvgPercent": 1.5,
 		"totalCgstVal": 159.36,

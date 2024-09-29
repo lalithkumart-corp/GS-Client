@@ -187,7 +187,7 @@ function GstBillTemplate1(props) {
     }
 
     return (
-        <div className={`jewellery-gst-bill-paper ${printContent?'has-preview':''}`}>
+        <div className={`jewellery-gst-bill-paper template1 ${printContent?'has-preview':''}`}>
             <Row className="inner-section">
                 {getDom()}
             </Row>

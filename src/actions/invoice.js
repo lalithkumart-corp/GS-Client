@@ -34,7 +34,7 @@ export const getBillNoFromDB = () => {
     }
 }
 
-export const storeSellingDataInDb = (apiParams) => {
+export const storeOriginalBillingDataInDb = (apiParams) => {
     return async (dispatch) => {
         let resp = await axiosMiddleware.post(SALE_ITEM, {apiParams});
         if(resp.data && resp.data.STATUS == "SUCCESS") {
@@ -44,6 +44,30 @@ export const storeSellingDataInDb = (apiParams) => {
             });
             dispatch({
                 type: 'INCR_GST_INVOICE_NO',
+                data: null
+            });
+            dispatch({
+                type: 'SET_CLEAR_ENTRIES_FLAG',
+                data: true
+            });
+        } else {
+            let msg = resp.data.MSG || 'ERROR';
+            toast.error(msg);
+        }
+
+    }
+}
+
+export const storeEstimateBillingDataInDb = (apiParams) => {
+    return async (dispatch) => {
+        let resp = await axiosMiddleware.post(SALE_ITEM, {apiParams});
+        if(resp.data && resp.data.STATUS == "SUCCESS") {
+            dispatch({
+                type: 'NEW_ESTIMATE_INVOICE_SAVED',
+                data: resp.data
+            });
+            dispatch({
+                type: 'INCR_ESTIMATE_INVOICE_NO',
                 data: null
             });
             dispatch({

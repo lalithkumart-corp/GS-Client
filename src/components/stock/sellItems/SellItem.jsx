@@ -5,7 +5,7 @@ import * as ReactAutosuggest from 'react-autosuggest';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 
-import { getBillNoFromDB, storeSellingDataInDb, setClearEntriesFlag } from '../../../actions/invoice';
+import { getBillNoFromDB, storeOriginalBillingDataInDb, storeEstimateBillingDataInDb , setClearEntriesFlag } from '../../../actions/invoice';
 import { FETCH_PROD_IDS, FETCH_STOCKS_BY_PRODID, FETCH_STOCKS_BY_ID, SALE_ITEM, FETCH_JEWELLERY_BILLING_AUTO_SUGGESTIONS, ANALYTICS } from '../../../core/sitemap';
 import axiosMiddleware from '../../../core/axios';
 import { getAccessToken } from '../../../core/storage';
@@ -23,6 +23,7 @@ import TemplateRenderer from '../../../templates/jewellery-gstBill/templateRende
 import WastageCalculator from '../../tools/wastageCalculator';
 import { wastageCalc } from '../../tools/wastageCalculator/wastageCalculator';
 import { MdRefresh } from 'react-icons/md';
+import { ESTIMATE_BILLING, ORIGINAL_BILLING } from '../../../constants';
 
 const TAGID = 'tagid';
 const HUID = 'huid';
@@ -88,7 +89,11 @@ class SellItem extends Component {
             selectedCustomer: null,
             invoiceSeries: props.invoice.gstInvoiceSeries,
             invoiceNo: props.invoice.gstInvoiceNo,
+            // estimateInvoiceSeries: props.invoice.estimateInvoiceSeries,
+            // estimateInvoiceNo: props.invoice.estimateInvoiceNo,
             selectedGstTemplateId: props.invoice.selectedGstTemplate,
+            selectedEstimateTemplateId: props.invoice.selectedEstimateTemplate,
+            billingType: ORIGINAL_BILLING,
             date: {
                 inputVal: new Date(), //moment().format('DD-MM-YYYY'),
                 _inputVal: getCurrentDateTimeInUTCForDB(),
@@ -123,6 +128,8 @@ class SellItem extends Component {
             showCalcRefreshIcon: false,
             roundOffRangeSel: 5
         }
+        console.log('--CONSTRUCTOR');
+        console.log(JSON.stringify(props.invoice));
         this.bindMethods();
     }
     bindMethods() {
@@ -140,6 +147,8 @@ class SellItem extends Component {
         this.deleteItemFromPurchaseItemPreview = this.deleteItemFromPurchaseItemPreview.bind(this);
         this.onClickDateLiveLabel = this.onClickDateLiveLabel.bind(this);
         this.onClickRoundOffRange = this.onClickRoundOffRange.bind(this);
+        this.onChangeBillingType = this.onChangeBillingType.bind(this);
+        this.preview = this.preview.bind(this);
     }
     componentDidMount() {
         if(this.props.updateMode) {
@@ -151,9 +160,18 @@ class SellItem extends Component {
         this.createEvent();
     }
     componentWillReceiveProps(nextProps) {
-        if(nextProps.invoice.gstInvoiceNo !== this.state.invoiceNo) {
+        console.log('---Component received props', nextProps);
+        if(this.state.billingType == ORIGINAL_BILLING && (nextProps.invoice.gstInvoiceNo !== this.state.invoiceNo)) {
             this.state.invoiceSeries = nextProps.invoice.gstInvoiceSeries;
             this.state.invoiceNo = nextProps.invoice.gstInvoiceNo;
+            this.state.selectedGstTemplateId = nextProps.invoice.selectedGstTemplate;
+            this.state.selectedEstimateTemplateId = nextProps.invoice.selectedEstimateTemplate;
+        }
+        if(this.state.billingType == ESTIMATE_BILLING && (nextProps.invoice.estimateInvoiceNo !== this.state.invoiceNo)) {
+            this.state.invoiceSeries = nextProps.invoice.estimateInvoiceSeries;
+            this.state.invoiceNo = nextProps.invoice.estimateInvoiceNo;
+            this.state.selectedGstTemplateId = nextProps.invoice.selectedGstTemplate;
+            this.state.selectedEstimateTemplateId = nextProps.invoice.selectedEstimateTemplate;
         }
         if(nextProps.invoice.clearEntries) {
             let newState = {...this.state};
@@ -199,8 +217,8 @@ class SellItem extends Component {
                 wastage: "",
                 wastageVal: "",
                 labour: "",
-                cgstPercent: 1.5,
-                sgstPercent: 1.5,
+                cgstPercent: this.state.billingType==ORIGINAL_BILLING?1.5:0,
+                sgstPercent: this.state.billingType==ORIGINAL_BILLING?1.5:0,
                 discount: "",
                 itemType: newState.currSelectedItem.metal
             };
@@ -500,6 +518,14 @@ class SellItem extends Component {
         this.setState(newState);
     }
 
+    onChangeBillingType(e) {
+        let newState = {...this.state};
+        newState.invoiceSeries = this.props.invoice.estimateInvoiceSeries;
+        newState.invoiceNo = this.props.invoice.estimateInvoiceNo;
+        newState.billingType = e.target.value;
+        this.setState(newState);
+    }
+
     // async generateEstimateBill() {
     //     let validation = validate(this.state, this.props);
     //     if(validation.flag) {
@@ -524,7 +550,10 @@ class SellItem extends Component {
                 console.log(apiParams);
                 let printContent = constructPrintContent(this.state, this.props);
                 apiParams.invoiceData = printContent;
-                this.props.storeSellingDataInDb(apiParams);
+                if(this.state.billingType == ORIGINAL_BILLING)
+                    this.props.storeOriginalBillingDataInDb(apiParams);
+                else
+                    this.props.storeEstimateBillingDataInDb(apiParams);
 
                 console.log(printContent);
                 this.triggerPrint(printContent);
@@ -533,6 +562,16 @@ class SellItem extends Component {
                 console.log(e);
                 toast.error('ERROR');
             }
+        } else {
+            toast.error(validation.msg.join(' , '));
+        }
+    }
+
+    preview() {
+        let validation = validate(this.state, this.props);
+        if(validation.flag) {
+            let printContent = constructPrintContent(this.state, this.props);
+            this.triggerPrint(printContent);
         } else {
             toast.error(validation.msg.join(' , '));
         }
@@ -1376,6 +1415,7 @@ class SellItem extends Component {
                 <p>Old Item Price: ₹ {this.state.paymentFormData.totalExchangeFinalPrice}</p>
                 <p>Round Off: ₹ {this.state.paymentFormData.roundOffVal} &nbsp; &nbsp; <span className="round-off-selector" onClick={this.onClickRoundOffRange}> By {this.state.roundOffRangeSel}</span></p>
                 <p style={{fontSize: '20px'}}>Sum: ₹ {formatNo(this.state.paymentFormData.sum, 2)}</p>
+                {this.state.billingType==ORIGINAL_BILLING && <>
                 <div className="pymnt-mode-input-div">
                     <span className="field-name payment-mode">Payment Mode:</span>
                     <div style={{display: 'inline-block'}}>
@@ -1405,6 +1445,7 @@ class SellItem extends Component {
                     <span>₹ {formatNo(this.state.paymentFormData.balance, 2)}</span>
                     {/* <input type="number" className="field-val amount-bal gs-input" disabled value={this.state.paymentFormData.balance} onChange={(e) => this.onInputValChange(e, AMT_BAL)}/>  */}
                 </div>
+                </>}
             </Col>
         );
     }
@@ -1494,6 +1535,21 @@ class SellItem extends Component {
                                                 <FormControl.Feedback />
                                             </InputGroup>
                                         </Form.Group>
+                                    </Col>
+                                    <Col xs={3} className="billing-type">
+                                        <Form.Group>
+                                            <Form.Label>Billing Type</Form.Label>
+                                            <FormControl
+                                                as="select"
+                                                value={this.state.billingType}
+                                                placeholder=""
+                                                className="reatil-price-field"
+                                                onChange={(e) => this.onChangeBillingType(e)}
+                                            >
+                                                <option key="original-billing" value={ORIGINAL_BILLING}>ORIGINAL</option>
+                                                <option key="estimate-billing" value={ESTIMATE_BILLING}>ESTIMATE</option>
+                                            </FormControl>
+                                        </Form.Group>
                                         {/* <div style={{marginTop: '8px'}}>Retail Rate: 
                                             <input type="number" 
                                                 value={this.state.retailPrice} 
@@ -1537,8 +1593,12 @@ class SellItem extends Component {
                             {this.getPaymentContainer()}
                         </Row>
                         <Row>
-                            <Col xs={12}>
-                                <input type="button" className="gs-button bordered" style={{width: '100%'}} value="Submit" onClick={this.submit}/>
+                            <Col xs={6}>
+                                <input type="button" className="gs-button bordered" style={{width: '100%'}} value="Preview" onClick={this.preview}/>
+                            </Col>
+
+                            <Col xs={6}>
+                                <input type="button" className="gs-button bordered" style={{width: '100%'}} value={this.state.billingType==ORIGINAL_BILLING?"Save":"Save Estimate"} onClick={this.submit}/>
                             </Col>
                         </Row>
                         {/* <Row>
@@ -1555,7 +1615,7 @@ class SellItem extends Component {
                         content={() => this.componentRef}
                         className="print-hidden-btn"
                     />
-                    <TemplateRenderer ref={(el) => (this.componentRef = el)} templateId={this.state.selectedGstTemplateId} content={this.state.printContent}/>
+                    <TemplateRenderer ref={(el) => (this.componentRef = el)} templateId={this.state.billingType==ORIGINAL_BILLING?this.state.selectedGstTemplateId:this.state.selectedEstimateTemplateId} content={this.state.printContent}/>
                 </Row>
             </Container>
         )
@@ -1570,4 +1630,4 @@ const mapStateToProps = (state) => {
     };
 };
 
-export default connect(mapStateToProps, {getBillNoFromDB, storeSellingDataInDb, setClearEntriesFlag})(SellItem);
+export default connect(mapStateToProps, {getBillNoFromDB, storeOriginalBillingDataInDb, storeEstimateBillingDataInDb , setClearEntriesFlag})(SellItem);

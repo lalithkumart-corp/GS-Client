@@ -1,4 +1,4 @@
-.jewellery-gst-bill-paper.template2 {
+.jewellery-gst-bill-paper.template3 {
     display: none;
     font-size: 17px;
     width: 1050px;
@@ -9,21 +9,21 @@
     }
 }
 
-.gst-bill-preview .jewellery-gst-bill-paper.template2.has-printcontent {
+.gst-bill-preview .jewellery-gst-bill-paper.template3.has-printcontent {
     display: block;
 }
 
-.jewellery-gst-bill-paper.template2.has-preview {
+.jewellery-gst-bill-paper.template3.has-preview {
     transform: scale(0.7);
     margin-top: -70px;
 }
 
 @media print {
-    .jewellery-gst-bill-paper.template2.has-preview {
+    .jewellery-gst-bill-paper.template3.has-preview {
         transform: none;
         margin-top: 40px;
     }
-    .jewellery-gst-bill-paper.template2 {
+    .jewellery-gst-bill-paper.template3 {
         display: block;
         font-size: 17px;
         width: 1195px;
