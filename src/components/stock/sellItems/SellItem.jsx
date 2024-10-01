@@ -23,7 +23,8 @@ import TemplateRenderer from '../../../templates/jewellery-gstBill/templateRende
 import WastageCalculator from '../../tools/wastageCalculator';
 import { wastageCalc } from '../../tools/wastageCalculator/wastageCalculator';
 import { MdRefresh } from 'react-icons/md';
-import { ESTIMATE_BILLING, ORIGINAL_BILLING } from '../../../constants';
+import { ESTIMATE_BILLING, IN, ORIGINAL_BILLING } from '../../../constants';
+import { PaymentSelectionCard } from '../../payment/paymentSelectionCard';
 
 const TAGID = 'tagid';
 const HUID = 'huid';
@@ -295,13 +296,13 @@ class SellItem extends Component {
                 newState.exchangeItemFormData[identifier] = val;
                 this.calculateExchangePrice(identifier);
                 break;
-            case AMT_PAID:
-            // case AMT_BAL:
-                let vall = e.target.value;
-                if(vall) vall = parseFloat(vall);
-                newState.paymentFormData[identifier] = vall;
-                newState.paymentFormData = calculatePaymentFormData(newState);
-                break;
+            // case AMT_PAID:
+            // // case AMT_BAL:
+            //     let vall = e.target.value;
+            //     if(vall) vall = parseFloat(vall);
+            //     newState.paymentFormData[identifier] = vall;
+            //     newState.paymentFormData = calculatePaymentFormData(newState);
+            //     break;
         }
         this.setState(newState);
         // this.transferFocus(e, identifier);
@@ -317,6 +318,22 @@ class SellItem extends Component {
                 newState.paymentFormData.paymentMode = e.target.value;
                 break;
         }
+        this.setState(newState);
+    }
+
+    onChangePaymentInInputs(obj) {
+        let newState = {...this.state};
+        newState.paymentSelectionCardData = obj;
+        
+        if(obj.mode == 'cash')
+            newState.paymentFormData.paid = obj.cash.value;
+        else if(obj.mode == 'online')
+            newState.paymentFormData.paid = obj.online.value;
+        else if(obj.mode == "mixed")
+            newState.paymentFormData.paid = parseFloat(obj.mixed.cash.value)+parseFloat(obj.mixed.online.value);
+
+        newState.paymentFormData = calculatePaymentFormData(newState);
+
         this.setState(newState);
     }
 
@@ -1417,9 +1434,10 @@ class SellItem extends Component {
                 <p style={{fontSize: '20px'}}>Sum: ₹ {formatNo(this.state.paymentFormData.sum, 2)}</p>
                 {this.state.billingType==ORIGINAL_BILLING && <>
                 <div className="pymnt-mode-input-div">
-                    <span className="field-name payment-mode">Payment Mode:</span>
+                    {/* <span className="field-name payment-mode">Payment Mode:</span> */}
                     <div style={{display: 'inline-block'}}>
-                        <Form.Group>
+                        <PaymentSelectionCard paymentFlow={IN} paymentMode={'cash'} onChange={(obj) => this.onChangePaymentInInputs(obj)} paymentInputDivView={true}/>
+                        {/* <Form.Group>
                             <Form.Control as="select"
                                 onChange={(e) => this.onDropdownChange(e, PAYMENT_MODE)} 
                                 value={this.state.paymentFormData.paymentMode}
@@ -1428,17 +1446,14 @@ class SellItem extends Component {
                                 // ref= {(domElm) => {this.domElmns[PAYMENT_MODE] = domElm; }}
                                 >
                                     <option key="key-cash" value="cash">CASH</option>
-                                    <option key="key-cheque" value="cheque">CHEQUE</option>
-                                    <option key="key-upi" value="upi">UPI</option>
-                                    <option key="key-paytm" value="paytm">Paytm</option>
-                                    <option key="key-gpay" value="gpay">GPay</option>
+                                    <option key="key-cash" value="online">Online</option>
                             </Form.Control>
-                        </Form.Group>
+                        </Form.Group> */}
                     </div>
                 </div>
-                <div>
+                <div style={{marginTop: '15px'}}>
                     <span className="field-name amount-paid">Amout Paid: ₹ </span>
-                    <input type="number" className="field-val amount-paid gs-input" value={this.state.paymentFormData.paid} onChange={(e) => this.onInputValChange(e, AMT_PAID)}/>
+                    {this.state.paymentFormData.paid}
                 </div>
                 <div>
                     <span className="field-name amount-bal">Amount Bal:</span>

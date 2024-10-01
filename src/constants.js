@@ -1,12 +1,12 @@
 export const PAYMENT_MODE = {
     1: 'cash',
-    2: 'cheque',
-    3: 'online'
+    2: 'online',
+    3: 'mixed'
 }
 export const PAYMENT_MODE_KEY = {
     'cash': 1,
-    'cheque': 2,
-    'online': 3
+    'online': 2,
+    'mixed': 3
 }
 
 export const UPI_INDEX_ID = 19;
@@ -33,25 +33,21 @@ export const CASH_TRNS_GIRVI = 'Girvi';
 
 export const DEFAULT_PAYMENT_OBJ_FOR_CASH_OUT = {
     mode: PAYMENT_MODE[1],
-    cash: {fromAccountId: ''},
-    cheque: {fromAccountId: ''},
-    online: {
-        fromAccountId: '',
-        toAccount: {
-            toAccountId: '',
-            accNo: '',
-            upiId: '',
-            ifscCode: ''
-        }
+    cash: {fromAccountId: '', value: 0},
+    online: {fromAccountId: '', value: 0, toAccount: {accNo: '', ifscCode: ''}},
+    mixed: {
+        cash: {fromAccountId: '', value: 0},
+        online: {fromAccountId: '', value: 0, toAccount: {accNo: '', ifsccode: ''}}
     }
 }
 
 export const DEFAULT_PAYMENT_OBJ_FOR_CASH_IN = {
     mode: PAYMENT_MODE[1],
-    cash: {toAccountId: ''},
-    cheque: {toAccountId: ''},
-    online: {
-        toAccountId: ''
+    cash: {toAccountId: '', value: 0},
+    online: {toAccountId: '', value: 0},
+    mixed: {
+        cash: {toAccountId: '', value: 0},
+        online: {toAccountId: '', value: 0},
     }
 }
 

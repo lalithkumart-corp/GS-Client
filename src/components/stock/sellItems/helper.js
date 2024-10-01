@@ -278,6 +278,7 @@ export const constructApiParams = (stateObj, propObj) => {
         totalExchangeFinalPrice: stateObj.paymentFormData.totalExchangeFinalPrice,
         sum: stateObj.paymentFormData.sum,
         paymentMode: stateObj.paymentFormData.paymentMode,
+        paymentObj: stateObj.paymentFormData.paymentObj,
         paid: stateObj.paymentFormData.paid,
         balance: stateObj.paymentFormData.balance
     };
@@ -297,6 +298,7 @@ export const constructApiParams = (stateObj, propObj) => {
         grandTotal: stateObj.paymentFormData.sum,
     };
     return {
+        billingType: stateObj.billingType,
         invoiceNo: stateObj.invoiceNo, // (stateObj.invoiceSeries?`${stateObj.invoiceSeries}.${stateObj.invoiceNo}`:stateObj.invoiceNo),
         invoiceSeries: stateObj.invoiceSeries,
         customerId: stateObj.selectedCustomer.customerId,
@@ -307,7 +309,8 @@ export const constructApiParams = (stateObj, propObj) => {
         oldOrnaments,
         paymentFormData,
         calculations,
-        date: stateObj.date.isLive?getCurrentDateTimeInUTCForDB():stateObj.date._inputVal
+        date: stateObj.date.isLive?getCurrentDateTimeInUTCForDB():stateObj.date._inputVal,
+        paymentSelectionCardData: stateObj.paymentSelectionCardData
     }
 }
 

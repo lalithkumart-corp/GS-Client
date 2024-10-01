@@ -472,8 +472,8 @@ export default class CashBook extends Component {
         let cashInTotal = 0;
         let cashOutTotal = 0;
         _.each(results, (aRes, index) => {
-            cashInTotal += aRes.cash_in;
-            cashOutTotal += aRes.cash_out;
+            cashInTotal += parseFloat(aRes.cash_in);
+            cashOutTotal += parseFloat(aRes.cash_out);
         });
         return {
             totalCashIn: cashInTotal,
