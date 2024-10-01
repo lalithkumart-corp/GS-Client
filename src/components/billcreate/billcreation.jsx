@@ -851,6 +851,8 @@ class BillCreation extends Component {
                         return false;
                     }
                 });
+            } else if(parseInt(inputValue)) {
+                return this.state.formData.cname.list.filter(anObj => this.getLowerCase(anObj.mobile).slice(0, splits[0].length) === splits[0]);
             } else {
                 return this.state.formData.cname.list.filter(anObj => this.getLowerCase(anObj.name).slice(0, splits[0].length) === splits[0]);
             }
