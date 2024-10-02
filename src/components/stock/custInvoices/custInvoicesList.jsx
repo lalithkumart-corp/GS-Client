@@ -18,6 +18,10 @@ import { GsScreen } from '../../gs-screen/GsScreen';
 import SellItemEditMode from '../sellItems/SellItemEditMode';
 import './custInvoicesList.scss';
 import { toast } from 'react-toastify';
+import { MdUndo } from 'react-icons/md';
+import JwlReturnPopup from '../jwlReturnsPopup/JwlReturnsPopup';
+
+
 class JewelleryCustomerInvoicesList extends Component {
     constructor(props) {
         super(props);
@@ -49,6 +53,7 @@ class JewelleryCustomerInvoicesList extends Component {
             totals: {
                 invoiceList: 0,
             },
+            returnsPopupData: {},
             columns: [
                 {
                     id: 'invoiceDate',
@@ -71,7 +76,12 @@ class JewelleryCustomerInvoicesList extends Component {
                     displayText: 'Inv. No',
                     isFilterable: true,
                     filterCallback: this.filterCallbacks.invoiceNo,
-                    className: 'invoice-no-col',
+                    tdClassNameGetter: (column, columnIndex, row, rowIndex) => {
+                        let clsName = 'jewellery-invoice-billno-col gold-item';
+                        if(row['itemMetalType'] == 'S')
+                            clsName = 'jewellery-invoice-billno-col silver-item';
+                        return clsName;
+                    },
                     formatter: (column, columnIndex, row, rowIndex) => {
                         return (
                             <span className='invoice-no-cell' onClick={(e) => this.cellClickCallbacks.onInvoiceNoClick({column, columnIndex, row, rowIndex}, e)}>
@@ -173,13 +183,22 @@ class JewelleryCustomerInvoicesList extends Component {
                                         <span className="invoice-btn gs-icon"><FontAwesomeIcon icon={['fas', 'file-pdf']} onClick={(e) => this.onInvoiceClick(e, row)}/></span>
                                     </Tooltip>
                                 </span>
-                                <span style={{marginLeft: '10px'}}>
-                                    <Tooltip title="Delete Invoice"
+                                {!row.isReturned && 
+                                <span style={{marginLeft: '10px'}} >
+                                    <Tooltip title="Return item"
                                             position='top'
                                             trigger='mouseenter'>
-                                        <span className="invoice-btn gs-icon"><FontAwesomeIcon icon='trash' onClick={(e)=> this.onDeleteInvoiceClick(e, row)}/></span>
+                                        <span className="invoice-btn gs-icon"><MdUndo  onClick={(e)=> this.onReturnInvoiceClick(e, row)}/></span>
                                     </Tooltip>
                                 </span>
+                                }
+                                    <span style={{marginLeft: '10px'}}>
+                                        <Tooltip title="Delete Invoice"
+                                                position='top'
+                                                trigger='mouseenter'>
+                                            <span className="invoice-btn gs-icon"><FontAwesomeIcon icon='trash' onClick={(e)=> this.onDeleteInvoiceClick(e, row)}/></span>
+                                        </Tooltip>
+                                    </span>
                             </span>
                         )
                     },
@@ -207,6 +226,14 @@ class JewelleryCustomerInvoicesList extends Component {
         this.onClickPrint = this.onClickPrint.bind(this);
         this.handlePageClick = this.handlePageClick.bind(this);
     }
+
+    rowClassNameGetter = (row) => {
+        let className = '';
+        if(row && row.isReturned)
+            className += 'returned';
+        return className;
+    }
+
     createEvent() {
         try {
             axiosMiddleware.post(ANALYTICS, {module: 'JEWELLERY_CUSTOMER_INVOICES_PAGE_VISIT'});
@@ -347,6 +374,28 @@ class JewelleryCustomerInvoicesList extends Component {
         }
     }
 
+    async onReturnInvoiceClick(e, row) {
+        try {
+            e.stopPropagation();
+            this.setState({displayReturnsPopup: true, returnsPopupData: row});
+            // if(confirm("Are you sure to delete this invoice ?")) {
+            //     let res = await axiosMiddleware.delete(RETURN_JWL_INVOICE, {data: {invoiceRef: row.invoiceRef}});
+            //     if(res && res.data && res.data.STATUS == 'SUCCESS') {
+            //         toast.success('Deleted specific invoice successfully');
+            //         this.refresh();
+            //     } else {
+            //         toast.error(res.data.MSG || "Some Error occured while deleting the invoice details in server");
+            //     }
+            // }
+        } catch(e) {
+            console.log(e);
+        }
+    }
+
+    handleReturnsPopupClose = () => {
+        this.setState({displayReturnsPopup: false});
+    }
+
     async fetchInvoiceData(invoicesRefArr) {
         try {
             let at = getAccessToken();
@@ -445,7 +494,7 @@ class JewelleryCustomerInvoicesList extends Component {
                                 showIcon= {false}
                             />
                         </Col>
-                        <Col xs={4}>
+                        <Col xs={4} style={{zIndex: 1}}>
                             <ReactPaginate previousLabel={"<"}
                                 nextLabel={">"}
                                 breakLabel={"..."}
@@ -470,6 +519,7 @@ class JewelleryCustomerInvoicesList extends Component {
                                 columns={this.state.columns}
                                 rowData={this.state.customerInvoiceList}
                                 expandRow = { this.expandRow }
+                                rowClassNameGetter={this.rowClassNameGetter}
                             />
                         </Col>
                     </Row>
@@ -481,7 +531,7 @@ class JewelleryCustomerInvoicesList extends Component {
                                 content={() => this.componentRef}
                                 className="print-hidden-btn"
                             />
-                            <input type="button" className="gs-button" value="Print" onClick={this.onClickPrint} />
+                            
                             <div ref={(el) => (this.componentRef = el)}>
                                 {(() => {
                                     let invoiceTemplates = [];
@@ -493,12 +543,18 @@ class JewelleryCustomerInvoicesList extends Component {
                                     return invoiceTemplates;
                                 })()}
                             </div>
+                            <div style={{textAlign: 'center', paddingBottom: '25px'}}>
+                                <input type="button" className="gs-button bordered" value="Print" onClick={this.onClickPrint} />
+                            </div>
                         </CommonModal>
                     </Row>
                 </GsScreen>
                 <GsScreen showScreen={this.state.currentScreen==2?true:false} goBack={this.goToInvoiceListScreen} secClass={'edit-invoice-screen-sec-class'}>
                     <SellItemEditMode data={this.state.invoiceDataForUpdate}/>
                 </GsScreen>
+                <CommonModal modalOpen={this.state.displayReturnsPopup} secClass="invoice-return-popup" handleClose={this.handleReturnsPopupClose}>
+                    <JwlReturnPopup handleClose={this.handleReturnsPopupClose} returnsPopupData={this.state.returnsPopupData}/>
+                </CommonModal>
             </Container>
         )
     }

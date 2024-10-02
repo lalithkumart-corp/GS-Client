@@ -137,6 +137,7 @@ export const FETCH_STOCKS_BY_ID =  `${config.proxy_protocol}://${config.proxy_ap
 export const FETCH_JWL_CUST_INVOICES_LIST = `${config.proxy_protocol}://${config.proxy_api_host}:${config.proxy_api_port}/${config.restApiRoot}/JewelleryInvoices/fetch-jewellery-cust-invoices-list`;
 export const FETCH_JWL_CUST_INVOICES_LIST_COUNT = `${config.proxy_protocol}://${config.proxy_api_host}:${config.proxy_api_port}/${config.restApiRoot}/JewelleryInvoices/fetch-jewellery-cust-invoices-list-count`;
 export const DELETE_JWL_INVOICE = `${config.proxy_protocol}://${config.proxy_api_host}:${config.proxy_api_port}/${config.restApiRoot}/JewelleryInvoices/delete`;
+export const RETURN_JWL_INVOICE = `${config.proxy_protocol}://${config.proxy_api_host}:${config.proxy_api_port}/${config.restApiRoot}/JewelleryInvoices/return-items`;
 export const FETCH_TOUCH_LIST = `${config.proxy_protocol}://${config.proxy_api_host}:${config.proxy_api_port}/${config.restApiRoot}/Touches/list`;
 export const SALE_ITEM = `${config.proxy_protocol}://${config.proxy_api_host}:${config.proxy_api_port}/${config.restApiRoot}/Stocks/sell-item`;
 export const GET_STORE_INFO = `${config.proxy_protocol}://${config.proxy_api_host}:${config.proxy_api_port}/${config.restApiRoot}/Stores/get-info`;
