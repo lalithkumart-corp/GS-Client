@@ -169,6 +169,7 @@ function GstBillingDemo() {
     let [roundOffRangeSel, setRoundOffRangeSel] = useState(1);
     let [grandTotal, setGrandTotal] = useState('');
     let [toolsVisibility, setToolsVisibility] = useState(true);
+    let [displayGstNumber, setDisplayGstNumber] = useState(true);
 
     useEffect(() => {
         if(printFlag && templateContent) {
@@ -785,6 +786,10 @@ function GstBillingDemo() {
                                 <FormControl.Feedback />
                             </FormGroup>
                         </Col>
+                        <Col xs={3} md={3} style={{paddingLeft: '30px', paddingTop: '15px'}}>
+                            <input type="checkbox" className={"gs-checkbox"} onChange={(e) => setDisplayGstNumber(e.target.checked)} checked={displayGstNumber}/>
+                            <span style={{paddingLeft: '5px', lineHeight: '26px'}}>Display GST Number</span>
+                        </Col>
                     </Row>
                     <Row style={{marginTop: '10px'}}>
                         <Col xs={3} md={3}>
@@ -913,7 +918,11 @@ function GstBillingDemo() {
                     <input type="button" className="gs-button bordered" value="Preview" onClick={onClickPreview} />
                     <input type="button" className="gs-button bordered" value="Print" onClick={onClickPrint} style={{marginLeft: '15px'}} />
                     <div className="gst-bill-preview" style={{transform: 'scale(0.68)', transformOrigin: "left top"}}>
-                        <TemplateRenderer ref={(el) => (componentRef = el)} templateId={2} content={templateContent}/>
+                        <TemplateRenderer 
+                            ref={(el) => (componentRef = el)} 
+                            templateId={2} 
+                            content={templateContent} 
+                            customArgs={{displayGstNumber}}/>
                     </div>
                     <ReactToPrint 
                         ref={(domElm) => {btnRef = domElm}}

@@ -136,6 +136,8 @@ export const FETCH_STOCKS_BY_PRODID = `${config.proxy_protocol}://${config.proxy
 export const FETCH_STOCKS_BY_ID =  `${config.proxy_protocol}://${config.proxy_api_host}:${config.proxy_api_port}/${config.restApiRoot}/Stocks/fetch-by-ids`;
 export const FETCH_JWL_CUST_INVOICES_LIST = `${config.proxy_protocol}://${config.proxy_api_host}:${config.proxy_api_port}/${config.restApiRoot}/JewelleryInvoices/fetch-jewellery-cust-invoices-list`;
 export const FETCH_JWL_CUST_INVOICES_LIST_COUNT = `${config.proxy_protocol}://${config.proxy_api_host}:${config.proxy_api_port}/${config.restApiRoot}/JewelleryInvoices/fetch-jewellery-cust-invoices-list-count`;
+export const FETCH_JWL_ESTIMATE_INVOICES_LIST = `${config.proxy_protocol}://${config.proxy_api_host}:${config.proxy_api_port}/${config.restApiRoot}/JewelleryEstimateInvoices/fetch-jewellery-estimate-invoices-list`;
+export const FETCH_JWL_ESTIMATE_INVOICES_LIST_COUNT = `${config.proxy_protocol}://${config.proxy_api_host}:${config.proxy_api_port}/${config.restApiRoot}/JewelleryEstimateInvoices/fetch-jewellery-estimate-invoices-list-count`;
 export const DELETE_JWL_INVOICE = `${config.proxy_protocol}://${config.proxy_api_host}:${config.proxy_api_port}/${config.restApiRoot}/JewelleryInvoices/delete`;
 export const RETURN_JWL_INVOICE = `${config.proxy_protocol}://${config.proxy_api_host}:${config.proxy_api_port}/${config.restApiRoot}/JewelleryInvoices/return-items`;
 export const FETCH_TOUCH_LIST = `${config.proxy_protocol}://${config.proxy_api_host}:${config.proxy_api_port}/${config.restApiRoot}/Touches/list`;
@@ -179,6 +181,7 @@ export const GET_JEWELLERY_TAG_SETTINGS = `${config.proxy_protocol}://${config.p
 
 export const SAVE_INVOICE_DATA = `${config.proxy_protocol}://${config.proxy_api_host}:${config.proxy_api_port}/${config.restApiRoot}/JewelleryInvoices/save-invoice`;
 export const FETCH_INVOICE_DATA = `${config.proxy_protocol}://${config.proxy_api_host}:${config.proxy_api_port}/${config.restApiRoot}/JewelleryInvoices/get-invoice-data`;
+export const FETCH_ESTIMATE_INVOICE_DATA = `${config.proxy_protocol}://${config.proxy_api_host}:${config.proxy_api_port}/${config.restApiRoot}/JewelleryEstimateInvoices/get-estimate-invoice-data`;
 export const FETCH_INVOICE_RECORD = `${config.proxy_protocol}://${config.proxy_api_host}:${config.proxy_api_port}/${config.restApiRoot}/JewelleryInvoices/get-invoice-record`;
 
 export const FETCH_FUND_ACCOUNTS_LIST = `${config.proxy_protocol}://${config.proxy_api_host}:${config.proxy_api_port}/${config.restApiRoot}/FundAccounts/get-list`;

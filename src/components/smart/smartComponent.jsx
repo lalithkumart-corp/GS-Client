@@ -32,7 +32,7 @@ import AddStock from '../stock/addStock/AddStock';
 // import ViewStock from '../stock/viewStock/ViewStock';
 import StockViewTabLayout from '../stock/viewStock/index';
 import SellItem from '../stock/sellItems/SellItem';
-import JewelleryCustomerInvoicesList from '../stock/custInvoices/custInvoicesList';
+import JewelleryInvoices from '../stock/jewelleryInvoices/jewelleryInvoicesList';
 import StockSetup from '../stock/setup/StockSetup';
 import TagSetup from '../jewellery/tag/TagSetup.jsx';
 import TagDemo from '../stock/tag/TagDemo';
@@ -54,6 +54,7 @@ import {LAL_M_AD_129} from '../../core/sitemap';
 import { saveLocation } from '../../utilities/apiUtils';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'react-tippy/dist/tippy.css'
+import JewelleryEstimateInvoicesList from '../stock/jewelleryEstimateInvoices/jewelleryEstimateInvoicesList';
 // var config  = {
 //     showDelay: 0,
 //     style: {
@@ -100,7 +101,7 @@ class SmartComponent extends Component {
         yy = yy.replaceAll('GS_', '');
         yy = yy.replaceAll('MAK_', '');
         yy = yy.replaceAll('INTER', '');
-        if(true || yy == "-236375844") {// yy == "-1844838684" // temporarily making as tru for development mode
+        if(true || yy == "554313406") {// yy == "-1844838684" // temporarily making as tru for development mode
             if(this.props.auth.isAuthenticated) {
                 if(!this.props.auth.isActivated) {
                     return (
@@ -155,7 +156,8 @@ class SmartComponent extends Component {
                                     <Route path= "/stock-add" element={<AddStock />} />
                                     <Route path= "/stock-view" element={<StockViewTabLayout />} />
                                     <Route path= "/sell-item" element={<SellItem />} />
-                                    <Route path= "/jewellery-cust-invoices" element={<JewelleryCustomerInvoicesList />} />
+                                    <Route path= "/jewellery-invoices" element={<JewelleryInvoices />} />
+                                    <Route path='/jewellery-estimate-invoices' element={<JewelleryEstimateInvoicesList/>} />
                                     <Route path= "/stock-setup" element={<StockSetup />} />
                                     {/* <Route path="/tag-setup" element={<TagSetup />} /> */}
                                     <Route path= "/tag-demo" element={<TagDemo />} />

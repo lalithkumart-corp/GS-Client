@@ -229,6 +229,7 @@ export const clearSession = () => {
     clearMyFundAccountsList();
     clearAllBanksList();
     clearJewelleryTagTemplateSettings();
+    clearJewelleryBillTemplateSettings();
     _clear(keys.session);
 }
 

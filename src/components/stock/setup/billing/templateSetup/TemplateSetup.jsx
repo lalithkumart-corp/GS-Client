@@ -3,7 +3,7 @@ import { useState, useRef, useEffect } from 'react';
 import { Row, Col } from 'react-bootstrap';
 import ReactToPrint from 'react-to-print';
 import { GET_JEWELLERY_BILL_SETTINGS, FETCH_AVL_JEWELLERY_BILL_TEMPLATES, UPDATE_JEWELLERY_BILL_SETTINGS } from '../../../../../core/sitemap';
-import { getAccessToken, saveJewelleryBillTemplateSettings } from '../../../../../core/storage';
+import { getAccessToken, getJewelleryBillTemplateSettings, saveJewelleryBillTemplateSettings } from '../../../../../core/storage';
 import CommonModal from '../../../../common-modal/commonModal';
 import axiosMiddleware from '../../../../../core/axios';
 import { constructApiAssetUrl } from '../../../../../utilities/utility';
@@ -13,6 +13,7 @@ import TemplateRenderer from '../../../../../templates/jewellery-gstBill/templat
 import './TemplateSetup.scss';
 import { template1, template2, template3 } from './sampleTemplateContent';
 import { toast } from 'react-toastify';
+import GSCheckbox from '../../../../ui/gs-checkbox/checkbox';
 
 export default function TemplateSetup(props) {
     let componentRef = useRef();
@@ -33,11 +34,18 @@ export default function TemplateSetup(props) {
 
     let [estimateBillPreviewVisibility, setEstimateBillPreviewVisibility] = useState(false);
 
+    let [gstCustomArgs, setGstCustomArgs] = useState(props.gstBillSettings.customArgs || {});
+    let [displayGstNumber, setDisplayGstNumber] = useState(null);
 
     useEffect(() => {
         // fetchSettings();
         fetchAvlTemplates();
+        parseCustomArgs();
     }, []);
+
+    useEffect(() => {
+        parseCustomArgs(props.gstBillSettings.customArgs);
+    }, [props.gstBillSettings.customArgs]);
 
     useEffect(() => {
         setGstSelectedTemplateId(props.gstBillSettings.selectedTemplate);
@@ -46,6 +54,24 @@ export default function TemplateSetup(props) {
     useEffect(() => {
         setSelectedEstimateBillTemplateId(props.estimateBillSettings.selectedTemplate);
     }, [props.estimateBillSettings.selectedTemplate]);
+
+    let parseCustomArgs = () => {
+        if(props.gstBillSettings.customArgs) {
+            try {
+                let r = JSON.parse(props.gstBillSettings.customArgs);
+                setGstCustomArgs(r);
+                if(Object.keys(r).includes('displayGstNumber') && (r.displayGstNumber == 'false' || r.displayGstNumber == false))
+                    setDisplayGstNumber(false);
+                else
+                    setDisplayGstNumber(true);
+            } catch(e) {
+                setDisplayGstNumber(true);
+                console.log(e);
+            }
+        } else {
+            setDisplayGstNumber(true);
+        }
+    }
 
     let onClickPreviewBtn = () => {
         setPreviewVisibility(true);
@@ -60,6 +86,11 @@ export default function TemplateSetup(props) {
 
     let onClickPrintEstimateBill = () => {
         //TODO:
+    }
+
+    let onChangeDisplayGstOption = (e) => {
+        setDisplayGstNumber(e.target.checked);
+        setGstCustomArgs({...gstCustomArgs, displayGstNumber: e.target.checked});
     }
 
     // const fetchSettings = async () => {
@@ -121,7 +152,7 @@ export default function TemplateSetup(props) {
                     </div>
                     <div className="screenshot-radio-btn-label">
                         <input type="radio" id={`jewellery-${identifier}-bill-body-template-id-${index}`} name={`jewellery-${identifier}-bill-body-template`} onChange={(e)=>onChangeTemplateSelection(e, aTemplate.template_id)} value={aTemplate.template_id} checked={checked}/>
-                        <label for={`jewellery-${identifier}-bill-body-template-id-${index}`}>{aTemplate.template_id}</label>
+                        <label for={`jewellery-${identifier}-bill-body-template-id-${index}`}> &nbsp; Template - {aTemplate.template_id}</label>
                     </div>
                 </Col>
             )
@@ -138,18 +169,19 @@ export default function TemplateSetup(props) {
             let apiParams = {
                 'gst': {
                     selectedTemplate: selectedGstTemplateId,
+                    customArgs: gstCustomArgs,
                 },
                 'estimate': {
                     selectedTemplate: selectedEstimateBillTemplateId
                 }
-                // category: 'gst',
-                // selectedTemplate: selectedGstTemplateId
             };
             let resp = await axiosMiddleware.post(UPDATE_JEWELLERY_BILL_SETTINGS, apiParams);
             if(resp && resp.data && resp.data.STATUS == 'SUCCESS') {
                 toast.success('Updated Successfully!');
                 let allSettings = getJewelleryBillTemplateSettings();
-                allSettings[apiParams.category] = {category: apiParams.category, selectedTemplate: apiParams.selectedTemplate}
+                allSettings.gst.selectedTemplate = apiParams.gst.selectedTemplate;
+                allSettings.gst.customArgs = apiParams.gst.customArgs;
+                allSettings.estimate.selectedTemplate = apiParams.estimate.selectedTemplate;
                 saveJewelleryBillTemplateSettings(allSettings);
             }
         } catch(e) {
@@ -164,7 +196,15 @@ export default function TemplateSetup(props) {
                 <Col clasName="gs-card-content" style={{marginTop: '20px'}}>
                     <h3 style={{marginBottom: '30px'}}>Bill Template Setup</h3>
                     <Row>
-                        <h5>GST Invoice</h5>
+                        <h5>Original Invoice</h5>
+                        <Col xs={12}>
+                            <div>
+                                <GSCheckbox labelText="" 
+                                            checked={displayGstNumber} 
+                                            onChangeListener = {(e) => {onChangeDisplayGstOption(e)}} />
+                                <span style={{paddingLeft: '30px', lineHeight: '26px'}}>Display GST Number</span>
+                            </div>
+                        </Col>
                         <Col xs={12}>
                             {/* <div style={{textAlign: 'right'}}>
                                 <input type="button" className="gs-button" value="Preview" onClick={onClickPreviewBtn}/>
@@ -176,7 +216,11 @@ export default function TemplateSetup(props) {
                                     content={() => componentRef}
                                 />
                                 <input type="button" className="gs-button" value="Print - Sample GST Bill" onClick={onClickPrintGstBill} />
-                                <TemplateRenderer ref={(el) => (componentRef = el)} templateId={props.gstBillSettings.selectedTemplate} content={templateContent}/>
+                                <TemplateRenderer 
+                                    ref={(el) => (componentRef = el)} 
+                                    templateId={props.gstBillSettings.selectedTemplate} 
+                                    content={templateContent}
+                                    customArgs={props.gstTemplateSettings.customArgs}/>
                                 
                                 <ReactToPrint 
                                     ref={(domElm) => {estimateBtnRef = domElm}}
@@ -184,7 +228,10 @@ export default function TemplateSetup(props) {
                                     content={() => estimateInvoiceComponentRef}
                                 />
                                 <input type="button" className="gs-button" value="Print - Sample Estimate Bill" onClick={onClickPrintEstimateBill} />
-                                <TemplateRenderer ref={(el) => (estimateInvoiceComponentRef = el)} templateId={props.estimateBillSettings.selectedTemplate} content={templateContent}/>
+                                <TemplateRenderer 
+                                    ref={(el) => (estimateInvoiceComponentRef = el)} 
+                                    templateId={props.estimateBillSettings.selectedTemplate} 
+                                    content={templateContent}/>
                             </CommonModal>
                         </Col>
                     </Row>

@@ -94,6 +94,7 @@ class SellItem extends Component {
             // estimateInvoiceNo: props.invoice.estimateInvoiceNo,
             selectedGstTemplateId: props.invoice.selectedGstTemplate,
             selectedEstimateTemplateId: props.invoice.selectedEstimateTemplate,
+            gstCustomArgs: props.invoice.gstCustomArgs,
             billingType: ORIGINAL_BILLING,
             date: {
                 inputVal: new Date(), //moment().format('DD-MM-YYYY'),
@@ -1630,7 +1631,11 @@ class SellItem extends Component {
                         content={() => this.componentRef}
                         className="print-hidden-btn"
                     />
-                    <TemplateRenderer ref={(el) => (this.componentRef = el)} templateId={this.state.billingType==ORIGINAL_BILLING?this.state.selectedGstTemplateId:this.state.selectedEstimateTemplateId} content={this.state.printContent}/>
+                    <TemplateRenderer 
+                        ref={(el) => (this.componentRef = el)} 
+                        templateId={this.state.billingType==ORIGINAL_BILLING?this.state.selectedGstTemplateId:this.state.selectedEstimateTemplateId} 
+                        content={this.state.printContent}
+                        customArgs={this.state.gstCustomArgs}/>
                 </Row>
             </Container>
         )

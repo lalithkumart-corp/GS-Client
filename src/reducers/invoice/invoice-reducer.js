@@ -1,4 +1,4 @@
-let defaultState = {gstInvoiceSeries: '', gstInvoiceNo: 0, estimateInvoiceSeries: '', estimateInvoiceNo: 0, selectedGstTemplate: 0, selectedEstimateTemplate: 0 };
+let defaultState = {gstInvoiceSeries: '', gstInvoiceNo: 0, estimateInvoiceSeries: '', estimateInvoiceNo: 0, selectedGstTemplate: 0, selectedEstimateTemplate: 0, gstCustomArgs: {} };
 export default function invoiceReducer(state=defaultState, action) {
     let newState = { ...state };    
     switch(action.type) {
@@ -10,6 +10,8 @@ export default function invoiceReducer(state=defaultState, action) {
             };
             if(action.data.selectedGstTemplate)
                 newState.selectedGstTemplate = action.data.selectedGstTemplate;
+            if(action.data.customArgs)
+                newState.gstCustomArgs = action.data.customArgs;
             break;
         case 'UPDATE_ESTIMATE_INVOICE_NO_SERIES':
             newState = {

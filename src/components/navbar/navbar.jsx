@@ -102,14 +102,15 @@ class NavbarComp extends Component {
                                     <NavDropdown.Item as={Link} to="/stock-add">Add Stock</NavDropdown.Item>
                                     <NavDropdown.Item as={Link} to="/stock-view">View Stock</NavDropdown.Item>
                                     <NavDropdown.Item as={Link} to="/sell-item">Billing</NavDropdown.Item>
-                                    <NavDropdown.Item as={Link} to='/jewellery-cust-invoices'>Cust. Invoices</NavDropdown.Item>
+                                    <NavDropdown.Item as={Link} to='/jewellery-invoices'>Invoices</NavDropdown.Item>
+                                    <NavDropdown.Item as={Link} to='/jewellery-estimate-invoices'>Estimate Invoices</NavDropdown.Item>
                                     <NavDropdown.Divider />
                                     <NavDropdown.Item as={Link} to="/stock-setup">Setup</NavDropdown.Item>
                                     <NavDropdown.Divider />
                                     <NavDropdown.Item as={Link} to="/tag-demo">Tag Generator</NavDropdown.Item>
                                     <NavDropdown.Item as={Link} to="/tag-v2">Tag Generator V2</NavDropdown.Item>
                                     <NavDropdown.Item as={Link} to="/label-generator">Label Generator</NavDropdown.Item>
-                                    <NavDropdown.Item as={Link} to="/gst-bill-generator">GST BILL Generator</NavDropdown.Item>
+                                    <NavDropdown.Item as={Link} to="/gst-bill-generator">Demo - GST Billing</NavDropdown.Item>
                                 </NavDropdown>
                             </Nav>
                         }

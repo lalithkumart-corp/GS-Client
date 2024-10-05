@@ -165,7 +165,7 @@ const JwlReturnPopup = (props) => {
         if(!payBackValue) {
             res.status = false;
             res.msg = "Enter the pay back amount";
-        } else if (parseFloat(props.returnsPopupData.paidAmt) - charges) {
+        } else if ((parseFloat(props.returnsPopupData.paidAmt) - charges) > payBackValue) {
             res.status = false;
             res.msg = "Payback amount is not matching with amount to return back";
         }

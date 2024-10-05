@@ -28,11 +28,17 @@ const DEFAULT_TEMPLATE_STRUC = {
 function GstBillTemplate2(props) {
 
     let [printContent, setPrintContent] = useState(props.printContent || DEFAULT_TEMPLATE_STRUC);
+    let [customArgs, setCustomArgs] = useState(props.customArgs || {});
 
     useEffect(() => {
         if(props.printContent && Object.keys(props.printContent).length)
             setPrintContent(props.printContent);
     }, [props.printContent]);
+
+    useEffect(() => {
+        if(props.customArgs && Object.keys(props.customArgs).length)
+            setCustomArgs(props.customArgs);
+    }, [props.customArgs]);
 
     const _formatNo = (number, decimals) => {
         return  new Number(number+'').toFixed(parseInt(decimals));
@@ -100,7 +106,8 @@ function GstBillTemplate2(props) {
             fontSize: "16px"
         }
         let gstStyle = {
-            fontSize: "16px"
+            fontSize: "16px",
+            visibility: (customArgs.displayGstNumber == 'false' || customArgs.displayGstNumber == false)?'hidden': 'visible'
         }
         let rightImgColStyles = {
             position: 'absolute',
@@ -118,12 +125,15 @@ function GstBillTemplate2(props) {
                 <img className="img" style={leftImgStyles} src={leftLogoImgSrc}/>
             </div>
         )
+        debugger;
         middleSection.push(
             <Col xs={12} style={middleSectionStyles}>
                 <><span className="store-name" style={storeNameStyles}>{strNme}</span></>  <br></br>
                 <><span className="full-addr-line" style={addressLineStyle}>{addressLine}</span></> <br></br>
                 <>   
                     {mobileLine && <span className="mobile-no" style={mobileStyle}>{mobileLine}, </span>}
+                    {/* {(customArgs.displayGstNumber == 'false' || customArgs.displayGstNumber == false) ? <></> 
+                    : printContent.gstNumber && <span className="gst-no" style={gstStyle}>GST: {printContent.gstNumber}</span>} */}
                     {printContent.gstNumber && <span className="gst-no" style={gstStyle}>GST: {printContent.gstNumber}</span>}
                 </>
             </Col>
@@ -291,7 +301,7 @@ function GstBillTemplate2(props) {
 
     const _constructOldPurchaseDom = () => {
         return <Row>
-                    {Object.keys(printContent.oldOrnaments).length ?
+                    {(Object.keys(printContent.oldOrnaments).length && printContent.oldOrnaments.netWt > 0)?
                     <div style={{paddingLeft: '10px', paddingRight: '10px', width: '90%', margin: '0 auto'}}>
                         <Col xs={12}>
                             <Row>

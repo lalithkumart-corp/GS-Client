@@ -16,13 +16,13 @@ import ReactToPrint from 'react-to-print';
 import ReactPaginate from 'react-paginate';
 import { GsScreen } from '../../gs-screen/GsScreen';
 import SellItemEditMode from '../sellItems/SellItemEditMode';
-import './custInvoicesList.scss';
+import './jewelleryInvoicesList.scss';
 import { toast } from 'react-toastify';
 import { MdUndo } from 'react-icons/md';
 import JwlReturnPopup from '../jwlReturnsPopup/JwlReturnsPopup';
 
 
-class JewelleryCustomerInvoicesList extends Component {
+class JewelleryInvoicesList extends Component {
     constructor(props) {
         super(props);
 
@@ -430,6 +430,7 @@ class JewelleryCustomerInvoicesList extends Component {
         if(allSettings.gst) gstSettingsObj = allSettings.gst;
         if(!gstSettingsObj)
             toast.error('GST Template Settings not found');
+
         this.setState({gstTemplateSettings: gstSettingsObj});
     }
 
@@ -468,11 +469,42 @@ class JewelleryCustomerInvoicesList extends Component {
     expandRow = {
         renderer: (row) => {
             return (
-                <>
-                    <div>Invoice Date: {convertToLocalTime(row.invoiceDate)}</div>
-                    <div>Entry Date: {row.createdDate.replace('T',' ').replace('Z','').substring(0,19)}</div>
-                    <div>Updated Date: {row.modifiedDate.replace('T',' ').replace('Z','').substring(0,19)}</div>
-                </>
+                <Row>
+                    {row.isReturned ? <Col xs={12} md={12}>
+                        <h6> Return Details</h6>
+                        <Row>
+                            <Col xs={2}>Returned Date</Col>
+                            <Col xs={3}>{row.returnDate}</Col>
+                        </Row>
+                        <Row>
+                            <Col xs={2}>Charges - collected from customer</Col>
+                            <Col xs={3}>{row.returnChargesVal}</Col>
+                        </Row>
+                        <Row>
+                            <Col xs={2}>Returned Amount</Col>
+                            <Col xs={3}>{row.returnedAmount}</Col>
+                        </Row>
+                    </Col> : <></>}
+                    <Col xs={12} style={{marginTop: '15px'}}>
+                        <h6>Timeline</h6>
+                        <Row>
+                            <Col xs={2} md={2}>
+                                Billing Date: 
+                            </Col>
+                            <Col xs={3} md={3}>
+                                {convertToLocalTime(row.invoiceDate)}
+                            </Col>
+                        </Row>
+                        <Row>
+                            <Col xs={2} md={2}>
+                                System Entry Date: 
+                            </Col>
+                            <Col xs={3} md={3}>
+                                {row.createdDate.replace('T',' ').replace('Z','').substring(0,19)}
+                            </Col>
+                        </Row>
+                    </Col>
+                </Row>
             )
         }
     }
@@ -482,7 +514,7 @@ class JewelleryCustomerInvoicesList extends Component {
             <Container className={`cust-inv-container full-screen`}>
                 <GsScreen showScreen={this.state.currentScreen==1?true:false} isMainScreen={true}>
                     <Row>
-                        <h4>Customer Invoices</h4>
+                        <h4>Invoices</h4>
                     </Row>
                     <Row>
                         <Col xs={3} md={3}>
@@ -538,7 +570,10 @@ class JewelleryCustomerInvoicesList extends Component {
                                     _.each(this.state.printContents, (aPrintData, index) => {
                                         if(index && index%2 == 0)
                                             invoiceTemplates.push(<br></br>);
-                                        invoiceTemplates.push(<TemplateRenderer templateId={this.state.gstTemplateSettings.selectedTemplate} content={aPrintData}/>);
+                                        invoiceTemplates.push(
+                                        <TemplateRenderer templateId={this.state.gstTemplateSettings.selectedTemplate} 
+                                        content={aPrintData}
+                                        customArgs={this.state.gstTemplateSettings.customArgs}/>);
                                     });
                                     return invoiceTemplates;
                                 })()}
@@ -566,4 +601,4 @@ const mapStateToProps = (state) => {
     };
 };
 
-export default connect(mapStateToProps, {})(JewelleryCustomerInvoicesList);
+export default connect(mapStateToProps, {})(JewelleryInvoicesList);

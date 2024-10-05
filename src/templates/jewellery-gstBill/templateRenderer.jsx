@@ -8,19 +8,20 @@ export default class TemplateRenderer extends Component {
         super(props);
     }
     getTemplateById() {
+        debugger;
         let theDom = [];
         switch(this.props.templateId) {
             case 1:
-                theDom.push(<Template1 printContent={this.props.content}/>);
+                theDom.push(<Template1 printContent={this.props.content} customArgs={this.props.customArgs}/>);
                 break;
             case 2:
-                theDom.push(<Template2 printContent={this.props.content}/>);
+                theDom.push(<Template2 printContent={this.props.content} customArgs={this.props.customArgs}/>);
                 break;
             case 3:
-                theDom.push(<Template3 printContent={this.props.content}/>);
+                theDom.push(<Template3 printContent={this.props.content} customArgs={this.props.customArgs}/>);
                 break;
             default:
-                theDom.push(<Template1 printContent={this.props.content}/>);
+                theDom.push(<Template1 printContent={this.props.content} customArgs={this.props.customArgs}/>);
         }
         return theDom;
     }

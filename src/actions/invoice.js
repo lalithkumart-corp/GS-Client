@@ -13,7 +13,7 @@ export const getBillNoFromDB = () => {
                     let gstRecord = successResp.data.RESP.filter((a) => a.category=='gst');
                     dispatch({
                         type: 'UPDATE_GST_INVOICE_NO_SERIES',
-                        data: {gstInvoiceSeries: gstRecord[0].billSeries, gstInvoiceNo: gstRecord[0].billNo, selectedGstTemplate: gstRecord[0].selectedTemplate}
+                        data: {gstInvoiceSeries: gstRecord[0].billSeries, gstInvoiceNo: gstRecord[0].billNo, selectedGstTemplate: gstRecord[0].selectedTemplate, customArgs: parseCustomArgs(gstRecord[0].customArgs)}
                     });
                     let estimateRecord = successResp.data.RESP.filter((a) => a.category=='estimate');
                     dispatch({
@@ -97,5 +97,13 @@ export const updateBillNoInStore = (billSeries, billNo) => {
             type: 'UPDATE_GST_INVOICE_NO_SERIES',
             data: {gstInvoiceSeries: billSeries, gstInvoiceNo: billNo}
         });
+    }
+}
+const parseCustomArgs = (customArgsStr) => {
+    try {
+        let r = JSON.parse(customArgsStr);
+        return r;
+    } catch(e) {
+        return {};
     }
 }
