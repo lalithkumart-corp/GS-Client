@@ -76,6 +76,10 @@
     margin: 7px 10px 0 16px;
     color: #337ab7;
 }
+.filter-popover-trigger-btn:hover {
+    color: #fba200;
+    cursor: pointer;
+}
 .no-of-items {
     margin-top: 14px;
     display: inline-block;
@@ -138,7 +142,7 @@
 }
 
 .view-stock-container .more-actions-dropdown {
-    display: inline-block;
+    display: inline-block !important;
 }
 .view-stock-container #dropdown-more-actions {
     background-color: white;

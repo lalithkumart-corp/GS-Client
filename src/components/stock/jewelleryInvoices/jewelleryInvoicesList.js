@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import { Container, Row, Col } from 'react-bootstrap';
+import { Container, Row, Col, Form } from 'react-bootstrap';
 import axiosMiddleware from '../../../core/axios';
 import { FETCH_JWL_CUST_INVOICES_LIST, FETCH_JWL_CUST_INVOICES_LIST_COUNT, FETCH_INVOICE_DATA, DELETE_JWL_INVOICE, ANALYTICS } from '../../../core/sitemap';
 import { getAccessToken, getJewelleryCustInvoicesPageFilters, setJewelleryCustInvoicesPageFilters, getJewelleryBillTemplateSettings } from '../../../core/storage';
@@ -20,7 +20,7 @@ import './jewelleryInvoicesList.scss';
 import { toast } from 'react-toastify';
 import { MdUndo } from 'react-icons/md';
 import JwlReturnPopup from '../jwlReturnsPopup/JwlReturnsPopup';
-
+import {Popover, ArrowContainer} from 'react-tiny-popover';
 
 class JewelleryInvoicesList extends Component {
     constructor(props) {
@@ -216,7 +216,11 @@ class JewelleryInvoicesList extends Component {
                 customerGaurdianName: null,
                 customerMobile: null,
                 customerAddress: null,
-            }
+                includeReturnedInvoices: true,
+                includeGoldOrnType: true,
+                includeSilverOrnType: true
+            },
+            filterPopupVisibility: false,
         }
         this.bindMethods();
     }
@@ -225,6 +229,11 @@ class JewelleryInvoicesList extends Component {
         this.goToInvoiceListScreen = this.goToInvoiceListScreen.bind(this);
         this.onClickPrint = this.onClickPrint.bind(this);
         this.handlePageClick = this.handlePageClick.bind(this);
+        this.onFilterBtnClick = this.onFilterBtnClick.bind(this);
+        this.onChangeIncludeReturnInvoiceOption = this.onChangeIncludeReturnInvoiceOption.bind(this);
+        this.refresh = this.refresh.bind(this);
+        this.validateFormInputs = this.validateFormInputs.bind(this);
+        this.onFilterApplyBtnClick = this.onFilterApplyBtnClick.bind(this);
     }
 
     rowClassNameGetter = (row) => {
@@ -439,12 +448,28 @@ class JewelleryInvoicesList extends Component {
     }
 
     refresh(options={}) {
-        clearTimeout(this.timer);
+        if(this.timer) clearTimeout(this.timer);
         this.timer = setTimeout(() => {
-            this.fetchInvoicesPerPage();
-            if(!options.fetchOnlyRows)
-                this.fetchTotals();
+            let {res, msg} = this.validateFormInputs();
+            if(res) {
+                this.fetchInvoicesPerPage();
+                if(!options.fetchOnlyRows)
+                    this.fetchTotals();
+            } else {
+                toast.error(msg);
+            }
         }, this.timeOut);
+    }
+
+    validateFormInputs() {
+        let res = true;
+        let msg = "";
+
+        if(!this.state.filters.includeGoldOrnType && !this.state.filters.includeSilverOrnType) {
+            res = false;
+            msg = 'Please select any one Ornament Type from Filter popup box';
+        }
+        return {res, msg};
     }
 
     async handlePageClick(selectedPage) {
@@ -509,6 +534,37 @@ class JewelleryInvoicesList extends Component {
         }
     }
 
+    onFilterBtnClick() {
+        this.setState({filterPopupVisibility: true});
+    }
+
+    onChangeIncludeReturnInvoiceOption(e) {
+        let newState = {...this.state};
+        newState.filters.includeReturnedInvoices = e.target.checked; //!newState.filters.includeReturnedInvoices;
+        this.setState(newState);
+    }
+
+    onChangeIncludeOrnTypeFilter(e, identifier) {
+        let newState = {...this.state};
+        switch(identifier) {
+            case 'GOLD':
+                newState.filters.includeGoldOrnType = e.target.checked;
+                break;
+            case 'SILVER':
+                newState.filters.includeSilverOrnType = e.target.checked;
+                break;
+        }
+        this.setState(newState);
+    }
+
+    onFilterApplyBtnClick() {
+        let {res, msg} = this.validateFormInputs();
+        if(res) {
+            this.setState({filterPopupVisibility: false});
+        }
+        this.refresh();
+    }
+
     render() {
         return (
             <Container className={`cust-inv-container full-screen`}>
@@ -525,6 +581,56 @@ class JewelleryInvoicesList extends Component {
                                 endDate={this.state.filters.date.endDate}
                                 showIcon= {false}
                             />
+                            <Popover
+                                containerClassName='jwl-invoices-list-filter-popover'
+                                // padding={0}
+                                isOpen={this.state.filterPopupVisibility}
+                                position={'bottom'} // preferred position
+                                onClickOutside={() => this.setState({ filterPopupVisibility: false })}
+                                content={({ position, targetRect, popoverRect }) => {
+                                    return (
+                                        <Container className='gs-card arrow-box left filter-popover-container'>
+                                            <Row className='filter-popover-content' >
+                                                <Col>
+                                                    <Row>
+                                                        <Col xs={12} className="include-returned-invoices">
+                                                            <h4>Returns</h4>
+                                                            <Form>
+                                                                <Form.Group>
+                                                                    <Form.Check id='return-inv' type='checkbox' checked={this.state.filters.includeReturnedInvoices} value='' label="Include Returned Invoices" onChange={(e)=>this.onChangeIncludeReturnInvoiceOption(e)}/>
+                                                                </Form.Group>
+                                                            </Form>
+                                                        </Col>
+                                                    </Row>
+                                                    <Row>
+                                                        <Col xs={12}>
+                                                        <h4>Ornament Type</h4>
+                                                            <Form>
+                                                                <Form.Group>
+                                                                    <Form.Check id='gold-orn-type' type='checkbox' checked={this.state.filters.includeGoldOrnType} value='' label="Gold" onChange={(e)=>this.onChangeIncludeOrnTypeFilter(e, 'GOLD')}/>
+                                                                    <Form.Check id='silver-orn-type' type='checkbox' checked={this.state.filters.includeSilverOrnType} value='' label="Silver" onChange={(e)=>this.onChangeIncludeOrnTypeFilter(e, 'SILVER')}/>
+                                                                </Form.Group>
+                                                            </Form>
+                                                        </Col>
+                                                    </Row>
+                                                    <Row style={{margin: '20px 0px'}}>
+                                                        <Col style={{textAlign: 'center'}} xs={12}>
+                                                            <input type="button" className="gs-button bordered" style={{width: '100%'}} value="APPLY" onClick={this.onFilterApplyBtnClick}/>
+                                                        </Col>
+                                                    </Row>
+                                                </Col>
+                                            </Row>
+                                        </Container>
+                                    )
+                                }
+                            }
+                            >
+                                <div style={{display: 'inline-block'}}>
+                                    <span className='filter-popover-trigger-btn' style={{display: 'inline-block'}} onClick={this.onFilterBtnClick}>
+                                        <FontAwesomeIcon icon='filter'/>
+                                    </span>
+                                </div>
+                            </Popover>
                         </Col>
                         <Col xs={4} style={{zIndex: 1}}>
                             <ReactPaginate previousLabel={"<"}

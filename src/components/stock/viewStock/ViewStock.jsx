@@ -835,7 +835,7 @@ export default class ViewStock extends Component {
         return (
             <Container className="view-stock-container">
                 <Row>
-                    <Col xs={4} style={{display: 'flex'}}>
+                    <Col xs={4}>
                         <DateRangePicker 
                             className = 'stock-view-date-filter'
                             selectDateRange={this.filterCallbacks.date}
@@ -844,10 +844,10 @@ export default class ViewStock extends Component {
                             showIcon= {false}
                         />
                         <Popover
-                            className='view-stock-filter-popover'
-                            padding={0}
+                            containerClassName='view-stock-filter-popover'
+                            // padding={0}
                             isOpen={this.state.filterPopupVisibility}
-                            position={'right'} // preferred position
+                            position={'bottom'} // preferred position
                             onClickOutside={() => this.setState({ filterPopupVisibility: false })}
                             content={({ position, targetRect, popoverRect }) => {
                                 return (
@@ -889,21 +889,20 @@ export default class ViewStock extends Component {
                             }
                         }
                         >
-                            <>
-                                <span className='filter-popover-trigger-btn' onClick={this.onFilterBtnClick}>
+                            <div style={{display: 'inline-block'}}>
+                                <span className='filter-popover-trigger-btn' style={{display: 'inline-block'}} onClick={this.onFilterBtnClick}>
                                     <FontAwesomeIcon icon='filter'/>
                                 </span>
-
-                                <Dropdown className="more-actions-dropdown action-btn">
-                                    <Dropdown.Toggle id="dropdown-more-actions" disabled={!this.state.selectedInfo.indexes.length}>
-                                        More Actions 
-                                    </Dropdown.Toggle>
-                                    <Dropdown.Menu>
-                                        <Dropdown.Item onClick={(e) => this.onMoreActionsDpdClick(e, 'printTag')}>Print Tag</Dropdown.Item>
-                                    </Dropdown.Menu>
-                                </Dropdown>
-                            </>
+                            </div>
                         </Popover>
+                        <Dropdown className="more-actions-dropdown action-btn">
+                            <Dropdown.Toggle id="dropdown-more-actions" disabled={!this.state.selectedInfo.indexes.length}>
+                                More Actions 
+                            </Dropdown.Toggle>
+                            <Dropdown.Menu>
+                                <Dropdown.Item onClick={(e) => this.onMoreActionsDpdClick(e, 'printTag')}>Print Tag</Dropdown.Item>
+                            </Dropdown.Menu>
+                        </Dropdown>
                     </Col>
                     <Col xs={4}>
                         <ReactPaginate previousLabel={"<"}

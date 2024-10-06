@@ -41,5 +41,17 @@ export const getFilterParams = (stateObj) => {
     if(stateObj.filters.huid)
         filters.huid = stateObj.filters.huid;
 
+    filters.includeReturnedInvoices = true;
+    if(!stateObj.filters.includeReturnedInvoices)
+        filters.includeReturnedInvoices = false;
+
+    filters.includeGoldOrnType = true;
+    if(!stateObj.filters.includeGoldOrnType)
+        filters.includeGoldOrnType = false; 
+
+    filters.includeSilverOrnType = true;
+    if(!stateObj.filters.includeSilverOrnType)
+        filters.includeSilverOrnType = false; 
+
     return filters;
 }

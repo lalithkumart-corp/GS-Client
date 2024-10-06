@@ -225,12 +225,13 @@ class Pledgebook extends Component {
                                                             </Form.Group>
                                                         </Form>
                                                     </Col>
-                                                    <Col xs={{span: 12}} md={{span: 12}} style={{textAlign: "center", marginBottom: 20}}>
+                                                    <Col xs={{span: 12}} md={{span: 12}} style={{textAlign: "center", marginBottom: 20, marginTop: 20}}>
                                                         <input 
                                                             type="button"
                                                             className='gs-button bordered'
                                                             onClick={(e) => this.onStatusPopoverSubmit()}
                                                             value='Apply Filters'
+                                                            style={{width: '100%'}}
                                                         />
                                                     </Col>
                                                 </Row>
