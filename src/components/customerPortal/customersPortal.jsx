@@ -1,12 +1,11 @@
 import React, { Component } from 'react';
 import { Container, Row, Col, FormGroup, FormLabel, FormControl, HelpBlock, InputGroup, Button, Glyphicon, Tabs, Tab } from 'react-bootstrap';
 import axios from 'axios';
-import { PLEDGEBOOK_METADATA, PLEDGEBOOK_FETCH_CUSTOMER_HISTORY } from '../../core/sitemap';
+import { PLEDGEBOOK_METADATA, PLEDGEBOOK_FETCH_CUSTOMER_HISTORY, FETCH_JWL_CUST_INVOICES_LIST } from '../../core/sitemap';
 import { getAccessToken } from '../../core/storage';
 import _ from 'lodash';
 import './customerPortal.css';
 import GeneralInfo from './generalInfo';
-import History from './history';
 import Notes from './notes';
 import Settings from './settings';
 import ReactPaginate from 'react-paginate';
@@ -16,6 +15,8 @@ import CommonModal from '../common-modal/commonModal';
 import CustomerPicker from '../customerPanel/CustomerPickerModal';
 import CustomerAttachments from './customerAttachments';
 import { FaBan } from 'react-icons/fa';
+import LoanHistory from './loanHistory';
+import JewelleryHistory from './jewelleryHistory';
 
 class CustomerPortal extends Component {
     constructor(props) {
@@ -34,6 +35,8 @@ class CustomerPortal extends Component {
                 onlyIsActive: false
             },
             customerSelectionModalOpen: false,
+            customerJwlInvoiceList: [],
+            custJwlHistoryLoading: false,
         }
         this.bindMethods();
     }
@@ -154,7 +157,8 @@ class CustomerPortal extends Component {
             else
                 aCust.isSelected = false;
         });
-        this.fetchCustomerHistory(aCust.customerId);        
+        this.fetchCustomerLoanHistory(aCust.customerId);
+        this.fetchCustomerJwlHistory(aCust.customerId);
         this.setState({selectedCust: aCust, customerList: custList, billHistory: null, billHistoryLoading: true});
     }
 
@@ -168,7 +172,8 @@ class CustomerPortal extends Component {
             } else
                 aCust.isSelected = false;
         });
-        this.fetchCustomerHistory(customerId);
+        this.fetchCustomerLoanHistory(customerId);
+        this.fetchCustomerJwlHistory(customerId);
         this.setState({selectedCust: selectedCust, customerList: custList, billHistory: null, billHistoryLoading: true});
     }
 
@@ -177,11 +182,21 @@ class CustomerPortal extends Component {
         this.initiateFetchPledgebookAPI();
     }
 
-    async fetchCustomerHistory(customerId) {
+    async fetchCustomerLoanHistory(customerId) {
         try {
             let accessToken = getAccessToken();
             let response = await axios.get(PLEDGEBOOK_FETCH_CUSTOMER_HISTORY + `?access_token=${accessToken}&customer_id=${customerId}`);            
             this.setState({billHistory: response.data.RESPONSE, billHistoryLoading: false});
+        } catch(e) {
+            alert(e);
+            console.log(e);
+        }        
+    }
+
+    async fetchCustomerJwlHistory(customerId) {
+        try {
+            let resp = await axiosMiddleware.get(`${FETCH_JWL_CUST_INVOICES_LIST}?access_token=${getAccessToken()}&filters=${JSON.stringify({customerId})}`);
+            this.setState({customerJwlInvoiceList: resp.data.CUST_INV_LIST, custJwlHistoryLoading: false});
         } catch(e) {
             alert(e);
             console.log(e);
@@ -357,8 +372,11 @@ class CustomerPortal extends Component {
                 <Tab eventKey="general" title="General" >
                     <GeneralInfo {...this.state} afterUpdate={this.afterUpdate}/>
                 </Tab>
-                <Tab eventKey="history" title="History">
-                    <History {...this.state}/>
+                <Tab eventKey="loanhistory" title="Loan History">
+                    <LoanHistory {...this.state}/>
+                </Tab>
+                <Tab eventKey="jwlhistory" title="Jewellery History">
+                    <JewelleryHistory {...this.state}/>
                 </Tab>
                 <Tab eventKey="notes" title="Notes">
                     <Notes {...this.state}/>

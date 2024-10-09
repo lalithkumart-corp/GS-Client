@@ -21,6 +21,7 @@ import { toast } from 'react-toastify';
 import { MdUndo } from 'react-icons/md';
 import JwlReturnPopup from '../jwlReturnsPopup/JwlReturnsPopup';
 import {Popover, ArrowContainer} from 'react-tiny-popover';
+import JwlBilleditemPreview from './jwlBilledItemPreview';
 
 class JewelleryInvoicesList extends Component {
     constructor(props) {
@@ -495,11 +496,12 @@ class JewelleryInvoicesList extends Component {
         renderer: (row) => {
             return (
                 <Row>
-                    {row.isReturned ? <Col xs={12} md={12}>
+                    <JwlBilleditemPreview data={row}/>
+                    {row.isReturned ? <Col xs={12} md={12} style={{marginTop: '20px'}}>
                         <h6> Return Details</h6>
                         <Row>
                             <Col xs={2}>Returned Date</Col>
-                            <Col xs={3}>{row.returnDate}</Col>
+                            <Col xs={3}>{convertToLocalTime(row.returnDate)}</Col>
                         </Row>
                         <Row>
                             <Col xs={2}>Charges - collected from customer</Col>

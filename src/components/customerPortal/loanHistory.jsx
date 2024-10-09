@@ -4,11 +4,11 @@ import GSTable from '../gs-table/GSTable';
 import _ from 'lodash';
 import ImageZoom from 'react-medium-image-zoom';
 import { convertToLocalTime, imageUrlCorrection, currencyFormatter } from '../../utilities/utility';
-import './history.css';
+import './loanHistory.css';
 import { calculateData } from '../redeem/helper';
 import moment from 'moment';
 
-class History extends Component {
+class LoanHistory extends Component {
     constructor(props) {
         super(props);
         this.state = {
@@ -287,4 +287,4 @@ class History extends Component {
     }
 }
 
-export default History;
+export default LoanHistory;
