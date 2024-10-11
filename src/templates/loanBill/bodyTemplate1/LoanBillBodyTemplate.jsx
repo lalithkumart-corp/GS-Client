@@ -259,8 +259,8 @@ export default class LoanBillBodyTemplate extends Component {
         dom.push(
             <Row className={`orn-table-header`}>
                 <Col className="orn-table-th-cell font17" xs={{span: 1}} md={{span: 1}} style={{paddingLeft: '3px'}}><b>S.No</b></Col>
-                <Col className="orn-table-th-cell font17" xs={{span: 9}} md={{span: 9}} style={{paddingLeft: "20px"}}><b>Articles Pledged</b></Col>
-                <Col className="orn-table-th-cell font17" xs={{span: 2}} md={{span: 2}} style={{paddingLeft: '3px', borderRight: 0}}><b>Pcs</b></Col>
+                <Col className="orn-table-th-cell font17" xs={{span: 10}} md={{span: 10}} style={{paddingLeft: "20px"}}><b>Articles Pledged</b></Col>
+                <Col className="orn-table-th-cell font17" xs={{span: 1}} md={{span: 1}} style={{textAlign: 'center', borderRight: 0}}><b>Pcs</b></Col>
                 {/* <Col className="orn-table-th-cell font17" xs={{span: 2}} md={{span: 2}} style={{paddingLeft: '3px'}}>WT</Col> */}
             </Row>
         )
@@ -283,8 +283,8 @@ export default class LoanBillBodyTemplate extends Component {
                     list.push(
                         <Row>
                             <Col xs={{span: 1}} md={{span: 1}} className="orn-table-body-cell sno">{index}</Col>
-                            <Col xs={{span: 9}} md={{span: 9}} className="orn-table-body-cell item">{theItemName}</Col>
-                            <Col xs={{span: 2}} md={{span: 2}} className="orn-table-body-cell nos">{anOrn.ornNos}</Col>
+                            <Col xs={{span: 10}} md={{span: 10}} className="orn-table-body-cell item">{theItemName}</Col>
+                            <Col xs={{span: 1}} md={{span: 1}} className="orn-table-body-cell nos">{anOrn.ornNos}</Col>
                         </Row>
                     );
                     rows++;
@@ -294,8 +294,8 @@ export default class LoanBillBodyTemplate extends Component {
                         console.log('theItemName is greater than 40');
                         list.push(<Row>
                             <Col xs={{span: 1}} md={{span: 1}} className="orn-table-body-cell sno"></Col>
-                            <Col xs={{span: 9}} md={{span: 9}} className="orn-table-body-cell item"></Col>
-                            <Col xs={{span: 2}} md={{span: 2}} className="orn-table-body-cell nos"></Col>
+                            <Col xs={{span: 10}} md={{span: 10}} className="orn-table-body-cell item"></Col>
+                            <Col xs={{span: 1}} md={{span: 1}} className="orn-table-body-cell nos"></Col>
                         </Row>)
                         rows++;
                     }
@@ -303,8 +303,8 @@ export default class LoanBillBodyTemplate extends Component {
                     console.log('Orn value is empty, so adding empty row');
                     list.push(<Row>
                         <Col xs={{span: 1}} md={{span: 1}} className="orn-table-body-cell sno"></Col>
-                        <Col xs={{span: 9}} md={{span: 9}} className="orn-table-body-cell item"></Col>
-                        <Col xs={{span: 2}} md={{span: 2}} className="orn-table-body-cell nos"></Col>
+                        <Col xs={{span: 10}} md={{span: 10}} className="orn-table-body-cell item"></Col>
+                        <Col xs={{span: 1}} md={{span: 1}} className="orn-table-body-cell nos"></Col>
                     </Row>)
                     rows++;
                 }
@@ -323,18 +323,18 @@ export default class LoanBillBodyTemplate extends Component {
             //             list.push(
             //                 <Row>
             //                     <Col xs={{span: 1}} md={{span: 1}} className="orn-table-body-cell sno">{index}</Col>
-            //                     <Col xs={{span: 9}} md={{span: 9}} className="orn-table-body-cell item">Others</Col>
-            //                     <Col xs={{span: 2}} md={{span: 2}} className="orn-table-body-cell nos"></Col>
-            //                     {/* <Col xs={{span: 2}} md={{span: 2}} className="orn-table-body-cell wt"></Col> */}
+            //                     <Col xs={{span: 10}} md={{span: 10}} className="orn-table-body-cell item">Others</Col>
+            //                     <Col xs={{span: 1}} md={{span: 1}} className="orn-table-body-cell nos"></Col>
+            //                     {/* <Col xs={{span: 1}} md={{span: 1}} className="orn-table-body-cell wt"></Col> */}
             //                 </Row>
             //             );
             //         } else if(totalOrnLength <= 10) {
             //             list.push(
             //                 <Row>
             //                     <Col xs={{span: 1}} md={{span: 1}} className="orn-table-body-cell sno">{index}</Col>
-            //                     <Col xs={{span: 9}} md={{span: 9}} className="orn-table-body-cell item">{this.enhanceOrnItemName(anOrn.ornItem, anOrn.ornNos)} {`${anOrn.ornSpec?(anOrn.ornSpec):''}`} </Col>
-            //                     <Col xs={{span: 2}} md={{span: 2}} className="orn-table-body-cell nos">{anOrn.ornNos}</Col>
-            //                     {/* <Col xs={{span: 2}} md={{span: 2}} className="orn-table-body-cell wt">{anOrn.ornNWt}</Col> */}
+            //                     <Col xs={{span: 10}} md={{span: 10}} className="orn-table-body-cell item">{this.enhanceOrnItemName(anOrn.ornItem, anOrn.ornNos)} {`${anOrn.ornSpec?(anOrn.ornSpec):''}`} </Col>
+            //                     <Col xs={{span: 1}} md={{span: 1}} className="orn-table-body-cell nos">{anOrn.ornNos}</Col>
+            //                     {/* <Col xs={{span: 1}} md={{span: 1}} className="orn-table-body-cell wt">{anOrn.ornNWt}</Col> */}
             //                 </Row>
             //             );
             //         }
@@ -343,16 +343,16 @@ export default class LoanBillBodyTemplate extends Component {
             //         list.push(
             //             <Row>
             //                 <Col xs={{span: 1}} md={{span: 1}} className="orn-table-body-cell sno">{index}</Col>
-            //                 <Col xs={{span: 9}} md={{span: 9}} className="orn-table-body-cell item">{itemName}</Col>
-            //                 <Col xs={{span: 2}} md={{span: 2}} className="orn-table-body-cell nos">{anOrn.ornNos}</Col>
-            //                 {/* <Col xs={{span: 2}} md={{span: 2}} className="orn-table-body-cell wt">{anOrn.ornNWt}</Col> */}
+            //                 <Col xs={{span: 10}} md={{span: 10}} className="orn-table-body-cell item">{itemName}</Col>
+            //                 <Col xs={{span: 1}} md={{span: 1}} className="orn-table-body-cell nos">{anOrn.ornNos}</Col>
+            //                 {/* <Col xs={{span: 1}} md={{span: 1}} className="orn-table-body-cell wt">{anOrn.ornNWt}</Col> */}
             //             </Row>
             //         );
             //         if(itemName.length > 40) {
             //             list.push(<Row>
             //                 <Col xs={{span: 1}} md={{span: 1}} className="orn-table-body-cell sno"></Col>
-            //                 <Col xs={{span: 9}} md={{span: 9}} className="orn-table-body-cell item"></Col>
-            //                 <Col xs={{span: 2}} md={{span: 2}} className="orn-table-body-cell nos"></Col>
+            //                 <Col xs={{span: 10}} md={{span: 10}} className="orn-table-body-cell item"></Col>
+            //                 <Col xs={{span: 1}} md={{span: 1}} className="orn-table-body-cell nos"></Col>
             //             </Row>)
             //         }
             //     }
@@ -363,9 +363,9 @@ export default class LoanBillBodyTemplate extends Component {
                 list.push(
                     <Row>
                         <Col xs={{span: 1}} md={{span: 1}} className="orn-table-body-cell sno"></Col>
-                        <Col xs={{span: 9}} md={{span: 9}} className="orn-table-body-cell item"></Col>
-                        <Col xs={{span: 2}} md={{span: 2}} className="orn-table-body-cell nos"></Col>
-                        {/* <Col xs={{span: 2}} md={{span: 2}} className="orn-table-body-cell wt"></Col> */}
+                        <Col xs={{span: 10}} md={{span: 10}} className="orn-table-body-cell item"></Col>
+                        <Col xs={{span: 1}} md={{span: 1}} className="orn-table-body-cell nos"></Col>
+                        {/* <Col xs={{span: 1}} md={{span: 1}} className="orn-table-body-cell wt"></Col> */}
                     </Row>
                 );
             }
@@ -378,8 +378,8 @@ export default class LoanBillBodyTemplate extends Component {
             )
             dom.push(
                 <Row className={`orn-list-footer`}>
-                    <Col xs={10} className="total-text">Total</Col>
-                    <Col xs={2} className="total-qty-val">{formatNumberLength(footer.qty, 2)}</Col>
+                    <Col xs={11} className="total-text">Total</Col>
+                    <Col xs={1} className="total-qty-val">{formatNumberLength(footer.qty, 2)}</Col>
                     {/* <Col xs={2}>{footer.wt}</Col> */}
                 </Row>
             )
@@ -390,10 +390,10 @@ export default class LoanBillBodyTemplate extends Component {
     getFourthSection() {
         return (
             <Row className="row-name-3">
-                <Col xs={{span: 9}} md={{span: 9}} className={`orn-info-col`}>
+                <Col xs={{span: 10}} md={{span: 10}} className={`orn-info-col`}>
                     {this.getOrnSecction()}
                 </Col>
-                <Col xs={{span: 3}} md={{span: 3}} className={`totals-gm-and-present-value`}>
+                <Col xs={{span: 2}} md={{span: 2}} className={`totals-gm-and-present-value`}>
                     {this.getTotalWtDom()}
                     {this.getPresentValDom()}
                 </Col>
@@ -427,15 +427,19 @@ export default class LoanBillBodyTemplate extends Component {
     }
 
     getPresentValDom() {
+        let fntSize = '27px';
+        if(this.state.billContent.amount > 99000) {
+            fntSize = '22px';
+        }
         return (
             <Row style={{textAlign: 'center'}}>
                 <Col xs={12} className="present-value-header">
                     Loan Amt
                 </Col>
-                <Col xs={12} className="present-value-col" style={{fontSize: '40px', lineHeight: '35px'}}>
+                <Col xs={12} className="present-value-col" style={{lineHeight: '35px'}}>
                     {/* {format(this.state.billContent.amount, {code: 'INR', decimalDigits: 0})}/- */}
-                    <span className="red-color-imp" style={{paddingRight: '5px'}}>₹</span> 
-                    <span style={{fontSize: '27px', verticalAlign: 'top'}}>{currencyFormatter(this.state.billContent.amount)}/- </span>
+                    <span className="red-color-imp" style={{ fontSize: '30px', paddingRight: '5px'}}>₹</span> 
+                    <span style={{fontSize: fntSize}}>{currencyFormatter(this.state.billContent.amount)}/- </span>
                 </Col>
             </Row>
         )
