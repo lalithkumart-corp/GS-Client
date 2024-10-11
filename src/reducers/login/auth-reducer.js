@@ -26,6 +26,7 @@ export default function authReducer(state=defaultState, action){
                 ...newState,
                 isActivated: action.data.isActive,
                 daysToExpire: action.data.daysToExpire,
+                softwareLicenseValidTill: action.data.softwareLicenseValidTill
             };
             break;
         case 'ENABLE_LOADER':

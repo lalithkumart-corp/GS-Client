@@ -8,6 +8,7 @@ import { openSideBar } from '../../actions/rightSidebar';
 import { serverStatusChecker } from '../../actions/common';
 import { FaGalacticSenate } from 'react-icons/fa';
 import './navbar.scss';
+import { Tooltip } from 'react-tippy';
 
 class NavbarComp extends Component {
     constructor(props) {
@@ -151,11 +152,16 @@ class NavbarComp extends Component {
                             <span style={{color: 'red'}}> {this.getExpiryStr()} &nbsp; &nbsp; &nbsp;</span> 
                         </Nav>
                         <Nav>
-                            <span style={{lineHeight: '31px'}}>Status :  {this.props.common.isServerStable?
-                                <span> <img src="/images/online-green.png" style={{height: '16px', width: '22px', marginTop: '-3px'}}/></span>:
-                                <span title="Please Restart the 'server'"> <img src="/images/offline-red.jfif" style={{height: '16px', marginTop: '-3px'}}/></span>}
-                                &nbsp; &nbsp; &nbsp;
-                            </span>
+                            <Tooltip title={`Software License is valid till ${this.props.auth.softwareLicenseValidTill}`}
+                                        position="bottom"
+                                        trigger="mouseenter">
+                                <span style={{lineHeight: '31px'}}>
+                                    Status :  {this.props.common.isServerStable?
+                                    <span> <img src="/images/online-green.png" style={{height: '16px', width: '22px', marginTop: '-3px'}}/></span>:
+                                    <span title="Please Restart the 'server'"> <img src="/images/offline-red.jfif" style={{height: '16px', marginTop: '-3px'}}/></span>}
+                                    &nbsp; &nbsp; &nbsp;
+                                </span>
+                            </Tooltip>
                             <NavDropdown title={this.getTitie()}>
                                 <NavDropdown.Item as={Link} to="/reset-pwd">Reset Password</NavDropdown.Item>
                                 <NavDropdown.Item as={Link} to="/logout">Logout</NavDropdown.Item>

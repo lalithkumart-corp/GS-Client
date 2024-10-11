@@ -113,6 +113,7 @@ export const isAccountActive = () => {
     return async (dispatch) => {
         let isActive = false;
         let daysToExpire = 0;
+        let softwareLicenseValidTill;
         try {
             let accessToken = getAccessToken();
             if(!accessToken)
@@ -123,6 +124,8 @@ export const isAccountActive = () => {
                     isActive = true;
                 if(typeof resp.data.daysToExpire !== 'undefined')
                     daysToExpire = resp.data.daysToExpire;
+                if(typeof resp.data.softwareLicenseValidTill !== 'undefined')
+                    softwareLicenseValidTill = new Date(resp.data.softwareLicenseValidTill).toLocaleString();
             }
             else if(resp && resp.data && resp.data.STATUS == 'ERROR') {
                 let msg = resp.data.MSG || 'SESSION EXPIRED / Do Logout+Login Again';
@@ -130,13 +133,13 @@ export const isAccountActive = () => {
             }
             dispatch({
                 type: 'APPLICATION_DATA',
-                data: {isActive, daysToExpire}
+                data: {isActive, daysToExpire, softwareLicenseValidTill}
             });
         } catch (e) {
             console.log(e);
             dispatch({
                 type: 'APPLICATION_DATA',
-                data: {isActive, daysToExpire}
+                data: {isActive, daysToExpire, softwareLicenseValidTill}
             });
         }
     }
