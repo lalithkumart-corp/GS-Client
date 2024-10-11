@@ -56,8 +56,13 @@ export default class ViewStock extends Component {
                     isFilterable: false,
                     width: '10%',
                     formatter: (column, columnIndex, row, rowIndex) => {
+                        let timeForTooltip = convertToLocalTime(row[column.id]);
                         return (
-                            <span>{convertToLocalTime(row[column.id], {excludeTime: true})}</span>
+                            <Tooltip title={timeForTooltip}
+                                    position="top"
+                                    trigger="mouseenter">
+                                <span>{convertToLocalTime(row[column.id], {excludeTime: true})}</span>
+                            </Tooltip>
                         )
                     }
                 },
@@ -646,7 +651,7 @@ export default class ViewStock extends Component {
             newState.selectedInfo.indexes.splice(rowIndex, 1);            
             newState.selectedInfo.rowObj= newState.selectedInfo.rowObj.filter(
                 (anItem) => {
-                    if(newState.selectedInfo.indexes.indexOf(anItem.rowNumber) == -1)
+                    if(newState.selectedInfo.indexes.indexOf(anItem.rowNumber) != -1)
                         return true;                                                  
                 }
             );
@@ -773,6 +778,7 @@ export default class ViewStock extends Component {
             if(resp.data.STOCK_LIST) {
                 _.each(resp.data.STOCK_LIST, (aStockItem, index) => {
                     newState.stockList.push({
+                        rowNumber: index,
                         uid: aStockItem.UID,
                         itemCode: aStockItem.ItemCode || '',
                         itemCodeNumber: aStockItem.ItemCodeNumber,

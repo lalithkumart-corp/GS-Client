@@ -125,7 +125,6 @@ function GstBillTemplate2(props) {
                 <img className="img" style={leftImgStyles} src={leftLogoImgSrc}/>
             </div>
         )
-        debugger;
         middleSection.push(
             <Col xs={12} style={middleSectionStyles}>
                 <><span className="store-name" style={storeNameStyles}>{strNme}</span></>  <br></br>

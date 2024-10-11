@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import { Container, Row, Col, Dropdown, DropdownButton } from 'react-bootstrap';
+import { Container, Row, Col, Form, Dropdown, DropdownButton } from 'react-bootstrap';
 import axios from '../../../core/axios';
 import { getAccessToken, getJewelleryBillTemplateSettings, getStockSoldListPageFilters, setStockSoldListPageFilters } from '../../../core/storage';
 import { toast } from 'react-toastify';
@@ -18,6 +18,8 @@ import { getDataFromStorageRespObj } from './helper';
 import SellItemEditMode from '../sellItems/SellItemEditMode';
 import { GsScreen } from '../../gs-screen/GsScreen';
 import axiosMiddleware from '../../../core/axios';
+import {Popover} from 'react-tiny-popover';
+
 class SoldItems extends Component {
     constructor(props) {
         super(props);
@@ -243,8 +245,10 @@ class SoldItems extends Component {
                 invoiceNo: '',
                 itemName: '',
                 itemCategory: '',
-                itemSubCategory: ''
-            }
+                itemSubCategory: '',
+                showReturnedItems: true
+            },
+            filterPopupVisibility: false
         }
         this.bindMethods();
     }
@@ -266,6 +270,9 @@ class SoldItems extends Component {
         this.goToStockListScreen = this.goToStockListScreen.bind(this);
         this.onClickPrint = this.onClickPrint.bind(this);
         this.printMultipleInvoicesHandler = this.printMultipleInvoicesHandler.bind(this);
+        this.onChangeItemsViewOption = this.onChangeItemsViewOption.bind(this);
+        this.onFilterBtnClick = this.onFilterBtnClick.bind(this);
+        this.refresh = this.refresh.bind(this);
     }
     setCurrentScreen(screenNo) {
         this.setState({currentScreen: screenNo});
@@ -290,8 +297,15 @@ class SoldItems extends Component {
             let args = this.getFilterParams();
             let params = {...args, offsetStart: offsets[0], offsetEnd: offsets[1]};
             let res = await axios.get(`${FETCH_STOCK_SOLD_OUT_LIST}?access_token=${getAccessToken()}&filters=${JSON.stringify(params)}`);
-            if(res && res.data && res.data.LIST)
-                this.setState({soldOutItemsList: res.data.LIST});
+            if(res && res.data && res.data.LIST) {
+                let parsedList = res.data.LIST.map((obj, index) => {
+                    return {
+                        ...obj,
+                        rowNumber: index
+                    }
+                });
+                this.setState({soldOutItemsList: parsedList});
+            }
             else
                 toast.warn('No list found');
         } catch(e) {
@@ -330,6 +344,7 @@ class SoldItems extends Component {
             itemName: this.state.filters.itemName,
             itemCategory: this.state.filters.itemCategory,
             itemSubCategory: this.state.filters.itemSubCategory,
+            showReturnedItems: this.state.filters.showReturnedItems
         }
         return filters;
     }
@@ -448,18 +463,19 @@ class SoldItems extends Component {
     handleCheckboxChangeListener(params) {
         let newState = {...this.state};
         if(params.isChecked) {
-            newState.selectedInfo.indexes.push(params.rowIndex);        
+            newState.selectedInfo.indexes.push(params.rowIndex);
             newState.selectedInfo.rowObj.push(params.row);
         } else {
             let rowIndex = newState.selectedInfo.indexes.indexOf(params.rowIndex);
             newState.selectedInfo.indexes.splice(rowIndex, 1);            
-            newState.selectedInfo.rowObj= newState.selectedInfo.rowObj.filter(
+            newState.selectedInfo.rowObj = newState.selectedInfo.rowObj.filter(
                 (anItem) => {
-                    if(newState.selectedInfo.indexes.indexOf(anItem.rowNumber) == -1)
+                    if(newState.selectedInfo.indexes.indexOf(anItem.rowNumber) != -1)
                         return true;                                                  
                 }
             );
-        }        
+        };
+        debugger;
         this.setState(newState);
     }
 
@@ -475,6 +491,13 @@ class SoldItems extends Component {
             newState.selectedInfo.rowObj = [];
         }
         this.setState(newState);
+    }
+
+    rowClassNameGetter(row) {
+        let className = '';
+        if(row && row.is_returned)
+            className += 'returned';
+        return className;
     }
 
     printMultipleInvoicesHandler() {
@@ -504,13 +527,23 @@ class SoldItems extends Component {
         expandByColumnOnly: true
     }
 
+    onChangeItemsViewOption(e) {
+        let newState = {...this.state};
+        newState.filters.showReturnedItems = e.target.checked;
+        this.setState(newState);
+    }
+
+    onFilterBtnClick() {
+        this.setState({filterPopupVisibility: !this.state.filterPopupVisibility});
+    }
+
     render() {
         return (
             <Container className="sold-out-list-container">
                 <GsScreen showScreen={this.state.currentScreen==1?true:false} isMainScreen={true}>
                     <Col xs={12} md={12}>
                         <Row>
-                            <Col xs={3} md={3} style={{display: 'flex'}}>
+                            <Col xs={3} md={3}>
                                 <DateRangePicker 
                                     className = 'stock-sold-out-itens-date-filter'
                                     selectDateRange={this.filterCallbacks.date}
@@ -518,6 +551,45 @@ class SoldItems extends Component {
                                     endDate={this.state.filters.date.endDate}
                                     showIcon= {false}
                                 />
+                                <Popover
+                                    containerClassName='view-sold-stock-filter-popover'
+                                    // padding={0}
+                                    isOpen={this.state.filterPopupVisibility}
+                                    position={'bottom'} // preferred position
+                                    onClickOutside={() => this.setState({ filterPopupVisibility: false })}
+                                    content={({ position, targetRect, popoverRect }) => {
+                                        return (
+                                            <Container className='gs-card arrow-box left filter-popover-container'>
+                                                <Row className='filter-popover-content' >
+                                                    <Col>
+                                                        <Row>
+                                                            <Col xs={12} className="show-returned-stock-items">
+                                                                <span className="field-name">Display Returned Items</span>
+                                                                <Form>
+                                                                    <Form.Group>
+                                                                        <Form.Check id='show-returned-items' type='checkbox' checked={this.state.filters.showReturnedItems} value='' label="Show Returned Items" onChange={(e)=>this.onChangeItemsViewOption(e)}/>
+                                                                    </Form.Group>
+                                                                </Form>
+                                                            </Col>
+                                                        </Row>
+                                                        <Row>
+                                                            <Col style={{textAlign: 'center'}}>
+                                                                <input type="button" className="gs-button" value="APPLY" onClick={this.refresh}/>
+                                                            </Col>
+                                                        </Row>
+                                                    </Col>
+                                                </Row>
+                                            </Container>
+                                        )
+                                    }
+                                }
+                                >
+                                    <div style={{display: 'inline-block'}}>
+                                        <span className='stock-sold-page-filter-popover-trigger-btn' style={{display: 'inline-block'}} onClick={this.onFilterBtnClick}>
+                                            <FontAwesomeIcon icon='filter'/>
+                                        </span>
+                                    </div>
+                                </Popover>
                                 <DropdownButton className="gs-dropdown action-dropdown-for-sold-out-jewellery-list" title="Actions" disabled={!this.state.selectedInfo.indexes.length}>
                                     <Dropdown.Item onClick={this.printMultipleInvoicesHandler}>Print Invoices</Dropdown.Item>
                                 </DropdownButton>
@@ -536,6 +608,7 @@ class SoldItems extends Component {
                                     checkboxOnChangeListener = {this.handleCheckboxChangeListener}
                                     globalCheckBoxListener = {this.handleGlobalCheckboxChange}
                                     selectedIndexes = {this.state.selectedInfo.indexes}
+                                    rowClassNameGetter={this.rowClassNameGetter}
                                 />
                             </Col>
                         </Row>

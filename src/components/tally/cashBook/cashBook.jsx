@@ -391,10 +391,16 @@ export default class CashBook extends Component {
             let resp = await axiosMiddleware.get(`${GET_FUND_TRN_LIST}?access_token=${at}&params=${JSON.stringify(params)}`);
             if(resp && resp.data && resp.data.RESP) {
                 let newState = {...this.state};
-                newState.transactions = resp.data.RESP.results;
+                let parsedRes =  res.data.RESP.map((obj, index) => {
+                    return {
+                        ...obj,
+                        rowNumber: index
+                    }
+                });
+                newState.transactions = parsedRes;
                 newState.totalTransactionsCount = resp.data.RESP.count;
                 newState.filters.collections = resp.data.RESP.collections;
-                newState.localCalculations = this.doLocalCalculations(resp.data.RESP.results);
+                newState.localCalculations = this.doLocalCalculations(parsedRes);
                 newState.loadingList = false;
                 this.setState(newState);
             }

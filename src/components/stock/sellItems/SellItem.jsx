@@ -984,7 +984,7 @@ class SellItem extends Component {
         )
     }
     getSellingInputControls() {
-        let formData = {qty: "", grossWt: "", netWt:"", wastage: "", wastageVal: "", labour: "", cgstPercent: "", sgstPercent: "", discount: "", price: ""};
+        let formData = {qty: "", grossWt: "", netWt:"", wastage: "", wastageVal: "", labour: "", cgstPercent: "", sgstPercent: "", discount: "", finalPrice: ""};
         if(this.state.currSelectedItem && Object.keys(this.state.currSelectedItem) !== 0 && this.state.currSelectedItem.formData) {
             formData.qty = this.state.currSelectedItem.formData.qty || null;
             formData.grossWt = this.state.currSelectedItem.formData.grossWt || null;

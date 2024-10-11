@@ -64,7 +64,7 @@ const JwlReturnPopup = (props) => {
                     invoiceRef: props.returnsPopupData.invoiceRef,
                     invoiceNo: props.returnsPopupData.invoiceNo,
                     custId: props.returnsPopupData.custId,
-                    charges: charges,
+                    charges: charges || 0,
                     paymentSelectionCardData: paymentSelectionCardData
                 };
                 await axiosMiddleware.post(RETURN_JWL_INVOICE, params);

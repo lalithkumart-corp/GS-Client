@@ -8,7 +8,6 @@ export default class TemplateRenderer extends Component {
         super(props);
     }
     getTemplateById() {
-        debugger;
         let theDom = [];
         switch(this.props.templateId) {
             case 1:

@@ -13,6 +13,10 @@
             }
         }
     }
+    tr.returned td {
+        color: grey;
+        text-decoration: line-through;
+    }
 }
 .stock-sold-out-itens-date-filter {
     border: 1px solid !important;
@@ -23,4 +27,12 @@
 }
 table.my-stock-sold-items-view-table.gs-table .inner-header input[type="text"] {
     width: 100%;
+}
+.stock-sold-page-filter-popover-trigger-btn {
+    margin: 7px 10px 0 16px;
+    color: #337ab7;
+}
+.stock-sold-page-filter-popover-trigger-btn:hover {
+    color: #fba200;
+    cursor: pointer;
 }
