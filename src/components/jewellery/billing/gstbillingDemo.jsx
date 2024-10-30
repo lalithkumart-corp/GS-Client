@@ -87,7 +87,7 @@ function GstBillingDemo() {
             qty: '',
             gwt: '',
             nwt: '',
-            priceOfOrn: '',
+            initialPrice: '',
             cgst: 1.5,
             sgst: 1.5,
             price: ''
@@ -102,7 +102,7 @@ function GstBillingDemo() {
             qty: '',
             gwt: '',
             nwt: '',
-            priceOfOrn: '',
+            initialPrice: '',
             cgst: 1.5,
             sgst: 1.5,
             price: ''
@@ -117,7 +117,7 @@ function GstBillingDemo() {
             qty: '',
             gwt: '',
             nwt: '',
-            priceOfOrn: '',
+            initialPrice: '',
             cgst: 1.5,
             sgst: 1.5,
             price: ''
@@ -132,7 +132,7 @@ function GstBillingDemo() {
             qty: '',
             gwt: '',
             nwt: '',
-            priceOfOrn: '',
+            initialPrice: '',
             cgst: 1.5,
             sgst: 1.5,
             price: ''
@@ -327,7 +327,7 @@ function GstBillingDemo() {
         let currNode = domList.findNode(currElmKey);
         let prevNode = currNode.prev;
         if(prevNode && !prevNode.enabled)
-            prevNode = getPrevElm(prevNode.key);        
+            prevNode = getPrevElm(prevNode.key);
         return prevNode;
     }
 
@@ -339,17 +339,17 @@ function GstBillingDemo() {
             rate = silverRatePerGm;
         let percents = newOrnData[options.row].cgst + newOrnData[options.row].sgst;
         let total = newOrnData[options.row].price - mcVal;
-        let {wsgPercent, wsgVal } = wastageCalc(wt, rate, percents, total);
+        let {wsgPercent, wsgVal } = wastageCalc(wt, rate, percents, total, {wstValDecimals: 5});
         newOrnData[options.row].wst = wsgPercent;
         newOrnData[options.row].wstVal = wsgVal;
 
-        //calc priceOfOrn
+        //calc initialPrice
         let wtVal = newOrnData[options.row].nwt + (newOrnData[options.row].nwt*wsgPercent)/100; 
         let gramPrice = goldRatePerGm;
         
         if(categ == 'silver')
             gramPrice = silverRatePerGm;
-        newOrnData[options.row].priceOfOrn = numberFormatter( (wtVal*gramPrice) + parseFloat(mcVal), 2); //without tax
+        newOrnData[options.row].initialPrice = numberFormatter( (wtVal*gramPrice) + parseFloat(mcVal), 2); //without tax
 
         setOrnaments(newOrnData);
         calcTotals();
@@ -379,7 +379,7 @@ function GstBillingDemo() {
         let price = (gramPrice * wtWithWst);
         price = numberFormatter(price + parseFloat(mcVal), 2);
 
-        newOrnData[row].priceOfOrn = price;
+        newOrnData[row].initialPrice = price;
 
         // add gst
         let gst = (ornData[row].cgst || 0) + (ornData[row].sgst || 0);
@@ -478,12 +478,13 @@ function GstBillingDemo() {
                 oldOrnaments: [],
                 calculations: {
                     totalMakingCharge: makingCharge,
-                    totalNetAmount: 0,
+                    totalInitialPrice: 0,
                     cgst: 0,
                     sgst: 0,
                     totalCgstVal: 0,
                     totalSgstVal: 0,
-                    roundedOffVal: roundOffVal,
+                    //roundedOffVal: roundOffVal,
+                    totalDiscount: roundOffVal, //Temp change
                     grandTotal: grandTotal
                 }
             };
@@ -507,13 +508,13 @@ function GstBillingDemo() {
                         discount: 0,
                         itemType: categ=='gold'?"G":"S",
                         pricePerGm: categ=='gold'?goldRatePerGm:silverRatePerGm,
-                        priceOfOrn: anOrn.priceOfOrn,
+                        initialPrice: anOrn.initialPrice,
                     });
 
                     cgstPercentAvg += anOrn.cgst;
                     sgstPercentAvg += anOrn.sgst;
-                    printData.calculations.totalCgstVal += numberFormatter((anOrn.priceOfOrn*anOrn.cgst)/100,2);
-                    printData.calculations.totalSgstVal += numberFormatter((anOrn.priceOfOrn*anOrn.sgst)/100,2);
+                    printData.calculations.totalCgstVal += numberFormatter((anOrn.initialPrice*anOrn.cgst)/100,2);
+                    printData.calculations.totalSgstVal += numberFormatter((anOrn.initialPrice*anOrn.sgst)/100,2);
                     iteration++;
 
                 }
@@ -522,9 +523,9 @@ function GstBillingDemo() {
             sgstPercentAvg = sgstPercentAvg/iteration;
             printData.calculations.cgst = cgstPercentAvg;
             printData.calculations.sgst = sgstPercentAvg;
-
-            printData.calculations.totalNetAmount = printData.ornaments.reduce(
-                (accumulator, currentValue) => accumulator + parseFloat(currentValue.priceOfOrn),
+            printData.decimals = {wstVal: 5};
+            printData.calculations.totalInitialPrice = printData.ornaments.reduce(
+                (accumulator, currentValue) => accumulator + parseFloat(currentValue.initialPrice),
                 0
             );
             console.log(printData);

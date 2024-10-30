@@ -69,6 +69,7 @@ const JwlReturnPopup = (props) => {
                 };
                 await axiosMiddleware.post(RETURN_JWL_INVOICE, params);
                 props.handleClose();
+                props.refresh();
                 toast.success("Returned the items Successfully");
             } else {
                 toast.error(result.msg);

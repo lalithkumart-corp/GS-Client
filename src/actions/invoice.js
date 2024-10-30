@@ -11,23 +11,34 @@ export const getBillNoFromDB = () => {
             .then(
                 (successResp) => {
                     let gstRecord = successResp.data.RESP.filter((a) => a.category=='gst');
-                    dispatch({
-                        type: 'UPDATE_GST_INVOICE_NO_SERIES',
-                        data: {gstInvoiceSeries: gstRecord[0].billSeries, gstInvoiceNo: gstRecord[0].billNo, selectedGstTemplate: gstRecord[0].selectedTemplate, customArgs: parseCustomArgs(gstRecord[0].customArgs)}
-                    });
+                    if(gstRecord && gstRecord.length > 0) {
+                        dispatch({
+                            type: 'UPDATE_GST_INVOICE_NO_SERIES',
+                            data: {gstInvoiceSeries: gstRecord[0].billSeries, gstInvoiceNo: gstRecord[0].billNo, selectedGstTemplate: gstRecord[0].selectedTemplate, customArgs: parseCustomArgs(gstRecord[0].customArgs)}
+                        });
+                    } else {
+                        toast.error("GST Bill Template Setup is not done! Please complete it first.")
+                    }
                     let estimateRecord = successResp.data.RESP.filter((a) => a.category=='estimate');
-                    dispatch({
-                        type: 'UPDATE_ESTIMATE_INVOICE_NO_SERIES',
-                        data: {estimateInvoiceSeries: estimateRecord[0].billSeries, estimateInvoiceNo: estimateRecord[0].billNo, selectedEstimateTemplate: estimateRecord[0].selectedTemplate}
-                    });
+                    if(estimateRecord && estimateRecord.length > 0) {
+                        dispatch({
+                            type: 'UPDATE_ESTIMATE_INVOICE_NO_SERIES',
+                            data: {estimateInvoiceSeries: estimateRecord[0].billSeries, estimateInvoiceNo: estimateRecord[0].billNo, selectedEstimateTemplate: estimateRecord[0].selectedTemplate}
+                        });
+                    } else {
+                        toast.error("Estimate Bill Template Setup is not done! Please complete it first.")
+                    }
+                    
                 },
                 (errResp) => {
+                    console.log(errResp);
                     if(!errResp._IsDeterminedError)
                         toast.error('Error in fetching the last entered Bill number series');
                 }
             )
             .catch(
                 (e) => {
+                    console.log(e);
                     toast.error('Exception occured in fetching the last entered Bill number series');
                 }
             )

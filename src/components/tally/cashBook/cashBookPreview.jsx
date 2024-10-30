@@ -136,7 +136,7 @@ export default function CashBookPreview(props) {
                     activeClassName={"active"}
                     forcePage={selectedPageIndex} />
             </Col>
-            <Col xs={12} md={12} xs={12}>
+            <Col xs={12} md={12}>
                 <GSTable 
                     columns={columns}
                     rowData={transactions}

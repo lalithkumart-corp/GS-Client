@@ -118,8 +118,11 @@ export default function TemplateSetup(props) {
         }
     }
 
-    const onChangeTemplateSelection = (e, templateId) => {
-        setGstSelectedTemplateId(templateId);
+    const onChangeTemplateSelection = (e, templateId, identifier) => {
+        if(identifier == 'gst')
+            setGstSelectedTemplateId(templateId);
+        else
+            setSelectedEstimateBillTemplateId(templateId);
     }
 
     const getTemplateListSelectionContainer = (identifier) => {
@@ -151,7 +154,7 @@ export default function TemplateSetup(props) {
                         </ImageZoom>
                     </div>
                     <div className="screenshot-radio-btn-label">
-                        <input type="radio" id={`jewellery-${identifier}-bill-body-template-id-${index}`} name={`jewellery-${identifier}-bill-body-template`} onChange={(e)=>onChangeTemplateSelection(e, aTemplate.template_id)} value={aTemplate.template_id} checked={checked}/>
+                        <input type="radio" id={`jewellery-${identifier}-bill-body-template-id-${index}`} name={`jewellery-${identifier}-bill-body-template`} onChange={(e)=>onChangeTemplateSelection(e, aTemplate.template_id, identifier)} value={aTemplate.template_id} checked={checked}/>
                         <label for={`jewellery-${identifier}-bill-body-template-id-${index}`}> &nbsp; Template - {aTemplate.template_id}</label>
                     </div>
                 </Col>
@@ -220,7 +223,7 @@ export default function TemplateSetup(props) {
                                     ref={(el) => (componentRef = el)} 
                                     templateId={props.gstBillSettings.selectedTemplate} 
                                     content={templateContent}
-                                    customArgs={props.gstTemplateSettings.customArgs}/>
+                                    customArgs={props.gstBillSettings.customArgs}/>
                                 
                                 <ReactToPrint 
                                     ref={(domElm) => {estimateBtnRef = domElm}}

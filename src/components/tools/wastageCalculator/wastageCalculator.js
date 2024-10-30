@@ -1,6 +1,13 @@
 
 // Returns {wsgPercent: number, wsgVal: number}
 export const wastageCalc = (wt, rate, gst, total, options) => {
+    let wstValDecimals = 4;
+    if(!options) {
+        options = {}
+    }
+    if(options.wstValDecimals) {
+        wstValDecimals = options.wstValDecimals;
+    }
     if(total && rate && wt) {
         total = parseFloat(total);
         gst = parseFloat(gst) || 0;
@@ -12,7 +19,7 @@ export const wastageCalc = (wt, rate, gst, total, options) => {
         let val = (wt*percent)/100;
 
         percent = parseFloat(percent.toFixed(3));
-        val = parseFloat(val.toFixed(3));
+        val = parseFloat(val.toFixed(wstValDecimals));
         
         let returnVal = {wsgPercent: percent, wsgVal: val};
 
@@ -20,7 +27,7 @@ export const wastageCalc = (wt, rate, gst, total, options) => {
             let percentWithoutGst = ((total/(rate/100))-(wt*100))/wt;   
             let valWithoutGst = (wt*percent)/100; 
             percentWithoutGst = parseFloat(percent.toFixed(3));
-            valWithoutGst = parseFloat(val.toFixed(3));
+            valWithoutGst = parseFloat(val.toFixed(wstValDecimals));
             returnVal = {...returnVal, percentWithoutGst, valWithoutGst}
         }
         

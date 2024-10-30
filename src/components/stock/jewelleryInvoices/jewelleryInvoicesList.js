@@ -696,7 +696,7 @@ class JewelleryInvoicesList extends Component {
                     <SellItemEditMode data={this.state.invoiceDataForUpdate}/>
                 </GsScreen>
                 <CommonModal modalOpen={this.state.displayReturnsPopup} secClass="invoice-return-popup" handleClose={this.handleReturnsPopupClose}>
-                    <JwlReturnPopup handleClose={this.handleReturnsPopupClose} returnsPopupData={this.state.returnsPopupData}/>
+                    <JwlReturnPopup handleClose={this.handleReturnsPopupClose} returnsPopupData={this.state.returnsPopupData} refresh={this.refresh} />
                 </CommonModal>
             </Container>
         )

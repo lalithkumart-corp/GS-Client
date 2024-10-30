@@ -151,6 +151,9 @@ function GstBillTemplate2(props) {
     }
 
     const _constructOrnBody = () => {
+        let wstValDecimals = 4;
+        if(printContent.decimals && printContent.decimals.wstVal) wstValDecimals = printContent.decimals.wstVal;
+
         let spans = {
             itemName: 9,
             division: 3,
@@ -235,7 +238,7 @@ function GstBillTemplate2(props) {
                                 {formatNo(anOrn.netWt,3, {returnType: 'string'})}
                             </Col>
                             <Col xs={spans.wastage} className="no-padding">
-                                {formatNo(anOrn.wastageVal,3, {returnType: 'string'})}
+                                {formatNo(anOrn.wastageVal, wstValDecimals, {returnType: 'string'})}
                             </Col>
                             <Col xs={spans.rate} className="no-padding">
                                 {currencyFormatter(formatNo(anOrn.pricePerGm,2))}
