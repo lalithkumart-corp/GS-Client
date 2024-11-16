@@ -283,9 +283,15 @@ function GstBillingDemo() {
 
     const handleKeyUp = (e, options) => {
         e.persist();
-        if(e.keyCode == ENTER_KEY)
+        if(e.keyCode == ENTER_KEY) {
             handleEnterKeyPress(e, options);
+            if(options.currElmKey.indexOf('price')==0){
+                onFocusPriceVal(options.row, {considerWsgVal: true});
+            }
+        }
     }
+
+    const handleFocus = (event) => event.target.select();
 
     const handleEnterKeyPress = (e, options) => {
         transferFocus(e, options.currElmKey, options.traverseDirection);
@@ -339,7 +345,7 @@ function GstBillingDemo() {
             rate = silverRatePerGm;
         let percents = newOrnData[options.row].cgst + newOrnData[options.row].sgst;
         let total = newOrnData[options.row].price - mcVal;
-        let {wsgPercent, wsgVal } = wastageCalc(wt, rate, percents, total, {wstValDecimals: 5});
+        let {wsgPercent, wsgVal } = wastageCalc(wt, rate, percents, total, {wstValDecimals: 3});
         newOrnData[options.row].wst = wsgPercent;
         newOrnData[options.row].wstVal = wsgVal;
 
@@ -356,7 +362,7 @@ function GstBillingDemo() {
         calcGrandTotal();
     }
 
-    const onFocusPriceVal = (row, options) => {
+    const onFocusPriceVal = (row, options, e) => {
         let newOrnData = {...ornData};
         let wtVal = ornData[row].nwt; // ornData[row].qty * ornData[row].nwt;
         let wtWithWst = wtVal;
@@ -391,6 +397,7 @@ function GstBillingDemo() {
         setOrnaments(newOrnData);
         calcTotals();
         calcGrandTotal();
+        if(e) handleFocus(e);
     }
 
     const onCalcRefreshClick = (row) => {
@@ -483,8 +490,8 @@ function GstBillingDemo() {
                     sgst: 0,
                     totalCgstVal: 0,
                     totalSgstVal: 0,
-                    //roundedOffVal: roundOffVal,
-                    totalDiscount: roundOffVal, //Temp change
+                    roundedOffVal: roundOffVal,
+                    // totalDiscount: roundOffVal, //Temp change
                     grandTotal: grandTotal
                 }
             };
@@ -523,7 +530,7 @@ function GstBillingDemo() {
             sgstPercentAvg = sgstPercentAvg/iteration;
             printData.calculations.cgst = cgstPercentAvg;
             printData.calculations.sgst = sgstPercentAvg;
-            printData.decimals = {wstVal: 5};
+            printData.decimals = {wstVal: 3};
             printData.calculations.totalInitialPrice = printData.ornaments.reduce(
                 (accumulator, currentValue) => accumulator + parseFloat(currentValue.initialPrice),
                 0
@@ -557,32 +564,38 @@ function GstBillingDemo() {
                             <Col xs={3} className="no-padding">
                                 <input type="text" className="gs-input" value={ornData[i].title} onChange={(e) => onChange(e.target.value, 'orn', {row:i, col: 'title'} )} style={{width: '100%'}}
                                     ref= {(domElm) => {domElmns["orn" + i] = domElm; }}
-                                    onKeyUp = {(e) => handleKeyUp(e, {currElmKey: "orn" + i}) }/>
+                                    onKeyUp = {(e) => handleKeyUp(e, {currElmKey: "orn" + i}) }
+                                    onFocus={handleFocus}/>
                             </Col>
                             <Col xs={2} className="no-padding">
                                 <input type="text" className="gs-input" value={ornData[i].huid} onChange={(e) => onChange(e.target.value, 'huid', {row:i, col: 'huid'} )} style={{width: '100%'}}
                                     ref= {(domElm) => {domElmns["huid"+i]  = domElm; }}
-                                    onKeyUp = {(e) => handleKeyUp(e, {currElmKey: "huid"+i}) }/>
+                                    onKeyUp = {(e) => handleKeyUp(e, {currElmKey: "huid"+i}) }
+                                    onFocus={handleFocus}/>
                             </Col>
                             <Col xs={2} className="no-padding">
                                 <input type="text" className="gs-input" value={ornData[i].div} onChange={(e) => onChange(e.target.value, 'div', {row:i, col: 'div'} )} style={{width: '100%'}}
                                     ref= {(domElm) => {domElmns["div"+i] = domElm; }}
-                                    onKeyUp = {(e) => handleKeyUp(e, {currElmKey: "div"+i}) }/>
+                                    onKeyUp = {(e) => handleKeyUp(e, {currElmKey: "div"+i}) }
+                                    onFocus={handleFocus}/>
                             </Col>
                             <Col xs={1} className="no-padding">
                                 <input type="number" className="gs-input" value={ornData[i].qty} onChange={(e) => onChange(parseInt(e.target.value), 'qty', {row:i, col: 'qty'} )} style={{width: '100%'}}
                                     ref= {(domElm) => {domElmns["qty"+i] = domElm; }}
-                                    onKeyUp = {(e) => handleKeyUp(e, {currElmKey: "qty"+i}) }/>
+                                    onKeyUp = {(e) => handleKeyUp(e, {currElmKey: "qty"+i}) }
+                                    onFocus={handleFocus}/>
                             </Col>
                             <Col xs={2} className="no-padding">
                                 <input type="number" className="gs-input" value={ornData[i].gwt} onChange={(e) => onChange(parseFloat(e.target.value), 'gwt', {row:i, col: 'gwt'} )} style={{width: '100%'}}
                                     ref= {(domElm) => {domElmns["gwt"+i] = domElm; }}
-                                    onKeyUp = {(e) => handleKeyUp(e, {currElmKey: "gwt"+i}) }/>
+                                    onKeyUp = {(e) => handleKeyUp(e, {currElmKey: "gwt"+i}) }
+                                    onFocus={handleFocus}/>
                             </Col>
                             <Col xs={2} className="no-padding">
                                 <input type="number" className="gs-input" value={ornData[i].nwt} onChange={(e) => onChange(parseFloat(e.target.value), 'nwt', {row:i, col: 'nwt'} )} style={{width: '100%'}}
                                     ref= {(domElm) => {domElmns["nwt"+i] = domElm; }}
-                                    onKeyUp = {(e) => handleKeyUp(e, {currElmKey: "nwt"+i}) }/>
+                                    onKeyUp = {(e) => handleKeyUp(e, {currElmKey: "nwt"+i}) }
+                                    onFocus={handleFocus}/>
                             </Col>
                         </Row>
                     </Col>
@@ -591,36 +604,41 @@ function GstBillingDemo() {
                             <Col xs={{span: 3}} className="no-padding">
                                 <input type="number" className="gs-input" value={ornData[i].wst} onChange={(e) => onChange(parseFloat(e.target.value), 'wst', {row:i, col: 'wst'} )} style={{width: '100%'}}
                                     ref= {(domElm) => {domElmns["wst"+i] = domElm; }}
-                                    onKeyUp = {(e) => handleKeyUp(e, {currElmKey: "wst"+i}) }/>
+                                    onKeyUp = {(e) => handleKeyUp(e, {currElmKey: "wst"+i}) }
+                                    onFocus={handleFocus}/>
                             </Col>
                             <Col xs={3} className="no-padding">
                                 <input type="number" className="gs-input" value={ornData[i].wstVal} onChange={(e) => onChange(parseFloat(e.target.value), 'wstVal', {row:i, col: 'wstVal'} )} style={{width: '100%'}}
                                     ref= {(domElm) => {domElmns["wstVal"+i] = domElm; }}
-                                    onKeyUp = {(e) => handleKeyUp(e, {currElmKey: "wstVal"+i}) }/>
+                                    onKeyUp = {(e) => handleKeyUp(e, {currElmKey: "wstVal"+i}) }
+                                    onFocus={handleFocus}/>
                             </Col>
                             <Col xs={2} className="no-padding">
                                 <input type="number" className="gs-input" value={ornData[i].mc} onChange={(e) => onChange(parseFloat(e.target.value), 'mc', {row:i, col: 'mc'} )} style={{width: '100%'}}
                                     ref= {(domElm) => {domElmns["mc"+i] = domElm; }}
-                                    onKeyUp = {(e) => handleKeyUp(e, {currElmKey: "mc"+i}) }/>
+                                    onKeyUp = {(e) => handleKeyUp(e, {currElmKey: "mc"+i}) }
+                                    onFocus={handleFocus}/>
                             </Col>
                             <Col xs={2} className="no-padding">
                                 <input type="number" className="gs-input" value={ornData[i].cgst} onChange={(e) => onChange(parseFloat(e.target.value), 'cgst', {row:i, col: 'cgst'} )} style={{width: '100%'}}
                                     ref= {(domElm) => {domElmns["cgst"+i] = domElm; }}
-                                    onKeyUp = {(e) => handleKeyUp(e, {currElmKey: "cgst"+i}) }/>
+                                    onKeyUp = {(e) => handleKeyUp(e, {currElmKey: "cgst"+i}) }
+                                    onFocus={handleFocus}/>
                             </Col>
                             <Col xs={2} className="no-padding">
                                 <input type="number" className="gs-input" value={ornData[i].sgst} onChange={(e) => onChange(parseFloat(e.target.value), 'sgst', {row:i, col: 'sgst'} )} style={{width: '100%'}}
                                     ref= {(domElm) => {domElmns["sgst"+i] = domElm; }}
-                                    onKeyUp = {(e) => handleKeyUp(e, {currElmKey: "sgst"+i}) }/>
+                                    onKeyUp = {(e) => handleKeyUp(e, {currElmKey: "sgst"+i}) }
+                                    onFocus={handleFocus}/>
                             </Col>
                         </Row>
                     </Col>
                     <Col xs={2} className='no-padding' style={{textAlign: 'center'}}>
                         <Row>
                             <Col xs={8} className="no-padding">
-                                <input type="number" className="gs-input" value={ornData[i].price} onFocus={(e)=>onFocusPriceVal(i)} onChange={(e) => onChange(e.target.value, 'price', {row:i, col: 'price'} )} style={{width: '100%'}}
+                                <input type="number" className="gs-input" value={ornData[i].price} onFocus={(e)=>onFocusPriceVal(i, null, e)} onChange={(e) => onChange(e.target.value, 'price', {row:i, col: 'price'} )} style={{width: '100%'}}
                                     ref= {(domElm) => {domElmns["price"+i] = domElm; }}
-                                    onKeyUp = {(e) => handleKeyUp(e, {currElmKey: "price"+i}) }/>
+                                    onKeyUp = {(e) => handleKeyUp(e, {currElmKey: "price"+i, row: i, col: 'price'}) }/>
                             </Col>
                             <Col xs={2}>
                                 <span className="calc-refresh-icon" style={{cursor: 'pointer', color: '#2196f3'}}
@@ -838,7 +856,7 @@ function GstBillingDemo() {
                     </Row>
                     <Row style={{padding: '0 15px', marginTop: '10px'}}>
                         <Col xs={12}>
-                            <Row>
+                            <Row style={{fontWeight: "bold"}}>
                                 <Col xs={6}>
                                     <Row>
                                         <Col xs={3} className="no-padding">

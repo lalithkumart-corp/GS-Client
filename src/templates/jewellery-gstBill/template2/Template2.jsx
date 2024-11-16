@@ -151,7 +151,7 @@ function GstBillTemplate2(props) {
     }
 
     const _constructOrnBody = () => {
-        let wstValDecimals = 4;
+        let wstValDecimals = 3;
         if(printContent.decimals && printContent.decimals.wstVal) wstValDecimals = printContent.decimals.wstVal;
 
         let spans = {
@@ -380,7 +380,7 @@ function GstBillTemplate2(props) {
                 {printContent.calculations.roundedOffVal ?
                 <Row>
                     <Col xs={{span: 6}} className="no-padding">
-                        Round Off:
+                        Round Off (+/-)
                     </Col>
                     <Col xs={2} style={{textAlign: 'right'}}>
                         ₹:

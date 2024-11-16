@@ -6,7 +6,16 @@
     }
     .gs-input-cell {
         width: 100%;
-        padding-left: 7px;
+        // padding-left: 7px;
+        padding: 0;
+        height: 25px;
+    }
+}
+.jewellery-gst-bill-demo {
+    .form-control {
+        border-radius: 0;
+        height: 25px;
+        padding: 0;
     }
 }
 .jewellery-gst-bill-demo .gst-bill-preview .jewellery-gst-bill-paper.has-preview {

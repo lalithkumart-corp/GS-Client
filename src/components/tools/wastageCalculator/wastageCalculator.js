@@ -1,7 +1,7 @@
 
 // Returns {wsgPercent: number, wsgVal: number}
 export const wastageCalc = (wt, rate, gst, total, options) => {
-    let wstValDecimals = 4;
+    let wstValDecimals = 3;
     if(!options) {
         options = {}
     }
