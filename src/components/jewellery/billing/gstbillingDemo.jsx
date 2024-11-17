@@ -38,6 +38,7 @@ domList.add('nwt0', {type: 'defaultInput', enabled: true});
 domList.add('wst0', {type: 'defaultInput', enabled: true});
 domList.add('wstVal0', {type: 'defaultInput', enabled: true});
 domList.add('mc0', {type: 'defaultInput', enabled: true});
+domList.add('discount0', {type: 'defaultInput', enabled: true});
 domList.add('price0', {type: 'defaultInput', enabled: true});
 domList.add('orn1', {type: 'defaultInput', enabled: true});
 domList.add('huid1', {type: 'defaultInput', enabled: true});
@@ -48,6 +49,7 @@ domList.add('nwt1', {type: 'defaultInput', enabled: true});
 domList.add('wst1', {type: 'defaultInput', enabled: true});
 domList.add('wstVal1', {type: 'defaultInput', enabled: true});
 domList.add('mc1', {type: 'defaultInput', enabled: true});
+domList.add('discount1', {type: 'defaultInput', enabled: true});
 domList.add('price1', {type: 'defaultInput', enabled: true});
 domList.add('orn2', {type: 'defaultInput', enabled: true});
 domList.add('huid2', {type: 'defaultInput', enabled: true});
@@ -58,6 +60,7 @@ domList.add('nwt2', {type: 'defaultInput', enabled: true});
 domList.add('wst2', {type: 'defaultInput', enabled: true});
 domList.add('wstVal2', {type: 'defaultInput', enabled: true});
 domList.add('mc2', {type: 'defaultInput', enabled: true});
+domList.add('discount2', {type: 'defaultInput', enabled: true});
 domList.add('price2', {type: 'defaultInput', enabled: true});
 domList.add('orn3', {type: 'defaultInput', enabled: true});
 domList.add('huid3', {type: 'defaultInput', enabled: true});
@@ -68,6 +71,7 @@ domList.add('nwt3', {type: 'defaultInput', enabled: true});
 domList.add('wst3', {type: 'defaultInput', enabled: true});
 domList.add('wstVal3', {type: 'defaultInput', enabled: true});
 domList.add('mc3', {type: 'defaultInput', enabled: true});
+domList.add('discount3', {type: 'defaultInput', enabled: true});
 domList.add('price3', {type: 'defaultInput', enabled: true});
 
 domList.add('cgstPercent', {type: 'formControl', enabled: true});
@@ -87,6 +91,7 @@ function GstBillingDemo() {
             qty: '',
             gwt: '',
             nwt: '',
+            discount: '',
             initialPrice: '',
             cgst: 1.5,
             sgst: 1.5,
@@ -102,6 +107,7 @@ function GstBillingDemo() {
             qty: '',
             gwt: '',
             nwt: '',
+            discount: '',
             initialPrice: '',
             cgst: 1.5,
             sgst: 1.5,
@@ -117,6 +123,7 @@ function GstBillingDemo() {
             qty: '',
             gwt: '',
             nwt: '',
+            discount: '',
             initialPrice: '',
             cgst: 1.5,
             sgst: 1.5,
@@ -132,6 +139,7 @@ function GstBillingDemo() {
             qty: '',
             gwt: '',
             nwt: '',
+            discount: '',
             initialPrice: '',
             cgst: 1.5,
             sgst: 1.5,
@@ -258,6 +266,15 @@ function GstBillingDemo() {
                     setOrnaments(newOrnData);
                 };
                 break;
+            case 'discount':
+                debugger;
+                if(options) {
+                    let newOrnData = {...ornData};
+                    newOrnData[options.row][options.col] = val;
+                    newOrnData[options.row]['discount'] = !isNaN(val)?numberFormatter(val, 2):'';
+                    setOrnaments(newOrnData);
+                };
+                break;
             case 'cgst':
             case 'sgst':
                 if(options) {
@@ -369,11 +386,18 @@ function GstBillingDemo() {
         let mcVal = ornData[row].mc || 0;
         let wstInput = ornData[row].wst || 0;
         let wstVal = ornData[row].wstVal || 0;
+        let discountVal = ornData[row].discount || 0;
 
-        if(options && options.considerWsgVal) {
+        // if(options && options.considerWsgVal) {
+        //     wtWithWst = wtVal + wstVal;
+        // } else { // considering wastage Percent 
+        //     if(wtVal*wstInput)
+        //         wtWithWst = wtVal + ((wtVal*wstInput)/100);
+        // }
+
+        if(wstVal) {
             wtWithWst = wtVal + wstVal;
-        } else { // considering wastage Percent 
-            if(wtVal*wstInput)
+        } else if(wstInput) {
                 wtWithWst = wtVal + ((wtVal*wstInput)/100);
         }
 
@@ -384,6 +408,8 @@ function GstBillingDemo() {
         // add making charge
         let price = (gramPrice * wtWithWst);
         price = numberFormatter(price + parseFloat(mcVal), 2);
+
+        price = price - discountVal;
 
         newOrnData[row].initialPrice = price;
 
@@ -421,12 +447,14 @@ function GstBillingDemo() {
         let totalWt = parseFloat(ornData[0]['nwt'] || 0 ) + parseFloat(ornData[1]['nwt'] || 0 ) + parseFloat(ornData[2]['nwt'] || 0 ) + parseFloat(ornData[3]['nwt'] || 0 );
         // let totalWst = (parseFloat(ornData[0]['wst'] || 0 ) + parseFloat(ornData[1]['wst'] || 0 ) + parseFloat(ornData[2]['wst'] || 0 ) + parseFloat(ornData[3]['wst'] || 0 ))/4;
         let totalMc = parseFloat(ornData[0]['mc'] || 0 ) + parseFloat(ornData[1]['mc'] || 0 ) + parseFloat(ornData[2]['mc'] || 0 ) + parseFloat(ornData[3]['mc'] || 0 );
+        let totalDiscount = parseFloat(ornData[0]['discount'] || 0 ) + parseFloat(ornData[1]['discount'] || 0 ) + parseFloat(ornData[2]['discount'] || 0 ) + parseFloat(ornData[3]['discount'] || 0 );
         let totalOrnPrices = parseFloat(ornData[0]['price'] || 0 ) + parseFloat(ornData[1]['price'] || 0 ) + parseFloat(ornData[2]['price'] || 0 ) + parseFloat(ornData[3]['price'] || 0 );
         setTotalsCalc({
             qty: totalQty,
             nwt: totalWt,
             mc: totalMc,
             price: totalOrnPrices,
+            discount: totalDiscount,
         });
     }
 
@@ -491,6 +519,7 @@ function GstBillingDemo() {
                     totalCgstVal: 0,
                     totalSgstVal: 0,
                     roundedOffVal: roundOffVal,
+                    totalDiscount: totalsCalc.discount,
                     // totalDiscount: roundOffVal, //Temp change
                     grandTotal: grandTotal
                 }
@@ -512,7 +541,7 @@ function GstBillingDemo() {
                         makingCharge: anOrn.mc,
                         cgstPercent: anOrn.cgst,
                         sgstPercent: anOrn.sgst,
-                        discount: 0,
+                        discount: anOrn.discount,
                         itemType: categ=='gold'?"G":"S",
                         pricePerGm: categ=='gold'?goldRatePerGm:silverRatePerGm,
                         initialPrice: anOrn.initialPrice,
@@ -601,13 +630,13 @@ function GstBillingDemo() {
                     </Col>
                     <Col xs={4}>
                         <Row>
-                            <Col xs={{span: 3}} className="no-padding">
+                            <Col xs={{span: 2}} className="no-padding">
                                 <input type="number" className="gs-input" value={ornData[i].wst} onChange={(e) => onChange(parseFloat(e.target.value), 'wst', {row:i, col: 'wst'} )} style={{width: '100%'}}
                                     ref= {(domElm) => {domElmns["wst"+i] = domElm; }}
                                     onKeyUp = {(e) => handleKeyUp(e, {currElmKey: "wst"+i}) }
                                     onFocus={handleFocus}/>
                             </Col>
-                            <Col xs={3} className="no-padding">
+                            <Col xs={2} className="no-padding">
                                 <input type="number" className="gs-input" value={ornData[i].wstVal} onChange={(e) => onChange(parseFloat(e.target.value), 'wstVal', {row:i, col: 'wstVal'} )} style={{width: '100%'}}
                                     ref= {(domElm) => {domElmns["wstVal"+i] = domElm; }}
                                     onKeyUp = {(e) => handleKeyUp(e, {currElmKey: "wstVal"+i}) }
@@ -617,6 +646,12 @@ function GstBillingDemo() {
                                 <input type="number" className="gs-input" value={ornData[i].mc} onChange={(e) => onChange(parseFloat(e.target.value), 'mc', {row:i, col: 'mc'} )} style={{width: '100%'}}
                                     ref= {(domElm) => {domElmns["mc"+i] = domElm; }}
                                     onKeyUp = {(e) => handleKeyUp(e, {currElmKey: "mc"+i}) }
+                                    onFocus={handleFocus}/>
+                            </Col>
+                            <Col xs={2} className="no-padding">
+                                <input type="number" className="gs-input" value={ornData[i].discount} onChange={(e) => onChange(parseFloat(e.target.value), 'discount', {row:i, col: 'discount'} )} style={{width: '100%'}}
+                                    ref= {(domElm) => {domElmns["discount"+i] = domElm; }}
+                                    onKeyUp = {(e) => handleKeyUp(e, {currElmKey: "discount"+i}) }
                                     onFocus={handleFocus}/>
                             </Col>
                             <Col xs={2} className="no-padding">
@@ -640,13 +675,14 @@ function GstBillingDemo() {
                                     ref= {(domElm) => {domElmns["price"+i] = domElm; }}
                                     onKeyUp = {(e) => handleKeyUp(e, {currElmKey: "price"+i, row: i, col: 'price'}) }/>
                             </Col>
+                            {!ornData[i].discount ?
                             <Col xs={2}>
                                 <span className="calc-refresh-icon" style={{cursor: 'pointer', color: '#2196f3'}}
                                 onClick={(e) => onCalcRefreshClick(i)}
                                 title={"Refresh action to caculate the Price value considering the rounded wastage value."}>
                                     <MdRefresh />    
                                 </span> 
-                            </Col>
+                            </Col>:<></>}
                         </Row>
                     </Col>
                 </Row>
@@ -678,13 +714,16 @@ function GstBillingDemo() {
                 </Col>
                 <Col xs={4}>
                     <Row>
-                        <Col xs={{span: 3}} className="no-padding">
+                        <Col xs={{span: 2}} className="no-padding">
                             {/* <input type="number" className="gs-input" value={totalsCalc.wst} readOnly style={{width: '100%'}}/> */}
                         </Col>
-                        <Col xs={3} className="no-padding">
+                        <Col xs={2} className="no-padding">
                         </Col>
                         <Col xs={2} className="no-padding">
                             <input type="number" className="gs-input" value={totalsCalc.mc} readOnly style={{width: '100%'}}/>
+                        </Col>
+                        <Col xs={2} className="no-padding">
+                            <input type="number" className="gs-input" value={totalsCalc.discount} readOnly style={{width: '100%'}}/>
                         </Col>
                         <Col xs={2} className="no-padding">
                         </Col>
@@ -881,14 +920,17 @@ function GstBillingDemo() {
                                 </Col>
                                 <Col xs={4}>
                                     <Row>
-                                        <Col xs={{span: 3}} className="no-padding">
+                                        <Col xs={{span: 2}} className="no-padding">
                                             <span> Wsg % </span>
                                         </Col>
-                                        <Col xs={3} className="no-padding">
+                                        <Col xs={2} className="no-padding">
                                             <span> Wsg(gm) </span>
                                         </Col>
                                         <Col xs={2} className="no-padding">
                                             <span> M.C </span>
+                                        </Col>
+                                        <Col xs={2} className="no-padding">
+                                            <span> Discount </span>
                                         </Col>
                                         <Col xs={2} className="no-padding">
                                             <span>CGST</span>
