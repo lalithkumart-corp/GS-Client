@@ -74,6 +74,11 @@ class Pledgebook extends Component {
                         grt: 5000,
                         lsr: 5500,
                         enabled: false
+                    },
+                    intPercent: {
+                        grt: 1,
+                        lsr: 3,
+                        enabled: false
                     }
                 },
                 ornCategory: {
@@ -454,17 +459,26 @@ class Pledgebook extends Component {
                 case 'lsr':
                     newState.filters.custom.pledgeAmtPerGram.lsr = parseInt(val) || null;
                     break;
+                case 'pledgeAmtPerGramCheckbox':
+                    newState.filters.custom.pledgeAmtPerGram.enabled = val;    
+                    break;
                 case 'pledge-amt-grt':
                     newState.filters.custom.pledgeAmt.grt = parseInt(val) || null;
                     break;
                 case 'pledge-amt-lsr':
                     newState.filters.custom.pledgeAmt.lsr = parseInt(val) || null;
                     break;
-                case 'pledgeAmtPerGramCheckbox':
-                    newState.filters.custom.pledgeAmtPerGram.enabled = val;    
-                    break;
                 case 'pledgeAmtCheckbox':
                     newState.filters.custom.pledgeAmt.enabled = val;    
+                    break;
+                case 'interest-percent-grt':
+                    newState.filters.custom.intPercent.grt = parseFloat(val) || null;
+                    break;
+                case 'interest-percent-lsr':
+                    newState.filters.custom.intPercent.lsr = parseFloat(val) || null;
+                    break;
+                case 'interestPercentCheckbox':
+                    newState.filters.custom.intPercent.enabled = val;    
                     break;
             }
             this.setState(newState);
@@ -547,6 +561,11 @@ class Pledgebook extends Component {
                     pledgeAmt: {
                         grt: 0,
                         lsr: 100000,
+                        enabled: false
+                    },
+                    intPercent: {
+                        grt: 1,
+                        lsr: 3,
                         enabled: false
                     }
                 },
@@ -957,6 +976,12 @@ class Pledgebook extends Component {
                 grt: this.state.filters.custom.pledgeAmt.grt,
                 lsr: this.state.filters.custom.pledgeAmt.lsr
             }
+        
+        if(this.state.filters.custom.intPercent.enabled)
+            filters.custom.intPercent = {
+                grt: this.state.filters.custom.intPercent.grt,
+                lsr: this.state.filters.custom.intPercent.lsr
+            }
 
         filters.custom.ornCategory = [];
         if(this.state.filters.ornCategory.gold)
@@ -1009,6 +1034,14 @@ class Pledgebook extends Component {
                 errors.push('Check the Custom Filter - Loan Amount filter value. "Greater than" input value should be greater than "lesser than" input value.')
             }
         }
+        
+        if(this.state.filters.custom.intPercent.enabled) {
+            if(this.state.filters.custom.intPercent.grt > this.state.filters.custom.intPercent.lsr) {
+                status = 'error';
+                errors.push('Check the Custom Filter - Interest Percent filter value. "Greater than" input value should be greater than "lesser than" input value.')
+            }
+        }
+
         if(!this.state.filters.ornCategory.gold && !this.state.filters.ornCategory.silver && !this.state.filters.ornCategory.brass )
             errors.push('Select any Ornament Group');
         if(errors.length > 0)
@@ -1031,7 +1064,9 @@ class Pledgebook extends Component {
 
     isAnyCustomFiltersEnabled() {
         let flag = false;
-        if(this.state.filters.custom.pledgeAmtPerGram.enabled || this.state.filters.custom.pledgeAmt.enabled)
+        if(this.state.filters.custom.pledgeAmtPerGram.enabled 
+            || this.state.filters.custom.pledgeAmt.enabled
+            || this.state.filters.custom.intPercent.enabled)
             flag = true;
         return flag;
     }
@@ -1206,6 +1241,26 @@ class Pledgebook extends Component {
                                 </Col>
                                 <Col xs={4}>
                                     <input type='number' className='less-input-val gs-input-cell' value={this.state.filters.custom.pledgeAmt.lsr} onChange={(e) => this.customFilters.onChange(e, e.target.value, 'pledge-amt-lsr')}/>
+                                </Col>
+                            </Row>
+                        </Col>
+                        <Col xs={1}>
+                            {/* <input type='checkbox' className='gs-checkbox' checked={this.state.filters.custom.pledgeAmt.enabled} onChange={(e) => this.customFilters.onChange(e, e.target.checked, 'pledgeAmtCheckbox')}/> */}
+                            <GSCheckbox labelText="" 
+                                checked={this.state.filters.custom.intPercent.enabled} 
+                                onChangeListener = {(e) => {this.customFilters.onChange(e, e.target.checked, 'interestPercentCheckbox')}} />
+                        </Col>
+                        <Col xs={11}>
+                            <Row>
+                                <Col xs={12}><h5 className='inline-block'>Interest Percent</h5></Col>
+                                <Col xs={4}>
+                                    <input type='number' className='gtr-input-val gs-input-cell' value={this.state.filters.custom.intPercent.grt} onChange={(e) => this.customFilters.onChange(e, e.target.value, 'interest-percent-grt')}/>
+                                </Col>
+                                <Col xs={4}>
+                                    <span className='gtr-label-less'> To </span>
+                                </Col>
+                                <Col xs={4}>
+                                    <input type='number' className='less-input-val gs-input-cell' value={this.state.filters.custom.intPercent.lsr} onChange={(e) => this.customFilters.onChange(e, e.target.value, 'interest-percent-lsr')}/>
                                 </Col>
                             </Row>
                         </Col>
