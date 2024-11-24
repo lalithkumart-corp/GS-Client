@@ -65,9 +65,14 @@ class Pledgebook extends Component {
                         enabled: false,
                         inputVal: ''
                     },
+                    pledgeAmtPerGram: {
+                        grt: 5000,
+                        lsr: 5500,
+                        enabled: false
+                    },
                     pledgeAmt: {
-                        grt: 2000,
-                        lsr: 2500,
+                        grt: 5000,
+                        lsr: 5500,
                         enabled: false
                     }
                 },
@@ -444,21 +449,22 @@ class Pledgebook extends Component {
             let newState = {...this.state};
             switch(identifier) {
                 case 'grt':
-                    //newState.moreFilter.perGramRange.gtrThanVal = val;
-                    newState.filters.custom.pledgeAmt.grt = val;
+                    newState.filters.custom.pledgeAmtPerGram.grt = parseInt(val) || null;
                     break;
                 case 'lsr':
-                    //newState.moreFilter.perGramRange.lessThanVal = val;
-                    newState.filters.custom.pledgeAmt.lsr = val;
+                    newState.filters.custom.pledgeAmtPerGram.lsr = parseInt(val) || null;
                     break;
-                case 'mobile':
-                    newState.filters.custom.mobile.inputVal = val;
+                case 'pledge-amt-grt':
+                    newState.filters.custom.pledgeAmt.grt = parseInt(val) || null;
+                    break;
+                case 'pledge-amt-lsr':
+                    newState.filters.custom.pledgeAmt.lsr = parseInt(val) || null;
+                    break;
+                case 'pledgeAmtPerGramCheckbox':
+                    newState.filters.custom.pledgeAmtPerGram.enabled = val;    
                     break;
                 case 'pledgeAmtCheckbox':
                     newState.filters.custom.pledgeAmt.enabled = val;    
-                    break;
-                case 'mobileCheckbox':
-                    newState.filters.custom.mobile.enabled = val;
                     break;
             }
             this.setState(newState);
@@ -533,9 +539,14 @@ class Pledgebook extends Component {
                         enabled: false,
                         inputVal: ''
                     },
+                    pledgeAmtPerGram: {
+                        grt: 5000,
+                        lsr: 5500,
+                        enabled: false
+                    },
                     pledgeAmt: {
-                        grt: 2000,
-                        lsr: 2500,
+                        grt: 0,
+                        lsr: 100000,
                         enabled: false
                     }
                 },
@@ -935,6 +946,12 @@ class Pledgebook extends Component {
         else if(this.state.filters.custom.mobile.enabled)
             filters.custom.mobile = this.state.filters.custom.mobile.inputVal;
 
+        if(this.state.filters.custom.pledgeAmtPerGram.enabled)
+            filters.custom.pledgeAmtPerGram = {
+                grt: this.state.filters.custom.pledgeAmtPerGram.grt,
+                lsr: this.state.filters.custom.pledgeAmtPerGram.lsr
+            }
+
         if(this.state.filters.custom.pledgeAmt.enabled)
             filters.custom.pledgeAmt = {
                 grt: this.state.filters.custom.pledgeAmt.grt,
@@ -980,10 +997,16 @@ class Pledgebook extends Component {
     doValidation() {
         let status = 'success';
         let errors = [];
+        if(this.state.filters.custom.pledgeAmtPerGram.enabled) {
+            if(this.state.filters.custom.pledgeAmtPerGram.grt > this.state.filters.custom.pledgeAmtPerGram.lsr) {
+                status = 'error';
+                errors.push('Check the Custom Filter - Amount per gram filter value. "Greater than" input value should be greater than "lesser than" input value.')
+            }
+        }
         if(this.state.filters.custom.pledgeAmt.enabled) {
             if(this.state.filters.custom.pledgeAmt.grt > this.state.filters.custom.pledgeAmt.lsr) {
                 status = 'error';
-                errors.push('Check the Custom Filter - Amount filter value. "Greater than" input value should be greater than "lesser than" input value.')
+                errors.push('Check the Custom Filter - Loan Amount filter value. "Greater than" input value should be greater than "lesser than" input value.')
             }
         }
         if(!this.state.filters.ornCategory.gold && !this.state.filters.ornCategory.silver && !this.state.filters.ornCategory.brass )
@@ -1008,9 +1031,7 @@ class Pledgebook extends Component {
 
     isAnyCustomFiltersEnabled() {
         let flag = false;
-        if(this.state.filters.custom.pledgeAmt.enabled)
-            flag = true;
-        else if(this.state.filters.custom.mobile.enabled)
+        if(this.state.filters.custom.pledgeAmtPerGram.enabled || this.state.filters.custom.pledgeAmt.enabled)
             flag = true;
         return flag;
     }
@@ -1152,27 +1173,45 @@ class Pledgebook extends Component {
                         <Col xs={1}>
                             {/* <input type='checkbox' className='gs-checkbox' checked={this.state.filters.custom.pledgeAmt.enabled} onChange={(e) => this.customFilters.onChange(e, e.target.checked, 'pledgeAmtCheckbox')}/> */}
                             <GSCheckbox labelText="" 
-                                checked={this.state.filters.custom.pledgeAmt.enabled} 
-                                onChangeListener = {(e) => {this.customFilters.onChange(e, e.target.checked, 'pledgeAmtCheckbox')}} />
+                                checked={this.state.filters.custom.pledgeAmtPerGram.enabled} 
+                                onChangeListener = {(e) => {this.customFilters.onChange(e, e.target.checked, 'pledgeAmtPerGramCheckbox')}} />
                         </Col>
                         <Col xs={11}>
                             <Row>
-                                <Col xs={12}><h5 className='inline-block'>Amount Range</h5></Col>
+                                <Col xs={12}><h5 className='inline-block'>Loan Amount - Per Gram</h5></Col>
                                 <Col xs={4}>
-                                    <input type='number' className='gtr-input-val gs-input-cell' value={this.state.filters.custom.pledgeAmt.grt} onChange={(e) => this.customFilters.onChange(e, e.target.value, 'grt')}/>
+                                    <input type='number' className='gtr-input-val gs-input-cell' value={this.state.filters.custom.pledgeAmtPerGram.grt} onChange={(e) => this.customFilters.onChange(e, e.target.value, 'grt')}/>
                                 </Col>
                                 <Col xs={4}>
                                     <span className='gtr-label-less'> To </span>
                                 </Col>
                                 <Col xs={4}>
-                                    <input type='number' className='less-input-val gs-input-cell' value={this.state.filters.custom.pledgeAmt.lsr} onChange={(e) => this.customFilters.onChange(e, e.target.value, 'lsr')}/>
+                                    <input type='number' className='less-input-val gs-input-cell' value={this.state.filters.custom.pledgeAmtPerGram.lsr} onChange={(e) => this.customFilters.onChange(e, e.target.value, 'lsr')}/>
+                                </Col>
+                            </Row>
+                        </Col>
+                        <Col xs={1}>
+                            <GSCheckbox labelText="" 
+                                checked={this.state.filters.custom.pledgeAmt.enabled} 
+                                onChangeListener = {(e) => {this.customFilters.onChange(e, e.target.checked, 'pledgeAmtCheckbox')}} />
+                        </Col>
+                        <Col xs={11}>
+                        <Row>
+                            <Col xs={12}><h5 className='inline-block'>Loan Amount</h5></Col>
+                                <Col xs={4}>
+                                    <input type='number' className='gtr-input-val gs-input-cell' value={this.state.filters.custom.pledgeAmt.grt} onChange={(e) => this.customFilters.onChange(e, e.target.value, 'pledge-amt-grt')}/>
+                                </Col>
+                                <Col xs={4}>
+                                    <span className='gtr-label-less'> To </span>
+                                </Col>
+                                <Col xs={4}>
+                                    <input type='number' className='less-input-val gs-input-cell' value={this.state.filters.custom.pledgeAmt.lsr} onChange={(e) => this.customFilters.onChange(e, e.target.value, 'pledge-amt-lsr')}/>
                                 </Col>
                             </Row>
                         </Col>
                     </Row>
-                    <Row>
+                    {/* <Row>
                         <Col xs={1}>
-                            {/* <input type='checkbox' className='gs-checkbox' checked={this.state.filters.custom.mobile.enabled} onChange={(e) => this.customFilters.onChange(e, e.target.checked, 'mobileCheckbox')}/> */}
                             <GSCheckbox labelText="" 
                                 checked={this.state.filters.custom.mobile.enabled} 
                                 onChangeListener = {(e) => {this.customFilters.onChange(e, e.target.checked, 'mobileCheckbox')}} />
@@ -1190,7 +1229,7 @@ class Pledgebook extends Component {
                                 </InputGroup>
                             </Form.Group>
                         </Col>
-                    </Row>
+                    </Row> */}
                 </Col>
             </Row>
         )
@@ -1312,8 +1351,8 @@ class Pledgebook extends Component {
                                         <Row className='gs-card'>
                                             <Col className='gs-card-content'>
                                                 {this.getCustomFilterOptions()}
-                                                <Row className='text-align-right'>
-                                                    <input type='button' className='gs-button' value='Apply' disabled={this.shouldDisableCustomFilterApplyBtn()} onClick={this.customFilters.onApply}/>
+                                                <Row className='text-align-right' style={{padding: '40px 20px 10px 20px'}} >
+                                                    <input type='button' className='gs-button bordered' value='Apply' disabled={this.shouldDisableCustomFilterApplyBtn()} onClick={this.customFilters.onApply}/>
                                                 </Row>
                                             </Col>
                                         </Row>

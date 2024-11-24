@@ -244,12 +244,15 @@
 }
 .gtr-input-val {
 	display: inline-block;
+	border-bottom: 1px solid lightgray;
 }
 .gtr-label-less {
 	display: inline-block;
+	padding: 6px;
 }
 .less-input-val {
 	display: inline-block;
+	border-bottom: 1px solid lightgray;
 }
 .custom-filter-popover-main {
 	width: 400px;
