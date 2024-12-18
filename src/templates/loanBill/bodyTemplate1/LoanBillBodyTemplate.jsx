@@ -39,7 +39,7 @@ export default class LoanBillBodyTemplate extends Component {
                 <Col xs={4} style={{textAlign: "center"}}>
                     <img style={{width: '40px'}} src="/images/swastik.png" />
                 </Col>
-                <Col xs={{span: 4}} md={{span: 4}} style={{textAlign: 'right'}}>
+                <Col xs={{span: 4}} md={{span: 4}} style={{textAlign: 'left'}}>
                     <span style={{lineHeight: '45px', paddingRight: '15px'}}>
                         <span style={{paddingRight: '5px'}}>DATE:</span>
                         <span className="font23 date-val">{this.getDate()}</span></span>
@@ -130,7 +130,7 @@ export default class LoanBillBodyTemplate extends Component {
                                 <span className="cust-name-section">
                                     <span style={{textTransform: "uppercase"}}>{this.state.billContent.cname}</span>
                                     &nbsp; 
-                                    <span className="font12">{this.state.billContent.guardianRelation || 'c/o'}</span> 
+                                    <span className="font12">{this.state.billContent.guardianRelation || ''}</span> 
                                     &nbsp; 
                                     <span style={{textTransform: "uppercase"}}>{this.state.billContent.gaurdianName}</span>
                                 </span>
@@ -142,14 +142,14 @@ export default class LoanBillBodyTemplate extends Component {
                             </Col>
                             <Col xs={10} md={10} className="addr-field" style={addrStyles}>
                                 {this.state.billContent.address?.length > 35 ?
-                                 <div>{this.state.billContent.address},
-                                    &nbsp;{this.state.billContent.place}, 
+                                 <div>{this.state.billContent.address}
+                                    &nbsp;{this.state.billContent.place}
                                     &nbsp;{this.state.billContent.city}-{this.state.billContent.pinCode}
                                  </div>
                                 :<>
                                 <div>{this.state.billContent.address}</div>
-                                {this.state.billContent.place}, 
-                                &nbsp; {this.state.billContent.city}-{this.state.billContent.pinCode}</>
+                                {this.state.billContent.place}
+                                &nbsp; {this.state.billContent.city}{this.state.billContent.pinCode}</>
                                 }
                                
                             </Col>
@@ -161,7 +161,7 @@ export default class LoanBillBodyTemplate extends Component {
                         </Col>
                         <Col xs={4} className="">
                             <span className="amount-value-top">
-                                ₹ {currencyFormatter(this.state.billContent.amount)}/-
+                                 {currencyFormatter(this.state.billContent.amount)}
                                 {/* {format(this.state.billContent.amount, {code: "INR", decimalDigits: 1, spaceBetweenAmountAndSymbol: true})}/- */}
                             </span>
                         </Col>
@@ -192,7 +192,7 @@ export default class LoanBillBodyTemplate extends Component {
         let amt = this.state.billContent.amount;
         if(amt)
             words = convertor(amt);
-        return words + ' Only.';
+        return words;// + ' Only.';
     }
 
     getAmountValWithWords() {
@@ -258,9 +258,9 @@ export default class LoanBillBodyTemplate extends Component {
         }
         dom.push(
             <Row className={`orn-table-header`}>
-                <Col className="orn-table-th-cell font17" xs={{span: 1}} md={{span: 1}} style={{paddingLeft: '3px'}}><b>S.No</b></Col>
-                <Col className="orn-table-th-cell font17" xs={{span: 10}} md={{span: 10}} style={{paddingLeft: "20px"}}><b>Articles Pledged</b></Col>
-                <Col className="orn-table-th-cell font17" xs={{span: 1}} md={{span: 1}} style={{textAlign: 'center', borderRight: 0}}><b>Pcs</b></Col>
+                <Col className="orn-table-th-cell" xs={{span: 1}} md={{span: 1}} style={{paddingLeft: '3px'}}><b>S.No</b></Col>
+                <Col className="orn-table-th-cell" xs={{span: 10}} md={{span: 10}} style={{paddingLeft: "20px"}}><b>Articles Pledged</b></Col>
+                <Col className="orn-table-th-cell" xs={{span: 1}} md={{span: 1}} style={{textAlign: 'center', borderRight: 0}}><b>Pcs</b></Col>
                 {/* <Col className="orn-table-th-cell font17" xs={{span: 2}} md={{span: 2}} style={{paddingLeft: '3px'}}>WT</Col> */}
             </Row>
         )
@@ -269,9 +269,8 @@ export default class LoanBillBodyTemplate extends Component {
             let totalOrnLength = Object.keys(this.state.billContent.orn).length;
             let rows = 0;
             let index = 1;
-            while(rows < 10) {
+            while(rows < 11) {
                 let anOrn = this.state.billContent.orn[index];
-                console.log(anOrn);
                 if(anOrn) {
                     footer.count++;
                     footer.wt = parseFloat((footer.wt  + parseFloat(anOrn.ornNWt || 0)).toFixed(3));
@@ -282,9 +281,9 @@ export default class LoanBillBodyTemplate extends Component {
                     let theItemName = `${this.enhanceOrnItemName(anOrn.ornItem, anOrn.ornNos)} ${anOrn.ornSpec?`(${anOrn.ornSpec})`:''}`;
                     list.push(
                         <Row>
-                            <Col xs={{span: 1}} md={{span: 1}} className="orn-table-body-cell sno">{index}</Col>
-                            <Col xs={{span: 10}} md={{span: 10}} className="orn-table-body-cell item">{theItemName}</Col>
-                            <Col xs={{span: 1}} md={{span: 1}} className="orn-table-body-cell nos">{anOrn.ornNos}</Col>
+                            <Col xs={{span: 1}} md={{span: 1}} className="orn-table-body-cell sno"></Col>
+                            <Col xs={{span: 10}} md={{span: 10}} className="orn-table-body-cell item"></Col>
+                            <Col xs={{span: 1}} md={{span: 1}} className="orn-table-body-cell nos"></Col>
                         </Row>
                     );
                     rows++;
@@ -312,54 +311,8 @@ export default class LoanBillBodyTemplate extends Component {
                 
             }
 
-            // _.each(this.state.billContent.orn, (anOrn, index) => {
-            //     footer.count++;
-            //     footer.wt = parseFloat((footer.wt  + parseFloat(anOrn.ornNWt || 0)).toFixed(3));
-            //     footer.qty += parseInt(anOrn.ornNos) || 0;
-            //     this._totalWt = footer.wt;
-            //     if(anOrn.ornSpec && anOrn.ornSpec.length > 0) anOrn.ornSpec = `${anOrn.ornSpec.trim()}`;
-            //     if(list.length >= 9) {
-            //         if(totalOrnLength > 10 && list.length == 9) {
-            //             list.push(
-            //                 <Row>
-            //                     <Col xs={{span: 1}} md={{span: 1}} className="orn-table-body-cell sno">{index}</Col>
-            //                     <Col xs={{span: 10}} md={{span: 10}} className="orn-table-body-cell item">Others</Col>
-            //                     <Col xs={{span: 1}} md={{span: 1}} className="orn-table-body-cell nos"></Col>
-            //                     {/* <Col xs={{span: 1}} md={{span: 1}} className="orn-table-body-cell wt"></Col> */}
-            //                 </Row>
-            //             );
-            //         } else if(totalOrnLength <= 10) {
-            //             list.push(
-            //                 <Row>
-            //                     <Col xs={{span: 1}} md={{span: 1}} className="orn-table-body-cell sno">{index}</Col>
-            //                     <Col xs={{span: 10}} md={{span: 10}} className="orn-table-body-cell item">{this.enhanceOrnItemName(anOrn.ornItem, anOrn.ornNos)} {`${anOrn.ornSpec?(anOrn.ornSpec):''}`} </Col>
-            //                     <Col xs={{span: 1}} md={{span: 1}} className="orn-table-body-cell nos">{anOrn.ornNos}</Col>
-            //                     {/* <Col xs={{span: 1}} md={{span: 1}} className="orn-table-body-cell wt">{anOrn.ornNWt}</Col> */}
-            //                 </Row>
-            //             );
-            //         }
-            //     } else {
-            //         let itemName = this.enhanceOrnItemName(anOrn.ornItem, anOrn.ornNos)} {anOrn.ornSpec?`(${anOrn.ornSpec})`:'';
-            //         list.push(
-            //             <Row>
-            //                 <Col xs={{span: 1}} md={{span: 1}} className="orn-table-body-cell sno">{index}</Col>
-            //                 <Col xs={{span: 10}} md={{span: 10}} className="orn-table-body-cell item">{itemName}</Col>
-            //                 <Col xs={{span: 1}} md={{span: 1}} className="orn-table-body-cell nos">{anOrn.ornNos}</Col>
-            //                 {/* <Col xs={{span: 1}} md={{span: 1}} className="orn-table-body-cell wt">{anOrn.ornNWt}</Col> */}
-            //             </Row>
-            //         );
-            //         if(itemName.length > 40) {
-            //             list.push(<Row>
-            //                 <Col xs={{span: 1}} md={{span: 1}} className="orn-table-body-cell sno"></Col>
-            //                 <Col xs={{span: 10}} md={{span: 10}} className="orn-table-body-cell item"></Col>
-            //                 <Col xs={{span: 1}} md={{span: 1}} className="orn-table-body-cell nos"></Col>
-            //             </Row>)
-            //         }
-            //     }
-            // });
-
             // If list is less than 10
-            while(list.length <10) {
+            while(list.length <11) {
                 list.push(
                     <Row>
                         <Col xs={{span: 1}} md={{span: 1}} className="orn-table-body-cell sno"></Col>
@@ -378,8 +331,8 @@ export default class LoanBillBodyTemplate extends Component {
             )
             dom.push(
                 <Row className={`orn-list-footer`}>
-                    <Col xs={11} className="total-text">Total</Col>
-                    <Col xs={1} className="total-qty-val">{formatNumberLength(footer.qty, 2)}</Col>
+                    <Col xs={11} className="orn-table-th-cell total-text">Total</Col>
+                    <Col xs={1} className="total-qty-val"></Col>
                     {/* <Col xs={2}>{footer.wt}</Col> */}
                 </Row>
             )
@@ -412,14 +365,14 @@ export default class LoanBillBodyTemplate extends Component {
         return (
             <Row className="total-wt-section">
                 <Col xs={12} style={{textAlign: 'center'}}>
-                    <Row><Col xs={12} className="total-wt-header">Total Wt</Col></Row>
+                    <Row><Col xs={12} className="orn-table-th-cell total-wt-header">Total Wt</Col></Row>
                     <Row>
-                        <Col xs={6} md={6} className="total-wt-gm-header">Gm</Col>
-                        <Col xs={6} md={6} className="total-wt-mg-header">Mg</Col>
+                        <Col xs={6} md={6} className="orn-table-th-cell total-wt-gm-header">Gm</Col>
+                        <Col xs={6} md={6} className="orn-table-th-cell total-wt-mg-header">Mg</Col>
                     </Row>
-                    <Row style={{height: '160px'}}>
-                        <Col xs={6} md={6} className="total-wt-gm-val">{gm}</Col>
-                        <Col xs={6} md={6} className="total-wt-mg-val">{mg}</Col>
+                    <Row style={{height: '199px'}}>
+                        <Col xs={6} md={6} className="total-wt-gm-val"></Col>
+                        <Col xs={6} md={6} className="total-wt-mg-val"></Col>
                     </Row>
                 </Col>
             </Row>
@@ -433,13 +386,13 @@ export default class LoanBillBodyTemplate extends Component {
         }
         return (
             <Row style={{textAlign: 'center'}}>
-                <Col xs={12} className="present-value-header">
+                <Col xs={12} className="orn-table-th-cell present-value-header">
                     Loan Amt
                 </Col>
                 <Col xs={12} className="present-value-col" style={{lineHeight: '35px'}}>
                     {/* {format(this.state.billContent.amount, {code: 'INR', decimalDigits: 0})}/- */}
-                    <span className="red-color-imp" style={{ fontSize: '30px', paddingRight: '5px'}}>₹</span> 
-                    <span style={{fontSize: fntSize}}>{currencyFormatter(this.state.billContent.amount)}/- </span>
+                    <span className="red-color-imp" style={{ fontSize: '30px', paddingRight: '5px'}}></span> 
+                    <span style={{fontSize: fntSize}}>{currencyFormatter(this.state.billContent.amount)} </span>
                 </Col>
             </Row>
         )
@@ -454,7 +407,7 @@ export default class LoanBillBodyTemplate extends Component {
                 <Col xs={10} md={10} style={{paddingLeft: '30px', fontSize: '17px'}}>
                     <p className="interest-pay-mon no-margin">Interest Should be paid in every 3 month</p>
                     <p className="no-margin">I declare that the above articles are my own.</p>
-                    <p>Date of consent to recover jewellery <span style={{fontWeight: 'bold'}} className="red-color-imp">{this.getExpiryDate()}</span></p>
+                    <p>Date of consent to recover jewellery <span style={{fontWeight: 'bold', fontSize: '20px'}} className="red-color-imp">{this.getExpiryDate()}</span></p>
                 </Col>
             </Row>
         )
@@ -462,20 +415,20 @@ export default class LoanBillBodyTemplate extends Component {
 
     getSignatureRow() {
         return (
-            <Row className="signature-row" style={{marginTop: '25px'}}>
+            <Row className="signature-row" style={{marginTop: '5px'}}>
                 <Col xs={{span: 5}} md={{span: 5}} className="no-padding">
                     <div className="signature1-space"></div>
                     <div className="signature1-text" style={{paddingLeft: '15px', letterSpacing: '3px'}}>
                         Signature of P.B or his Agent
                     </div>
                 </Col>
-                <Col xs={3} style={{textAlign: "left", padding: 0}}>
+                <Col xs={2} style={{textAlign: "left", padding: 0}}>
                     <img src="/images/right-hand-symbol.jpg" style={{width: '100px'}}/>
                     {/* <span>
                         <FaRegHandPointRight />
                     </span> */}
                 </Col>
-                <Col xs={{span: 4}} md={{span: 4}} className="no-padding">
+                <Col xs={{span: 5}} md={{span: 5}} className="no-padding">
                     <div className="signature2-space"></div>
                     <div className="signature2-text" style={{letterSpacing: '3px'}}>
                         Signature of LTI of Pawner
@@ -505,7 +458,7 @@ export default class LoanBillBodyTemplate extends Component {
         
         return (
             <Row className="bill-footer-text">
-                <Col xs={12} md={12} style={{textAlign: 'center', paddingTop: '10px', paddingBottom: '7px'}}>
+                <Col xs={12} md={12} style={{textAlign: 'center', paddingTop: '3px', paddingBottom: '5px'}}>
                     <span className="last-row-tamil-text red-color-imp">அடகு பொருட்களுக்கு கடைசி தவணை{txt} மட்டுமே</span>
                 </Col>
             </Row>

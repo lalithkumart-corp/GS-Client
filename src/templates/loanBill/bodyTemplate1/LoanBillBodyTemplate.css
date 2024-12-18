@@ -1,11 +1,11 @@
 .bill-header-section_1 {
-    margin: 45px 25px 0 25px;
+    margin: 45px 20px 0 20px;
     border: 1px solid;
     border-bottom: none;
     padding-bottom: 10px;
 }
 .loan-bill-body-template1 {
-    margin: 0 25px 0px 25px;
+    margin: 0 20px 0px 20px;
     font-size: 20px;
     border: 1px solid;
     padding: 15px 15px 7px 15px;
@@ -55,10 +55,10 @@
 
 .loan-bill-body-template1 .orn-info-col {
     /* border: 1px solid black; */
-    margin-bottom: 20px;
+    margin-bottom: 10px;
 }
 .loan-bill-body-template1 .orn-table-header {
-    height: 41px;
+    /* height: 41px; */
     text-align: center;
     border-top: 1px solid black;
     border-bottom: 1px solid black;
@@ -67,6 +67,7 @@
 
 .loan-bill-body-template1 .orn-table-th-cell {
     padding-top: 6px;
+    padding-bottom: 3px;
     border-right: 1px solid black;
 }
 .loan-bill-body-template1 .orn-table-body-cell {
@@ -86,7 +87,6 @@
 }
 .loan-bill-body-template1 .orn-list-footer .total-text {
     text-align: center;
-    font-size: 24px;
     
 }
 .loan-bill-body-template1 .orn-list-footer .total-text,
@@ -94,9 +94,7 @@
     border-right: 1px solid black;
 }
 .loan-bill-body-template1 .orn-list-footer .total-qty-val {
-    /* padding: 0; */
     text-align: center;
-    font-size: 22px;
 }
 
 .loan-bill-body-template1 .total-wt-section .total-wt-header,
@@ -140,6 +138,13 @@
     border-top: none;
 }
 
+.loan-bill-body-template1 .totals-gm-and-present-value .orn-table-th-cell,
+.loan-bill-body-template1 .orn-table-header,
+.loan-bill-body-template1 .orn-list-footer {
+    font-size: 16px;
+    text-align: center;
+}
+
 .loan-bill-body-template1 .present-value-col {
     height: 98px;
     font-size: 27px;
@@ -166,7 +171,8 @@
     text-align: center;
 }
 .loan-bill-body-template1 .last-row-tamil-text {
-    font-size: 17px;
+    font-size: 16px;
+    letter-spacing: 2px;
     border: 1px solid red;
     color: red;
     margin-top: 20px;
@@ -180,13 +186,13 @@
 }
 @media print {
     .bill-header-section_1 {
-        margin: 45px 25px 0 25px;
+        margin: 45px 20px 0 20px;
         border: 1px solid;
         border-bottom: none;
         padding-bottom: 10px;
     }
     .loan-bill-body-template1 {
-        margin: 0 25px 0 25px;
+        margin: 0 20px 0 20px;
         font-size: 20px;
         border: 1px solid;
         padding: 15px 15px 7px 15px;
@@ -238,11 +244,10 @@
     }
 
     .loan-bill-body-template1 .orn-info-col {
-        /* border: 1px solid black; */
-        margin-bottom: 20px;
+        margin-bottom: 10px;
     }
     .loan-bill-body-template1 .orn-table-header {
-        height: 41px;
+        /* height: 41px; */
         text-align: center;
         border-top: 1px solid black;
         border-bottom: 1px solid black;
@@ -272,7 +277,6 @@
     }
     .loan-bill-body-template1 .orn-list-footer .total-text {
         text-align: center;
-        font-size: 24px;
     }
     .loan-bill-body-template1 .orn-list-footer .total-text,
     .loan-bill-body-template1 .orn-list-footer .total-qty-val {
@@ -280,7 +284,6 @@
     }
     .loan-bill-body-template1 .orn-list-footer .total-qty-val {
         text-align: center;
-        font-size: 22px;
     }
 
     .loan-bill-body-template1 .total-wt-section .total-wt-header,
@@ -323,7 +326,12 @@
     .loan-bill-body-template1 .present-value-col {
         border-top: none;
     }
-
+    .loan-bill-body-template1 .totals-gm-and-present-value .orn-table-th-cell,
+    .loan-bill-body-template1 .orn-table-header,
+    .loan-bill-body-template1 .orn-list-footer {
+        font-size: 16px;
+        text-align: center;
+    }
     .loan-bill-body-template1 .present-value-col {
         height: 98px;
         font-size: 27px;
@@ -349,7 +357,8 @@
         text-align: center;
     }
     .loan-bill-body-template1 .last-row-tamil-text {
-        font-size: 17px;
+        font-size: 16px;
+        letter-spacing: 2px;
         border: 1px solid red;
         color: red;
         margin-top: 20px;

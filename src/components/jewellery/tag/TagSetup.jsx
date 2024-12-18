@@ -15,7 +15,7 @@ const TagSetup = () => {
 
     const [templatesList, setTemplatesList] = useState([]);
 
-    const [storeName, setStoreNameAbbr] = useState('MJK');
+    const [storeName, setStoreNameAbbr] = useState('STR');
     const [division, setDivision] = useState('916KDM');
     const [grams, setGrams] = useState(1.240);
     const [size, setSize] = useState(22);
@@ -88,6 +88,8 @@ const TagSetup = () => {
             if(aTemplate.template_id == selectedTemplateId) {
                 checked = true;
                 console.log('CHECKED = ', aTemplate.template_id );
+                if(aTemplate.store_name_abbr != storeName)
+                    setStoreNameAbbr(aTemplate.store_name_abbr);
             }
             list.push(
                 <Col xs={6} md={6}>
