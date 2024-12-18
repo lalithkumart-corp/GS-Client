@@ -538,8 +538,13 @@ class SellItem extends Component {
 
     onChangeBillingType(e) {
         let newState = {...this.state};
-        newState.invoiceSeries = this.props.invoice.estimateInvoiceSeries;
-        newState.invoiceNo = this.props.invoice.estimateInvoiceNo;
+        if(e.target.value == ORIGINAL_BILLING) {
+            newState.invoiceSeries = this.props.invoice.gstInvoiceSeries;
+            newState.invoiceNo = this.props.invoice.gstInvoiceNo;
+        } else {
+            newState.invoiceSeries = this.props.invoice.estimateInvoiceSeries;
+            newState.invoiceNo = this.props.invoice.estimateInvoiceNo;
+        }
         newState.billingType = e.target.value;
         this.setState(newState);
     }

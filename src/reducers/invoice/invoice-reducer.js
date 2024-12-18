@@ -35,7 +35,7 @@ export default function invoiceReducer(state=defaultState, action) {
             };
             break;
         case 'INCR_ESTIMATE_INVOICE_NO':
-            let currInvoiceNo = parseInt(state.gstInvoiceNo);
+            let currInvoiceNo = parseInt(state.estimateInvoiceNo);
             newState = {
                 ...newState,
                 estimateInvoiceNo: ++currInvoiceNo
