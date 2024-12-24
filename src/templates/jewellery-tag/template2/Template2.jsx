@@ -1,8 +1,9 @@
 import './Template2.scss';
+import Barcode from "react-barcode";
 
 const Template2 = ({
     storeName, division, 
-    grams, size, itemName, huid, config
+    grams, size, itemName, huid, config, productId, trackId, wsgPct
 }) => {
     config = config || {};
     let showSize = size?true:false;
@@ -60,36 +61,52 @@ const Template2 = ({
         display: showSize?'inline-block':'none'
     };
 
+    const getBarCode = () => {
+        return <>
+            <span className="barcode-span">
+                <Barcode 
+                    value={productId} 
+                    width={1} 
+                    fontSize={1}  //px
+                    height={16.5} //px
+                    displayValue={false}
+                    renderer='svg'
+                    // background='lightgray'
+                    // format='CODE128'
+                />
+                <span className="product-id">{productId}</span>
+            </span>
+        </>;
+    };
+
     return (
         <>
             <div className="jewellery-tag-template-2-label">
                 <div  className='label-content-section'>
                     <div className='section-1'>
                         <div className='row-1'>
-                            <span className='store-name-abbr' style={storeNameStyles}>{storeName}</span>
-                            <span className='item-division' style={itemDivStyles}>{division}</span>
-                            <span className='hallmark-logo-span' style={hallmarkLogoSpanStyles}>
-                                <img className='hallmark-logo' style={hallmarkLogoStyles} src='/images/bis.jpg' />
-                            </span>
+                            <div className='track-id-div'>
+                                {trackId}
+                            </div>
+                            <div className='barcode-div'>
+                                {getBarCode()}
+                            </div>
+                            <div className='wsg-div' style={{visibility: wsgPct?'visible':'hidden'}}>
+                                VA <br></br>
+                                {wsgPct}% 
+                            </div>
                         </div>
-                        <div className='row-2'>
-                            <span style={{fontWeight: 'bold'}}>
-                                <span style={weightLabelStyles}>wt: </span>
-                                <span style={weightValueStyles}>{grams}</span>
-                            </span>
+                        <div className='row-2' style={{visibility: huid?'visible':'hidden'}}>
+                            HUID: {huid}
                         </div>
                     </div>
                     <div className='section-2'>
                         <div className='row-1'>
-                            <span style={itemSizeStyles}>{showSize?`s${size}`:''}</span>
-                            <span style={itemNameStyles}>{showItemName?itemName:''}</span>
-                            <span style={huidStyles}>{showHuid?huid:''}</span>
+                            <div style={{textTransform: 'uppercase'}}>{itemName}</div>
+                            <div style={{paddingTop: '3px'}}>G.Wt: {grams}</div>
                         </div>
                         <div className='row-2'>
-                            <span style={{fontWeight: 'bold', paddingLeft: '3px'}}>
-                                <span style={weightLabelStyles}>wt: </span>
-                                <span style={weightValueStyles}>{grams}</span>
-                            </span>
+                            N.Wt: {grams}
                         </div>
                     </div>
                 </div>

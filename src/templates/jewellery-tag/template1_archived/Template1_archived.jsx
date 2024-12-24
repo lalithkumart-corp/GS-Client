@@ -13,32 +13,27 @@ const Template1 = ({
     grams = grams?parseFloat(grams).toFixed(3):'';
 
     const storeNameStyles = {
-        width: '25px',
-        fontSize: 15,
+        width: '45px',
+        fontSize: 20,
         fontWeight: 'bold'
     };
     const itemDivStyles = {
         textAlign: 'center',
-        width: '57px',
-        fontSize: '14px',
+        width: '70px',
+        fontSize: '17px',
         fontWeight: 'bold'
     };
     const hallmarkLogoSpanStyles = {
-        height: '11px',
-        display: config.showBis?'inline-block':'none',
-        position: 'absolute',
-        marginLeft: '-4px',
-        marginTop: '3px'
+        height: '19px',
+        width: '24px',
+        display: config.showBis?'inline-block':'none'
     };
     const hallmarkLogoStyles = {
         height: '100%',
         marginTop: '-6px'
     };
-    const weightLabelStyles = {
-        fontSize: '14px'
-    }
-    const weightValueStyles = {
-        fontSize: '15px',
+    const weightStyles = {
+        fontSize: '22px',
         fontWeight: 'bold'
     };
     const itemNameStyles = {
@@ -50,12 +45,11 @@ const Template1 = ({
     const huidStyles = {
         display: showHuid?'inline-block':'none',
         fontWeight: 'bold',
-        fontSize: '14px',
-        width: '60px'
+        fontSize: '17px'
     };
     const itemSizeStyles = {
-        width: '31px',
-        fontSize: '14px',
+        width: '34px',
+        fontSize: '16px',
         fontWeight: 'bold',
         display: showSize?'inline-block':'none'
     };
@@ -74,8 +68,8 @@ const Template1 = ({
                         </div>
                         <div className='row-2'>
                             <span style={{fontWeight: 'bold'}}>
-                                <span style={weightLabelStyles}>wt: </span>
-                                <span style={weightValueStyles}>{grams}</span>
+                                <span style={{fontSize: '22px'}}>wt: </span>
+                                <span style={weightStyles}>{grams}</span>
                             </span>
                         </div>
                     </div>
@@ -87,8 +81,8 @@ const Template1 = ({
                         </div>
                         <div className='row-2'>
                             <span style={{fontWeight: 'bold', paddingLeft: '3px'}}>
-                                <span style={weightLabelStyles}>wt: </span>
-                                <span style={weightValueStyles}>{grams}</span>
+                                <span style={{fontSize: '22px'}}>wt: </span>
+                                <span style={weightStyles}>{grams}</span>
                             </span>
                         </div>
                     </div>

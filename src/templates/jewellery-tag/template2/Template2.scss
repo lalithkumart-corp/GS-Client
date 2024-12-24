@@ -1,57 +1,80 @@
-
 .jewellery-tag-template-2-label {
-    width: 80mm;
-    height: 11.5mm;
-    font-family: monospace;
     background-color: lightgray;
-    display: inline-block;
-    line-height: 1;
+    font-family: auto;
+    width: 302px;
+    max-height: 43px;
+    line-height: 7px;
+    font-family: sans-serif;
+    font-weight: bold;
     .label-content-section {
-        width: 53mm;
-        height: 11.5mm;
-        display: flex;
-        .section-1, .section-2 {
-            width: 27mm;
-            height: 11.5mm;
-            display: inline-block;
-        }
+        width: 204px;
+        max-height: 43px;
+        margin-left: 2mm;
         .section-1 {
-            border-right: 1px dashed;
-            padding-left: 5px;
+            width: 102px;
+            display: inline-block;
+            vertical-align: top;
+            font-size: 10px;
             .row-1 {
-                height: 5mm;
-                display: inline-block;
-                .store-name-abbr {
+                height: 32.5px;
+                .track-id-div {
+                    width: 18px;
+                    transform: rotate(270deg); 
+                    transform-origin: 65% 65%;
                     display: inline-block;
+                    text-align: center;
                 }
-                .item-division {
+                .barcode-div {
+                    width: 62px;
                     display: inline-block;
+                    .barcode-span {
+                        svg {
+                            width: 62px;
+                            padding: 4px 0 0 0;
+                        }
+                        g {
+                            transform: translateX(10px); //translate(0,0);
+                        }
+                        svg > rect:first-child {
+                            height: 32px;
+                            // fill: lightgray;
+                        }
+                    }
+                }
+                .wsg-div {
+                    width: 20px;
+                    transform: rotate(270deg); 
+                    display: inline-block;
+                    text-align: center;
+                    font-size: 8px;
+                }
+                .product-id {
+                    position: absolute;
+                    top: 21px;
+                    left: 36px;
+                    font-size: 10px;
+                    max-width: 62px;
+                    text-align: center;
+                    min-width: 62px;
                 }
             }
             .row-2 {
-                display: inline-block;
-                .item-wt {
-                    display: inline-block;
-                }
+                height: 10.5px;
+                font-size: 8px;
+                text-align: center;
             }
         }
         .section-2 {
-            padding-left: 4px;
+            width: 102px;
+            display: inline-block;
+            font-size: 10px;
+            letter-spacing: 1px;
             .row-1 {
-                height: 5mm;
-                display: inline-block;
-                .item-size {
-                    display: inline-block;
-                }
-                .item-name {
-                    display: inline-block;
-                }
+                height: 32.5px;
+                padding-top: 3px;
             }
             .row-2 {
-                display: inline-block;
-                .item-wt {
-                    display: inline-block;
-                }
+                height: 10.5px;
             }
         }
     }
@@ -60,7 +83,35 @@
     .jewellery-tag-template-2-label {
         .label-content-section {
             .section-1 {
-                border: none;
+                .row-1 {
+                    .barcode-div {
+                        .barcode-span {
+                            svg > rect:first-child {
+                                // fill: white !important;
+                            }
+                        }
+                    }
+                    .product-id {
+                        left: 25px;
+                    }
+                }
+            }
+        }
+    }
+}
+
+// Custom CSS for tag - when displaying on TagSetup page 
+.jewellery-tag-template-setup-container {
+    .jewellery-tag-template-2-label {
+        .label-content-section {
+            .section-1 {
+                .row-1 {
+                    .barcode-span {
+                        svg > rect:first-child {
+                            fill: lightgray !important;
+                        }
+                    }
+                }
             }
         }
     }

@@ -47,6 +47,8 @@ const PROD_SGST_AMT = 'productSgstAmt';
 const PROD_IGST_AMT = 'productIgstAmt';
 const PROD_SGST_PERCENT = 'productSgstPercent';
 const PROD_IGST_PERCENT = 'productIgstPercent';
+const PROD_SALES_WST_PERCENT = 'productSalesWsgPercent';
+const PROD_SALES_MAKING_CHARGE = 'productSalesMakingCharge';
 const ADD_ENTRY = 'addEntry';
 const CONFIRM_ADD = 'confirmAdd';
 const UPDATE_ENTRY = 'updateEntry';
@@ -71,6 +73,8 @@ domList.add(PROD_PTOUCH, {type: 'formControl', enabled: true});
 domList.add(PROD_ITOUCH, {type: 'formControl', enabled: true});
 domList.add(PROD_LAB_CHARGES, {type: 'formControl', enabled: true});
 domList.add(PROD_LAB_CALC_UNIT, {type: 'formControl', enabled: false});
+domList.add(PROD_SALES_WST_PERCENT, {type: 'formControl', enabled: true});
+domList.add(PROD_SALES_MAKING_CHARGE, {type: 'formControl', enabled: true});
 domList.add(PROD_CGST_PERCENT, {type: 'formControl', enabled: true});
 domList.add(PROD_SGST_PERCENT, {type: 'formControl', enabled: true});
 domList.add(PROD_IGST_PERCENT, {type: 'formControl', enabled: true});
@@ -112,6 +116,8 @@ class AddStock extends Component {
                 productLabourCalcUnit: 'fixed',
                 calcLabourVal: '',
                 calcAmtWithLabour: '',
+                productSalesWsgPercent: null,
+                productSalesMakingCharge: null,
                 productCgstPercent: 1.5,
                 productCgstAmt: null,
                 productSgstPercent: 1.5,
@@ -205,6 +211,9 @@ class AddStock extends Component {
         newState.formData.productLabourCalcUnit = rowData.labourChargeUnit;
         newState.formData.calcLabourVal = rowData.labourChargeCalc;
         newState.formData.calcAmtWithLabour = null;//rowData.dealerStoreName;
+        
+        // TODO: for productSalesMakingCharge, productSalesWsgPercent
+        
         newState.formData.productCgstPercent = rowData.CgstPercent;
         newState.formData.productCgstAmt = rowData.CgstAmt;
         newState.formData.productSgstPercent = rowData.SgstPercent;
@@ -255,6 +264,8 @@ class AddStock extends Component {
                 case PROD_IGST_PERCENT:
                 case PROD_IGST_AMT:
                 case PROD_CODE_NO:
+                case PROD_SALES_WST_PERCENT:
+                case PROD_SALES_MAKING_CHARGE:
                     newState.formData[identifier] = val;
                     break;
                 case METAL_PRICE:
@@ -908,6 +919,8 @@ class AddStock extends Component {
                                 <col style={{width: "100px"}}></col>
 
                                 <col style={{width: "100px"}}></col>
+                                <col style={{width: "75px"}}></col>
+                                <col style={{width: "75px"}}></col>
                             </colgroup>
                             <thead>
                                 <tr>
@@ -919,9 +932,11 @@ class AddStock extends Component {
 
                                     <th>I-Touch</th>
                                     <th>I-wt</th>
-                                    <th>LAB/HM Charge</th>
+                                    <th>LAB/H.M Charge</th>
                                     
-                                    <th>Total</th>
+                                    <th>Sub Total</th>
+                                    <th>Sales Wsg %</th>
+                                    <th>Sales M.C</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -1083,6 +1098,34 @@ class AddStock extends Component {
                                                 placeholder="0"
                                                 value={`₹ `+ (this.state.formData.calcAmtWithLabour||0.00)}
                                                 readOnly={true}
+                                            />
+                                        </Form.Group>
+                                    </td>
+                                    <td>
+                                        <Form.Group>
+                                            <Form.Control
+                                                type="text"
+                                                placeholder=""
+                                                onChange={(e) => this.inputControls.onChange(null, e.target.value, PROD_SALES_WST_PERCENT)} 
+                                                onKeyUp={(e) => this.handleKeyUp(e, {currElmKey: PROD_SALES_WST_PERCENT})}
+                                                ref= {(domElm) => {this.domElmns[PROD_SALES_WST_PERCENT] = domElm; }}
+                                                value={this.state.formData.productSalesWsgPercent}
+                                                onFocus={(e)=> {e.target.select()}}
+                                                className="gs-input-cell"
+                                            />
+                                        </Form.Group>
+                                    </td>
+                                    <td>
+                                        <Form.Group>
+                                            <Form.Control
+                                                type="text"
+                                                placeholder=""
+                                                onChange={(e) => this.inputControls.onChange(null, e.target.value, PROD_SALES_MAKING_CHARGE)} 
+                                                onKeyUp={(e) => this.handleKeyUp(e, {currElmKey: PROD_SALES_MAKING_CHARGE})}
+                                                ref= {(domElm) => {this.domElmns[PROD_SALES_MAKING_CHARGE] = domElm; }}
+                                                value={this.state.formData.productSalesMakingCharge}
+                                                onFocus={(e)=> {e.target.select()}}
+                                                className="gs-input-cell"
                                             />
                                         </Form.Group>
                                     </td>

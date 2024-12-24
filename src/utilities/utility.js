@@ -281,3 +281,14 @@ export const displayNo = (numericVal, decimalLen) => {
         displayVal = parseInt(numericVal);
     return displayVal;
 }
+
+export const safeParseJson = (jsonStr) => {
+    if(!jsonStr) return null;
+    let returnVal = null;
+    try {
+        returnVal = JSON.parse(jsonStr);
+    } catch(e) {
+        returnVal = null;
+    }
+    return returnVal;
+}

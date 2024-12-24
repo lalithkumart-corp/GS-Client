@@ -1,26 +1,22 @@
 
 .jewellery-tag-template-1-label {
-    width: 80mm;
-    height: 11.5mm;
+    width: 475px;
+    height: 65px;
     font-family: monospace;
+    padding-left: 15px;
     background-color: lightgray;
-    display: inline-block;
-    line-height: 1;
     .label-content-section {
-        width: 53mm;
-        height: 11.5mm;
-        display: flex;
+        width: 317px;
+        height: 65px;
+        padding-left: 15px;
         .section-1, .section-2 {
-            width: 27mm;
-            height: 11.5mm;
+            width: 150px;
+            height: 65px;
             display: inline-block;
         }
         .section-1 {
-            border-right: 1px dashed;
-            padding-left: 5px;
             .row-1 {
-                height: 5mm;
-                display: inline-block;
+                height: 32px;
                 .store-name-abbr {
                     display: inline-block;
                 }
@@ -29,17 +25,15 @@
                 }
             }
             .row-2 {
-                display: inline-block;
+                height: 32px;
                 .item-wt {
                     display: inline-block;
                 }
             }
         }
         .section-2 {
-            padding-left: 4px;
             .row-1 {
-                height: 5mm;
-                display: inline-block;
+                height: 32px;
                 .item-size {
                     display: inline-block;
                 }
@@ -48,19 +42,10 @@
                 }
             }
             .row-2 {
-                display: inline-block;
+                height: 32px;
                 .item-wt {
                     display: inline-block;
                 }
-            }
-        }
-    }
-}
-@media print {
-    .jewellery-tag-template-1-label {
-        .label-content-section {
-            .section-1 {
-                border: none;
             }
         }
     }

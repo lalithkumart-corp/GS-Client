@@ -540,7 +540,7 @@ export default class ViewStock extends Component {
                     showBis: true,
                 },
                 productId: `${row.itemCode}${row.itemCodeNumber}`,
-                wsgPct: row.salesWsg || 0,
+                wsgPct: row.salesWsgPercent || 0,
                 trackId: row.id || 0
             });
         });
@@ -814,6 +814,8 @@ export default class ViewStock extends Component {
                         labourCharge: aStockItem.LabourCharge,
                         labourChargeUnit: aStockItem.LabourChargeUnit,
                         labourChargeCalc: aStockItem.LabourAmtCalc,
+                        salesMakingCharge: aStockItem.SalesMakingCharge,
+                        salesWsgPercent: aStockItem.SalesWsgPercent,
                         amount: aStockItem.Amount,
                         cgstPercent: aStockItem.CgstPercent,
                         cgstAmt: aStockItem.CgstAmt,

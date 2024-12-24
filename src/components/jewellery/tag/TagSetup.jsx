@@ -8,6 +8,7 @@ import './TagSetup.scss';
 import _ from 'lodash';
 import { toast } from 'react-toastify';
 import ReactToPrint from 'react-to-print';
+import { safeParseJson } from '../../../utilities/utility';
 
 const TagSetup = () => {
     let btnRef = useRef();
@@ -58,8 +59,10 @@ const TagSetup = () => {
     const onClickUpdate = async () => {
         try {
             let resp = await axiosMiddleware.put(UPDATE_JEWELLERY_TAG_SETTINGS, {selectedTemplateId, storeNameAbbr: storeName});
-            if(resp && resp.data && resp.data.STATUS == 'SUCCESS') toast.success('Updated Successfully');
-            else {
+            if(resp && resp.data && resp.data.STATUS == 'SUCCESS') {
+                toast.success('Updated Successfully. Logout + Login again to reflect');
+                //TODO: update cookie
+            } else {
                 console.log(e);
                 toast.error('Error while update the tag selection.');
             }
@@ -94,8 +97,13 @@ const TagSetup = () => {
             if(aTemplate.template_id == selectedTemplateId) {
                 checked = true;
                 console.log('CHECKED = ', aTemplate.template_id );
-                if(aTemplate.store_name_abbr != storeName)
+                if(aTemplate.store_name_abbr && aTemplate.store_name_abbr != storeName)
                     setStoreNameAbbr(aTemplate.store_name_abbr);
+            }
+            let labelStr = aTemplate.template_id;
+            let paramertsJson = safeParseJson(aTemplate.parameters_json);
+            if(paramertsJson) {
+                labelStr = `${paramertsJson.labelWidth}MM X ${paramertsJson.labelHeight}MM`;
             }
             list.push(
                 <Col xs={6} md={6}>
@@ -108,7 +116,9 @@ const TagSetup = () => {
                         />
                     <div className="jewellery-tag-radio-btn-label">
                         <input type="radio" id={`jewellery-tag-template-id-${aTemplate.template_id}`} name="jewellery-tag-template" onChange={(e)=>onChangeTemplateSelection(e, aTemplate.template_id)} value={aTemplate.template_id} checked={checked}/>
-                        <label for={`jewellery-tag-template-id-${aTemplate.template_id}`}>{aTemplate.template_id}</label>
+                        <label for={`jewellery-tag-template-id-${aTemplate.template_id}`} style={{marginLeft: '7px'}}>
+                            {labelStr}
+                        </label>
                     </div>
                 </Col>
             )
