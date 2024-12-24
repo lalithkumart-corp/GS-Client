@@ -1,11 +1,26 @@
 .jewellery-gst-bill-paper.template2 {
     display: none;
-    font-size: 17px;
-    width: 1050px;
-    min-height: 685px;
-    max-height: 685px;
-    .store-name {
-        color: red;
+    font-size: 12px;
+    min-width: 793px;
+    max-width: 793px;
+    min-height: 560px;
+    max-height: 560px;
+    padding-top: 30px;
+    outline: 1px dashed deeppink;
+    .inner-section {
+        border: 1px solid;
+        margin-left: 20px;
+        margin-right: 20px;
+        .top-store-header-panel {
+            line-height: 18px;
+        }
+        .store-name {
+            color: red;
+        }
+        .old-orn-and-price-totals-panel {
+            min-height: 85px;
+            max-height: 85px;
+        }
     }
 }
 
@@ -25,10 +40,12 @@
     }
     .jewellery-gst-bill-paper.template2 {
         display: block;
-        font-size: 17px;
-        width: 1195px;
-        min-height: 765px;
-        max-height: 765px;
+        font-size: 12px;
+        min-width: 793px;
+        max-width: 793px;
+        min-height: 560px;
+        max-height: 560px;
+        outline: none;
         .store-name {
             color: red !important;
         }

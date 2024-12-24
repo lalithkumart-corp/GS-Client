@@ -5,6 +5,7 @@ import GSCheckbox from '../../../components/ui/gs-checkbox/checkbox';
 import _ from 'lodash';
 import './Template3.scss';
 import { currencyFormatter, formatNo } from '../../../utilities/utility';
+import convertor from 'rupees-to-words';
 
 const DEFAULT_TEMPLATE_STRUC = {
     ornaments: [],
@@ -25,18 +26,33 @@ const DEFAULT_TEMPLATE_STRUC = {
     }
 }
 
-function EstimateBillTemplate3(props) {
+function GstBillTemplate3(props) {
 
     let [printContent, setPrintContent] = useState(props.printContent || DEFAULT_TEMPLATE_STRUC);
+    let [customArgs, setCustomArgs] = useState(props.customArgs || {});
 
     useEffect(() => {
         if(props.printContent && Object.keys(props.printContent).length)
             setPrintContent(props.printContent);
     }, [props.printContent]);
 
+    useEffect(() => {
+        if(props.customArgs && Object.keys(props.customArgs).length)
+            setCustomArgs(props.customArgs);
+    }, [props.customArgs]);
+
     const _formatNo = (number, decimals) => {
         return  new Number(number+'').toFixed(parseInt(decimals));
     }
+
+    const _isItemTypeGold = () => {
+        return printContent.ornaments[0].itemType == 'G';
+    }
+
+    const _isItemTypeSilver = () => {
+        return printContent.ornaments[0].itemType == 'S';
+    }
+
     const constructHeader = () => {
         let leftSection = [];
         let middleSection = [];
@@ -100,7 +116,8 @@ function EstimateBillTemplate3(props) {
             fontSize: "16px"
         }
         let gstStyle = {
-            fontSize: "16px"
+            fontSize: "16px",
+            visibility: (customArgs.displayGstNumber == 'false' || customArgs.displayGstNumber == false)?'hidden': 'visible'
         }
         let rightImgColStyles = {
             position: 'absolute',
@@ -123,7 +140,10 @@ function EstimateBillTemplate3(props) {
                 <><span className="store-name" style={storeNameStyles}>{strNme}</span></>  <br></br>
                 <><span className="full-addr-line" style={addressLineStyle}>{addressLine}</span></> <br></br>
                 <>   
-                    {mobileLine && <span className="mobile-no" style={mobileStyle}>{mobileLine} </span>}
+                    {mobileLine && <span className="mobile-no" style={mobileStyle}>{mobileLine}, </span>}
+                    {/* {(customArgs.displayGstNumber == 'false' || customArgs.displayGstNumber == false) ? <></> 
+                    : printContent.gstNumber && <span className="gst-no" style={gstStyle}>GST: {printContent.gstNumber}</span>} */}
+                    {printContent.gstNumber && <span className="gst-no" style={gstStyle}>GST: {printContent.gstNumber}</span>}
                 </>
             </Col>
         )
@@ -141,57 +161,86 @@ function EstimateBillTemplate3(props) {
     }
 
     const _constructOrnBody = () => {
+        let wstValDecimals = 3;
+        if(printContent.decimals && printContent.decimals.wstVal) wstValDecimals = printContent.decimals.wstVal;
+
         let spans = {
-            itemName: 9,
-            division: 3,
-            qty: 1,
-            netWt: 2,
-            wastage: 2,
-            rate: 2,
-            makingCharge: 2,
-            amt: 2,
-            discount: 2,
-            netAmt: 3
+            part1: {
+                _span: 5,
+                sno: 1,
+                hsn: 2,
+                itemName: 8,
+                qty: 1,
+            },
+            part2: {
+                _span: 3,
+                netWt: 4,
+                grossWt: 4,
+                wastage: 4,
+            },
+            part3: {
+                _span: 4,
+                rate: 3,
+                makingCharge: 3,
+                netAmt: 6,
+            },
+            // sno: 1,
+            // itemName: 9,
+            // hsn: 2,
+            // qty: 1,
+            // netWt: 1,
+            // grossWt: 1,
+            // wastage: 2,
+            // rate: 2,
+            // makingCharge: 1,
+            // amt: 2,
+            // discount: 2,
+            // netAmt: 2
         }
 
         let totalNetWt = 0;
+        let totalGrossWt = 0;
         let ornTableHeader = 
             <>
-                <Row  style={{fontWeight: 'bold', borderBottom: '1px solid grey'}} className="orn-table-header">
-                    <Col xs={5}>
+                <Row  style={{fontWeight: 'bold', borderBottom: '1px solid grey', paddingLeft: '10px', paddingRight: '10px'}} className="orn-table-header">
+                    <Col xs={spans.part1._span}>
                         <Row>
-                            <Col xs={spans.itemName} className="no-padding">
-                                Item Name
+                            <Col xs={spans.part1.sno} className="no-padding">
+                                S.N
                             </Col>
-                            <Col xs={spans.division} className="no-padding">
-                                Division
+                            <Col xs={spans.part1.hsn} className="no-padding">
+                                HSN
+                            </Col>
+                            <Col xs={spans.part1.itemName} className="no-padding">
+                                Description
+                            </Col>
+                            <Col xs={spans.part1.qty} className="no-padding">
+                                Qty
                             </Col>
                         </Row>
                     </Col>
-                    <Col xs={7}>
+                    <Col xs={spans.part2._span}>
                         <Row>
-                            <Col xs={spans.qty} className="no-padding">
-                                Qty
+                            <Col xs={spans.part2.grossWt} className="no-padding">
+                                Gr.Wt
                             </Col>
-                            <Col xs={spans.netWt} className="no-padding">
-                                N.Wt(gm)
+                            <Col xs={spans.part2.netWt} className="no-padding">
+                                Nt.Wt
                             </Col>
-                            <Col xs={spans.wastage} className="no-padding">
-                                W.A(gm)
+                            <Col xs={spans.part2.wastage} className="no-padding">
+                                V.A gms
                             </Col>
-                            <Col xs={spans.rate} className="no-padding">
+                        </Row>
+                    </Col>
+                    <Col xs={spans.part3._span}>
+                        <Row>
+                            <Col xs={spans.part3.rate} className="no-padding">
                                 Rate(₹)
                             </Col>
-                            <Col xs={spans.makingCharge} className="no-padding">
+                            <Col xs={spans.part3.makingCharge} className="no-padding">
                                 M.C(₹)
                             </Col>
-                            {/* <Col xs={spans.amt} className="no-padding">
-                                Amt
-                            </Col>
-                            <Col xs={spans.discount} className="no-padding">
-                                Discount
-                            </Col> */}
-                            <Col xs={spans.netAmt} className="no-padding">
+                            <Col xs={spans.part3.netAmt} className="no-padding">
                                 Net Amt (₹)
                             </Col>
                         </Row>
@@ -201,46 +250,48 @@ function EstimateBillTemplate3(props) {
         let ornBody = [];
         _.each(printContent.ornaments, (anOrn, index) => {
             totalNetWt += anOrn.netWt;
+            totalGrossWt += anOrn.grossWt;
             ornBody.push(<>
-                <Row>
-                    <Col xs={5}>
+                <Row style={{paddingLeft: '10px', paddingRight: '10px'}}>
+                    <Col xs={spans.part1._span}>
                         <Row>
-                            <Col xs={spans.itemName} className="no-padding" style={{fontSize: '16px', fontWeight: 'bold'}}>
+                            <Col xs={spans.part1.sno} className="no-padding">
+                                {index+1}
+                            </Col>
+                            <Col xs={spans.part1.hsn} className="no-padding">
+                                {printContent.hsCode}
+                            </Col>
+                            <Col xs={spans.part1.itemName} className="no-padding" style={{fontSize: '12px', fontWeight: 'bold'}}>
                                 {anOrn.itemType} {anOrn.title} {anOrn.huid?`- ${anOrn.huid}`:''}
                             </Col>
-                            {/* <Col xs={spans.pcs} className="no-padding">
-                                {anOrn.quanity}
-                            </Col> */}
-                            <Col xs={spans.division} className="no-padding">
-                                {anOrn.division}
+                            <Col xs={spans.part1.qty} className="no-padding">
+                                {anOrn.qty}
                             </Col>
                         </Row>
                     </Col>
-                    <Col xs={7}>
+                    <Col xs={spans.part2._span}>
                         <Row>
-                            <Col xs={spans.qty} className="no-padding">
-                                {anOrn.qty}
+                            <Col xs={spans.part2.grossWt} className="no-padding">
+                                {formatNo(anOrn.grossWt,3, {returnType: 'string'})}
                             </Col>
-                            <Col xs={spans.netWt} className="no-padding">
+                            <Col xs={spans.part2.netWt} className="no-padding">
                                 {formatNo(anOrn.netWt,3, {returnType: 'string'})}
                             </Col>
-                            <Col xs={spans.wastage} className="no-padding">
-                                {formatNo(anOrn.wastageVal,3, {returnType: 'string'})}
+                            <Col xs={spans.part2.wastage} className="no-padding">
+                                {formatNo(anOrn.wastageVal, wstValDecimals, {returnType: 'string'})}
                             </Col>
-                            <Col xs={spans.rate} className="no-padding">
+                        </Row>
+                    </Col>
+                    <Col xs={spans.part3._span}>
+                        <Row>
+                            <Col xs={spans.part3.rate} className="no-padding">
                                 {currencyFormatter(formatNo(anOrn.pricePerGm,2))}
                             </Col>
-                            <Col xs={spans.makingCharge} className="no-padding">
-                                {currencyFormatter(formatNo(anOrn.makingCharge))}
+                            <Col xs={spans.part3.makingCharge} className="no-padding">
+                                {currencyFormatter(formatNo(anOrn.makingCharge||''))}
                             </Col>
-                            {/* <Col xs={spans.amt} className="no-padding">
-                                {anOrn.amount}
-                            </Col>
-                            <Col xs={spans.discount} className="no-padding">
-                                {anOrn.discount}
-                            </Col> */}
-                            <Col xs={spans.netAmt} className="no-padding">
-                                {currencyFormatter(formatNo(anOrn.priceOfOrn, 2, {returnType: 'string'}))}
+                            <Col xs={spans.part3.netAmt} className="no-padding">
+                                {currencyFormatter(formatNo(anOrn.initialPrice, 2, {returnType: 'string'}))}
                             </Col>
                         </Row>
                     </Col>
@@ -257,22 +308,27 @@ function EstimateBillTemplate3(props) {
         ornFooter.push(
             <>
                 <Row style={{fontWeight: 'bold', borderTop: '1px solid lightgray'}}>
-                    <Col xs={5}>
+                    <Col xs={spans.part1._span}>
                         <Row>
-                            <Col xs={spans.itemName} className="no-padding">
+                            <Col xs={spans.part1.sno}></Col>
+                            <Col xs={spans.part1.hsn + spans.part1.itemName + spans.part1.qty} className="no-padding">
                                 Total: {itemsQty} item(s)
+                            </Col> 
+                        </Row>
+                    </Col>
+                    <Col xs={spans.part2._span}>
+                        <Row>
+                            <Col xs={{span: spans.part2.grossWt}} className="no-padding">
+                                {formatNo(totalGrossWt||0, 3, {returnType: 'string'})}
+                            </Col>
+                            <Col xs={{span: spans.part2.netWt}} className="no-padding">
+                                {formatNo(totalNetWt||0, 3, {returnType: 'string'})}
                             </Col>
                         </Row>
                     </Col>
-                    <Col xs={7}>
+                    <Col xs={spans.part3._span}>
                         <Row>
-                            <Col xs={spans.qty} className="no-padding">
-                                
-                            </Col>
-                            <Col xs={{span: spans.netWt}} className="no-padding">
-                                {formatNo(totalNetWt||0, 3, {returnType: 'string'})}
-                            </Col>
-                            <Col xs={{span: spans.netAmt, offset: 6}} className="no-padding">
+                            <Col xs={{span: spans.part3.netAmt, offset: spans.part3.makingCharge+spans.part3.rate}} className="no-padding">
                                 ₹: {currencyFormatter(formatNo(printContent.calculations.totalInitialPrice,2, {returnType: 'string'}))}
                             </Col>
                         </Row>
@@ -281,16 +337,16 @@ function EstimateBillTemplate3(props) {
             </>
         )
 
-        return <div style={{marginTop: '20px', paddingLeft: '10px', paddingRight: '10px'}}>
+        return <div>
             {ornTableHeader}
-            <div style={{minHeight: '200px'}}>{ornBody}</div>
+            <div className='orn-tbl-body-div'>{ornBody}</div>
             {ornFooter}
         </div>
     }
 
     const _constructOldPurchaseDom = () => {
         return <Row>
-                    {Object.keys(printContent.oldOrnaments).length ?
+                    {(Object.keys(printContent.oldOrnaments).length && printContent.oldOrnaments.netWt > 0)?
                     <div style={{paddingLeft: '10px', paddingRight: '10px', width: '90%', margin: '0 auto'}}>
                         <Col xs={12}>
                             <Row>
@@ -317,8 +373,21 @@ function EstimateBillTemplate3(props) {
     }
 
     const _constructPricingDom = () => {
-        return <div style={{fontSize: '16px', minHeight: '130px'}}>
-            <Row>
+        return <div style={{fontSize: '12px', minHeight: '90px'}}>
+                {printContent.calculations.totalDiscount ? 
+                <Row>
+                    <Col xs={{span: 6}} className="no-padding">
+                        (-) Less:
+                    </Col>
+                    <Col xs={2} style={{textAlign: 'right'}}>
+                        ₹:
+                    </Col>
+                    <Col xs={{span: 4}} className="no-padding">
+                        {currencyFormatter(formatNo(printContent.calculations.totalDiscount,2, {returnType: 'string'}))}
+                    </Col>
+                </Row>
+                : <></>}
+                <Row>
                     <Col xs={{span: 6}} className="no-padding">
                         SGST 1.5%
                     </Col>
@@ -351,23 +420,10 @@ function EstimateBillTemplate3(props) {
                         {currencyFormatter(formatNo(printContent.calculations.totalExchangeFinalPrice,2, {returnType: 'string'}))}
                     </Col>
                 </Row>:<></>}
-                {printContent.calculations.totalDiscount ? 
-                <Row>
-                    <Col xs={{span: 6}} className="no-padding">
-                        (-) Less:
-                    </Col>
-                    <Col xs={2} style={{textAlign: 'right'}}>
-                        ₹:
-                    </Col>
-                    <Col xs={{span: 4}} className="no-padding">
-                        {currencyFormatter(formatNo(printContent.calculations.totalDiscount,2, {returnType: 'string'}))}
-                    </Col>
-                </Row>
-                : <></>}
                 {printContent.calculations.roundedOffVal ?
                 <Row>
                     <Col xs={{span: 6}} className="no-padding">
-                        Round Off:
+                        Round Off (+/-)
                     </Col>
                     <Col xs={2} style={{textAlign: 'right'}}>
                         ₹:
@@ -377,7 +433,7 @@ function EstimateBillTemplate3(props) {
                     </Col>
                 </Row>
                 : <></>}
-                <Row style={{fontSize: '18px', fontWeight: 'bold'}}>
+                <Row style={{fontSize: '12px', fontWeight: 'bold'}}>
                     <Col xs={{span: 6}} className="no-padding">
                         Grand Total
                     </Col>
@@ -421,50 +477,71 @@ function EstimateBillTemplate3(props) {
             </div>
     }
 
-    const constructBody = () => {
-        let barCode = <>
-            <Row>
-                <Col xs={12} style={{textAlign: 'center'}}>
-                    <span style={{width: '50px'}}>
-                        <Barcode value={printContent.billNo} width={1} fontSize={20} height={25} displayValue={false}/>
+    const getPaymentInfoDom = () => {
+        let dom = [<span>Mode of Payment: </span>];
+        if(printContent.paymentSelectionCardData && printContent.paymentSelectionCardData.mode) {
+            let mode = printContent.paymentSelectionCardData.mode;
+            if(mode == 'mixed') {
+                dom.push(<>
+                    <span className='a-payment-mode-val'>
+                        CASH - Rs:{printContent.paymentSelectionCardData.mixed.cash.value}
                     </span>
-                </Col>
-            </Row>
-        </>
+                    <span className='a-payment-mode-val'>
+                        ONLINE - Rs:{printContent.paymentSelectionCardData.mixed.online.value}
+                    </span>
+                </>
+                )
+            } else {
+                dom.push(
+                    <span className='a-payment-mode-val'>
+                        {mode.toUpperCase()} - Rs:{printContent.paymentSelectionCardData[mode].value}
+                    </span>
+                )
+            }
+        } else {
+            dom.push(<span className='a-payment-mode-val'>
+                {printContent.paymentFormData?.paid}
+            </span>)
+        }
+        return <div><>{dom}</></div>;
+    }
+
+    const constructBody = () => {
         let custInfo = <>
             <Row>
-                <Col xs={3}>INVOICE NO: </Col>
-                <Col xs={9} style={{position: 'relative'}}>
-                    {printContent.billNo} 
-                    <span style={{width: '50px', position: 'absolute', top: '-14px', marginLeft: '10px'}}>
-                        <Barcode value={printContent.billNo} width={1} fontSize={20} height={25} displayValue={false}/>
-                    </span>
-                </Col>
+                <Col xs={3}>Customer: </Col>
+                <Col xs={9}>{printContent.address}</Col>
             </Row>
             <Row>
-                <Col xs={3}>CUSTOMER: </Col>
+                <Col xs={3}>Address: </Col>
                 <Col xs={9}>{printContent.customerName}</Col>
             </Row>
             <Row>
-                <Col xs={3}>MOBILE: </Col>
+                <Col xs={3}>Mobile: </Col>
                 <Col xs={9}>{(printContent.customerMobile && printContent.customerMobile!== 'null')?printContent.customerMobile:''}</Col>
             </Row>
         </>
         let rateAndDate = <>
             <Row>
-                <Col xs={4} style={{paddingLeft: 0}}>DATE:</Col>
+                <Col xs={4} style={{paddingLeft: 0}}>Bill No: </Col>
+                <Col xs={6} style={{position: 'relative'}}>
+                    {printContent.billNo} 
+                </Col>
+            </Row>
+            <Row>
+                <Col xs={4} style={{paddingLeft: 0}}>Date:</Col>
                 <Col xs={6}>{printContent.dateVal}</Col>
             </Row>
             <Row>
                 {printContent.ornaments && printContent.ornaments.length > 0 && <>
                     <Col xs={4} style={{paddingLeft: 0, paddingRight: 0}}>
-                        {printContent.ornaments[0].itemType == 'G' && 'Gold Rate'}
-                        {printContent.ornaments[0].itemType == 'S' && 'Silver Rate'}
+                        {_isItemTypeGold() && 'Gold Rate'}
+                        {_isItemTypeSilver() && 'Silver Rate'}
                     </Col>
                     <Col xs={6}>
                         ₹ &nbsp;
-                        {printContent.ornaments[0].itemType == 'G' && currencyFormatter(printContent.goldRatePerGm)}
-                        {printContent.ornaments[0].itemType == 'S' && currencyFormatter(printContent.silverRatePerGm)}
+                        {_isItemTypeGold() && currencyFormatter(printContent.goldRatePerGm)}
+                        {_isItemTypeSilver() && currencyFormatter(printContent.silverRatePerGm)}
                     </Col>
                 </>}
             </Row>
@@ -472,25 +549,29 @@ function EstimateBillTemplate3(props) {
                 <Col xs={6}>Silver Rate</Col>
                 <Col xs={6}>{printContent.silverRatePerGm}</Col>
             </Row> */}
-            <Row>
+            {/* <Row>
                 <Col xs={4} style={{paddingLeft: 0}}>HSN NO:</Col>
                 <Col xs={6}>{printContent.hsCode}</Col>
-            </Row>
+            </Row> */}
         </>
 
         let ornBody = _constructOrnBody();
         let oldPurchaseDom = _constructOldPurchaseDom();
         let pricingDetailDom = _constructPricingDom();
         return <Col xs={12}>
-                    <Row>
-                        <Col xs={8}>
-                            {custInfo}
-                        </Col>
-                        {/* <Col xs={4}>
-                            
-                        </Col> */}
-                        <Col xs={4}>
-                            {rateAndDate}
+                    <Row className={'customer-info-div'}>
+                        <Col xs={12}>
+                            <Row>
+                                <Col xs={8}>
+                                    {custInfo}
+                                </Col>
+                                {/* <Col xs={4}>
+                                    
+                                </Col> */}
+                                <Col xs={4}>
+                                    {rateAndDate}
+                                </Col>
+                            </Row>
                         </Col>
                     </Row>
                     <Row>
@@ -498,13 +579,19 @@ function EstimateBillTemplate3(props) {
                             {ornBody}
                         </Col>
                     </Row>
-                    <Row>
-                        <Col xs={7} style={{marginTop: '20px'}}>
+                    <Row className="old-orn-and-price-totals-panel">
+                        <Col xs={7} style={{marginTop: '20px'}} className="old-orn-div">
                             {oldPurchaseDom}
                         </Col>
-                        <Col xs={5}>
+                        <Col xs={5} className="price-totals-div">
                             {pricingDetailDom}
                         </Col>
+                    </Row>
+                    <Row className="payment-mode-div">
+                        {getPaymentInfoDom()}
+                    </Row>
+                    <Row className="amount-in-words-div">
+                        <span>In Words: {convertor(printContent.calculations.grandTotal || 0)}</span>
                     </Row>
                 </Col>
     }
@@ -535,18 +622,18 @@ function EstimateBillTemplate3(props) {
 
     const getDom = () => {
         let dom = [];
-        let headerDom = constructHeader();
+        // let headerDom = constructHeader();
         let bodyDom = constructBody();
-        let footerDom = constructFooter();
+        // let footerDom = constructFooter();
         return <> 
-                <Row style={{position: 'relative', fontSize: '19px'}}>{headerDom}</Row>
-                <Row style={{marginTop: '23px'}}>{bodyDom}</Row>
-                <Row>{footerDom}</Row>
+                <Row style={{position: 'relative', fontSize: '19px', minHeight: '132px', visibility: 'hidden'}}></Row>
+                <Row style={{minHeight: '362px', maxHeight: '362px', border: '1px solid'}}>{bodyDom}</Row>
+                <Row style={{minHeight: '54px', maxHeight: '54px'}} className='bottom-signature-box'></Row>
             </>;
     }
 
     return (
-        <div className={`jewellery-estimate-bill-paper template3 ${printContent?'has-printcontent':''}`}>
+        <div className={`jewellery-gst-bill-paper template3 ${printContent?'has-printcontent':''}`}>
             <Row className="inner-section">
                 <Col xs={12}>
                     {getDom()}
@@ -556,4 +643,4 @@ function EstimateBillTemplate3(props) {
     )
 }
 
-export default EstimateBillTemplate3;
+export default GstBillTemplate3;

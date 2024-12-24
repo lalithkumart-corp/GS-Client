@@ -538,7 +538,10 @@ export default class ViewStock extends Component {
                 huid: row.itemHuid,
                 config: {
                     showBis: true,
-                }
+                },
+                productId: `${row.itemCode}${row.itemCodeNumber}`,
+                wsgPct: row.salesWsg || 0,
+                trackId: row.id || 0
             });
         });
         return dataArr;
@@ -779,6 +782,7 @@ export default class ViewStock extends Component {
                 _.each(resp.data.STOCK_LIST, (aStockItem, index) => {
                     newState.stockList.push({
                         rowNumber: index,
+                        id: aStockItem.Id,
                         uid: aStockItem.UID,
                         itemCode: aStockItem.ItemCode || '',
                         itemCodeNumber: aStockItem.ItemCodeNumber,

@@ -23,6 +23,7 @@ const ENTER_KEY = 13;
 var domList = new DoublyLinkedList();
 domList.add('goldRatePerGm', {type: 'formControl', enabled: true});
 domList.add('silverRatePerGm', {type: 'formControl', enabled: true});
+domList.add('templateId', {type: 'formControl', enabled: true});
 domList.add('billSeries', {type: 'formControl', enabled: true});
 domList.add('billNo', {type: 'formControl', enabled: true});
 // domList.add('date', {type: 'datePicker', enabled: true});
@@ -163,6 +164,7 @@ function GstBillingDemo() {
     let [customerName, setCustomerName] = useState('');
     let [cusomertAddr, setCusomertAddr] = useState('');
     let [customerMobile, setCustomerMob] = useState(null);
+    let [templateId, setTemplateId] = useState(2);
     let [templateContent, setTemplateContent] = useState(null);
     let [ornData, setOrnaments] = useState(  JSON.parse(JSON.stringify(defaultOrn))  );
 
@@ -267,7 +269,6 @@ function GstBillingDemo() {
                 };
                 break;
             case 'discount':
-                debugger;
                 if(options) {
                     let newOrnData = {...ornData};
                     newOrnData[options.row][options.col] = val;
@@ -294,6 +295,9 @@ function GstBillingDemo() {
                 break;
             case 'sgstPercent':
                 setSgstPercent(val);
+                break;
+            case 'templateId':
+                setTemplateId(val);
                 break;
         }
     }
@@ -588,7 +592,7 @@ function GstBillingDemo() {
         for(let i=0; i<rowsCount; i++) {
             rows.push(
                 <Row className="orn-input-row">
-                    <Col xs={6}>
+                    <Col xs={5}>
                         <Row>
                             <Col xs={3} className="no-padding">
                                 <input type="text" className="gs-input" value={ornData[i].title} onChange={(e) => onChange(e.target.value, 'orn', {row:i, col: 'title'} )} style={{width: '100%'}}
@@ -630,13 +634,13 @@ function GstBillingDemo() {
                     </Col>
                     <Col xs={4}>
                         <Row>
-                            <Col xs={{span: 2}} className="no-padding">
+                            <Col xs={{span: 3}} className="no-padding">
                                 <input type="number" className="gs-input" value={ornData[i].wst} onChange={(e) => onChange(parseFloat(e.target.value), 'wst', {row:i, col: 'wst'} )} style={{width: '100%'}}
                                     ref= {(domElm) => {domElmns["wst"+i] = domElm; }}
                                     onKeyUp = {(e) => handleKeyUp(e, {currElmKey: "wst"+i}) }
                                     onFocus={handleFocus}/>
                             </Col>
-                            <Col xs={2} className="no-padding">
+                            <Col xs={4} className="no-padding">
                                 <input type="number" className="gs-input" value={ornData[i].wstVal} onChange={(e) => onChange(parseFloat(e.target.value), 'wstVal', {row:i, col: 'wstVal'} )} style={{width: '100%'}}
                                     ref= {(domElm) => {domElmns["wstVal"+i] = domElm; }}
                                     onKeyUp = {(e) => handleKeyUp(e, {currElmKey: "wstVal"+i}) }
@@ -648,12 +652,16 @@ function GstBillingDemo() {
                                     onKeyUp = {(e) => handleKeyUp(e, {currElmKey: "mc"+i}) }
                                     onFocus={handleFocus}/>
                             </Col>
-                            <Col xs={2} className="no-padding">
+                            <Col xs={3} className="no-padding">
                                 <input type="number" className="gs-input" value={ornData[i].discount} onChange={(e) => onChange(parseFloat(e.target.value), 'discount', {row:i, col: 'discount'} )} style={{width: '100%'}}
                                     ref= {(domElm) => {domElmns["discount"+i] = domElm; }}
                                     onKeyUp = {(e) => handleKeyUp(e, {currElmKey: "discount"+i}) }
                                     onFocus={handleFocus}/>
                             </Col>
+                        </Row>
+                    </Col>
+                    <Col xs={3} className='no-padding' style={{textAlign: 'center'}}>
+                        <Row>
                             <Col xs={2} className="no-padding">
                                 <input type="number" className="gs-input" value={ornData[i].cgst} onChange={(e) => onChange(parseFloat(e.target.value), 'cgst', {row:i, col: 'cgst'} )} style={{width: '100%'}}
                                     ref= {(domElm) => {domElmns["cgst"+i] = domElm; }}
@@ -666,11 +674,7 @@ function GstBillingDemo() {
                                     onKeyUp = {(e) => handleKeyUp(e, {currElmKey: "sgst"+i}) }
                                     onFocus={handleFocus}/>
                             </Col>
-                        </Row>
-                    </Col>
-                    <Col xs={2} className='no-padding' style={{textAlign: 'center'}}>
-                        <Row>
-                            <Col xs={8} className="no-padding">
+                            <Col xs={6} className="no-padding">
                                 <input type="number" className="gs-input" value={ornData[i].price} onFocus={(e)=>onFocusPriceVal(i, null, e)} onChange={(e) => onChange(e.target.value, 'price', {row:i, col: 'price'} )} style={{width: '100%'}}
                                     ref= {(domElm) => {domElmns["price"+i] = domElm; }}
                                     onKeyUp = {(e) => handleKeyUp(e, {currElmKey: "price"+i, row: i, col: 'price'}) }/>
@@ -694,7 +698,7 @@ function GstBillingDemo() {
     let getTotalsRow = () => {
         return (
             <Row className="orn-totals-row">
-                <Col xs={6}>
+                <Col xs={5}>
                     <Row>
                         <Col xs={3} className="no-padding">
                         </Col>
@@ -714,26 +718,26 @@ function GstBillingDemo() {
                 </Col>
                 <Col xs={4}>
                     <Row>
-                        <Col xs={{span: 2}} className="no-padding">
+                        <Col xs={{span: 3}} className="no-padding">
                             {/* <input type="number" className="gs-input" value={totalsCalc.wst} readOnly style={{width: '100%'}}/> */}
                         </Col>
-                        <Col xs={2} className="no-padding">
+                        <Col xs={4} className="no-padding">
                         </Col>
                         <Col xs={2} className="no-padding">
                             <input type="number" className="gs-input" value={totalsCalc.mc} readOnly style={{width: '100%'}}/>
                         </Col>
-                        <Col xs={2} className="no-padding">
+                        <Col xs={3} className="no-padding">
                             <input type="number" className="gs-input" value={totalsCalc.discount} readOnly style={{width: '100%'}}/>
-                        </Col>
-                        <Col xs={2} className="no-padding">
-                        </Col>
-                        <Col xs={2} className="no-padding">
                         </Col>
                     </Row>
                 </Col>
-                <Col xs={2} className='no-padding' style={{textAlign: 'center'}}>
+                <Col xs={3} className='no-padding' style={{textAlign: 'center'}}>
                     <Row>
-                        <Col xs={8} className="no-padding">
+                        <Col xs={2} className="no-padding">
+                        </Col>
+                        <Col xs={2} className="no-padding">
+                        </Col>
+                        <Col xs={6} className="no-padding">
                             <input type="number" className="gs-input" value={totalsCalc.price} readOnly style={{width: '100%'}}/>
                         </Col>
                     </Row>
@@ -811,6 +815,19 @@ function GstBillingDemo() {
                                     onChange={(e) => onChange(e.target.value, 'silverRatePerGm')}
                                     onKeyUp = {(e) => handleKeyUp(e, {currElmKey: 'silverRatePerGm'}) }
                                     ref={(domElm) => { domElmns.silverRatePerGm = domElm; }}
+                                />
+                            </FormGroup>
+                        </Col>
+                        <Col xs={2} md={2}>
+                            <FormGroup>
+                                <FormLabel>Template Id</FormLabel>
+                                <FormControl
+                                    type="number"
+                                    placeholder=""
+                                    value={templateId}
+                                    onChange={(e) => onChange(e.target.value, 'templateId')}
+                                    onKeyUp = {(e) => handleKeyUp(e, {currElmKey: 'templateId'}) }
+                                    ref={(domElm) => { domElmns.templateId = domElm; }}
                                 />
                             </FormGroup>
                         </Col>
@@ -896,7 +913,7 @@ function GstBillingDemo() {
                     <Row style={{padding: '0 15px', marginTop: '10px'}}>
                         <Col xs={12}>
                             <Row style={{fontWeight: "bold"}}>
-                                <Col xs={6}>
+                                <Col xs={5}>
                                     <Row>
                                         <Col xs={3} className="no-padding">
                                             <span> Title </span>
@@ -920,29 +937,29 @@ function GstBillingDemo() {
                                 </Col>
                                 <Col xs={4}>
                                     <Row>
-                                        <Col xs={{span: 2}} className="no-padding">
+                                        <Col xs={{span: 3}} className="no-padding">
                                             <span> Wsg % </span>
                                         </Col>
-                                        <Col xs={2} className="no-padding">
+                                        <Col xs={4} className="no-padding">
                                             <span> Wsg(gm) </span>
                                         </Col>
                                         <Col xs={2} className="no-padding">
                                             <span> M.C </span>
                                         </Col>
-                                        <Col xs={2} className="no-padding">
+                                        <Col xs={3} className="no-padding">
                                             <span> Discount </span>
                                         </Col>
+                                    </Row>
+                                </Col>
+                                <Col xs={3}>
+                                    <Row>
                                         <Col xs={2} className="no-padding">
                                             <span>CGST</span>
                                         </Col>
                                         <Col xs={2} className="no-padding">
                                             <span>SGST</span>
                                         </Col>
-                                    </Row>
-                                </Col>
-                                <Col xs={2}>
-                                    <Row>
-                                        <Col xs={8} className="no-padding">
+                                        <Col xs={6} className="no-padding">
                                             <span> price </span>
                                         </Col>
                                     </Row>
@@ -978,10 +995,10 @@ function GstBillingDemo() {
                 <Col xs={5}>
                     <input type="button" className="gs-button bordered" value="Preview" onClick={onClickPreview} />
                     <input type="button" className="gs-button bordered" value="Print" onClick={onClickPrint} style={{marginLeft: '15px'}} />
-                    <div className="gst-bill-preview" style={{transform: 'scale(0.68)', transformOrigin: "left top"}}>
+                    <div className="gst-bill-preview" style={{transform: 'scale(0.68)', transformOrigin: "left top"}} >
                         <TemplateRenderer 
                             ref={(el) => (componentRef = el)} 
-                            templateId={2} 
+                            templateId={templateId} 
                             content={templateContent} 
                             customArgs={{displayGstNumber}}/>
                     </div>

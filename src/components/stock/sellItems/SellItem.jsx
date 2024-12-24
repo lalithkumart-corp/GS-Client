@@ -20,6 +20,8 @@ import { DoublyLinkedList } from '../../../utilities/doublyLinkedList';
 import { formatNo, getCurrentDateTimeInUTCForDB, getMyDateObjInUTCForDB } from '../../../utilities/utility';
 import ReactToPrint from 'react-to-print';
 import TemplateRenderer from '../../../templates/jewellery-gstBill/templateRenderer';
+import EstimateBillTemplateRenderer from '../../../templates/jewellery-estimateBill/templateRenderer';
+
 import WastageCalculator from '../../tools/wastageCalculator';
 import { wastageCalc } from '../../tools/wastageCalculator/wastageCalculator';
 import { MdRefresh } from 'react-icons/md';
@@ -1636,11 +1638,18 @@ class SellItem extends Component {
                         content={() => this.componentRef}
                         className="print-hidden-btn"
                     />
+                    {ORIGINAL_BILLING?
                     <TemplateRenderer 
                         ref={(el) => (this.componentRef = el)} 
-                        templateId={this.state.billingType==ORIGINAL_BILLING?this.state.selectedGstTemplateId:this.state.selectedEstimateTemplateId} 
+                        templateId={this.state.selectedGstTemplateId} 
                         content={this.state.printContent}
                         customArgs={this.state.gstCustomArgs}/>
+                    :
+                    <EstimateBillTemplateRenderer 
+                        ref={(el) => (this.componentRef = el)} 
+                        templateId={this.state.selectedEstimateTemplateId} 
+                        content={this.state.printContent}
+                        customArgs={this.state.gstCustomArgs}/>}
                 </Row>
             </Container>
         )

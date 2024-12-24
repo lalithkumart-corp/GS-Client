@@ -19,8 +19,11 @@ const TagSetup = () => {
     const [division, setDivision] = useState('916KDM');
     const [grams, setGrams] = useState(1.240);
     const [size, setSize] = useState(22);
-    const [itemName, setItemName] = useState('');
+    const [itemName, setItemName] = useState('Kamal Tops');
     const [huid, setHuid] = useState('HJ7l5K');
+    const [productId, setProductId] = useState('RN2');
+    const [trackId, setTrackId] = useState('104');
+    const [wsgPct, setWsgPct] = useState('14%');
     
     const [selectedTemplateId, setSelectedTemplateId] = useState(null);
 
@@ -80,7 +83,10 @@ const TagSetup = () => {
             huid: huid,
             config: {
                 showBis: true,
-            }
+            },
+            productId: productId,
+            trackId,
+            wsgPct
         }];
         _.each(templatesList, (aTemplate) => {
             let checked = false;
@@ -94,7 +100,9 @@ const TagSetup = () => {
             list.push(
                 <Col xs={6} md={6}>
                     <TagTemplateRenderer 
-                        ref={(el)=>{selectedTagRef=el}} 
+                        ref={(el)=>{
+                            if(checked) selectedTagRef=el;
+                        }} 
                         templateId={aTemplate.template_id} 
                         content={tagContext}
                         />
@@ -123,6 +131,38 @@ const TagSetup = () => {
                     </Row>
                     <Row>
                         <Col xs={1}>
+                            Track Id: 
+                        </Col>
+                        <Col xs={2}>
+                            <input type="text" className="gs-input-cell" value={trackId} onChange={(e) => setTrackId(e.target.value)}/>
+                        </Col>
+                    </Row>
+                    <Row>
+                        <Col xs={1}>
+                            Product Id: 
+                        </Col>
+                        <Col xs={2}>
+                            <input type="text" className="gs-input-cell" value={productId} onChange={(e) => setProductId(e.target.value)}/>
+                        </Col>
+                    </Row>
+                    <Row>
+                        <Col xs={1}>
+                            HUID: 
+                        </Col>
+                        <Col xs={2}>
+                            <input type="text" className="gs-input-cell" value={huid} onChange={(e) => setHuid(e.target.value)}/>
+                        </Col>
+                    </Row>
+                    <Row>
+                        <Col xs={1}>
+                            Item Name: 
+                        </Col>
+                        <Col xs={2}>
+                            <input type="text" className="gs-input-cell" value={itemName} onChange={(e) => setItemName(e.target.value)}/>
+                        </Col>
+                    </Row>
+                    <Row>
+                        <Col xs={1}>
                             Division: 
                         </Col>
                         <Col xs={2}>
@@ -143,6 +183,14 @@ const TagSetup = () => {
                         </Col>
                         <Col xs={2}>
                             <input type="text" className="gs-input-cell" value={size} onChange={(e) => setSize(e.target.value)}/>
+                        </Col>
+                    </Row>
+                    <Row>
+                        <Col xs={1}>
+                            Wsg %: 
+                        </Col>
+                        <Col xs={2}>
+                            <input type="text" className="gs-input-cell" value={wsgPct} onChange={(e) => setWsgPct(e.target.value)}/>
                         </Col>
                     </Row>
                     <Row>

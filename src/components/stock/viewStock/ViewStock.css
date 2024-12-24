@@ -152,9 +152,9 @@
 .view-stock-container #dropdown-more-actions:disabled {
     color: lightgrey;
 }
-/* .tag-renderer-comp {
+.tag-renderer-comp {
     display: none;
-} */
+}
 
 @media print {
     .tag-renderer-comp {

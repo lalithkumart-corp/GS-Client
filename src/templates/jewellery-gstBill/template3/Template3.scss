@@ -1,0 +1,65 @@
+.jewellery-gst-bill-paper.template3 {
+    display: none;
+    font-size: 12px;
+    width: 793px;
+    min-height: 560px;
+    max-height: 560px;
+    outline: 1px dashed deeppink; //temporary
+    .inner-section {
+        border: none;
+        margin-left: 20px;
+        margin-right: 20px;
+    }
+    .store-name {
+        color: red;
+    }
+    .customer-info-div {
+        min-height: 68px;
+        max-height: 68px;
+    }
+    .orn-tbl-body-div {
+        min-height: 110px;
+        max-height: 110px;
+    }
+    .old-orn-and-price-totals-panel {
+        min-height: 104px;
+        max-height: 104px;
+    }
+    .payment-mode-div, .amount-in-words-div {
+        min-height: 20px;
+        max-height: 20px;
+        border-top: 1px solid;
+        .a-payment-mode-val {
+            padding-right: 30px;
+        }
+    }
+    .bottom-signature-box {
+        border: 1px solid;
+        border-top: none;
+    }
+}
+
+.gst-bill-preview .jewellery-gst-bill-paper.template3.has-printcontent {
+    display: block;
+}
+
+.jewellery-gst-bill-paper.template3.has-preview {
+    transform: scale(0.7);
+    margin-top: -70px;
+}
+
+@media print {
+    .jewellery-gst-bill-paper.template3.has-preview {
+        transform: none;
+        margin-top: 40px;
+        width: 793px;
+        min-height: 560px;
+        max-height: 560px;
+    }
+    .jewellery-gst-bill-paper.template3 {
+        display: block;
+        .store-name {
+            color: red !important;
+        }
+    }
+}

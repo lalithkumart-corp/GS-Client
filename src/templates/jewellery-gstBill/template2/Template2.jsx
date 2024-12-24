@@ -81,40 +81,40 @@ function GstBillTemplate2(props) {
         //Styles
         let leftImgColStyles = {
             position: 'absolute',
-            height: "65px",
+            height: "45px",
             left: "35px",
-            top: "50px",
+            top: "20px",
         }
         let leftImgStyles={
             height: '100%'
         }
         let middleSectionStyles = {
             textAlign: 'center',
-            paddingTop: '37px'
+            paddingTop: '12px'
         }
         let storeNameStyles = {
-            fontSize: "41px",
+            fontSize: "31px",
             letterSpacing: "2px",
             fontWeight: "bold",
             fontFamily: 'initial',
             lineHeight: '24px'
         }
         let addressLineStyle = {
-            fontSize: "16px"
+            fontSize: "12px"
         }
         let mobileStyle = {
-            fontSize: "16px"
+            fontSize: "12px"
         }
         let gstStyle = {
-            fontSize: "16px",
+            fontSize: "12px",
             visibility: (customArgs.displayGstNumber == 'false' || customArgs.displayGstNumber == false)?'hidden': 'visible'
         }
         let rightImgColStyles = {
             position: 'absolute',
-            height: "76px",
+            height: "45px",
             // right: "40px",
             left: "calc(100% - 130px)",
-            top: "46px"
+            top: "20px"
         }
         let rightImgStyles={
             height: '100%'
@@ -143,11 +143,11 @@ function GstBillTemplate2(props) {
             </div>
         )
       
-        return <>
+        return <div className="top-store-header-panel">
                     {leftSection}
                     {middleSection}
                     {rightSection}
-                </>;
+                </div>;
     }
 
     const _constructOrnBody = () => {
@@ -218,7 +218,7 @@ function GstBillTemplate2(props) {
                 <Row>
                     <Col xs={5}>
                         <Row>
-                            <Col xs={spans.itemName} className="no-padding" style={{fontSize: '16px', fontWeight: 'bold'}}>
+                            <Col xs={spans.itemName} className="no-padding" style={{fontSize: '12px', fontWeight: 'bold'}}>
                                 {anOrn.itemType} {anOrn.title} {anOrn.huid?`- ${anOrn.huid}`:''}
                             </Col>
                             {/* <Col xs={spans.pcs} className="no-padding">
@@ -294,9 +294,9 @@ function GstBillTemplate2(props) {
             </>
         )
 
-        return <div style={{marginTop: '20px', paddingLeft: '10px', paddingRight: '10px'}}>
+        return <div style={{paddingLeft: '10px', paddingRight: '10px'}}>
             {ornTableHeader}
-            <div style={{minHeight: '200px'}}>{ornBody}</div>
+            <div style={{minHeight: '150px'}}>{ornBody}</div>
             {ornFooter}
         </div>
     }
@@ -330,7 +330,7 @@ function GstBillTemplate2(props) {
     }
 
     const _constructPricingDom = () => {
-        return <div style={{fontSize: '16px', minHeight: '130px'}}>
+        return <div style={{fontSize: '12px'}}>
                 {printContent.calculations.totalDiscount ? 
                 <Row>
                     <Col xs={{span: 6}} className="no-padding">
@@ -390,7 +390,7 @@ function GstBillTemplate2(props) {
                     </Col>
                 </Row>
                 : <></>}
-                <Row style={{fontSize: '18px', fontWeight: 'bold'}}>
+                <Row style={{fontSize: '16px', fontWeight: 'bold'}}>
                     <Col xs={{span: 6}} className="no-padding">
                         Grand Total
                     </Col>
@@ -511,11 +511,11 @@ function GstBillTemplate2(props) {
                             {ornBody}
                         </Col>
                     </Row>
-                    <Row>
-                        <Col xs={7} style={{marginTop: '20px'}}>
+                    <Row className="old-orn-and-price-totals-panel">
+                        <Col xs={7} style={{marginTop: '20px'}} className="old-orn-div">
                             {oldPurchaseDom}
                         </Col>
-                        <Col xs={5}>
+                        <Col xs={5} className="price-totals-div">
                             {pricingDetailDom}
                         </Col>
                     </Row>
@@ -524,7 +524,7 @@ function GstBillTemplate2(props) {
 
     const constructFooter = () => {
         return <Col xs={12}>
-            <div style={{borderBottom: '1px solid lightgrey', width: '100%', marginLeft: '10px', marginRight: '10px'}}>
+            <div style={{width: '100%', marginLeft: '10px', marginRight: '10px'}}>
                 <Row>
                     <Col xs={6} style={{textAlign: 'center'}}>
                         <div style={{height: '60px'}}>
@@ -533,15 +533,20 @@ function GstBillTemplate2(props) {
                         <div>Customer's Signature</div>
                     </Col>
                     <Col xs={6} style={{textAlign: "center"}}>
-                        <div style={{height: '70px'}}>
+                        <div style={{height: '60px'}}>
 
                         </div>
                         <div>For <b>{printContent.storeName}</b></div>
                     </Col>
                 </Row>
             </div>
-            <Row style={{textAlign: 'center', paddingBottom: '5px'}}>
-                <h5 style={{width: '100%', margin: 0}}>Thank you! Visit Again</h5>
+        </Col>
+    }
+
+    const constructThankyouNote = () => {
+        return <Col xs={12}>
+            <Row style={{textAlign: 'center'}}>
+                <div style={{width: '100%', margin: 0, fontSize: '12px', fontStyle: 'italic', lineHeight: '10px'}}>Thank you! Visit Again</div>
             </Row>
         </Col>
     }
@@ -551,6 +556,7 @@ function GstBillTemplate2(props) {
         let headerDom = constructHeader();
         let bodyDom = constructBody();
         let footerDom = constructFooter();
+        // let thankyouNoteDom = constructThankyouNote();
         return <> 
                 <Row style={{position: 'relative', fontSize: '19px'}}>{headerDom}</Row>
                 <Row style={{marginTop: '23px'}}>{bodyDom}</Row>
@@ -565,6 +571,7 @@ function GstBillTemplate2(props) {
                     {getDom()}
                 </Col>
             </Row>
+            <Row>{constructThankyouNote()}</Row>
         </div>
     )
 }

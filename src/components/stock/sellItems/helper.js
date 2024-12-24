@@ -359,6 +359,16 @@ export const constructPrintContent = (stateObj, propObj) => {
         customerMobile = stateObj.selectedCustomer.mobile;
     }
 
+    let paymentFormData = {
+        newItemPrice: stateObj.paymentFormData.totalPurchaseFinalPrice,
+        totalExchangeFinalPrice: stateObj.paymentFormData.totalExchangeFinalPrice,
+        sum: stateObj.paymentFormData.sum,
+        paymentMode: stateObj.paymentFormData.paymentMode,
+        paymentObj: stateObj.paymentFormData.paymentObj,
+        paid: stateObj.paymentFormData.paid,
+        balance: stateObj.paymentFormData.balance
+    };
+
     return {
         gstNumber: propObj.storeDetail.gstNo,
         itemType: itemType,
@@ -393,7 +403,9 @@ export const constructPrintContent = (stateObj, propObj) => {
             totalExchangeFinalPrice: stateObj.paymentFormData.totalExchangeFinalPrice,
             roundedOffVal: stateObj.paymentFormData.roundOffVal,
             grandTotal: stateObj.paymentFormData.sum,
-        }
+        },
+        paymentFormData,
+        paymentSelectionCardData: stateObj.paymentSelectionCardData
     }
 }
 
