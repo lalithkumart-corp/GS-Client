@@ -429,7 +429,7 @@ class JewelleryInvoicesList extends Component {
             invoiceRespArr[i].pinCode = this.props.storeDetail.pincode;
             invoiceRespArr[i].storeMobile1 = this.props.storeDetail.mobile;
             invoiceRespArr[i].hsCode = 7113;
-            invoiceRespArr[i].dateVal = convertDateObjToStr(new Date(invoiceRespArr[i].dateVal), {excludeTime: true});
+            invoiceRespArr[i].dateVal = convertDateObjToStr(new Date(invoiceRespArr[i].dateVal), {excludeSeconds: true, addAmPmSuffix: true});
         }
         return invoiceRespArr;
     }

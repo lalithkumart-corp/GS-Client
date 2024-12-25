@@ -144,7 +144,11 @@ export default function TemplateSetup(props) {
             let theUrl = aTemplate.screenshot_url;
 
             templatesContainer.push(
-                <Col xs={3} md={3}>
+                <Col xs={6} md={6}>
+                    <div className="screenshot-radio-btn-label">
+                        <input type="radio" id={`jewellery-${identifier}-bill-body-template-id-${index}`} name={`jewellery-${identifier}-bill-body-template`} onChange={(e)=>onChangeTemplateSelection(e, aTemplate.template_id, identifier)} value={aTemplate.template_id} checked={checked}/>
+                        <label for={`jewellery-${identifier}-bill-body-template-id-${index}`}> &nbsp; Template - {aTemplate.template_id}</label>
+                    </div>
                     <div className="screenshot-prview-container">
                         <ImageZoom>
                             <img
@@ -153,10 +157,6 @@ export default function TemplateSetup(props) {
                                 alt="Image not found"
                                 className='template-image-viewer' />
                         </ImageZoom>
-                    </div>
-                    <div className="screenshot-radio-btn-label">
-                        <input type="radio" id={`jewellery-${identifier}-bill-body-template-id-${index}`} name={`jewellery-${identifier}-bill-body-template`} onChange={(e)=>onChangeTemplateSelection(e, aTemplate.template_id, identifier)} value={aTemplate.template_id} checked={checked}/>
-                        <label for={`jewellery-${identifier}-bill-body-template-id-${index}`}> &nbsp; Template - {aTemplate.template_id}</label>
                     </div>
                 </Col>
             )

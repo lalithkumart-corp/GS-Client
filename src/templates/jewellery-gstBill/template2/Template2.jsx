@@ -130,10 +130,10 @@ function GstBillTemplate2(props) {
                 <><span className="store-name" style={storeNameStyles}>{strNme}</span></>  <br></br>
                 <><span className="full-addr-line" style={addressLineStyle}>{addressLine}</span></> <br></br>
                 <>   
-                    {mobileLine && <span className="mobile-no" style={mobileStyle}>{mobileLine}, </span>}
+                    {mobileLine && <span className="mobile-no" style={mobileStyle}>{mobileLine} </span>}
                     {/* {(customArgs.displayGstNumber == 'false' || customArgs.displayGstNumber == false) ? <></> 
                     : printContent.gstNumber && <span className="gst-no" style={gstStyle}>GST: {printContent.gstNumber}</span>} */}
-                    {printContent.gstNumber && <span className="gst-no" style={gstStyle}>GST: {printContent.gstNumber}</span>}
+                    {printContent.gstNumber && <span className="gst-no" style={gstStyle}>, GST: {printContent.gstNumber}</span>}
                 </>
             </Col>
         )
@@ -294,7 +294,7 @@ function GstBillTemplate2(props) {
             </>
         )
 
-        return <div style={{paddingLeft: '10px', paddingRight: '10px'}}>
+        return <div style={{paddingLeft: '10px', paddingRight: '10px', paddingTop: '10px'}}>
             {ornTableHeader}
             <div style={{minHeight: '150px'}}>{ornBody}</div>
             {ornFooter}
@@ -450,7 +450,7 @@ function GstBillTemplate2(props) {
                 <Col xs={9} style={{position: 'relative'}}>
                     {printContent.billNo} 
                     <span style={{width: '50px', position: 'absolute', top: '-14px', marginLeft: '10px'}}>
-                        <Barcode value={printContent.billNo} width={1} fontSize={20} height={25} displayValue={false}/>
+                        <Barcode value={printContent.billNo} width={1} fontSize={1} height={16.5} displayValue={false}/>
                     </span>
                 </Col>
             </Row>
@@ -558,8 +558,8 @@ function GstBillTemplate2(props) {
         let footerDom = constructFooter();
         // let thankyouNoteDom = constructThankyouNote();
         return <> 
-                <Row style={{position: 'relative', fontSize: '19px'}}>{headerDom}</Row>
-                <Row style={{marginTop: '23px'}}>{bodyDom}</Row>
+                <Row style={{position: 'relative', fontSize: '19px', minHeight: '82px'}}>{headerDom}</Row>
+                <Row style={{marginTop: '18px'}}>{bodyDom}</Row>
                 <Row>{footerDom}</Row>
             </>;
     }

@@ -130,7 +130,7 @@ function EstimateBillTemplate1(props) {
                 <><span className="store-name" style={storeNameStyles}>{strNme}</span></>  <br></br>
                 <><span className="full-addr-line" style={addressLineStyle}>{addressLine}</span></> <br></br>
                 <>   
-                    {mobileLine && <span className="mobile-no" style={mobileStyle}>{mobileLine}, </span>}
+                    {mobileLine && <span className="mobile-no" style={mobileStyle}>{mobileLine} </span>}
                     {/* {(customArgs.displayGstNumber == 'false' || customArgs.displayGstNumber == false) ? <></> 
                     : printContent.gstNumber && <span className="gst-no" style={gstStyle}>GST: {printContent.gstNumber}</span>} */}
                     {/* {printContent.gstNumber && <span className="gst-no" style={gstStyle}>GST: {printContent.gstNumber}</span>} */}
@@ -294,7 +294,7 @@ function EstimateBillTemplate1(props) {
             </>
         )
 
-        return <div style={{paddingLeft: '10px', paddingRight: '10px'}}>
+        return <div style={{paddingLeft: '10px', paddingRight: '10px', paddingTop: '10px'}}>
             {ornTableHeader}
             <div style={{minHeight: '150px'}}>{ornBody}</div>
             {ornFooter}
@@ -439,7 +439,7 @@ function EstimateBillTemplate1(props) {
             <Row>
                 <Col xs={12} style={{textAlign: 'center'}}>
                     <span style={{width: '50px'}}>
-                        <Barcode value={printContent.billNo} width={1} fontSize={20} height={25} displayValue={false}/>
+                        <Barcode value={printContent.billNo} width={1} fontSize={1} height={16.5} displayValue={false}/>
                     </span>
                 </Col>
             </Row>
@@ -465,16 +465,16 @@ function EstimateBillTemplate1(props) {
         </>
         let rateAndDate = <>
             <Row>
-                <Col xs={4} style={{paddingLeft: 0}}>DATE:</Col>
-                <Col xs={6}>{printContent.dateVal}</Col>
+                <Col xs={3} style={{paddingLeft: 0}}>DATE:</Col>
+                <Col xs={9} style={{paddingLeft: 0}}>{printContent.dateVal}</Col>
             </Row>
             <Row>
                 {printContent.ornaments && printContent.ornaments.length > 0 && <>
-                    <Col xs={4} style={{paddingLeft: 0, paddingRight: 0}}>
+                    <Col xs={3} style={{paddingLeft: 0, paddingRight: 0}}>
                         {printContent.ornaments[0].itemType == 'G' && 'Gold Rate'}
                         {printContent.ornaments[0].itemType == 'S' && 'Silver Rate'}
                     </Col>
-                    <Col xs={6}>
+                    <Col xs={9} style={{paddingLeft: 0}}>
                         ₹ &nbsp;
                         {printContent.ornaments[0].itemType == 'G' && currencyFormatter(printContent.goldRatePerGm)}
                         {printContent.ornaments[0].itemType == 'S' && currencyFormatter(printContent.silverRatePerGm)}
@@ -486,8 +486,8 @@ function EstimateBillTemplate1(props) {
                 <Col xs={6}>{printContent.silverRatePerGm}</Col>
             </Row> */}
             <Row>
-                <Col xs={4} style={{paddingLeft: 0}}>HSN NO:</Col>
-                <Col xs={6}>{printContent.hsCode}</Col>
+                <Col xs={3} style={{paddingLeft: 0}}>HSN NO:</Col>
+                <Col xs={9} style={{paddingLeft: 0}}>{printContent.hsCode}</Col>
             </Row>
         </>
 
@@ -558,8 +558,8 @@ function EstimateBillTemplate1(props) {
         let footerDom = constructFooter();
         // let thankyouNoteDom = constructThankyouNote();
         return <> 
-                <Row style={{position: 'relative', fontSize: '19px'}}>{headerDom}</Row>
-                <Row style={{marginTop: '23px'}}>{bodyDom}</Row>
+                <Row style={{position: 'relative', fontSize: '19px',  minHeight: '82px'}}>{headerDom}</Row>
+                <Row style={{marginTop: '18px'}}>{bodyDom}</Row>
                 <Row>{footerDom}</Row>
             </>;
     }

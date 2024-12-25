@@ -115,7 +115,7 @@ export const template2 = {
 };
 
 export const template3 = {
-	"gstNumber": "112a",
+    "gstNumber": "112a",
 	"storeName": "MAHALAKSHMI JEWELLERS",
 	"address": "2/34 MAIN ROAD",
 	"place": "KATTUPAKKAM",
@@ -124,51 +124,53 @@ export const template3 = {
 	"storeMobile1": "8148588004",
 	"storeMobile2": "",
 	"hsCode": 7113,
-	"goldRatePerGm": "4622",
-	"silverRatePerGm": "70",
-	"billNo": "A: 1",
-	"customerName": "DANIEPHILP",
-	"customerMobile": "8148616456",
-	"dateVal": "23-09-2021",
-	"ornaments": [{
-		"title": "Ring",
-		"qty": 1,
-		"grossWt": 2.07,
-		"netWt": 2.07,
-		"division": "916",
-		"wastagePercent": 10,
-		"pricePerGm": 4622,
-		"wastageVal": 0.207,
-		"makingCharge": 100,
-		"priceOfOrn": 10624.294,
-		"cgstPercent": 1.5,
-		"cgstVal": 159.36,
-		"sgstPercent": 1.5,
-		"sgstVal": 159.36,
-		"discount": 943.014,
-		"amountWithTax": 10943.01,
-		"amountWithTaxAndDiscount": 10000,
-        "itemType": 'G'
-	}],
-	"oldOrnaments": {
-		"itemType": "G",
-		"grossWt": 1,
-		"lessWt": 0.15,
-		"netWt": 1,
-		"pricePerGram": 4522,
-		"netAmount": 3843.7
-	},
-	"calculations": {
-		"totalMakingCharge": 100,
-		"totalInitialPrice": 10624.294,
-		"cgstAvgPercent": 1.5,
-		"sgstAvgPercent": 1.5,
-		"totalCgstVal": 159.36,
-		"totalSgstVal": 159.36,
-		"totalNetAmountWithTax": 10943.014000000001,
-		"totalDiscount": 943.014,
-		"totalPurchasePrice": 10000,
-		"oldNetAmt": 3843.7,
-		"grandTotal": 6156.3
-	}
+    "itemType": "G",
+    "goldRatePerGm": 7100,
+    "silverRatePerGm": 0,
+    "billNo": "A.10",
+    "customerName": "RAJA",
+    "customerMobile": 9796544996,
+    "customerPanNo": "AKMPL0000N",
+    "dateVal": "2024-12-25 09:59 AM",
+    "ornaments": [
+        {
+            "title": "KAMAL",
+            "huid": "JK907/PXZM67",
+            "prodId": "KML4",
+            "qty": 1,
+            "grossWt": 4,
+            "netWt": 4,
+            "division": "22K916",
+            "wastagePercent": 16.225,
+            "pricePerGm": 7100,
+            "wastageVal": 0.649,
+            "makingCharge": null,
+            "initialPrice": 33007.9,
+            "finalPrice": 33998.1,
+            "cgstPercent": 1.5,
+            "cgstVal": 495.12,
+            "sgstPercent": 1.5,
+            "sgstVal": 495.12,
+            "discount": null,
+            "itemType": "G"
+        }
+    ],
+    "oldOrnaments": {
+        "itemType": "G",
+        "grossWt": 4,
+        "netWt": 4,
+        "lessWt": 0,
+        "netAmount": 28400,
+        "pricePerGram": 7100
+    },
+    "calculations": {
+        "totalInitialPrice": 33007.9,
+        "totalDiscount": 0,
+        "totalCgstVal": 495.12,
+        "totalSgstVal": 495.12,
+        "totalPurchaseFinalPrice": 33998.1,
+        "totalExchangeFinalPrice": 28400,
+        "roundedOffVal": 1.86,
+        "grandTotal": 5600
+    }
 };
