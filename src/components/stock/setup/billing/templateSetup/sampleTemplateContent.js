@@ -147,7 +147,8 @@ export const template3 = {
 		"sgstVal": 159.36,
 		"discount": 943.014,
 		"amountWithTax": 10943.01,
-		"amountWithTaxAndDiscount": 10000
+		"amountWithTaxAndDiscount": 10000,
+        "itemType": 'G'
 	}],
 	"oldOrnaments": {
 		"itemType": "G",

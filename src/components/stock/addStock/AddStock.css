@@ -1,5 +1,7 @@
 .add-stock-container {
+    margin-top: 50px;
     margin-bottom: 50px;
+    width: 82%;
 }
 
 .bill-meta-data-row .form-group {
@@ -181,4 +183,8 @@ table.item-input-table {
 
 .add-stock-container .preview-container-row .a-section .section-body {
     padding: 15px;
+}
+
+.edit-stock-common-modal .add-stock-container {
+    width: 100%;
 }

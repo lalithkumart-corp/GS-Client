@@ -14,6 +14,7 @@ import './TemplateSetup.scss';
 import { template1, template2, template3 } from './sampleTemplateContent';
 import { toast } from 'react-toastify';
 import GSCheckbox from '../../../../ui/gs-checkbox/checkbox';
+import EstimateBillTemplateRenderer from '../../../../../templates/jewellery-estimateBill/templateRenderer';
 
 export default function TemplateSetup(props) {
     let componentRef = useRef();
@@ -85,7 +86,7 @@ export default function TemplateSetup(props) {
     };
 
     let onClickPrintEstimateBill = () => {
-        //TODO:
+        estimateBtnRef.handlePrint();
     }
 
     let onChangeDisplayGstOption = (e) => {
@@ -231,7 +232,7 @@ export default function TemplateSetup(props) {
                                     content={() => estimateInvoiceComponentRef}
                                 />
                                 <input type="button" className="gs-button" value="Print - Sample Estimate Bill" onClick={onClickPrintEstimateBill} />
-                                <TemplateRenderer 
+                                <EstimateBillTemplateRenderer 
                                     ref={(el) => (estimateInvoiceComponentRef = el)} 
                                     templateId={props.estimateBillSettings.selectedTemplate} 
                                     content={templateContent}/>

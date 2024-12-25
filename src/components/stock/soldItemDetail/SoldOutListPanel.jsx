@@ -475,7 +475,6 @@ class SoldItems extends Component {
                 }
             );
         };
-        debugger;
         this.setState(newState);
     }
 

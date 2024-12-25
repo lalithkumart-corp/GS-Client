@@ -21,6 +21,7 @@ export default function invoiceReducer(state=defaultState, action) {
             };
             if(action.data.selectedEstimateTemplate)
                 newState.selectedEstimateTemplate = action.data.selectedEstimateTemplate;
+            break;
         case 'SET_CLEAR_ENTRIES_FLAG':
             newState = {
                 ...newState,

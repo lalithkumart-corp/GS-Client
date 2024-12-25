@@ -319,6 +319,7 @@ export const constructPrintContent = (stateObj, propObj) => {
     let itemType = '';
     let customerName = '';
     let customerMobile = '';
+    let customerPanNo = '';
     _.each(stateObj.purchaseItemPreview, (anItem, index) => {
         newProds.push({
             title: anItem.item_name,
@@ -357,6 +358,10 @@ export const constructPrintContent = (stateObj, propObj) => {
     if(stateObj.selectedCustomer && Object.keys(stateObj.selectedCustomer).length > 0 ) {
         customerName = stateObj.selectedCustomer.cname;
         customerMobile = stateObj.selectedCustomer.mobile;
+        if(stateObj.selectedCustomer.otherDetailsJson && stateObj.selectedCustomer.otherDetailsJson.length > 0) {
+            let filteredArr = stateObj.selectedCustomer.otherDetailsJson.filter((a) => a.field === 'Pan Card');
+            customerPanNo = filteredArr[0].val;
+        }
     }
 
     let paymentFormData = {
@@ -385,7 +390,9 @@ export const constructPrintContent = (stateObj, propObj) => {
         billNo: stateObj.invoiceSeries?`${stateObj.invoiceSeries}.${stateObj.invoiceNo}`:stateObj.invoiceNo,
         customerName: customerName,
         customerMobile: customerMobile,
-        dateVal: convertDateObjToStr(stateObj.date.isLive?new Date():stateObj.date.inputVal, {excludeTime: true}),
+        customerPanNo: customerPanNo,
+        // dateVal: convertDateObjToStr(stateObj.date.isLive?new Date():stateObj.date.inputVal, {excludeTime: true}),
+        dateVal: convertDateObjToStr(stateObj.date.isLive?new Date():stateObj.date.inputVal),
         ornaments: newProds,
         oldOrnaments,
         calculations: {
@@ -427,7 +434,9 @@ export const resetPageState = (stateObj) => {
             paymentDetails: {},
             paid: 0,
             balance: 0
-        }
-    }
+        },
+        paymentCardResetActionFlag: true //for payment card
+    };
+    debugger;
     return stateObj;
 }

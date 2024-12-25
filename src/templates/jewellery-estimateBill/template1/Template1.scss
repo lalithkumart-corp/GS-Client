@@ -1,0 +1,53 @@
+.jewellery-estimate-bill-paper.template1 {
+    display: none;
+    font-size: 12px;
+    min-width: 793px;
+    max-width: 793px;
+    min-height: 560px;
+    max-height: 560px;
+    padding-top: 30px;
+    outline: 1px dashed deeppink;
+    .inner-section {
+        border: 1px solid;
+        margin-left: 20px;
+        margin-right: 20px;
+        .top-store-header-panel {
+            line-height: 18px;
+        }
+        .store-name {
+            color: red;
+        }
+        .old-orn-and-price-totals-panel {
+            min-height: 85px;
+            max-height: 85px;
+        }
+    }
+}
+
+.estimate-bill-preview .jewellery-estimate-bill-paper.template1.has-printcontent {
+    display: block;
+}
+
+.jewellery-estimate-bill-paper.template1.has-preview {
+    transform: scale(0.7);
+    margin-top: -70px;
+}
+
+@media print {
+    .jewellery-estimate-bill-paper.template1.has-preview {
+        transform: none;
+        margin-top: 40px;
+    }
+    .jewellery-estimate-bill-paper.template1 {
+        display: block;
+        font-size: 12px;
+        min-width: 793px;
+        max-width: 793px;
+        min-height: 560px;
+        max-height: 560px;
+        outline: none;
+        .store-name {
+            color: red !important;
+        }
+    }
+}

@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { Row, Col } from 'react-bootstrap';
 import { FETCH_AVL_JEWELLERY_TAG_TEMPLATES, UPDATE_JEWELLERY_TAG_SETTINGS } from '../../../core/sitemap';
-import { getAccessToken } from '../../../core/storage';
+import { getAccessToken, getJewelleryTagTemplateSettings, saveJewelleryTagTemplateSettings } from '../../../core/storage';
 import axiosMiddleware from '../../../core/axios';
 import TagTemplateRenderer from '../../../templates/jewellery-tag/templateRenderer';
 import './TagSetup.scss';
@@ -60,8 +60,11 @@ const TagSetup = () => {
         try {
             let resp = await axiosMiddleware.put(UPDATE_JEWELLERY_TAG_SETTINGS, {selectedTemplateId, storeNameAbbr: storeName});
             if(resp && resp.data && resp.data.STATUS == 'SUCCESS') {
-                toast.success('Updated Successfully. Logout + Login again to reflect');
-                //TODO: update cookie
+                toast.success('Updated Successfully!');
+                let tagTemplateSettings = getJewelleryTagTemplateSettings();
+                tagTemplateSettings.selected_tag_template_id = selectedTemplateId;
+                tagTemplateSettings.store_name_abbr = storeName;
+                saveJewelleryTagTemplateSettings(tagTemplateSettings);
             } else {
                 console.log(e);
                 toast.error('Error while update the tag selection.');
@@ -107,6 +110,12 @@ const TagSetup = () => {
             }
             list.push(
                 <Col xs={6} md={6}>
+                    <div className="jewellery-tag-radio-btn-label">
+                        <input type="radio" id={`jewellery-tag-template-id-${aTemplate.template_id}`} name="jewellery-tag-template" onChange={(e)=>onChangeTemplateSelection(e, aTemplate.template_id)} value={aTemplate.template_id} checked={checked}/>
+                        <label for={`jewellery-tag-template-id-${aTemplate.template_id}`} style={{marginLeft: '7px'}}>
+                            {labelStr}
+                        </label>
+                    </div>
                     <TagTemplateRenderer 
                         ref={(el)=>{
                             if(checked) selectedTagRef=el;
@@ -114,12 +123,6 @@ const TagSetup = () => {
                         templateId={aTemplate.template_id} 
                         content={tagContext}
                         />
-                    <div className="jewellery-tag-radio-btn-label">
-                        <input type="radio" id={`jewellery-tag-template-id-${aTemplate.template_id}`} name="jewellery-tag-template" onChange={(e)=>onChangeTemplateSelection(e, aTemplate.template_id)} value={aTemplate.template_id} checked={checked}/>
-                        <label for={`jewellery-tag-template-id-${aTemplate.template_id}`} style={{marginLeft: '7px'}}>
-                            {labelStr}
-                        </label>
-                    </div>
                 </Col>
             )
         });

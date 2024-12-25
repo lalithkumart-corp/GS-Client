@@ -16,6 +16,7 @@ import { Collapse } from 'react-collapse';
 import { MdRefresh } from 'react-icons/md';
 import axiosMiddleware from '../../../core/axios';
 import { ANALYTICS } from '../../../core/sitemap';
+import { convertDateObjToStr } from '../../../utilities/utility';
 
 // import GstBillTemplate1 from '../../../templates/jewellery-gstBill/template1/Template1';
 const ENTER_KEY = 13;
@@ -30,6 +31,7 @@ domList.add('billNo', {type: 'formControl', enabled: true});
 domList.add('customerName', {type: 'formControl', enabled: true});
 domList.add('customerMobile', {type: 'formControl', enabled: true});
 domList.add('cusomertAddr', {type: 'formControl', enabled: true});
+domList.add('customerPanNo', {type: 'customerPanNo', enabled: true});
 domList.add('orn0', {type: 'defaultInput', enabled: true});
 domList.add('huid0', {type: 'defaultInput', enabled: true});
 domList.add('div0', {type: 'defaultInput', enabled: true});
@@ -160,9 +162,10 @@ function GstBillingDemo() {
     let [silverRatePerGm, setSilverRatePerGm] = useState('');
     let [billSeries, setBillSeries] = useState('');
     let [billNo, setBillNo] = useState('');
-    let [dateVal, setDate] = useState(moment().format('DD-MM-YYYY'));
+    let [dateVal, setDate] = useState(new Date()); //moment().format('DD-MM-YYYY')
     let [customerName, setCustomerName] = useState('');
     let [cusomertAddr, setCusomertAddr] = useState('');
+    let [customerPanNo, setCustomerPanNo] = useState('');
     let [customerMobile, setCustomerMob] = useState(null);
     let [templateId, setTemplateId] = useState(2);
     let [templateContent, setTemplateContent] = useState(null);
@@ -214,13 +217,16 @@ function GstBillingDemo() {
                 setBillNo(val);
                 break;
             case 'date':
-                setDate(moment(val).format('DD-MM-YYYY'));
+                setDate(val); //moment(val).format('DD-MM-YYYY')
                 break;
             case 'customerName':
                 setCustomerName(val);
                 break;
             case 'cusomertAddr':
                 setCusomertAddr(val);
+                break;
+            case 'customerPanNo':
+                setCustomerPanNo(val);
                 break;
             case 'customerMobile':
                 setCustomerMob(val);
@@ -506,13 +512,13 @@ function GstBillingDemo() {
     
                 hsCode: hsCode,
     
-                dateVal: dateVal,
+                dateVal: convertDateObjToStr(dateVal, {excludeSeconds: true, addAmPmSuffix: true}),
                 billNo: (billSeries?`${billSeries}:`:'')+billNo,
                 
                 customerName: customerName,
                 customerMobile: customerMobile,
                 customerAddress: cusomertAddr,
-                customerCardNo: '',
+                customerPanNo: customerPanNo,
                 ornaments: [],
                 oldOrnaments: [],
                 calculations: {
@@ -756,13 +762,16 @@ function GstBillingDemo() {
                                 <FormLabel>Date</FormLabel>
                                 <DatePicker
                                     popperClassName="gst-bill-demo-datepicker-popper" 
-                                    value={dateVal} 
+                                    selected={dateVal} 
                                     onChange={(fullDateVal, dateVal) => {onChange(fullDateVal, 'date')} }
-                                    onKeyUp = {(e) => handleKeyUp(e, {currElmKey: 'date'}) }
+                                    // onKeyUp = {(e) => handleKeyUp(e, {currElmKey: 'date'}) }
                                     ref = {(domElm) => { domElmns.date = domElm; }}
                                     showMonthDropdown
                                     showYearDropdown
                                     className='gs-input-cell'
+                                    timeInputLabel="Time:"
+                                    showTimeInput
+                                    dateFormat="dd/MM/yyyy h:mm aa"
                                     />
                             </FormGroup>
                         </Col>
@@ -861,9 +870,9 @@ function GstBillingDemo() {
                                 <FormControl.Feedback />
                             </FormGroup>
                         </Col>
-                        <Col xs={3} md={3} style={{paddingLeft: '30px', paddingTop: '15px'}}>
+                        <Col xs={5} md={5} style={{paddingLeft: '30px', paddingTop: '15px'}}>
                             <input type="checkbox" className={"gs-checkbox"} onChange={(e) => setDisplayGstNumber(e.target.checked)} checked={displayGstNumber}/>
-                            <span style={{paddingLeft: '5px', lineHeight: '26px'}}>Display GST Number</span>
+                            <span style={{paddingLeft: '5px', lineHeight: '26px'}}>Display GST Number (Bill Header)</span>
                         </Col>
                     </Row>
                     <Row style={{marginTop: '10px'}}>
@@ -895,7 +904,7 @@ function GstBillingDemo() {
                                 <FormControl.Feedback />
                             </FormGroup>
                         </Col>
-                        <Col xs={6}>
+                        <Col xs={4} md={4}>
                             <FormGroup>
                                 <FormLabel>Address</FormLabel>
                                 <FormControl
@@ -905,6 +914,20 @@ function GstBillingDemo() {
                                     onKeyUp = {(e) => handleKeyUp(e, {currElmKey: 'cusomertAddr'}) }
                                     ref={(domElm) => { domElmns.cusomertAddr = domElm; }}
                                     value={cusomertAddr}
+                                />
+                                <FormControl.Feedback />
+                            </FormGroup>
+                        </Col>
+                        <Col xs={2} md={2}>
+                            <FormGroup>
+                                <FormLabel>PAN</FormLabel>
+                                <FormControl
+                                    type="text"
+                                    placeholder=""
+                                    onChange={(e) => onChange(e.target.value, 'customerPanNo')} 
+                                    onKeyUp = {(e) => handleKeyUp(e, {currElmKey: 'customerPanNo'}) }
+                                    ref={(domElm) => { domElmns.customerPanNo = domElm; }}
+                                    value={customerPanNo}
                                 />
                                 <FormControl.Feedback />
                             </FormGroup>

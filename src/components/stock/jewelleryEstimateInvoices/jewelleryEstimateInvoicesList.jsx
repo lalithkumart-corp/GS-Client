@@ -18,6 +18,7 @@ import { GsScreen } from '../../gs-screen/GsScreen';
 import SellItemEditMode from '../sellItems/SellItemEditMode';
 import './jewelleryEstimateInvoicesList.scss';
 import { toast } from 'react-toastify';
+import EstimateBillTemplateRenderer from '../../../templates/jewellery-estimateBill/templateRenderer';
 
 
 class JewelleryEstimateInvoicesList extends Component {
@@ -36,6 +37,7 @@ class JewelleryEstimateInvoicesList extends Component {
             currentScreen: 1,
             customerInvoiceList: [],
             gstTemplateSettings: {},
+            estimateTemplateSettings: {},
             previewVisibility: false,
             timeOut: 400,
             pageLimit: 10,
@@ -416,10 +418,12 @@ class JewelleryEstimateInvoicesList extends Component {
     setTemplateId() {
         let allSettings = getJewelleryBillTemplateSettings();
         let gstSettingsObj = null;
+        let estimateSettingsObj = null;
         if(allSettings.gst) gstSettingsObj = allSettings.gst;
-        if(!gstSettingsObj)
-            toast.error('GST Template Settings not found');
-        this.setState({gstTemplateSettings: gstSettingsObj});
+        if(allSettings.estimate) estimateSettingsObj = allSettings.estimate;
+        if(!gstSettingsObj && !estimateSettingsObj)
+            toast.error('GST as well as Estimate Billing - Template Settings not found');
+        this.setState({gstTemplateSettings: gstSettingsObj, estimateTemplateSettings: estimateSettingsObj});
     }
 
     handlePreviewClose() {
@@ -527,7 +531,13 @@ class JewelleryEstimateInvoicesList extends Component {
                                     _.each(this.state.printContents, (aPrintData, index) => {
                                         if(index && index%2 == 0)
                                             invoiceTemplates.push(<br></br>);
-                                        invoiceTemplates.push(<TemplateRenderer templateId={this.state.gstTemplateSettings.selectedTemplate} content={aPrintData}/>);
+                                        
+                                        if(this.state.estimateTemplateSettings && this.state.estimateTemplateSettings.selectedTemplate) {
+                                            invoiceTemplates.push(<EstimateBillTemplateRenderer templateId={this.state.estimateTemplateSettings.selectedTemplate} content={aPrintData}/>);
+                                        } else {
+                                            invoiceTemplates.push(<TemplateRenderer templateId={this.state.gstTemplateSettings.selectedTemplate} content={aPrintData}/>);
+                                        }
+
                                     });
                                     return invoiceTemplates;
                                 })()}

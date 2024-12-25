@@ -829,7 +829,7 @@ class AddStock extends Component {
 
     render() {
         return (
-            <Container className="add-stock-container" style={{maxWidth: "100%"}}>
+            <Container className="add-stock-container">
                 <Row className="bill-meta-data-row">
                     <Col>
                         <table className="bill-metal-table">
@@ -1147,12 +1147,12 @@ class AddStock extends Component {
                                                         onKeyUp: (e) => this.reactAutosuggestControls.onKeyUp(e, {currElmKey: PROD_CATEG}),
                                                         className: "react-autosuggest__input gs-input-cell",
                                                         onFocus: (e)=> {e.target.select()},
-                                                        style: {padding: 0}
+                                                        style: {padding: '6px'}
                                                     }}
                                                     ref = {(domElm) => { this.domElmns[PROD_CATEG] = domElm?domElm.input:domElm; }}
                                                 />
                                             </Col>
-                                            <Col xs={{span:3}} className="no-padding item-category1-input-col">
+                                            <Col xs={{span:4}} className="no-padding item-category2-input-col">
                                                 <ReactAutosuggest
                                                     suggestions={this.state.autoSuggestions.filteredItemSubCategoryList}
                                                     onSuggestionsFetchRequested={({value}) => this.reactAutosuggestControls.onSuggestionsFetchRequested({value}, PROD_SUB_CATEG)}
@@ -1165,13 +1165,13 @@ class AddStock extends Component {
                                                         onChange: (e, {newValue, method}) => this.reactAutosuggestControls.onChange(e, {newValue, method}, PROD_SUB_CATEG),
                                                         onKeyUp: (e) => this.reactAutosuggestControls.onKeyUp(e, {currElmKey: PROD_SUB_CATEG}),
                                                         className: "react-autosuggest__input gs-input-cell",
-                                                        style: {padding: 0},
+                                                        style: {padding: '6px'},
                                                         onFocus: (e)=> {e.target.select()}
                                                     }}
                                                     ref = {(domElm) => { this.domElmns[PROD_SUB_CATEG] = domElm?domElm.input:domElm; }}
                                                 />
                                             </Col>
-                                            <Col xs={{span:4}} className="no-padding">
+                                            <Col xs={{span:3}} className="no-padding">
                                                 <ReactAutosuggest
                                                     suggestions={this.state.autoSuggestions.filteredItemDimentionList}
                                                     onSuggestionsFetchRequested={({value}) => this.reactAutosuggestControls.onSuggestionsFetchRequested({value}, PROD_DIM)}
@@ -1184,7 +1184,7 @@ class AddStock extends Component {
                                                         onChange: (e, {newValue, method}) => this.reactAutosuggestControls.onChange(e, {newValue, method}, PROD_DIM),
                                                         onKeyUp: (e) => this.reactAutosuggestControls.onKeyUp(e, {currElmKey: PROD_DIM}),
                                                         className: "react-autosuggest__input gs-input-cell",
-                                                        style: {padding: 0},
+                                                        style: {padding: '6px'},
                                                         onFocus: (e)=> {e.target.select()}
                                                     }}
                                                     ref = {(domElm) => { this.domElmns[PROD_DIM] = domElm?domElm.input:domElm; }}
@@ -1244,6 +1244,7 @@ class AddStock extends Component {
                                                 onKeyUp={(e) => this.handleKeyUp(e, {currElmKey: PROD_HUID})}
                                                 ref= {(domElm) => {this.domElmns[PROD_HUID] = domElm; }}
                                                 className="gs-input-cell"
+                                                style={{padding: '6px'}}
                                             />
                                         </Form.Group>
                                     </td>
@@ -1370,9 +1371,10 @@ class AddStock extends Component {
                                 type="button" 
                                 className="gs-button bordered" 
                                 value="Update" 
-                                // onKeyUp={(e) => this.handleKeyUp(e, {currElmKey: ADD_ENTRY})}
+                                // onKeyUp={(e) => this.handleKeyUp(e, {currElmKey: UPDATE_ENTRY})}
                                 ref= {(domElm) => {this.domElmns[UPDATE_ENTRY] = domElm; }}
                                 onClick={(e) => this.onButtonClicks(e, UPDATE_ENTRY)}
+                                style={{width: '60%', marginTop: '40px'}}
                             />
                         }
 
@@ -1380,10 +1382,11 @@ class AddStock extends Component {
                             <input 
                                 type="button" 
                                 className="gs-button bordered" 
-                                value="Add" 
+                                value="Add To Stock" 
                                 // onKeyUp={(e) => this.handleKeyUp(e, {currElmKey: ADD_ENTRY})}
                                 ref= {(domElm) => {this.domElmns[ADD_ENTRY] = domElm; }}
                                 onClick={(e) => this.onButtonClicks(e, ADD_ENTRY)}
+                                style={{width: '60%', marginTop: '40px'}}
                             />
                         }
                     </Col>

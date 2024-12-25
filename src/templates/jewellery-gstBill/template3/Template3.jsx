@@ -53,113 +53,6 @@ function GstBillTemplate3(props) {
         return printContent.ornaments[0].itemType == 'S';
     }
 
-    const constructHeader = () => {
-        let leftSection = [];
-        let middleSection = [];
-        let rightSection = [];
-        
-        let leftLogoImgSrc = '/images/god_lakshmiji.jpg';
-        if(printContent.headerLeftLogo) {
-            if(printContent.headerRightLogo.src)
-                leftLogoImgSrc = printContent.headerRightLogo.src;
-        }
-        let rightLogoImgSrc = '/images/vinayagar.jpeg';
-        if(printContent.headerrightLogo) {
-            if(printContent.headerRightLogo.src)
-                rightLogoImgSrc = printContent.headerRightLogo.src;
-        }
-
-        let strNme = printContent.storeName || '<Store Name>';
-
-        let addressLine = '';
-        if(printContent.address)
-            addressLine += `${printContent.address}, `;
-        if(printContent.place)
-            addressLine += `${printContent.place}, `;
-        if(printContent.city)
-            addressLine += `${printContent.city}-${printContent.pinCode}`
-
-        if(!addressLine) addressLine = '<address-line>';
-
-        let mobileLine = '';
-        if(printContent.storeMobile1) {
-            mobileLine = `Ph- ${printContent.storeMobile1}`;
-            if(printContent.storeMobile2)
-                mobileLine += `, ${printContent.storeMobile2}`;
-        }
-
-        //Styles
-        let leftImgColStyles = {
-            position: 'absolute',
-            height: "65px",
-            left: "35px",
-            top: "50px",
-        }
-        let leftImgStyles={
-            height: '100%'
-        }
-        let middleSectionStyles = {
-            textAlign: 'center',
-            paddingTop: '37px'
-        }
-        let storeNameStyles = {
-            fontSize: "41px",
-            letterSpacing: "2px",
-            fontWeight: "bold",
-            fontFamily: 'initial',
-            lineHeight: '24px'
-        }
-        let addressLineStyle = {
-            fontSize: "16px"
-        }
-        let mobileStyle = {
-            fontSize: "16px"
-        }
-        let gstStyle = {
-            fontSize: "16px",
-            visibility: (customArgs.displayGstNumber == 'false' || customArgs.displayGstNumber == false)?'hidden': 'visible'
-        }
-        let rightImgColStyles = {
-            position: 'absolute',
-            height: "76px",
-            // right: "40px",
-            left: "calc(100% - 130px)",
-            top: "46px"
-        }
-        let rightImgStyles={
-            height: '100%'
-        }
-
-        leftSection.push(
-            <div className="logo-div left" style={leftImgColStyles}>
-                <img className="img" style={leftImgStyles} src={leftLogoImgSrc}/>
-            </div>
-        )
-        middleSection.push(
-            <Col xs={12} style={middleSectionStyles}>
-                <><span className="store-name" style={storeNameStyles}>{strNme}</span></>  <br></br>
-                <><span className="full-addr-line" style={addressLineStyle}>{addressLine}</span></> <br></br>
-                <>   
-                    {mobileLine && <span className="mobile-no" style={mobileStyle}>{mobileLine}, </span>}
-                    {/* {(customArgs.displayGstNumber == 'false' || customArgs.displayGstNumber == false) ? <></> 
-                    : printContent.gstNumber && <span className="gst-no" style={gstStyle}>GST: {printContent.gstNumber}</span>} */}
-                    {printContent.gstNumber && <span className="gst-no" style={gstStyle}>GST: {printContent.gstNumber}</span>}
-                </>
-            </Col>
-        )
-        rightSection.push(
-            <div className="logo-div right" style={rightImgColStyles}>
-                <img className="img" style={rightImgStyles} src={rightLogoImgSrc}/>
-            </div>
-        )
-      
-        return <>
-                    {leftSection}
-                    {middleSection}
-                    {rightSection}
-                </>;
-    }
-
     const _constructOrnBody = () => {
         let wstValDecimals = 3;
         if(printContent.decimals && printContent.decimals.wstVal) wstValDecimals = printContent.decimals.wstVal;
@@ -183,19 +76,7 @@ function GstBillTemplate3(props) {
                 rate: 3,
                 makingCharge: 3,
                 netAmt: 6,
-            },
-            // sno: 1,
-            // itemName: 9,
-            // hsn: 2,
-            // qty: 1,
-            // netWt: 1,
-            // grossWt: 1,
-            // wastage: 2,
-            // rate: 2,
-            // makingCharge: 1,
-            // amt: 2,
-            // discount: 2,
-            // netAmt: 2
+            }
         }
 
         let totalNetWt = 0;
@@ -222,7 +103,7 @@ function GstBillTemplate3(props) {
                     <Col xs={spans.part2._span}>
                         <Row>
                             <Col xs={spans.part2.grossWt} className="no-padding">
-                                Gr.Wt
+                                G.Wt
                             </Col>
                             <Col xs={spans.part2.netWt} className="no-padding">
                                 Nt.Wt
@@ -261,7 +142,7 @@ function GstBillTemplate3(props) {
                             <Col xs={spans.part1.hsn} className="no-padding">
                                 {printContent.hsCode}
                             </Col>
-                            <Col xs={spans.part1.itemName} className="no-padding" style={{fontSize: '12px', fontWeight: 'bold'}}>
+                            <Col xs={spans.part1.itemName} className="no-padding" style={{fontSize: '12px'}}>
                                 {anOrn.itemType} {anOrn.title} {anOrn.huid?`- ${anOrn.huid}`:''}
                             </Col>
                             <Col xs={spans.part1.qty} className="no-padding">
@@ -350,21 +231,21 @@ function GstBillTemplate3(props) {
                     <div style={{paddingLeft: '10px', paddingRight: '10px', width: '90%', margin: '0 auto'}}>
                         <Col xs={12}>
                             <Row>
-                                <Col xs={12} className="no-padding" style={{textAlign: 'center'}}>OLD GOLD PURCHASE DETAILS</Col>
+                                <Col xs={12} className="no-padding" style={{fontSize: '10px', textAlign: 'center'}}>OLD GOLD PURCHASE DETAILS</Col>
                             </Row>
                             <Row style={{fontWeight: 'bold', borderBottom: '1px solid lightgrey'}}>
                                 <Col xs={3} className="no-padding">Gross Wt</Col>
-                                <Col xs={3} className="no-padding">Wtg</Col>
+                                <Col xs={3} className="no-padding">Wsg</Col>
                                 {/* <Col xs={2} className="no-padding">Net wt</Col> */}
                                 <Col xs={3} className="no-padding">Rate</Col>
                                 <Col xs={3} className="no-padding">Net Amt</Col>
                             </Row>
                             <Row>
-                                <Col xs={3} className="no-padding">{formatNo(printContent.oldOrnaments.grossWt,3)}</Col>
-                                <Col xs={3} className="no-padding">{formatNo(printContent.oldOrnaments.lessWt,3)}</Col>
+                                <Col xs={3} className="no-padding">{formatNo(printContent.oldOrnaments.grossWt,3, {returnType: 'string'})}</Col>
+                                <Col xs={3} className="no-padding">{formatNo(printContent.oldOrnaments.lessWt,3, {returnType: 'string'})}</Col>
                                 {/* <Col xs={2} className="no-padding">{formatNo(printContent.oldOrnaments.netWt,3)}</Col> */}
-                                <Col xs={3} className="no-padding">{formatNo(printContent.oldOrnaments.pricePerGram,2)}</Col>
-                                <Col xs={3} className="no-padding">{formatNo(printContent.oldOrnaments.netAmount,2)}</Col>
+                                <Col xs={3} className="no-padding">{currencyFormatter(formatNo(printContent.oldOrnaments.pricePerGram,2))}</Col>
+                                <Col xs={3} className="no-padding">{currencyFormatter(formatNo(printContent.oldOrnaments.netAmount,2))}</Col>
                             </Row>
                         </Col>
                     </div>
@@ -444,36 +325,6 @@ function GstBillTemplate3(props) {
                         {currencyFormatter(formatNo(printContent.calculations.grandTotal,2, {returnType: 'string'}))}
                     </Col>
                 </Row>
-                {/* {printContent.payments.card && 
-                    <Row>
-                        <Col xs={{span: 6}} className="no-padding">
-                            Card Payment
-                        </Col>
-                        <Col xs={6} className="no-padding">
-                            {printContent.payments.card}
-                        </Col>
-                    </Row>
-                }
-                {printContent.payments.mobilePay && 
-                    <Row>
-                        <Col xs={{span: 6}} className="no-padding">
-                            Mobile Pay
-                        </Col>
-                        <Col xs={6} className="no-padding">
-                            {printContent.payments.mobilePay}
-                        </Col>
-                    </Row>
-                }
-                {printContent.payments.cash && 
-                    <Row>
-                        <Col xs={{span: 6}} className="no-padding">
-                            Cash Received
-                        </Col>
-                        <Col xs={6} className="no-padding">
-                            {printContent.payments.cash}
-                        </Col>
-                    </Row>
-                } */}
             </div>
     }
 
@@ -518,21 +369,29 @@ function GstBillTemplate3(props) {
             </Row>
             <Row>
                 <Col xs={3}>Mobile: </Col>
-                <Col xs={9}>{(printContent.customerMobile && printContent.customerMobile!== 'null')?printContent.customerMobile:''}</Col>
+                <Col xs={9}>{(printContent.customerMobile && printContent.customerMobile!== 'null')?printContent.customerMobile:''}
+                    <span style={{visibility: printContent.customerPanNo?'visible': 'hidden'}}>&nbsp;|&nbsp;PAN: {printContent.customerPanNo || ''} </span>
+                </Col>
             </Row>
         </>
         let rateAndDate = <>
             <Row>
-                <Col xs={4} style={{paddingLeft: 0}}>Bill No: </Col>
-                <Col xs={6} style={{position: 'relative'}}>
+                <Col xs={3} style={{padding: 0}}>GSTIN: </Col>
+                <Col xs={9} style={{paddingLeft: 0, position: 'relative'}}>
+                    {printContent.gstNumber} 
+                </Col>
+            </Row>
+            <Row>
+                <Col xs={3} style={{padding: 0}}>Bill No: </Col>
+                <Col xs={9} style={{paddingLeft: 0, position: 'relative'}}>
                     {printContent.billNo} 
                 </Col>
             </Row>
             <Row>
-                <Col xs={4} style={{paddingLeft: 0}}>Date:</Col>
-                <Col xs={6}>{printContent.dateVal}</Col>
+                <Col xs={3} style={{padding: 0}}>Date:</Col>
+                <Col xs={9} style={{paddingLeft: 0}}>{printContent.dateVal }</Col>
             </Row>
-            <Row>
+            {/* <Row>
                 {printContent.ornaments && printContent.ornaments.length > 0 && <>
                     <Col xs={4} style={{paddingLeft: 0, paddingRight: 0}}>
                         {_isItemTypeGold() && 'Gold Rate'}
@@ -544,14 +403,6 @@ function GstBillTemplate3(props) {
                         {_isItemTypeSilver() && currencyFormatter(printContent.silverRatePerGm)}
                     </Col>
                 </>}
-            </Row>
-            {/* <Row>
-                <Col xs={6}>Silver Rate</Col>
-                <Col xs={6}>{printContent.silverRatePerGm}</Col>
-            </Row> */}
-            {/* <Row>
-                <Col xs={4} style={{paddingLeft: 0}}>HSN NO:</Col>
-                <Col xs={6}>{printContent.hsCode}</Col>
             </Row> */}
         </>
 
@@ -562,13 +413,15 @@ function GstBillTemplate3(props) {
                     <Row className={'customer-info-div'}>
                         <Col xs={12}>
                             <Row>
-                                <Col xs={8}>
+                                <Col xs={5}>
                                     {custInfo}
                                 </Col>
-                                {/* <Col xs={4}>
-                                    
-                                </Col> */}
-                                <Col xs={4}>
+                                <Col xs={{span: 2}}>
+                                    <div style={{textAlign: 'center'}}>
+                                        Tax Invoice
+                                    </div>
+                                </Col>
+                                <Col xs={{span: 3, offset: 2}}>
                                     {rateAndDate}
                                 </Col>
                             </Row>

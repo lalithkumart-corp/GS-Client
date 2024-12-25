@@ -1,4 +1,4 @@
-import { isNull } from '../../utilities/utility';
+import { isNull, safeParseJson } from '../../utilities/utility';
 
 export const constructCreateCustParams = (thatState) => {
     let state = thatState;
@@ -12,8 +12,17 @@ export const constructCreateCustParams = (thatState) => {
         pinCode: !isNull(state.selectedCustomer.pincode)?(state.selectedCustomer.pincode):(state.formData.pincode.inputVal),
         mobile: _getMobileNumber(state),
         hashKey: state.selectedCustomer.hashKey || null,
+        otherDetailsJson: getCustomerOtherDetailsJsonFormat(state)
     };
     return params;
+}
+
+const getCustomerOtherDetailsJsonFormat = (state) => {
+    let formattedArr = null;
+    if(state.selectedCustomer?.otherDetails && state.selectedCustomer?.otherDetails !== "") {
+        formattedArr = safeParseJson(state.selectedCustomer.otherDetails);
+    }
+    return formattedArr;
 }
 
 const _getMobileNumber = (state) => {

@@ -160,8 +160,14 @@ export const convertDateObjToStr = (dateObj, options) => {
     } else {
         let hr = twoDigitFormat(dateObj.getHours());
         let min = twoDigitFormat(dateObj.getMinutes());
-        let sec = twoDigitFormat(dateObj.getSeconds());
-        localDate = `${dd}-${mm}-${yyyy} ${hr}:${min}:${sec}`;
+        if(options.excludeSeconds) {
+            localDate = `${dd}-${mm}-${yyyy} ${hr}:${min}`;    
+        } else {
+            let sec = twoDigitFormat(dateObj.getSeconds());
+            localDate = `${dd}-${mm}-${yyyy} ${hr}:${min}:${sec}`;
+        }
+        if(options.addAmPmSuffix)
+            localDate += hr>=12?' PM':' AM';
     }
     return localDate;    
 }
@@ -292,3 +298,6 @@ export const safeParseJson = (jsonStr) => {
     }
     return returnVal;
 }
+
+export const selectInputBoxLetters = (event) => event.target.select();
+

@@ -465,16 +465,16 @@ function GstBillTemplate2(props) {
         </>
         let rateAndDate = <>
             <Row>
-                <Col xs={4} style={{paddingLeft: 0}}>DATE:</Col>
-                <Col xs={6}>{printContent.dateVal}</Col>
+                <Col xs={3} style={{paddingLeft: 0}}>DATE:</Col>
+                <Col xs={9} style={{paddingLeft: 0}}>{printContent.dateVal}</Col>
             </Row>
             <Row>
                 {printContent.ornaments && printContent.ornaments.length > 0 && <>
-                    <Col xs={4} style={{paddingLeft: 0, paddingRight: 0}}>
+                    <Col xs={3} style={{paddingLeft: 0, paddingRight: 0}}>
                         {printContent.ornaments[0].itemType == 'G' && 'Gold Rate'}
                         {printContent.ornaments[0].itemType == 'S' && 'Silver Rate'}
                     </Col>
-                    <Col xs={6}>
+                    <Col xs={9} style={{paddingLeft: 0}}>
                         ₹ &nbsp;
                         {printContent.ornaments[0].itemType == 'G' && currencyFormatter(printContent.goldRatePerGm)}
                         {printContent.ornaments[0].itemType == 'S' && currencyFormatter(printContent.silverRatePerGm)}
@@ -486,8 +486,8 @@ function GstBillTemplate2(props) {
                 <Col xs={6}>{printContent.silverRatePerGm}</Col>
             </Row> */}
             <Row>
-                <Col xs={4} style={{paddingLeft: 0}}>HSN NO:</Col>
-                <Col xs={6}>{printContent.hsCode}</Col>
+                <Col xs={3} style={{paddingLeft: 0}}>HSN NO:</Col>
+                <Col xs={9} style={{paddingLeft: 0}}>{printContent.hsCode}</Col>
             </Row>
         </>
 

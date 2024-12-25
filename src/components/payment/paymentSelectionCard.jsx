@@ -1,5 +1,5 @@
-import { useState, useEffect, useMemo } from "react";
-import { fetchMyAccountsList, fetchAllBanksList } from '../../utilities/apiUtils';
+import { useState, useEffect } from "react";
+import { fetchMyAccountsList } from '../../utilities/apiUtils';
 import { Collapse } from 'react-collapse';
 import { Container, Row, Col, Form, FormGroup, FormLabel, FormControl, HelpBlock, InputGroup, Button, Glyphicon } from 'react-bootstrap';
 import { DEFAULT_PAYMENT_OBJ_FOR_CASH_IN, DEFAULT_PAYMENT_OBJ_FOR_CASH_OUT, IN, OUT } from '../../constants';
@@ -8,21 +8,31 @@ export const PaymentSelectionCard = (props) => {
     const [defaultAccObj, setDefaultAccObj] = useState(null);
     const [paymentInputDivView, setPaymentInputDivView] = useState(props.paymentInputDivView || false);
     const [accountsList, setAccountsList] = useState([]);
-    // const [allBanksList, setAllBanksList] = useState([]);
-    // const [defaultAccountId, setDefaultAccountId] = useState(null);
     const [paymentFlow, setPaymentFlow] = useState(props.paymentFlow || IN);
     const [paymentObj, setPaymentObj] = useState(
         () => {
             if(paymentFlow == IN)
-                return {...DEFAULT_PAYMENT_OBJ_FOR_CASH_IN, mode: props.paymentMode};
+                return {...JSON.parse(JSON.stringify(DEFAULT_PAYMENT_OBJ_FOR_CASH_IN)), mode: props.paymentMode};
             else
-                return {...DEFAULT_PAYMENT_OBJ_FOR_CASH_OUT, mode: props.paymentMode};
+                return {...JSON.parse(JSON.stringify(DEFAULT_PAYMENT_OBJ_FOR_CASH_OUT)), mode: props.paymentMode};
         }
     );
 
     useEffect(() => {
         fetchAccountDroddownList();
     }, []);
+
+    useEffect(() => {
+        if(props.resetActionFlag) {
+            let r = {...JSON.parse(JSON.stringify(DEFAULT_PAYMENT_OBJ_FOR_CASH_IN)), mode: props.paymentMode};
+            if(paymentFlow == OUT)
+                r = {...JSON.parse(JSON.stringify(DEFAULT_PAYMENT_OBJ_FOR_CASH_OUT)), mode: props.paymentMode};
+            
+            setPaymentObj(r);
+
+            props.updateResetActionFlag(false);
+        }
+    }, [props.resetActionFlag])
 
     useEffect(()=>{
         setPaymentFlow(props.paymentFlow);
@@ -42,27 +52,28 @@ export const PaymentSelectionCard = (props) => {
                     return aFundAcc;
             });
             await setDefaultAccObj(_defaultFundAcc[0]);
-            updateAccountIdsWithDefault();
+            updateAccountIdsWithDefault(_defaultFundAcc[0]);
         }
         setAccountsList(list);
         // setAllBanksList(theAllBanksList);
     }
 
-    const updateAccountIdsWithDefault = () => {
-        if(defaultAccObj) {
+    const updateAccountIdsWithDefault = (_defaultAccObj) => {
+        let obj = _defaultAccObj || defaultAccObj;
+        if(obj) {
             // setDefaultAccountId(defaultAccObj.id);
             let tt = {...paymentObj};
 
             if(paymentFlow == IN) {
-                tt.cash.toAccountId = defaultAccObj.id;
-                tt.online.toAccountId = defaultAccObj.id;
-                tt.mixed.cash.toAccountId = defaultAccObj.id;
-                tt.mixed.online.toAccountId = defaultAccObj.id;
+                tt.cash.toAccountId = obj.id;
+                tt.online.toAccountId = obj.id;
+                tt.mixed.cash.toAccountId = obj.id;
+                tt.mixed.online.toAccountId = obj.id;
             } else {
-                tt.cash.fromAccountId = defaultAccObj.id;
-                tt.online.fromAccountId = defaultAccObj.id;
-                tt.mixed.cash.fromAccountId = defaultAccObj.id;
-                tt.mixed.online.fromAccountId = defaultAccObj.id;
+                tt.cash.fromAccountId = obj.id;
+                tt.online.fromAccountId = obj.id;
+                tt.mixed.cash.fromAccountId = obj.id;
+                tt.mixed.online.fromAccountId = obj.id;
             }
             setPaymentObj(tt);
             props.onChange(tt);
@@ -125,6 +136,7 @@ export const PaymentSelectionCard = (props) => {
     }
 
     const onChangePaymentAmounts = (val, identifier) => {
+        debugger;
         switch(identifier) {
             case 'inward-cash-val':
             case 'outward-cash-val':
@@ -148,6 +160,8 @@ export const PaymentSelectionCard = (props) => {
         setPaymentObj(paymentObj);
         props.onChange(paymentObj);
     }
+
+    const handleFocus = (event) => event.target.select();
 
     const getMyAccListDOM = (key) => {
         let theDom = [];
@@ -228,6 +242,7 @@ export const PaymentSelectionCard = (props) => {
                                             type="number"
                                             value={paymentObj.cash.value}
                                             onChange={(e) => onChangePaymentAmounts(e.target.value, 'inward-cash-val')}
+                                            onFocus={handleFocus}
                                         />
                                     </Form.Group>
                                 </Col>
@@ -253,6 +268,7 @@ export const PaymentSelectionCard = (props) => {
                                             type="number"
                                             value={paymentObj.cash.value}
                                             onChange={(e) => onChangePaymentAmounts(e.target.value, 'outward-cash-val')}
+                                            onFocus={handleFocus}
                                         />
                                     </Form.Group>
                                 </Col>
@@ -317,6 +333,7 @@ export const PaymentSelectionCard = (props) => {
                                                 type="number"
                                                 value={paymentObj.online.value}
                                                 onChange={(e) => onChangePaymentAmounts(e.target.value, 'inward-online-val')}
+                                                onFocus={handleFocus}
                                             />
                                         </Form.Group>
                                     </Col>
@@ -343,6 +360,7 @@ export const PaymentSelectionCard = (props) => {
                                                     type="number"
                                                     value={paymentObj.online.value}
                                                     onChange={(e) => onChangePaymentAmounts(e.target.value, 'outward-online-val')}
+                                                    onFocus={handleFocus}
                                                 />
                                             </Form.Group>
                                         </Col>
@@ -353,6 +371,7 @@ export const PaymentSelectionCard = (props) => {
                                                     type="text"
                                                     value={paymentObj.online.toAccount.accNo}
                                                     onChange={(e) => onChangePaymentInputs(e.target.value, 'outward-online-to-acc-no')}
+                                                    onFocus={handleFocus}
                                                     >
                                                 </Form.Control>
                                             </Form.Group>
@@ -363,6 +382,7 @@ export const PaymentSelectionCard = (props) => {
                                                     type="text"
                                                     value={paymentObj.online.toAccount.ifscCode}
                                                     onChange={(e) => onChangePaymentInputs(e.target.value, 'outward-online-to-acc-ifsc')}
+                                                    onFocus={handleFocus}
                                                     >
                                                 </Form.Control>
                                             </Form.Group>
@@ -396,6 +416,7 @@ export const PaymentSelectionCard = (props) => {
                                             type="number"
                                             value={paymentObj.mixed.cash.value}
                                             onChange={(e) => onChangePaymentAmounts(e.target.value, 'inward-mixed-cash-val')}
+                                            onFocus={handleFocus}
                                         />
                                     </Form.Group>
                                 </Col>
@@ -419,6 +440,7 @@ export const PaymentSelectionCard = (props) => {
                                             type="number"
                                             value={paymentObj.mixed.online.value}
                                             onChange={(e) => onChangePaymentAmounts(e.target.value, 'inward-mixed-online-val')}
+                                            onFocus={handleFocus}
                                         />
                                     </Form.Group>
                                 </Col>
@@ -445,6 +467,7 @@ export const PaymentSelectionCard = (props) => {
                                             type="number"
                                             value={paymentObj.mixed.cash.value}
                                             onChange={(e) => onChangePaymentAmounts(e.target.value, 'outward-mixed-cash-val')}
+                                            onFocus={handleFocus}
                                         />
                                     </Form.Group>
                                 </Col>
@@ -469,6 +492,7 @@ export const PaymentSelectionCard = (props) => {
                                                 type="number"
                                                 value={paymentObj.mixed.online.value}
                                                 onChange={(e) => onChangePaymentAmounts(e.target.value, 'outward-mixed-online-val')}
+                                                onFocus={handleFocus}
                                             />
                                         </Form.Group>
                                     </Col>
@@ -479,6 +503,7 @@ export const PaymentSelectionCard = (props) => {
                                                 type="text"
                                                 value={paymentObj.online.toAccount.accNo}
                                                 onChange={(e) => onChangePaymentInputs(e.target.value, 'outward-mixed-online-to-acc-no')}
+                                                onFocus={handleFocus}
                                                 >
                                             </Form.Control>
                                         </Form.Group>
@@ -489,6 +514,7 @@ export const PaymentSelectionCard = (props) => {
                                                 type="text"
                                                 value={paymentObj.online.toAccount.ifscCode}
                                                 onChange={(e) => onChangePaymentInputs(e.target.value, 'outward-mixed-online-to-acc-ifsc')}
+                                                onFocus={handleFocus}
                                                 >
                                             </Form.Control>
                                         </Form.Group>

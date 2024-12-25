@@ -17,7 +17,7 @@ import './SellItem.css';
 import {calcPurchaseTotals, calculateExchangeTotals, calculatePaymentFormData, validate, constructApiParams, resetPageState, defaultExchangeItemFormData, constructPrintContent } from './helper';
 import { toast } from 'react-toastify';
 import { DoublyLinkedList } from '../../../utilities/doublyLinkedList';
-import { formatNo, getCurrentDateTimeInUTCForDB, getMyDateObjInUTCForDB } from '../../../utilities/utility';
+import { formatNo, getCurrentDateTimeInUTCForDB, getMyDateObjInUTCForDB, selectInputBoxLetters } from '../../../utilities/utility';
 import ReactToPrint from 'react-to-print';
 import TemplateRenderer from '../../../templates/jewellery-gstBill/templateRenderer';
 import EstimateBillTemplateRenderer from '../../../templates/jewellery-estimateBill/templateRenderer';
@@ -130,7 +130,8 @@ class SellItem extends Component {
                 balance: 0
             },
             showCalcRefreshIcon: false,
-            roundOffRangeSel: 5
+            roundOffRangeSel: 5,
+            paymentCardResetActionFlag: false,
         }
         console.log('--CONSTRUCTOR');
         console.log(JSON.stringify(props.invoice));
@@ -153,6 +154,7 @@ class SellItem extends Component {
         this.onClickRoundOffRange = this.onClickRoundOffRange.bind(this);
         this.onChangeBillingType = this.onChangeBillingType.bind(this);
         this.preview = this.preview.bind(this);
+        this.updateResetActionFlag = this.updateResetActionFlag.bind(this);
     }
     componentDidMount() {
         if(this.props.updateMode) {
@@ -218,9 +220,9 @@ class SellItem extends Component {
                 qty: newState.currSelectedItem.avl_qty || 1,
                 grossWt: parseFloat(newState.currSelectedItem.avl_g_wt),
                 netWt: parseFloat(newState.currSelectedItem.avl_n_wt),
-                wastage: "",
+                wastage: parseFloat(newState.currSelectedItem.sales_wsg_percent || 0),
                 wastageVal: "",
-                labour: "",
+                labour: parseFloat(newState.currSelectedItem.sales_mc || 0),
                 cgstPercent: this.state.billingType==ORIGINAL_BILLING?1.5:0,
                 sgstPercent: this.state.billingType==ORIGINAL_BILLING?1.5:0,
                 discount: "",
@@ -423,6 +425,10 @@ class SellItem extends Component {
     onCalcRefreshClick = () => {
         this.calculateSellingPrice(SELL_WASTAGE_VAL);
         this.setState({showCalcRefreshIcon: false});
+    }
+
+    updateResetActionFlag = (flag) => {
+        this.setState({paymentCardResetActionFlag: flag});
     }
 
     async addItemToBillPreview(e) {
@@ -632,6 +638,10 @@ class SellItem extends Component {
                 case RETAIL_PRICE:
                     if(!this.canEnableItemSellInput())
                         canTransferFocus = false;
+                    break;
+                case 'price1':
+                    this.onCalcRefreshClick();
+                    break;
             }
         }
         if(canTransferFocus)
@@ -1035,17 +1045,20 @@ class SellItem extends Component {
                                     <td>
                                         <input type="number" className="gs-input" value={formData.qty} onChange={(e)=>this.onInputValChange(e, 'qty')} readOnly={isReadOnly}
                                                                 onKeyUp = {(e) => this.onKeyUp(e, {currElmKey: 'qty1'})}
-                                                                ref= {(domElm) => {this.domElmns.qty1 = domElm; }}/>
+                                                                ref= {(domElm) => {this.domElmns.qty1 = domElm; }}
+                                                                onFocus={selectInputBoxLetters}/>
                                     </td>
                                     <td>
                                         <input type="number" className="gs-input" value={formData.grossWt} onChange={(e)=>this.onInputValChange(e, 'grossWt')} readOnly={this.preventWeighttModification()}
                                                                 onKeyUp = {(e) => this.onKeyUp(e, {currElmKey: 'wt1'})}
-                                                                ref= {(domElm) => {this.domElmns.wt1 = domElm; }} />
+                                                                ref= {(domElm) => {this.domElmns.wt1 = domElm; }} 
+                                                                onFocus={selectInputBoxLetters}/>
                                     </td>
                                     <td>
                                         <input type="number" className="gs-input" value={formData.netWt} onChange={(e)=>this.onInputValChange(e, 'netWt')} readOnly={this.preventWeighttModification()}
                                                                 onKeyUp = {(e) => this.onKeyUp(e, {currElmKey: 'wt2'})}
-                                                                ref= {(domElm) => {this.domElmns.wt2 = domElm; }} />
+                                                                ref= {(domElm) => {this.domElmns.wt2 = domElm; }} 
+                                                                onFocus={selectInputBoxLetters}/>
                                     </td>
                                     <td>
                                         <input type="number" className="gs-input" value={formData.wastage} onChange={(e)=>this.onInputValChange(e, 'wastage')} readOnly={isReadOnly}
@@ -1055,17 +1068,20 @@ class SellItem extends Component {
                                     <td>
                                         <input type="number" className="gs-input" value={formData.wastageVal} onChange={(e)=>this.onInputValChange(e, 'wastageVal')} readOnly={isReadOnly}
                                                                 onKeyUp = {(e) => this.onKeyUp(e, {currElmKey: 'wastageVal1'})}
-                                                                ref= {(domElm) => {this.domElmns.wastageVal1 = domElm;}} />
+                                                                ref= {(domElm) => {this.domElmns.wastageVal1 = domElm;}} 
+                                                                onFocus={selectInputBoxLetters}/>
                                     </td>
                                     <td>
                                         <input type="number" className="gs-input" value={formData.labour} onChange={(e)=>this.onInputValChange(e, 'labour')} readOnly={isReadOnly}
                                                                 onKeyUp = {(e) => this.onKeyUp(e, {currElmKey: 'labour1'})}
-                                                                ref= {(domElm) => {this.domElmns.labour1 = domElm;}} />
+                                                                ref= {(domElm) => {this.domElmns.labour1 = domElm;}} 
+                                                                onFocus={selectInputBoxLetters}/>
                                     </td>
                                     <td>
                                         <input type="number" className="gs-input" value={formData.discount || ""} onChange={(e) => this.onInputValChange(e, 'discount')} readOnly={isReadOnly}
                                             onKeyUp = {(e) => this.onKeyUp(e, {currElmKey: 'discount1'})}
-                                            ref= {(domElm) => {this.domElmns.discount1 = domElm;}} />
+                                            ref= {(domElm) => {this.domElmns.discount1 = domElm;}} 
+                                            onFocus={selectInputBoxLetters}/>
                                     </td>
                                 </tr>
                             </tbody>
@@ -1103,17 +1119,20 @@ class SellItem extends Component {
                                     <td>
                                         <input type="number" className="gs-input" value={formData.cgstPercent} onChange={(e)=>this.onInputValChange(e, 'cgstPercent')} readOnly={isReadOnly}
                                                                 onKeyUp = {(e) => this.onKeyUp(e, {currElmKey: 'cgstPercent1'})}
-                                                                ref= {(domElm) => {this.domElmns.cgstPercent1 = domElm;}} />
+                                                                ref= {(domElm) => {this.domElmns.cgstPercent1 = domElm;}} 
+                                                                onFocus={selectInputBoxLetters}/>
                                     </td>
                                     <td>
                                         <input type="number" className="gs-input" value={formData.sgstPercent} onChange={(e)=>this.onInputValChange(e, 'sgstPercent')} readOnly={isReadOnly}
                                                                 onKeyUp = {(e) => this.onKeyUp(e, {currElmKey: 'sgstPercent1'})}
-                                                                ref= {(domElm) => {this.domElmns.sgstPercent1 = domElm;}} />
+                                                                ref= {(domElm) => {this.domElmns.sgstPercent1 = domElm;}} 
+                                                                onFocus={selectInputBoxLetters}/>
                                     </td>
                                     <td>
                                         <input type="number" className="gs-input" value={formData.finalPrice} onChange={(e) => this.onInputValChange(e, 'finalPrice')} readOnly={isReadOnly}
                                                 onKeyUp = {(e) => this.onKeyUp(e, {currElmKey: 'price1'})}
-                                                ref= {(domElm) => {this.domElmns.price1 = domElm;}} />
+                                                ref= {(domElm) => {this.domElmns.price1 = domElm;}} 
+                                                onFocus={selectInputBoxLetters}/>
                                             {/* <span className="selling-price-val">{formData.price}</span> */}
                                     </td>
                                 </tr>
@@ -1442,21 +1461,15 @@ class SellItem extends Component {
                 <p style={{fontSize: '20px'}}>Sum: ₹ {formatNo(this.state.paymentFormData.sum, 2)}</p>
                 {this.state.billingType==ORIGINAL_BILLING && <>
                 <div className="pymnt-mode-input-div">
-                    {/* <span className="field-name payment-mode">Payment Mode:</span> */}
                     <div style={{display: 'inline-block'}}>
-                        <PaymentSelectionCard paymentFlow={IN} paymentMode={'cash'} onChange={(obj) => this.onChangePaymentInInputs(obj)} paymentInputDivView={true}/>
-                        {/* <Form.Group>
-                            <Form.Control as="select"
-                                onChange={(e) => this.onDropdownChange(e, PAYMENT_MODE)} 
-                                value={this.state.paymentFormData.paymentMode}
-                                style={{ height: "26px", padding: '0 5px' }}
-                                // onKeyUp={(e) => this.handleKeyUp(e, {currElmKey: PAYMENT_MODE})}
-                                // ref= {(domElm) => {this.domElmns[PAYMENT_MODE] = domElm; }}
-                                >
-                                    <option key="key-cash" value="cash">CASH</option>
-                                    <option key="key-cash" value="online">Online</option>
-                            </Form.Control>
-                        </Form.Group> */}
+                        <PaymentSelectionCard 
+                            paymentFlow={IN} 
+                            paymentMode={'cash'} 
+                            onChange={(obj) => this.onChangePaymentInInputs(obj)} 
+                            paymentInputDivView={true}
+                            resetActionFlag={this.state.paymentCardResetActionFlag}
+                            updateResetActionFlag={this.updateResetActionFlag}
+                        />
                     </div>
                 </div>
                 <div style={{marginTop: '15px'}}>
@@ -1513,6 +1526,7 @@ class SellItem extends Component {
                                                     placeholder=""
                                                     className="invoice-number-field"
                                                     onChange={(e) => this.onInvoiceNumberChange(e.target.value)}
+                                                    onFocus={selectInputBoxLetters}
                                                 />
                                                 <FormControl.Feedback />
                                             </InputGroup>
@@ -1554,6 +1568,7 @@ class SellItem extends Component {
                                                     className="reatil-price-field"
                                                     onChange={(e) => this.onInputValChange(e, 'retailPrice')}
                                                     onKeyUp = {(e) => this.onKeyUp(e, {currElmKey: RETAIL_PRICE})}
+                                                    onFocus={selectInputBoxLetters}
                                                 />
                                                 <FormControl.Feedback />
                                             </InputGroup>
@@ -1621,7 +1636,7 @@ class SellItem extends Component {
                             </Col>
 
                             <Col xs={6}>
-                                <input type="button" className="gs-button bordered" style={{width: '100%'}} value={this.state.billingType==ORIGINAL_BILLING?"Save":"Save Estimate"} onClick={this.submit}/>
+                                <input type="button" className="gs-button bordered" style={{width: '100%'}} value={this.state.billingType==ORIGINAL_BILLING?"Submit":"Save Estimate"} onClick={this.submit}/>
                             </Col>
                         </Row>
                         {/* <Row>
@@ -1638,7 +1653,7 @@ class SellItem extends Component {
                         content={() => this.componentRef}
                         className="print-hidden-btn"
                     />
-                    {ORIGINAL_BILLING?
+                    {this.state.billingType === ORIGINAL_BILLING?
                     <TemplateRenderer 
                         ref={(el) => (this.componentRef = el)} 
                         templateId={this.state.selectedGstTemplateId} 
