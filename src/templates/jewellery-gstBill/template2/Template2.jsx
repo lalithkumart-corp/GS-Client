@@ -390,7 +390,7 @@ function GstBillTemplate2(props) {
                     </Col>
                 </Row>
                 : <></>}
-                <Row style={{fontSize: '16px', fontWeight: 'bold'}}>
+                <Row style={{fontSize: '14px', fontWeight: 'bold'}}>
                     <Col xs={{span: 6}} className="no-padding">
                         Grand Total
                     </Col>
@@ -449,7 +449,7 @@ function GstBillTemplate2(props) {
                 <Col xs={3}>INVOICE NO: </Col>
                 <Col xs={9} style={{position: 'relative'}}>
                     {printContent.billNo} 
-                    <span style={{width: '50px', position: 'absolute', top: '-14px', marginLeft: '10px'}}>
+                    <span class="barcode-span" style={{width: '50px', position: 'absolute', top: '-10px'}}>
                         <Barcode value={printContent.billNo} width={1} fontSize={1} height={16.5} displayValue={false}/>
                     </span>
                 </Col>

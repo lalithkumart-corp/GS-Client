@@ -21,6 +21,11 @@
             min-height: 85px;
             max-height: 85px;
         }
+        .barcode-span {
+            svg > rect:first-child {
+                fill: transparent !important;
+            }
+        }
     }
 }
 

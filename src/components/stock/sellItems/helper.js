@@ -360,7 +360,7 @@ export const constructPrintContent = (stateObj, propObj) => {
         customerMobile = stateObj.selectedCustomer.mobile;
         if(stateObj.selectedCustomer.otherDetailsJson && stateObj.selectedCustomer.otherDetailsJson.length > 0) {
             let filteredArr = stateObj.selectedCustomer.otherDetailsJson.filter((a) => a.field === 'Pan Card');
-            customerPanNo = filteredArr[0].val;
+            customerPanNo = filteredArr[0]?.val;
         }
     }
 

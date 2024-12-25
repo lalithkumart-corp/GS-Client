@@ -390,7 +390,7 @@ function EstimateBillTemplate1(props) {
                     </Col>
                 </Row>
                 : <></>}
-                <Row style={{fontSize: '16px', fontWeight: 'bold'}}>
+                <Row style={{fontSize: '14px', fontWeight: 'bold'}}>
                     <Col xs={{span: 6}} className="no-padding">
                         Grand Total
                     </Col>
@@ -435,22 +435,22 @@ function EstimateBillTemplate1(props) {
     }
 
     const constructBody = () => {
-        let barCode = <>
-            <Row>
-                <Col xs={12} style={{textAlign: 'center'}}>
-                    <span style={{width: '50px'}}>
-                        <Barcode value={printContent.billNo} width={1} fontSize={1} height={16.5} displayValue={false}/>
-                    </span>
-                </Col>
-            </Row>
-        </>
+        // let barCode = <>
+        //     <Row>
+        //         <Col xs={12} style={{textAlign: 'center'}}>
+        //             <span style={{width: '50px'}}>
+        //                 <Barcode value={printContent.billNo} width={1} fontSize={1} height={16.5} displayValue={false}/>
+        //             </span>
+        //         </Col>
+        //     </Row>
+        // </>
         let custInfo = <>
             <Row>
                 <Col xs={3}>INVOICE NO: </Col>
                 <Col xs={9} style={{position: 'relative'}}>
                     {printContent.billNo} 
-                    <span style={{width: '50px', position: 'absolute', top: '-14px', marginLeft: '10px'}}>
-                        <Barcode value={printContent.billNo} width={1} fontSize={20} height={25} displayValue={false}/>
+                    <span className='barcode-span' style={{width: '50px', position: 'absolute', top: '-10px'}}>
+                        <Barcode value={printContent.billNo} width={1} fontSize={20} height={16.5} displayValue={false}/>
                     </span>
                 </Col>
             </Row>
