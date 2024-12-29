@@ -29,7 +29,7 @@ class HomeClass extends Component {
 
                     </div>
                     <div style={{textAlign: "center"}}>
-                        <img src="/images/logo.png" className="home-image"/>
+                        <img src="/images/pj_logo.jpeg" className="home-image"/>
                     </div>
                 </div>
             )

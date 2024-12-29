@@ -4,7 +4,7 @@ import Barcode from "react-barcode";
 import GSCheckbox from '../../../components/ui/gs-checkbox/checkbox';
 import _ from 'lodash';
 import './Template3.scss';
-import { currencyFormatter, formatNo } from '../../../utilities/utility';
+import { convertDateObjToStr, currencyFormatter, formatNo } from '../../../utilities/utility';
 import convertor from 'rupees-to-words';
 
 const DEFAULT_TEMPLATE_STRUC = {
@@ -361,11 +361,11 @@ function GstBillTemplate3(props) {
         let custInfo = <>
             <Row>
                 <Col xs={3}>Customer: </Col>
-                <Col xs={9}>{printContent.address}</Col>
+                <Col xs={9}>{printContent.customerName}</Col>
             </Row>
             <Row>
                 <Col xs={3}>Address: </Col>
-                <Col xs={9}>{printContent.customerName}</Col>
+                <Col xs={9}>{printContent.customerAddr}</Col>
             </Row>
             <Row>
                 <Col xs={3}>Mobile: </Col>
@@ -389,7 +389,9 @@ function GstBillTemplate3(props) {
             </Row>
             <Row>
                 <Col xs={3} style={{padding: 0}}>Date:</Col>
-                <Col xs={9} style={{paddingLeft: 0}}>{printContent.dateVal }</Col>
+                <Col xs={9} style={{paddingLeft: 0}}>{
+                    convertDateObjToStr(new Date(printContent.dateVal), {excludeSeconds: true, addAmPmSuffix: true})
+                }</Col>
             </Row>
             {/* <Row>
                 {printContent.ornaments && printContent.ornaments.length > 0 && <>

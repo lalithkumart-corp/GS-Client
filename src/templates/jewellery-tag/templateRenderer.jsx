@@ -1,12 +1,29 @@
 import { Component } from 'react';
 import Template1 from './template1/Template1';
 import Template2 from './template2/Template2';
+import { getJewelleryTagTemplateSettings } from '../../core/storage';
 
 export default class TemplateRenderer extends Component {
     constructor(props) {
         super(props);
+        this.state = {
+            customization: null
+        }
+    }
+    componentDidMount() {
+        this.getJewelleryTagTemplateSettings();
+    }
+    getJewelleryTagTemplateSettings() {
+        let data = getJewelleryTagTemplateSettings();
+        let newState = {...this.state};
+        if(data && data.customization) {
+            data.customization = JSON.parse(data.customization);
+            newState.customization = data.customization;
+            this.setState(newState);
+        }
     }
     getTemplateById = (tag) => {
+        tag = {...tag, customization: this.state.customization};
         let theDom = [];
         switch(this.props.templateId) {
             case 1:

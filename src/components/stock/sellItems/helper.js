@@ -320,6 +320,7 @@ export const constructPrintContent = (stateObj, propObj) => {
     let customerName = '';
     let customerMobile = '';
     let customerPanNo = '';
+    let customerAddr = '';
     _.each(stateObj.purchaseItemPreview, (anItem, index) => {
         newProds.push({
             title: anItem.item_name,
@@ -358,6 +359,7 @@ export const constructPrintContent = (stateObj, propObj) => {
     if(stateObj.selectedCustomer && Object.keys(stateObj.selectedCustomer).length > 0 ) {
         customerName = stateObj.selectedCustomer.cname;
         customerMobile = stateObj.selectedCustomer.mobile;
+        customerAddr = stateObj.selectedCustomer.address;
         if(stateObj.selectedCustomer.otherDetailsJson && stateObj.selectedCustomer.otherDetailsJson.length > 0) {
             let filteredArr = stateObj.selectedCustomer.otherDetailsJson.filter((a) => a.field === 'Pan Card');
             customerPanNo = filteredArr[0]?.val;
@@ -391,6 +393,7 @@ export const constructPrintContent = (stateObj, propObj) => {
         customerName: customerName,
         customerMobile: customerMobile,
         customerPanNo: customerPanNo,
+        customerAddr: customerAddr,
         // dateVal: convertDateObjToStr(stateObj.date.isLive?new Date():stateObj.date.inputVal, {excludeTime: true}),
         dateVal: convertDateObjToStr(stateObj.date.isLive?new Date():stateObj.date.inputVal),
         ornaments: newProds,

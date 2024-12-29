@@ -3,7 +3,7 @@ import Barcode from "react-barcode";
 
 const Template2 = ({
     storeName, division, 
-    grams, size, itemName, huid, config, productId, trackId, wsgPct
+    grams, size, itemName, huid, config, productId, trackId, wsgPct, customization
 }) => {
     config = config || {};
     let showSize = size?true:false;
@@ -13,55 +13,15 @@ const Template2 = ({
 
     grams = grams?parseFloat(grams).toFixed(3):'';
 
-    const storeNameStyles = {
-        width: '25px',
-        fontSize: 15,
-        fontWeight: 'bold'
-    };
-    const itemDivStyles = {
-        textAlign: 'center',
-        width: '57px',
-        fontSize: '14px',
-        fontWeight: 'bold'
-    };
-    const hallmarkLogoSpanStyles = {
-        height: '11px',
-        display: config.showBis?'inline-block':'none',
-        position: 'absolute',
-        marginLeft: '-4px',
-        marginTop: '3px'
-    };
-    const hallmarkLogoStyles = {
-        height: '100%',
-        marginTop: '-6px'
-    };
-    const weightLabelStyles = {
-        fontSize: '14px'
-    }
-    const weightValueStyles = {
-        fontSize: '15px',
-        fontWeight: 'bold'
-    };
-    const itemNameStyles = {
-        fontSize: '17px',
-        fontWeight: 'normal',
-        width: '35px',
-        display: showItemName?'inline-block': 'none',
-    };
-    const huidStyles = {
-        display: showHuid?'inline-block':'none',
-        fontWeight: 'bold',
-        fontSize: '14px',
-        width: '60px'
-    };
-    const itemSizeStyles = {
-        width: '31px',
-        fontSize: '14px',
-        fontWeight: 'bold',
-        display: showSize?'inline-block':'none'
-    };
+    let customCss = customization?.css;
 
     const getBarCode = () => {
+        const productIdCss = {
+            top: 21
+        };
+        if(customCss.topOffsetPx) {
+            productIdCss.top = parseInt(customCss.topOffsetPx) + 21;
+        }
         return <>
             <span className="barcode-span">
                 <Barcode 
@@ -74,14 +34,18 @@ const Template2 = ({
                     // background='lightgray'
                     // format='CODE128'
                 />
-                <span className="product-id">{productId}</span>
+                <span className="product-id" style={productIdCss}>{productId}</span>
             </span>
         </>;
     };
 
+    let panelCss = {};
+    if(customCss)
+        panelCss.paddingTop = customCss.topOffsetPx || 0;
+    
     return (
         <>
-            <div className="jewellery-tag-template-2-label">
+            <div className="jewellery-tag-template-2-label" style={panelCss}>
                 <div  className='label-content-section'>
                     <div className='section-1'>
                         <div className='row-1'>
