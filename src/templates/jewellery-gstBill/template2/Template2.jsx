@@ -4,7 +4,7 @@ import Barcode from "react-barcode";
 import GSCheckbox from '../../../components/ui/gs-checkbox/checkbox';
 import _ from 'lodash';
 import './Template2.scss';
-import { currencyFormatter, formatNo } from '../../../utilities/utility';
+import { convertDateObjToStr, currencyFormatter, formatNo } from '../../../utilities/utility';
 
 const DEFAULT_TEMPLATE_STRUC = {
     ornaments: [],
@@ -466,7 +466,9 @@ function GstBillTemplate2(props) {
         let rateAndDate = <>
             <Row>
                 <Col xs={3} style={{paddingLeft: 0}}>DATE:</Col>
-                <Col xs={9} style={{paddingLeft: 0}}>{printContent.dateVal}</Col>
+                <Col xs={9} style={{paddingLeft: 0}}>{
+                    convertDateObjToStr(new Date(printContent.dateVal), {excludeTime: true})
+                    }</Col>
             </Row>
             <Row>
                 {printContent.ornaments && printContent.ornaments.length > 0 && <>
