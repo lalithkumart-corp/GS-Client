@@ -837,8 +837,8 @@ class AddStock extends Component {
                                 <tr>
                                     <th>BillDate</th>
                                     <th>Metal</th>
-                                    <th>Price</th>
-                                    <th>SupplierShop</th>
+                                    <th>Metal Price (10gm)</th>
+                                    <th>Supplier Shop</th>
                                     <th>Supplier Person</th>
                                 </tr>
                             </thead>
@@ -867,7 +867,7 @@ class AddStock extends Component {
                                         <Form.Group className="border-right-none">
                                             <Form.Control
                                                 type="text"
-                                                placeholder="MetalPrice"
+                                                placeholder="Enter the MetalPrice"
                                                 onChange={(e) => this.inputControls.onChange(null, e.target.value, METAL_PRICE)} 
                                                 onKeyUp = {(e) => this.handleKeyUp(e, {currElmKey: METAL_PRICE}) }
                                                 value={this.state.formData.metalPrice}

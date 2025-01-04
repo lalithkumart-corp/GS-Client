@@ -13,14 +13,14 @@ const Template2 = ({
 
     grams = grams?parseFloat(grams).toFixed(3):'';
 
-    let customCss = customization?.css;
+    let customCss = customization?.css || {};
 
     const getBarCode = () => {
         const productIdCss = {
-            top: 21
+            top: '21px'
         };
         if(customCss.topOffsetPx) {
-            productIdCss.top = parseInt(customCss.topOffsetPx) + 21;
+            productIdCss.top = (parseInt(customCss.topOffsetPx) + 21 ) + 'px';
         }
         return <>
             <span className="barcode-span">
