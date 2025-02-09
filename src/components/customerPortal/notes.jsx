@@ -157,7 +157,13 @@ class Notes extends Component {
                 theDOM .push(
                     <Row xs={12} md={12} className='bill-remark-display'>
                         <Col xs={12} md={12}><p><span>{aRec.BillNo}</span> <span className='float-right'>{convertToLocalTime(aRec.Date, {excludeTime: true})}</span></p></Col>
-                        <Col xs={12} md={12}><p>{aRec.Remarks}</p></Col>
+                        <Col xs={12} md={12}>
+                            <ReactQuill 
+                                value = {aRec.Remarks}
+                                readOnly = {true}
+                                className= {'gs-cls-readonly'}
+                            />
+                        </Col>
                     </Row>
                 );
             }
@@ -272,14 +278,35 @@ function NoteCard(props) {
     const onChange = (content, delta, source, editor) => {
         setValue(content);
     }
-
+    const formats = [
+        "header",
+        "font",
+        "size",
+        "bold",
+        "italic",
+        "underline",
+        "align",
+        "strike",
+        "script",
+        "blockquote",
+        "background",
+        "list",
+        "bullet",
+        "indent",
+        "link",
+        "image",
+        "color",
+        "code-block"
+      ];
     return (
         <div>
             <ReactQuill 
+                theme="snow"
                 value = {value}
                 readOnly = {props.readOnly}
                 className= {props.readOnly?'gs-cls-readonly':''}
                 onChange = {(content, delta, source, editor) => onChange(content, delta, source, editor)}
+                formats={formats}
             />
             {!props.readOnly && 
                 <div>

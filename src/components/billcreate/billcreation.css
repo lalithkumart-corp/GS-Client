@@ -218,8 +218,8 @@
     padding-left: 0;
     padding-right: 0;
 }
-.bill-remarks-adder-dom {
-    /* margin-top: 15px !important; */
+.bill-remarks-adder-dom .gs-cls-readonly .ql-toolbar {
+    display: none;
 }
 
 .submit-container {

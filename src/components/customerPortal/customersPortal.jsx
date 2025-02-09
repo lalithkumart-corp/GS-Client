@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { Container, Row, Col, FormGroup, FormLabel, FormControl, HelpBlock, InputGroup, Button, Glyphicon, Tabs, Tab } from 'react-bootstrap';
 import axios from 'axios';
-import { PLEDGEBOOK_METADATA, PLEDGEBOOK_FETCH_CUSTOMER_HISTORY, FETCH_JWL_CUST_INVOICES_LIST } from '../../core/sitemap';
+import { PLEDGEBOOK_METADATA, PLEDGEBOOK_FETCH_CUSTOMER_HISTORY, FETCH_JWL_CUST_INVOICES_LIST, FETCH_CUSTOMER_UDHAAR_HISTORY } from '../../core/sitemap';
 import { getAccessToken } from '../../core/storage';
 import _ from 'lodash';
 import './customerPortal.css';
@@ -17,6 +17,7 @@ import CustomerAttachments from './customerAttachments';
 import { FaBan } from 'react-icons/fa';
 import LoanHistory from './loanHistory';
 import JewelleryHistory from './jewelleryHistory';
+import UdhaarHistory from './udhaarHistory';
 
 class CustomerPortal extends Component {
     constructor(props) {
@@ -37,6 +38,8 @@ class CustomerPortal extends Component {
             customerSelectionModalOpen: false,
             customerJwlInvoiceList: [],
             custJwlHistoryLoading: false,
+            customerUdhaarList: [],
+            custUdhaarHistoryLoading: false,
         }
         this.bindMethods();
     }
@@ -159,6 +162,7 @@ class CustomerPortal extends Component {
         });
         this.fetchCustomerLoanHistory(aCust.customerId);
         this.fetchCustomerJwlHistory(aCust.customerId);
+        this.fetchCustomerUdhaarHistory(aCust.customerId);
         this.setState({selectedCust: aCust, customerList: custList, billHistory: null, billHistoryLoading: true});
     }
 
@@ -174,6 +178,7 @@ class CustomerPortal extends Component {
         });
         this.fetchCustomerLoanHistory(customerId);
         this.fetchCustomerJwlHistory(customerId);
+        this.fetchCustomerUdhaarHistory(customerId);
         this.setState({selectedCust: selectedCust, customerList: custList, billHistory: null, billHistoryLoading: true});
     }
 
@@ -200,7 +205,17 @@ class CustomerPortal extends Component {
         } catch(e) {
             alert(e);
             console.log(e);
-        }        
+        }
+    }
+
+    async fetchCustomerUdhaarHistory(customerId) {
+        try {
+            let resp = await axiosMiddleware.get(`${FETCH_CUSTOMER_UDHAAR_HISTORY}?access_token=${getAccessToken()}&customer_id=${customerId}`);
+            this.setState({customerUdhaarList: resp.data.RESPONSE, custUdhaarHistoryLoading: false});
+        } catch(e) {
+            alert(e);
+            console.log(e);
+        }
     }
 
     async refreshCustomerList(cb) {
@@ -377,6 +392,9 @@ class CustomerPortal extends Component {
                 </Tab>
                 <Tab eventKey="jwlhistory" title="Jewellery History">
                     <JewelleryHistory {...this.state}/>
+                </Tab>
+                <Tab eventKey="udhaarhistory" title="Udhaar History">
+                    <UdhaarHistory {...this.state}/>
                 </Tab>
                 <Tab eventKey="notes" title="Notes">
                     <Notes {...this.state}/>

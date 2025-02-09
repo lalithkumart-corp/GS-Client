@@ -417,6 +417,7 @@ function UdhaarEntry(props) {
                         </Row>
                     </div>
                 </Col>
+                {mode != 'edit' ?
                 <Col xs={4} md={4} className="history-side-card">
                     <Row>
                         <Col xs={12} md={12}><h5 style={{color: 'gray', textAlign: 'center'}}>Customer History</h5></Col>
@@ -424,7 +425,7 @@ function UdhaarEntry(props) {
                             <UdhaarHistory customerId={getCustomerId()} refresh={refreshHistory} setRefreshFlag={setHistoryRefreshFlag}/>
                         </Col>
                     </Row>
-                </Col>
+                </Col>: <></>}
             </Row>
         </Container>
     )

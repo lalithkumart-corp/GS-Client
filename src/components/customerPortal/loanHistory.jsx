@@ -7,6 +7,9 @@ import { convertToLocalTime, imageUrlCorrection, currencyFormatter } from '../..
 import './loanHistory.css';
 import { calculateData } from '../redeem/helper';
 import moment from 'moment';
+import {Popover, ArrowContainer} from 'react-tiny-popover';
+import { MdEdit, MdOutlineTableChart } from 'react-icons/md';
+import ReactQuill from 'react-quill';
 
 class LoanHistory extends Component {
     constructor(props) {
@@ -17,6 +20,8 @@ class LoanHistory extends Component {
                 closedBills: []
             },
             billHistoryLoading: false,
+            notesPopup: {},
+            ornPopup: {},
             columns : [{
                 id: 'Date',
                 displayText: 'Date',
@@ -62,6 +67,18 @@ class LoanHistory extends Component {
                 displayText: 'Address',
                 width: '30%',                
                 className: 'pb-address-col'
+            }, {
+                id: '',
+                displayText: '',
+                width: '6%',
+                className: 'pb-actions-col',
+                formatter: (column, columnIndex, row, rowIndex) => {
+                    return (
+                        <div className='actions-cell'>
+                            {this.actionsColFormater(row)}
+                        </div>
+                    )
+                }
             }],
             columns2 : [{
                 id: 'Date',
@@ -131,6 +148,59 @@ class LoanHistory extends Component {
         return parsedBillHistory;
     }
 
+    constructOrnInfoTable(ornData) {
+        return (
+            <table>
+                <colgroup>
+                    <col style={{width: "40%"}}></col>
+                    <col style={{width: "15%"}}></col>
+                    <col style={{width: "15%"}}></col>
+                    <col style={{width: "25%"}}></col>
+                    <col style={{width: "10%"}}></col>
+                </colgroup>
+                <thead>
+                    <tr>
+                        <td>Orn Name</td>
+                        <td>Gross Wt</td>
+                        <td>Net Wt</td>
+                        <td>Specs</td>
+                        <td>Qty</td>
+                    </tr>
+                </thead>
+                <tbody>
+                    {
+                        ( () => {
+                            let rows = [];
+                            _.each(ornData, (anOrnItem, index) => {
+                                let className = "even";
+                                if(index && index%2 !== 0)
+                                    className = "odd";
+                                rows.push(
+                                    <tr className={className}>
+                                        <td>{anOrnItem.ornItem}</td>
+                                        <td>{anOrnItem.ornGWt}</td>
+                                        <td>{anOrnItem.ornNWt}</td>
+                                        <td>{anOrnItem.ornSpec}</td>
+                                        <td>{anOrnItem.ornNos}</td>
+                                    </tr>
+                                )
+                            });
+                            return rows;
+                        })()
+                    }
+                </tbody>
+            </table>     
+        )
+    }
+
+    constructOrnImage(ornImagePath) {
+        return <ImageZoom>
+                    <img src={ornImagePath}
+                        alt='Ornament image not found'
+                        className='pledgebook-orn-display-in-row' />
+                </ImageZoom>
+    }
+
     expandRow = {
         renderer: (row) => {
             let ornData = JSON.parse(row.Orn) || {};
@@ -156,54 +226,11 @@ class LoanHistory extends Component {
             return (
                 <Row>
                     <Col xs={6} md={6} className="orn-display-dom">
-                        <table>
-                            <colgroup>
-                                <col style={{width: "40%"}}></col>
-                                <col style={{width: "15%"}}></col>
-                                <col style={{width: "15%"}}></col>
-                                <col style={{width: "25%"}}></col>
-                                <col style={{width: "10%"}}></col>
-                            </colgroup>
-                            <thead>
-                                <tr>
-                                    <td>Orn Name</td>
-                                    <td>Gross Wt</td>
-                                    <td>Net Wt</td>
-                                    <td>Specs</td>
-                                    <td>Qty</td>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {
-                                    ( () => {
-                                        let rows = [];
-                                        _.each(ornData, (anOrnItem, index) => {
-                                            let className = "even";
-                                            if(index && index%2 !== 0)
-                                                className = "odd";
-                                            rows.push(
-                                                <tr className={className}>
-                                                    <td>{anOrnItem.ornItem}</td>
-                                                    <td>{anOrnItem.ornGWt}</td>
-                                                    <td>{anOrnItem.ornNWt}</td>
-                                                    <td>{anOrnItem.ornSpec}</td>
-                                                    <td>{anOrnItem.ornNos}</td>
-                                                </tr>
-                                            )
-                                        });
-                                        return rows;
-                                    })()
-                                }
-                            </tbody>
-                        </table>                   
+                        {this.constructOrnInfoTable(ornData)}
                     </Col>
                     <Col xs={2} md={2} style={{display: 'inline-block'}}>
                         {row.OrnImagePath &&
-                            <ImageZoom>
-                                <img src={row.OrnImagePath}
-                                    alt='Ornament image not found'
-                                    className='pledgebook-orn-display-in-row' />
-                            </ImageZoom>
+                            this.constructOrnImage(row.OrnImagePath)
                         }
                     </Col>
                     <Col xs={4} md={4} style={{paddingTop: '15px'}}>
@@ -252,6 +279,128 @@ class LoanHistory extends Component {
             )
         }
     }
+
+    onClickBillNotesIcon(e, row) {
+        e.stopPropagation();
+        let newState = {...this.state};
+        let id = row.UniqueIdentifier;
+        if(newState.notesPopup[id]) {
+            newState.notesPopup[id].isOpen = !newState.notesPopup[id].isOpen;
+        } else {
+            newState.notesPopup[id] = {};
+            newState.notesPopup[id].isOpen = true;
+        }
+        this.setState(newState);
+    }
+
+    closeNotesPopover(row) {
+        let newState = {...this.state};
+        let id = row.UniqueIdentifier;
+        if(newState.notesPopup[id]) {
+            newState.notesPopup[id].isOpen = false;
+        }
+        this.setState(newState);
+    }
+
+    onClickBillOrnIcon(e, row) {
+        e.stopPropagation();
+        let newState = {...this.state};
+        let id = row.UniqueIdentifier;
+        if(newState.ornPopup[id]) {
+            newState.ornPopup[id].isOpen = !newState.ornPopup[id].isOpen;
+        } else {
+            newState.ornPopup[id] = {};
+            newState.ornPopup[id].isOpen = true;
+        }
+        this.setState(newState);
+    }
+
+    closeOrnPopover(row) {
+        let newState = {...this.state};
+        let id = row.UniqueIdentifier;
+        if(newState.ornPopup[id]) {
+            newState.ornPopup[id].isOpen = false;
+        }
+        this.setState(newState);
+    }
+
+    getNotesPopupVisisbility(id) {
+        let flag = false;
+        if(this.state.notesPopup && this.state.notesPopup[id] && this.state.notesPopup[id].isOpen)
+            flag = true;
+        return flag;
+    }
+
+    getOrnPopupVisisbility(id) {
+        let flag = false;
+        if(this.state.ornPopup && this.state.ornPopup[id] && this.state.ornPopup[id].isOpen)
+            flag = true;
+        return flag;
+    }
+
+    actionsColFormater(row) {
+        let isNotesPopoverVisible = this.getNotesPopupVisisbility(row.UniqueIdentifier);
+        let isOrnPopoverVisible = this.getOrnPopupVisisbility(row.UniqueIdentifier);
+        let hasNotes = row.Remarks.length?true:false;
+        return (
+            <div>
+                <div style={{display: 'inline-block'}}>
+                    <Popover
+                        containerClassName="pledgebook-notes-popover"
+                        padding={15}
+                        isOpen={isNotesPopoverVisible}
+                        positions={['left', 'top']}
+                        onClickOutside={() => this.closeNotesPopover(row)}
+                        content={({ position, childRect, popoverRect }) => {
+                            return(
+                                <Container className='gs-card arrow-box right'>
+                                    <Row>
+                                        <BillNotesDom notes={row.Remarks}/>
+                                    </Row>
+                                </Container>
+                        )
+                        }}
+                        >
+                        <span className={`pledgebook-bill-notes-icon ${hasNotes?'has-notes':'notes-empty'}`} style={{display: 'inline-block', padding: '0 2px', fontSize: '19px'}} onClick={(e) => this.onClickBillNotesIcon(e, row)}>
+                            <MdEdit />
+                        </span>
+                    </Popover>
+                </div>
+                <div style={{display: 'inline-block'}}>
+                    <Popover
+                        containerClassName="pledgebook-orn-popover"
+                        padding={15}
+                        isOpen={isOrnPopoverVisible}
+                        positions={['left']}
+                        onClickOutside={() => this.closeOrnPopover(row)}
+                        content={({ position, childRect, popoverRect }) => {
+                            let ornData = JSON.parse(row.Orn) || {};
+                            return(
+                                <Container className='gs-card arrow-box right' style={{minWidth: '600px', padding: '10px'}}>
+                                    <Row>
+                                        <h4 style={{textAlign: 'center'}}>Ornaments</h4>
+                                        <Col xs={{span: 9}} className="orn-display-dom">
+                                            {this.constructOrnInfoTable(ornData)}
+                                        </Col>
+                                        <Col xs={{span: 2}}>
+                                            {row.OrnImagePath &&
+                                                this.constructOrnImage(row.OrnImagePath)
+                                            }
+                                        </Col>
+                                    </Row>
+                                </Container>
+                            )
+                        }}
+                        >
+                        <span className="pledgebook-bill-orn-icon" style={{display: 'inline-block', padding: '0 2px', fontSize: '19px'}} onClick={(e) => this.onClickBillOrnIcon(e, row)}>
+                            <MdOutlineTableChart />
+                        </span>
+                    </Popover>
+                </div>
+            </div>
+        )
+    }
+
     render() {        
         return (
             <Container className="customer-portal-history-panel">
@@ -288,3 +437,21 @@ class LoanHistory extends Component {
 }
 
 export default LoanHistory;
+
+const BillNotesDom = ({notes}) => {
+    if(notes) {
+        return (
+            <div>
+                <ReactQuill 
+                    value = {notes}
+                    readOnly = {true}
+                    className= {'gs-cls-readonly'}
+                />
+            </div>
+        )
+    } else {
+        return (
+            <div> No Notes added...</div>
+        )
+    }
+}

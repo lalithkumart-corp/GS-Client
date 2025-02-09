@@ -4,6 +4,7 @@
 	width: 100%;
 	min-width: 1000px;
 	max-width: calc(100% - 100px);
+	height: calc(100vh - 120px);
 	.second-row {
 		padding-top: 10px;
 		padding-bottom: 5px;
@@ -111,9 +112,13 @@
 		background-color: #f5f5f5;
 	}
 	.pledgebook-alert-icon {
-		font-size: 20px;
+		font-size: 18px;
 		margin-right: 10px;
 		cursor: pointer;
+		color: #00000091;
+		.has-alert {
+			color: #337ab7;
+		}
 	}
 	tr.bill-archived {
 		color: darkgrey;
@@ -354,4 +359,36 @@
     font-size: 20px;
 	margin-top: -14px;
 	z-index: 5;
+}
+
+.pledgebook-notes-popover .gs-cls-readonly .ql-toolbar {
+	display: none;
+}
+.pledgebook-notes-popover .gs-cls-readonly .ql-container {
+	border: 0;
+}
+.pledgebook-bill-orn-icon,
+.pledgebook-bill-notes-icon.has-notes {
+	cursor: pointer;
+	&:hover {
+		color: #fba200;
+	}
+}
+
+.pb-actions-col {
+	padding: 0 !important;
+	.actions-cell {
+		text-align: center;
+	}
+}
+.pledgebook-bill-notes-icon.notes-empty {
+	// color: lightgrey;
+	color: #00000091;
+}
+.pledgebook-bill-notes-icon.has-notes {
+	color: #337ab7;
+}
+
+.pledgebook-bill-orn-icon {
+	color: #337ab7;
 }

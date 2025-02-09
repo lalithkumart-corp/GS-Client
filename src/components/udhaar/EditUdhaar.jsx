@@ -7,7 +7,7 @@ import { getAccessToken } from '../../core/storage';
 import { toast } from 'react-toastify';
 import { CashIn } from '../tally/cashManager/cashIn';
 import GSTable from '../gs-table/GSTable';
-import { FETCH_UDHAAR_DETAIL, CASH_IN_FOR_BILL, GET_FUND_TRN_LIST_BY_BILL, MARK_RESOLVED_BY_PAYMENT_CLEARANCE } from '../../core/sitemap';
+import { FETCH_UDHAAR_DETAIL, CASH_IN_FOR_BILL, GET_FUND_TRN_LIST_BY_BILL, MARK_RESOLVED_BY_PAYMENT_CLEARANCE, REOPEN_UDHAAR, CLOSE_UDHAAR } from '../../core/sitemap';
 import { convertToLocalTime } from '../../utilities/utility';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { deleteTransactions } from '../tally/cashBook/helper';
@@ -73,13 +73,15 @@ function EditUdhaar(props) {
     }
 
     let paymentCallback = async () => {
-        let res = await axiosMiddleware.post(MARK_RESOLVED_BY_PAYMENT_CLEARANCE, {uid: props.content.udhaarUid});
-        if(res && res.data && res.data.STATUS == 'SUCCESS') {
-            console.log('Marked the udhar bill status as Resolved in DB');
-        } else {
-            console.log('Could not able to mark the udhaar status as resolved in DB');
-        }
+        // let res = await axiosMiddleware.post(MARK_RESOLVED_BY_PAYMENT_CLEARANCE, {uid: props.content.udhaarUid});
+        // if(res && res.data && res.data.STATUS == 'SUCCESS') {
+        //     console.log('Marked the udhar bill status as Resolved in DB');
+        // } else {
+        //     console.log('Could not able to mark the udhaar status as resolved in DB');
+        // }
     }
+
+
 
     let backToPrevious = () => {
         let options = {};
@@ -122,11 +124,47 @@ function EditUdhaar(props) {
         }
     }
 
+    const closeUdhaar = async () => {
+        try {
+            let res = await axiosMiddleware.post(CLOSE_UDHAAR, {uid: props.content.udhaarUid});
+            if(res && res.data && res.data.STATUS == 'SUCCESS') {
+                toast.success("Successfully Closed this Udhaar");
+                console.log('Closed this Udhaar');
+            } else {
+                toast.error(res.data.RESP || 'Error!');
+                console.log('Could not able to update this udhaar status');
+            }
+        } catch(e) {
+            toast.error(res.data.error.ERR || 'Error!');
+        }
+        
+    }
+
+    const reOpenUdhaar = async () => {
+        try {
+            let res = await axiosMiddleware.post(REOPEN_UDHAAR, {uid: props.content.udhaarUid});
+            if(res && res.data && res.data.STATUS == 'SUCCESS') {
+                toast.success("Successfully Reopened this Udhaar");
+                console.log('Reopen this Udhaar');
+            } else {
+                toast.error(res.data.RESP || 'Error!');
+                console.log('Could not able to update this udhaar status');
+            }
+        } catch(e) {
+            toast.error(res.data.error.ERR || 'Error!');
+        }
+    }
+
     return (
         <div>
             <Row>
                 <Col xs={2} md={2} onClick={backToPrevious} style={{paddingRight: 0}}>
                     <h4> <FaArrowLeft /> Detail </h4>
+                </Col>
+                <Col xs={10} md={10} style={{textAlign: 'right'}}>
+                    {udhaarDetail && udhaarDetail.udhaarStatus ?
+                        <input type="button" value="Close Udhaar Bill" className="gs-button bordered" onClick={closeUdhaar} />
+                        : <input type="button" value="Re-Open Udhaar Bill" className="gs-button bordered" onClick={reOpenUdhaar} />}
                 </Col>
             </Row>
             <Row>

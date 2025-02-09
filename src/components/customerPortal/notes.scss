@@ -6,6 +6,9 @@
     margin-bottom: 20px;
     border-color: lightgrey;
     color: dimgrey;
+    .gs-cls-readonly .ql-toolbar {
+        display: none;
+    }
 }
 
 .notes-main-container .container-view{

@@ -28,4 +28,13 @@
         -moz-box-shadow: 1px 0px 14px 2px rgba(165,156,156,0.75);
         padding-top: 15px;
     }
+    .filter-popover-trigger.action-btn {
+        cursor: pointer;
+        color: #337ab7;
+    }
+}
+.udhaar-filter-popover {
+    .gs-card {
+        min-width: 300px;
+    }
 }

@@ -22,12 +22,13 @@ import { toast } from 'react-toastify';
 import GSCheckbox from '../ui/gs-checkbox/checkbox';
 import { getSession, getPledgebookFilters, setPledgebookFilter } from '../../core/storage';
 import BillTemplate from '../billcreate/billTemplate2';
-import { MdNotifications, MdNotificationsActive, MdNotificationsNone, MdNotificationsOff, MdNotificationsPaused, MdBorderColor, MdInfoOutline } from 'react-icons/md';
+import { MdNotifications, MdNotificationsActive, MdNotificationsNone, MdNotificationsOff, MdNotificationsPaused, MdBorderColor, MdInfoOutline, MdNotes, MdDiamond, MdTableRows, MdTableView, MdTableChart, MdBackupTable, MdOutlineTableBar, MdOutlineTableChart, MdEditNote, MdNoteAlt, MdEdit } from 'react-icons/md';
 import axiosMiddleware from '../../core/axios';
 import { ARCHIVE_PLEDGEBOOK_BILLS, UNARCHIVE_PLEDGEBOOK_BILLS, TRASH_PLEDGEBOOK_BILLS, PERMANENTLY_DELETE_PLEDGEBOOK_BILLS, RESTORE_TRASHED_PLEDGEBOOK_BILLS, ANALYTICS } from '../../core/sitemap';
 import AlertComp from '../alert/Alert';
 import {Tooltip} from 'react-tippy';
 import EventEmitter from 'events';
+import ReactQuill from 'react-quill';
 
 class Pledgebook extends Component {
     constructor(props) {
@@ -50,6 +51,8 @@ class Pledgebook extends Component {
             offsetStart: 0,
             offsetEnd: 10,
             alertPopups: {},
+            notesPopup: {},
+            ornPopup: {},
             filters: {
                 date: {
                     startDate: pastDate,
@@ -357,18 +360,18 @@ class Pledgebook extends Component {
                         )
                     },
                     filterDataType: 'number'
-                // }, {
-                //     id: '',
-                //     displayText: '',
-                //     width: '3%',
-                //     className: 'pb-actions-col',
-                //     formatter: (column, columnIndex, row, rowIndex) => {
-                //         return (
-                //             <span className='actions-cell'>
-                //                 {this.actionsColFormater()}
-                //             </span>
-                //         )
-                    // }
+                }, {
+                    id: '',
+                    displayText: '',
+                    width: '8%',
+                    className: 'pb-actions-col',
+                    formatter: (column, columnIndex, row, rowIndex) => {
+                        return (
+                            <div className='actions-cell'>
+                                {this.actionsColFormater(row)}
+                            </div>
+                        )
+                    }
                 }
             ]
         }
@@ -777,6 +780,7 @@ class Pledgebook extends Component {
     }
 
     onClickAlertIcon(e, row) {
+        e.stopPropagation();
         let newState = {...this.state};
         let id = row.UniqueIdentifier;
         if(newState.alertPopups[id]) {
@@ -784,6 +788,50 @@ class Pledgebook extends Component {
         } else {
             newState.alertPopups[id] = {};
             newState.alertPopups[id].isOpen = true;
+        }
+        this.setState(newState);
+    }
+
+    onClickBillNotesIcon(e, row) {
+        e.stopPropagation();
+        let newState = {...this.state};
+        let id = row.UniqueIdentifier;
+        if(newState.notesPopup[id]) {
+            newState.notesPopup[id].isOpen = !newState.notesPopup[id].isOpen;
+        } else {
+            newState.notesPopup[id] = {};
+            newState.notesPopup[id].isOpen = true;
+        }
+        this.setState(newState);
+    }
+
+    closeNotesPopover(row) {
+        let newState = {...this.state};
+        let id = row.UniqueIdentifier;
+        if(newState.notesPopup[id]) {
+            newState.notesPopup[id].isOpen = false;
+        }
+        this.setState(newState);
+    }
+
+    onClickBillOrnIcon(e, row) {
+        e.stopPropagation();
+        let newState = {...this.state};
+        let id = row.UniqueIdentifier;
+        if(newState.ornPopup[id]) {
+            newState.ornPopup[id].isOpen = !newState.ornPopup[id].isOpen;
+        } else {
+            newState.ornPopup[id] = {};
+            newState.ornPopup[id].isOpen = true;
+        }
+        this.setState(newState);
+    }
+
+    closeOrnPopover(row) {
+        let newState = {...this.state};
+        let id = row.UniqueIdentifier;
+        if(newState.ornPopup[id]) {
+            newState.ornPopup[id].isOpen = false;
         }
         this.setState(newState);
     }
@@ -1071,73 +1119,85 @@ class Pledgebook extends Component {
         return flag;
     }
 
+    constructOrnInfoTable(ornData) {
+        return (
+            <table>
+                <colgroup>
+                    <col style={{width: "40%"}}></col>
+                    <col style={{width: "10%"}}></col>
+                    <col style={{width: "10%"}}></col>
+                    <col style={{width: "20%"}}></col>
+                    <col style={{width: "20%"}}></col>
+                </colgroup>
+                <thead>
+                    <tr style={{backgroundColor: '#f5f5f5'}}>
+                        <td>Orn Name</td>
+                        <td>G-Wt</td>
+                        <td>N-Wt</td>
+                        <td>Specs</td>
+                        <td>Qty</td>
+                    </tr>
+                </thead>
+                <tbody>
+                    {
+                        ( () => {
+                            let rows = [];
+                            _.each(ornData, (anOrnItem, index) => {
+                                let className = "even";
+                                if(index && index%2 !== 0)
+                                    className = "odd";
+                                rows.push(
+                                    <tr className={className}>
+                                        <td>{anOrnItem.ornItem}</td>
+                                        <td>{anOrnItem.ornGWt}</td>
+                                        <td>{anOrnItem.ornNWt}</td>
+                                        <td>{anOrnItem.ornSpec}</td>
+                                        <td>{anOrnItem.ornNos}</td>
+                                    </tr>
+                                )
+                            });
+                            return rows;
+                        })()
+                    }
+                </tbody>
+            </table>
+        )
+    }
+
+    constructOrnImage(ornImagePath) {
+        return (
+            <ImageZoom>
+                <img 
+                    alt="Ornament Image not found"
+                    src={ornImagePath}
+                    className='pledgebook-orn-display-in-row'
+                />
+            </ImageZoom>
+        )
+    }
+
     expandRow = {
         renderer: (row) => {
             let ornData = JSON.parse(row.Orn) || {};
-            let isPopoverVisible = this.getAlertPopoverVisibility(row.UniqueIdentifier);
+            // let isPopoverVisible = this.getAlertPopoverVisibility(row.UniqueIdentifier);
             return (
                 <>
                     <Row>
                         <Col xs={{span: 6}} className="orn-display-dom">
-                            <table>
-                                <colgroup>
-                                    <col style={{width: "40%"}}></col>
-                                    <col style={{width: "10%"}}></col>
-                                    <col style={{width: "10%"}}></col>
-                                    <col style={{width: "20%"}}></col>
-                                    <col style={{width: "20%"}}></col>
-                                </colgroup>
-                                <thead>
-                                    <tr>
-                                        <td>Orn Name</td>
-                                        <td>G-Wt</td>
-                                        <td>N-Wt</td>
-                                        <td>Specs</td>
-                                        <td>Qty</td>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {
-                                        ( () => {
-                                            let rows = [];
-                                            _.each(ornData, (anOrnItem, index) => {
-                                                let className = "even";
-                                                if(index && index%2 !== 0)
-                                                    className = "odd";
-                                                rows.push(
-                                                    <tr className={className}>
-                                                        <td>{anOrnItem.ornItem}</td>
-                                                        <td>{anOrnItem.ornGWt}</td>
-                                                        <td>{anOrnItem.ornNWt}</td>
-                                                        <td>{anOrnItem.ornSpec}</td>
-                                                        <td>{anOrnItem.ornNos}</td>
-                                                    </tr>
-                                                )
-                                            });
-                                            return rows;
-                                        })()
-                                    }
-                                </tbody>
-                            </table>                   
+                            {this.constructOrnInfoTable(ornData)}
                         </Col>
                         <Col xs={{span: 2}}>
                             {row.OrnImagePath &&
-                                <ImageZoom>
-                                    <img 
-                                        alt="Ornament Image not found"
-                                        src={row.OrnImagePath}
-                                        className='pledgebook-orn-display-in-row'
-                                    />
-                                </ImageZoom>
+                                this.constructOrnImage(row.OrnImagePath)
                             }
                         </Col>
                         <Col xs={{span: 1, offset: 2}}>
-                            <span >
+                            {/* <div >
                                 <Popover
                                     containerClassName="pledgebook-alert-popever"
                                     padding={0}
                                     isOpen={isPopoverVisible}
-                                    position={'left'} // preferred position
+                                    positions={['left']} // preferred position
                                     // onClickOutside={() => this.closePopover(row.UniqueIdentifier)}
                                     content={({ position, targetRect, popoverRect }) => {
                                         return (
@@ -1157,8 +1217,7 @@ class Pledgebook extends Component {
                                         {!row.alertId && <MdNotificationsNone/>}
                                     </span>
                                 </Popover>
-                                {/* <FaPencilAlt /> */}
-                            </span>
+                            </div> */}
                         </Col>
                     </Row>
                     <Row>
@@ -1196,6 +1255,20 @@ class Pledgebook extends Component {
     getAlertPopoverVisibility(id) {
         let flag = false;
         if(this.state.alertPopups && this.state.alertPopups[id] && this.state.alertPopups[id].isOpen)
+            flag = true;
+        return flag;
+    }
+
+    getNotesPopupVisisbility(id) {
+        let flag = false;
+        if(this.state.notesPopup && this.state.notesPopup[id] && this.state.notesPopup[id].isOpen)
+            flag = true;
+        return flag;
+    }
+
+    getOrnPopupVisisbility(id) {
+        let flag = false;
+        if(this.state.ornPopup && this.state.ornPopup[id] && this.state.ornPopup[id].isOpen)
             flag = true;
         return flag;
     }
@@ -1364,13 +1437,97 @@ class Pledgebook extends Component {
     }
     // END: Helper's
 
-    // actionsColFormater() {
-    //     return (
-    //         <div>
-    //             <span><FontAwesomeIcon icon="bell"/></span>
-    //         </div>
-    //     )
-    // }
+    actionsColFormater(row) {
+        let isNotesPopoverVisible = this.getNotesPopupVisisbility(row.UniqueIdentifier);
+        let isOrnPopoverVisible = this.getOrnPopupVisisbility(row.UniqueIdentifier);
+        let isPopoverVisible = this.getAlertPopoverVisibility(row.UniqueIdentifier);
+        let hasNotes = row.Remarks.length?true:false;
+        return (
+            <div>
+                {hasNotes && 
+                    <div style={{display: 'inline-block'}}>
+                        <Popover
+                            containerClassName="pledgebook-notes-popover"
+                            padding={15}
+                            isOpen={isNotesPopoverVisible}
+                            positions={['left']}
+                            onClickOutside={() => this.closeNotesPopover(row)}
+                            content={({ position, childRect, popoverRect }) => {
+                                return(
+                                    <Container className='gs-card arrow-box right'>
+                                        <Row>
+                                            <BillNotesDom notes={row.Remarks}/>
+                                        </Row>
+                                    </Container>
+                            )
+                            }}
+                            >
+                            <span className={`pledgebook-bill-notes-icon ${hasNotes?'has-notes':'notes-empty'}`} style={{display: 'inline-block', padding: '0 2px', fontSize: '18px'}} onClick={(e) => this.onClickBillNotesIcon(e, row)}>
+                                <MdEdit />
+                            </span>
+                        </Popover>
+                    </div>
+                }
+                <div style={{display: 'inline-block'}}>
+                    <Popover
+                        containerClassName="pledgebook-orn-popover"
+                        padding={15}
+                        isOpen={isOrnPopoverVisible}
+                        positions={['left']}
+                        onClickOutside={() => this.closeOrnPopover(row)}
+                        content={({ position, childRect, popoverRect }) => {
+                            let ornData = JSON.parse(row.Orn) || {};
+                            return(
+                                <Container className='gs-card arrow-box right' style={{minWidth: '600px', padding: '10px'}}>
+                                    <Row>
+                                        <h4 style={{textAlign: 'center'}}>Ornaments</h4>
+                                        <Col xs={{span: 9}} className="orn-display-dom">
+                                            {this.constructOrnInfoTable(ornData)}
+                                        </Col>
+                                        <Col xs={{span: 2}}>
+                                            {row.OrnImagePath &&
+                                                this.constructOrnImage(row.OrnImagePath)
+                                            }
+                                        </Col>
+                                    </Row>
+                               </Container>
+                           )
+                        }}
+                        >
+                        <span className="pledgebook-bill-orn-icon" style={{display: 'inline-block', padding: '0 2px', fontSize: '18px'}} onClick={(e) => this.onClickBillOrnIcon(e, row)}>
+                            <MdOutlineTableChart />
+                        </span>
+                    </Popover>
+                </div>
+                <div style={{display: 'inline-block'}}>
+                    <Popover
+                        containerClassName="pledgebook-alert-popever"
+                        padding={0}
+                        isOpen={isPopoverVisible}
+                        positions={['left']} // preferred position
+                        // onClickOutside={() => this.closePopover(row.UniqueIdentifier)}
+                        content={({ position, targetRect, popoverRect }) => {
+                            return (
+                                <AlertComp 
+                                    closePopover={this.closePopover} 
+                                    row={row} 
+                                    refreshCallback={this.refresh}
+                                    getCreateAlertParams = {getCreateAlertParams}
+                                    getUpdateAlertParams = {getUpdateAlertParams}
+                                    getDeleteAlertParams = {getDeleteAlertParams}
+                                    />
+                            )
+                        }}
+                        >
+                        <span className="pledgebook-alert-icon" onClick={(e) => this.onClickAlertIcon(e, row)}>
+                            {row.alertId && <span className='has-alert'><MdNotifications/></span>}
+                            {!row.alertId && <MdNotificationsNone/>}
+                        </span>
+                    </Popover>
+                </div>
+            </div>
+        )
+    }
 
     render() {                    
         return (
@@ -1512,3 +1669,22 @@ const mapStateToProps = (state) => {
 };
 
 export default connect(mapStateToProps, { getPledgebookData, setRefreshFlag })(Pledgebook);
+
+
+const BillNotesDom = ({notes}) => {
+    if(notes) {
+        return (
+            <div>
+                <ReactQuill 
+                    value = {notes}
+                    readOnly = {true}
+                    className= {'gs-cls-readonly'}
+                />
+            </div>
+        )
+    } else {
+        return (
+            <div> No Notes added...</div>
+        )
+    }
+}

@@ -42,6 +42,8 @@ import { fetchMyAccountsList, fetchAllBanksList } from '../../utilities/apiUtils
 import { format } from 'currency-formatter';
 import { PAYMENT_MODE, LOAN_BILL_EXPIRY_DAYS } from '../../constants';
 import CustomerPickerInput from '../customerPanel/CustomerPickerInput';
+import ReactQuill from 'react-quill';
+import 'quill/dist/quill.snow.css';
 
 const ENTER_KEY = 13;
 const SPACE_KEY = 32;
@@ -1990,9 +1992,8 @@ class BillCreation extends Component {
             return (                
                 <Row className='bill-remarks-adder-dom'>
                     <Col xs={12} md={12}>
-                        <Form.Group>
+                        {/* <Form.Group>
                             <InputGroup>
-                                {/* <InputGroup.Text>Bill Notes</InputGroup.Text> */}
                                 <Form.Control as="textarea" 
                                     placeholder="Type here..." 
                                     value={this.state.formData.moreDetails.billRemarks} 
@@ -2000,7 +2001,14 @@ class BillCreation extends Component {
                                     readOnly={this.props.billCreation.loading}
                                 />
                             </InputGroup>
-                        </Form.Group>
+                        </Form.Group> */}
+                        <ReactQuill 
+                            theme="snow"
+                            value = {this.state.formData.moreDetails.billRemarks}
+                            readOnly = {this.props.billCreation.loading}
+                            className= {this.props.billCreation.loading?'gs-cls-readonly':''}
+                            onChange = {(content, delta, source, editor) => this.inputControls.onChange(null, content, "billRemarks")}
+                        />
                     </Col>
                 </Row>
             )

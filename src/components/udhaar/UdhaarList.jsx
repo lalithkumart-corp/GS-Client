@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
-import { Container, Row, Col } from 'react-bootstrap';
+import { Container, Row, Col, Form} from 'react-bootstrap';
+import {Popover, ArrowContainer} from 'react-tiny-popover';
 import axiosMiddleware from '../../core/axios';
 import { FETCH_UDHAAR_LIST } from '../../core/sitemap';
 import { getAccessToken } from '../../core/storage';
@@ -12,19 +13,20 @@ import { convertToLocalTime, dateFormatter } from '../../utilities/utility';
 import { debounce, DebouncedFunc } from 'lodash';
 import EditUdhaar from './EditUdhaar';
 import {Tooltip} from 'react-tippy';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 function UdhaarListComp() {
 
-    let past1daysStartDate = new Date();
-        past1daysStartDate.setDate(past1daysStartDate.getDate()-1);
-        past1daysStartDate.setHours(0,0,0,0);
+    let last30DaysStartDate = new Date();
+        last30DaysStartDate.setDate(last30DaysStartDate.getDate()-30);
+        last30DaysStartDate.setHours(0,0,0,0);
     let todaysEndDate = new Date();
     todaysEndDate.setHours(23,59,59,999); 
 
     let [udhaarList, setUdhaarList] = useState([]);
     let [listCount, setListCount] = useState(0);
 
-    let [dates, setDates] = useState({sd:past1daysStartDate, ed: todaysEndDate});
+    let [dates, setDates] = useState({sd:last30DaysStartDate, ed: todaysEndDate});
     let [udhaarBillFilter, setUdhaarBillFilter] = useState('');
     let [custNameFilter, setCustNameFilter] = useState('');
     let [guardianNameFilter, setGuardianNameFilter] = useState('');
@@ -41,6 +43,8 @@ function UdhaarListComp() {
     let [editMode, setEditMode] = useState(false);
     let [editContent, setEditContent] = useState(null);
     let timer;
+
+    let [filterPopoverOpen, setFilterPopoverOpen] = useState(false);
 
     let columns = [
         {
@@ -66,6 +70,12 @@ function UdhaarListComp() {
                         <div>{convertToLocalTime(row[column.id], {excludeTime: true})}</div>
                     </Tooltip>
                 )
+            },
+            tdClassNameGetter: (column, columnIndex, row, rowIndex) => {
+                let className = 'bill-open';
+                if(row.udhaarStatus == 0)
+                    className = 'bill-closed';
+                return className;
             }
         },
         {
@@ -227,6 +237,7 @@ function UdhaarListComp() {
             limit: pageLimit,
             offsetStart: offsetVal[0] || 0,
             offsetEnd: offsetVal[1] || 10,
+
         };
         return params;
     }
@@ -308,19 +319,89 @@ function UdhaarListComp() {
         }
     }
 
-    let getOffsets = () => {        
+    let getOffsets = () => {
         let pageNumber = parseInt(selectedPageIndex);
         let offsetStart = pageNumber * parseInt(pageLimit);
         let offsetEnd = offsetStart + parseInt(pageLimit);
         return [offsetStart, offsetEnd];
     }
     
+    const onStatusPopoverChange = (e) => {
+        setStatusFilter(e.target.value);
+        refresh();
+    }
+
+    const onApplyFilter = () => {
+        refresh();
+        setFilterPopoverOpen(false);
+    }
+
+    let getFilterDom = () => {
+        return (
+            <Row>
+                <Col xs={6}>
+                    <h5>Bills</h5>
+                    <Form onChange={onStatusPopoverChange}>
+                        <Form.Group>
+                            <Form.Check id='billstatus-11' type='radio' name='billstatus' checked={statusFilter=='all'} value='all' label='All'/>
+                        </Form.Group>
+                        <Form.Group>
+                            <Form.Check id='billstatus-22' type='radio' name='billstatus' checked={statusFilter=='pending'} value='pending' label='Pending'/>
+                        </Form.Group>
+                        <Form.Group>
+                            <Form.Check id='billstatus-33' type='radio' name='billstatus' checked={statusFilter=='closed'} value='closed' label='Closed'/>
+                        </Form.Group>
+                    </Form>
+                </Col>
+            </Row>
+        )
+    }
+
+    let getFilterPopver = () => {
+        return (
+            <div style={{display: 'inline-block', marginLeft: '15px'}}> 
+                <Popover
+                    containerClassName='udhaar-filter-popover'
+                    isOpen={filterPopoverOpen}
+                    onClickOutside={() => setFilterPopoverOpen(false)}
+                    position={'right'}
+                    content={({position, childRect, popoverRect}) => {
+                        return (
+                            <ArrowContainer
+                                position={position}
+                                childRect={childRect}
+                                popoverRect={popoverRect}
+                                arrowColor={'white'}
+                                arrowSize={10}
+                                arrowClassName='udhaar-filter-popoever-arrow'
+                            >
+                                <Row className='gs-card'>
+                                    <Col className='gs-card-content'>
+                                        {getFilterDom()}
+                                        <Row className='text-align-right' style={{padding: '40px 20px 10px 20px'}} >
+                                            <input type='button' className='gs-button bordered' value='Apply' onClick={onApplyFilter}/>
+                                        </Row>
+                                    </Col>
+                                </Row>
+                            </ArrowContainer>
+                        )
+                    }}
+                    >
+                        <div className={'filter-popover-trigger action-btn'} onClick={() => setFilterPopoverOpen(true)}>
+                            <FontAwesomeIcon icon='filter'/>
+                        </div>
+                </Popover>
+            </div> );
+    }
 
     return (
         <Container className="udhaar-list-page">
             {!editMode && <>
             <Row>
-                <Col xs={{span: 3, offset: 9}} style={{textAlign: 'right', marginBottom: '12px', fontWeight: 'bold'}}>
+                <Col xs={3}>
+                    <h3>Udhaar List</h3>
+                </Col>
+                <Col xs={{span: 3, offset: 6}} style={{textAlign: 'right', marginBottom: '12px', fontWeight: 'bold'}}>
                     No. Of List: {listCount}
                 </Col>
             </Row>
@@ -332,6 +413,7 @@ function UdhaarListComp() {
                         startDate={dates.sd}
                         endDate={dates.ed}
                     />
+                    {getFilterPopver()}
                 </Col>
                 <Col xs={5} md={5} style={{textAlign: 'right'}}>
                     <ReactPaginate previousLabel={"<"}
@@ -359,16 +441,18 @@ function UdhaarListComp() {
                     </select>
                 </Col>
             </Row>
-            <GSTable 
-                className="udhaar-list-table"
-                columns={columns}
-                rowData={udhaarList}
-                checkbox = {true}
-                checkboxOnChangeListener = {handleCheckboxChangeListener}
-                globalCheckBoxListener = {handleGlobalCheckboxChange}
-                selectedIndexes = {selectedIndexes}
-                selectedRowJson = {selectedRowJson}
-            />
+            <Row>
+                <GSTable 
+                    className="udhaar-list-table"
+                    columns={columns}
+                    rowData={udhaarList}
+                    checkbox = {true}
+                    checkboxOnChangeListener = {handleCheckboxChangeListener}
+                    globalCheckBoxListener = {handleGlobalCheckboxChange}
+                    selectedIndexes = {selectedIndexes}
+                    selectedRowJson = {selectedRowJson}
+                />
+            </Row>
             </>
             }
             {editMode && <>
