@@ -189,8 +189,9 @@ class CustomerPortal extends Component {
 
     async fetchCustomerLoanHistory(customerId) {
         try {
+            let theFilters = {includeArchived: false};
             let accessToken = getAccessToken();
-            let response = await axios.get(PLEDGEBOOK_FETCH_CUSTOMER_HISTORY + `?access_token=${accessToken}&customer_id=${customerId}`);            
+            let response = await axios.get(PLEDGEBOOK_FETCH_CUSTOMER_HISTORY + `?access_token=${accessToken}&customer_id=${customerId}&filters=${JSON.stringify(theFilters)}`);            
             this.setState({billHistory: response.data.RESPONSE, billHistoryLoading: false});
         } catch(e) {
             alert(e);

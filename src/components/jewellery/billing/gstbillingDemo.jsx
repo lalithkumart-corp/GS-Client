@@ -512,7 +512,7 @@ function GstBillingDemo() {
     
                 hsCode: hsCode,
     
-                dateVal: convertDateObjToStr(dateVal),
+                dateVal: dateVal,
                 billNo: (billSeries?`${billSeries}:`:'')+billNo,
                 
                 customerName: customerName,

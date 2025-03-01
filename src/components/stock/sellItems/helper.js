@@ -375,7 +375,6 @@ export const constructPrintContent = (stateObj, propObj) => {
         paid: stateObj.paymentFormData.paid,
         balance: stateObj.paymentFormData.balance
     };
-
     return {
         gstNumber: propObj.storeDetail.gstNo,
         itemType: itemType,
@@ -395,7 +394,7 @@ export const constructPrintContent = (stateObj, propObj) => {
         customerPanNo: customerPanNo,
         customerAddr: customerAddr,
         // dateVal: convertDateObjToStr(stateObj.date.isLive?new Date():stateObj.date.inputVal, {excludeTime: true}),
-        dateVal: convertDateObjToStr(stateObj.date.isLive?new Date():stateObj.date.inputVal),
+        dateVal: convertDateObjToStr(stateObj.date.isLive?new Date():stateObj.date.inputVal, {format: 'MDY'}),
         ornaments: newProds,
         oldOrnaments,
         calculations: {

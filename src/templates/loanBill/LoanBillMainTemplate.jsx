@@ -149,6 +149,17 @@ export default class LoanBillMainTemplate extends Component {
             return DEFAULTS.FIFTHLINE_FONTSIZE;
     }
 
+    getHeaderLinesCount() {
+        let count = 1;
+        if(this.state.settings && this.state.settings.header) {
+            let arr = ['secondLine', 'thirdLine', 'fourthLine', 'fifthLine']
+            arr.forEach((a) => {
+                if(this.state.settings.header[a] && this.state.settings.header[a].text && this.state.settings.header[a].text.length > 0) count++;
+            });
+        }
+        return count;
+    }
+
     getHeaderDom() {
         let thirdLineFontSize = this.getThirdLineFontSize() + 'px';
         let fourthLineFontSize = this.getFourthLineFontSize() + 'px';
@@ -227,16 +238,18 @@ export default class LoanBillMainTemplate extends Component {
         let bodyTemplateId = DEFAULTS.BODY_TEMPLATE_ID;
         if(this.state.settings && this.state.settings.bodyTemplate)
             bodyTemplateId = this.state.settings.bodyTemplate;
+        debugger;
+        let headerLinesCnt = this.getHeaderLinesCount();
         if(bodyTemplateId == 1)
-            return (<LoanBillBodyTemplate currBillContent={this.state.currBillContent} settings = {this.state.settings}/>);
+            return (<LoanBillBodyTemplate currBillContent={this.state.currBillContent} settings = {this.state.settings} headerLinesCount={headerLinesCnt}/>);
         else if(bodyTemplateId == 2)
-            return (<LoanBillBodyTemplate2 currBillContent={this.state.currBillContent} settings = {this.state.settings}/>);
+            return (<LoanBillBodyTemplate2 currBillContent={this.state.currBillContent} settings = {this.state.settings} headerLinesCount={headerLinesCnt}/>);
         // else if(bodyTemplateId == 3)
         //     return (<LoanBillBodyTemplate3 currBillContent={this.state.currBillContent} settings = {this.state.settings}/>);
         // else if(bodyTemplateId == 4)
         //     return (<LoanBillBodyTemplate4 currBillContent={this.state.currBillContent} settings = {this.state.settings}/>);
 
-        return (<LoanBillBodyTemplate currBillContent={this.state.currBillContent} settings = {this.state.settings}/>);
+        return (<LoanBillBodyTemplate currBillContent={this.state.currBillContent} settings = {this.state.settings} headerLinesCount={headerLinesCnt}/>);
     }
 
     render() {

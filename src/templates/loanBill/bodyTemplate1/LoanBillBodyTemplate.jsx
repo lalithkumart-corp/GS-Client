@@ -256,6 +256,9 @@ export default class LoanBillBodyTemplate extends Component {
             wt: 0,
             qty: 0
         }
+        let ornLimit = 10;
+        if(this.props.headerLinesCount && this.props.headerLinesCount == 5)
+            ornLimit = 9;
         dom.push(
             <Row className={`orn-table-header`}>
                 <Col className="orn-table-th-cell" xs={{span: 1}} md={{span: 1}} style={{paddingLeft: '3px'}}><b>S.No</b></Col>
@@ -269,7 +272,7 @@ export default class LoanBillBodyTemplate extends Component {
             let totalOrnLength = Object.keys(this.state.billContent.orn).length;
             let rows = 0;
             let index = 1;
-            while(rows < 11) {
+            while(rows <= ornLimit) {
                 let anOrn = this.state.billContent.orn[index];
                 if(anOrn) {
                     footer.count++;
@@ -311,8 +314,8 @@ export default class LoanBillBodyTemplate extends Component {
                 
             }
 
-            // If list is less than 10
-            while(list.length <10) {
+            // If list is less than ornLimit(10)
+            while(list.length < ornLimit) {
                 list.push(
                     <Row>
                         <Col xs={{span: 1}} md={{span: 1}} className="orn-table-body-cell sno"></Col>
@@ -362,6 +365,9 @@ export default class LoanBillBodyTemplate extends Component {
             gm = wtVals[0];
             mg = formatNumberLength(wtVals[1], 3, 'suffix') || '000';
         }
+        let divHeight = '199px';
+        if(this.props.headerLinesCount && this.props.headerLinesCount == 5)
+            divHeight = '169px';
         return (
             <Row className="total-wt-section">
                 <Col xs={12} style={{textAlign: 'center'}}>
@@ -370,7 +376,7 @@ export default class LoanBillBodyTemplate extends Component {
                         <Col xs={6} md={6} className="orn-table-th-cell total-wt-gm-header">Gm</Col>
                         <Col xs={6} md={6} className="orn-table-th-cell total-wt-mg-header">Mg</Col>
                     </Row>
-                    <Row style={{height: '199px'}}>
+                    <Row style={{height: divHeight}}>
                         <Col xs={6} md={6} className="total-wt-gm-val">{gm}</Col>
                         <Col xs={6} md={6} className="total-wt-mg-val">{mg}</Col>
                     </Row>

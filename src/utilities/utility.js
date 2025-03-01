@@ -155,16 +155,21 @@ export const convertDateObjToStr = (dateObj, options) => {
     let mm = twoDigitFormat(dateObj.getMonth() + 1);        
     let yyyy = dateObj.getFullYear();
     let localDate;
-    if(options.excludeTime) {
+    if(options.format === 'MDY')
+        localDate = `${mm}-${dd}-${yyyy}`;
+    else
         localDate = `${dd}-${mm}-${yyyy}`;
+
+    if(options.excludeTime) {
+        
     } else {
         let hr = twoDigitFormat(dateObj.getHours());
         let min = twoDigitFormat(dateObj.getMinutes());
         if(options.excludeSeconds) {
-            localDate = `${dd}-${mm}-${yyyy} ${hr}:${min}`;    
+            localDate += ` ${hr}:${min}`;    
         } else {
             let sec = twoDigitFormat(dateObj.getSeconds());
-            localDate = `${dd}-${mm}-${yyyy} ${hr}:${min}:${sec}`;
+            localDate += ` ${hr}:${min}:${sec}`;
         }
         if(options.addAmPmSuffix)
             localDate += hr>=12?' PM':' AM';
