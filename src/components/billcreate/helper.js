@@ -1,4 +1,4 @@
-import _ from 'lodash';
+import _, { forEach } from 'lodash';
 import { PLEDGEBOOK_METADATA, ORNAMENT_LIST, FETCH_CUSTOMERS_BASIC_LIST } from '../../core/sitemap';
 import { getAccessToken } from '../../core/storage';
 import axiosMiddleware from '../../core/axios';
@@ -191,7 +191,13 @@ const _getMobileNumber = (state) => {
 }
 
 const _getOrnamentsData = (thatState) => {
-    return thatState.formData.orn.inputs;
+    let ornBkt = {};
+    let ornRows = thatState.formData.orn.inputs;
+    Object.keys(ornRows).forEach((a) => {
+        if(ornRows[a].ornItem !== '' && ornRows[a].ornNos !== '')
+            ornBkt[a] = ornRows[a];
+    });
+    return ornBkt;
 } 
 
 const _getMoreData = (thatState) => {
@@ -375,7 +381,8 @@ export const fetchCustomerMetaData = () => {
                     //let newState = {...this.state};
                     let returnObj = {};
                     let results = successResp.data;
-                    returnObj.cnameList = results.customers.list;
+                    let parsedList = parseCustomerListData(results.customers.list);
+                    returnObj.cnameList = parsedList;
                     returnObj.gaurdianNameList = getGaurdianNameList(results.customers.list);
                     returnObj.addressList = getAddressList(results.customers.list);
                     returnObj.placeList = getPlaceList(results.customers.list);
@@ -399,6 +406,19 @@ export const fetchCustomerMetaData = () => {
                 }
             )
     });
+}
+
+const parseCustomerListData = (customerList) => {
+    let parsed = [];
+    _.each(customerList, (aCustomerObj) => {
+        try {
+            aCustomerObj.otherDetails = JSON.parse(aCustomerObj.otherDetails);
+        } catch(e) {
+            
+        }
+        parsed.push(aCustomerObj);
+    });
+    return parsed;
 }
 
 export const fetchCustomersList = (optionalFilters) => {

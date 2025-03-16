@@ -240,20 +240,7 @@ class GeneralInfo extends Component {
             return (                
                 <Row>
                     <Col xs={12} className='font-weight-bold'>Customer Information</Col>
-                    <Col xs={6} md={6}>
-                        {/* <Autosuggest
-                            datalist={this.state.formData.moreDetails.list}
-                            placeholder="select any key"
-                            itemAdapter={CustomerInfoAdaptor.instance}
-                            valueIsItem={true}
-                            value={this.state.formData.moreDetails.currCustomerInputField}
-                            onChange={ (val) => this.autuSuggestionControls.onChange(val, 'moreCustomerDetailsField') }
-                        /> */}
-                        {/* <GsDropdown searchable={true}>
-                            {this.state.formData.moreDetails.list.map((item, index) => {
-                                <Dropdown.Item>{item}</Dropdown.Item>
-                            })}
-                        </GsDropdown> */}
+                    <Col xs={5} md={5}>
                         <FormGroup>
                             <FormControl as="select" onChange={(e) => this.onDropdownChange(e, 'moreDetails')} value={this.state.formData.moreDetails.currCustomerInputField}>
                                 {this.state.formData.moreDetails.list.map((item) => {
@@ -261,23 +248,8 @@ class GeneralInfo extends Component {
                                 })}
                             </FormControl>
                         </FormGroup>
-                        {/* <ReactAutosuggest
-                            suggestions={this.state.formData.moreDetails.limitedList}
-                            onSuggestionsFetchRequested={({value}) => this.reactAutosuggestControls.onSuggestionsFetchRequested({value})}
-                            // onSuggestionsClearRequested={this.reactAutosuggestControls.onSuggestionsClearRequested}
-                            getSuggestionValue={(suggestion, e) => this.reactAutosuggestControls.getSuggestionValue(suggestion, 'moreDetails')}
-                            renderSuggestion={(suggestion) => this.reactAutosuggestControls.renderSuggestion(suggestion, 'moreDetails')}
-                            onSuggestionSelected={(event, { suggestion, suggestionValue, suggestionIndex, sectionIndex, method}) => this.reactAutosuggestControls.onSuggestionSelected(event, { suggestion, suggestionValue, suggestionIndex, sectionIndex, method }, 'ornItem')}
-                            inputProps={{
-                                placeholder: 'Type ...',
-                                value: this.state.formData.moreDetails.currCustomerInputField,
-                                onChange: (e, {newValue, method}) => this.reactAutosuggestControls.onChange(e, {newValue, method}, 'moreDetails'),
-                                //onKeyUp: (e) => this.reactAutosuggestControls.onKeyUp(e, {currElmKey: 'moreDetails'}),
-                                className: "react-autosuggest__input"
-                            }}
-                        /> */}
                     </Col>
-                    <Col xs={6} md={6}>
+                    <Col xs={5} md={5}>
                         <FormGroup>
                             <FormControl
                                 type="text"
@@ -288,7 +260,10 @@ class GeneralInfo extends Component {
                             />
                             <FormControl.Feedback />
                         </FormGroup>
-                    </Col>                    
+                    </Col>
+                    <Col xs={2} md={2}>
+                        <input type="button" className='gs-button bordered' value="ADD" onClick={() => this.handleEnterKeyPress(null, 'addDetail', null)}/>
+                    </Col>
                 </Row>
             )
         }
@@ -301,13 +276,13 @@ class GeneralInfo extends Component {
                         _.each(this.state.custDetail.otherDetails, (aDetail, i) => {                            
                             rows.push(
                                 <Row className="customer-info-display-row" key={i}>
-                                    <Col xs={6} md={6}>
+                                    <Col xs={5} md={5}>
                                         {aDetail['field']}
                                     </Col>
                                     <Col xs={5} md={5}>
                                         {aDetail['val']}
                                     </Col>                                    
-                                    <Col xs={1} md={1} className='sub-actions-div'>
+                                    <Col xs={2} md={2} className='sub-actions-div'>
                                         <span className='icon edit-icon' onClick={(e) => this.onEditDetailIconClick(aDetail)}><FontAwesomeIcon icon="edit" /></span>
                                         <span className='icon' onClick={(e) => this.onDeleteDetailIconClick(aDetail)}><FontAwesomeIcon icon="trash" /></span>
                                     </Col>                                    

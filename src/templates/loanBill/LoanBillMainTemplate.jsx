@@ -238,7 +238,6 @@ export default class LoanBillMainTemplate extends Component {
         let bodyTemplateId = DEFAULTS.BODY_TEMPLATE_ID;
         if(this.state.settings && this.state.settings.bodyTemplate)
             bodyTemplateId = this.state.settings.bodyTemplate;
-        debugger;
         let headerLinesCnt = this.getHeaderLinesCount();
         if(bodyTemplateId == 1)
             return (<LoanBillBodyTemplate currBillContent={this.state.currBillContent} settings = {this.state.settings} headerLinesCount={headerLinesCnt}/>);

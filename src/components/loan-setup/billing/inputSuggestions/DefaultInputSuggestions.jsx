@@ -22,6 +22,9 @@ class DefaultInputSuggestions extends Component {
             },
             alertOfflineDate: {
                 inputVal: this.getValueFromStore('alertOfflineDate')
+            },
+            expiryDays: {
+                inputVal: this.getValueFromStore('expiryDays')
             }
         }
         this.bindMethods();
@@ -48,6 +51,10 @@ class DefaultInputSuggestions extends Component {
             case 'alertOfflineDate':
                 if(this.props.auth && typeof this.props.auth.userPreferences)
                     val = this.props.auth.userPreferences.bill_create_alert_offline_date || false;
+                break;
+            case 'expiryDays':
+                if(this.props.auth && typeof this.props.auth.userPreferences)
+                    val = this.props.auth.userPreferences.loan_bill_expiry_days || 372;
                 break;
         }
         return val;
@@ -80,6 +87,7 @@ class DefaultInputSuggestions extends Component {
             city: this.state.city.inputVal,
             pincode: this.state.pincode.inputVal,
             alertOfflineDate: this.state.alertOfflineDate.inputVal,
+            expiryDays: this.state.expiryDays.inputVal
         }
     }
     render() {
@@ -132,6 +140,24 @@ class DefaultInputSuggestions extends Component {
                                                     type="text"
                                                     value={this.state.pincode.inputVal}
                                                     onChange={(e) => this.onChange(e, 'pincode')}
+                                                />
+                                                <FormControl.Feedback />
+                                            </FormGroup>
+                                        </Col>
+                                    </Row>
+                                </Col>
+                            </Row>
+                            <Row style={{marginTop: '15px'}}>
+                                <Col xs={3}>
+                                    <Row>
+                                        <Col xs={12}>Loan Expiry Days:</Col>
+                                        <Col xs={12}>
+                                            <FormGroup>
+                                                <FormControl
+                                                    placeholder="Enter Loan Expiry Days"
+                                                    type="number"
+                                                    value={this.state.expiryDays.inputVal}
+                                                    onChange={(e) => this.onChange(e, 'expiryDays')}
                                                 />
                                                 <FormControl.Feedback />
                                             </FormGroup>

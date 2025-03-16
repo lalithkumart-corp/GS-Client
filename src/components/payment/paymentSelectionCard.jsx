@@ -136,7 +136,6 @@ export const PaymentSelectionCard = (props) => {
     }
 
     const onChangePaymentAmounts = (val, identifier) => {
-        debugger;
         switch(identifier) {
             case 'inward-cash-val':
             case 'outward-cash-val':

@@ -44,7 +44,7 @@ export const getDateInUTC = (theDate, options) => {
 }
 
 export const dateFormatter = (theDate, options) => {
-    let formattedDate = theDate.toISOString().replace('T', ' ').slice(0,19);
+    let formattedDate = theDate.toISOString().replace('T', ' ').slice(0,19);  // return utc date
     if(options) {
         if(options.onlyDate)
             formattedDate = formattedDate.slice(0, 10);

@@ -439,6 +439,5 @@ export const resetPageState = (stateObj) => {
         },
         paymentCardResetActionFlag: true //for payment card
     };
-    debugger;
     return stateObj;
 }

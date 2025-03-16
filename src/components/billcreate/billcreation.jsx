@@ -80,6 +80,7 @@ class BillCreation extends Component {
         //     content: () => this.componentRef.current,
         // });
         this.domOrders = domList;
+        let expiryDaysFromStore = this.getDefaultFromStore('expiryDays') || LOAN_BILL_EXPIRY_DAYS;
         this.state = {
             showPreview: false,  
             showMoreInputs: false,
@@ -93,8 +94,8 @@ class BillCreation extends Component {
                     _inputVal: new Date().toISOString(),
                     isLive: true,
                 },
-                expiryDayLimit: LOAN_BILL_EXPIRY_DAYS,
-                expiryDate: addDays(new Date(), LOAN_BILL_EXPIRY_DAYS),
+                expiryDayLimit: expiryDaysFromStore,
+                expiryDate: addDays(new Date(), expiryDaysFromStore),
                 billseries: {
                     inputVal: props.billCreation.billSeries,
                     hasError: false 
@@ -388,6 +389,7 @@ class BillCreation extends Component {
         this.onSelectSecJewelRedeemer = this.onSelectSecJewelRedeemer.bind(this);
         this.clearPledgeForCustomer = this.clearPledgeForCustomer.bind(this);
         this.clearSelectedJewelRedeemCustomer = this.clearSelectedJewelRedeemCustomer.bind(this);
+        this.insertItemIntoMoreBucket = this.insertItemIntoMoreBucket.bind(this);
     }
 
     /*async uploadImage(e) {
@@ -768,6 +770,10 @@ class BillCreation extends Component {
             case 'pincode':
                 if(this.props.auth && this.props.auth.userPreferences)
                     val = this.props.auth.userPreferences.bill_create_pincode_default || '';
+                break;
+            case 'expiryDays':
+                if(this.props.auth && this.props.auth.userPreferences)
+                    val = this.props.auth.userPreferences.loan_bill_expiry_days;
                 break;
         }
         return val;
@@ -1913,7 +1919,7 @@ class BillCreation extends Component {
             return (
                 <Row>
                     {/* <Col xs={12} className='font-weight-bold' style={{marginBottom: '5px'}}>ID</Col>                     */}
-                    <Col xs={6} md={6}>
+                    <Col xs={5} md={5}>
                         <Form.Group>
                             <Form.Control as="select" onChange={(e) => this.onDropdownChange(e, 'moreCustomerDetailsField')} value={this.state.formData.moreDetails.currCustomerInputField}>
                                 {this.state.formData.moreDetails.list.map((item) => {
@@ -1940,7 +1946,7 @@ class BillCreation extends Component {
                             ref = {(domElm) => { this.domElmns.moreCustomerDetailField = domElm?domElm.input:domElm; }}
                         /> */}
                     </Col>
-                    <Col xs={6} md={6}>
+                    <Col xs={5} md={5}>
                         <Form.Group>
                             <Form.Control
                                 type="text"
@@ -1953,7 +1959,10 @@ class BillCreation extends Component {
                             />
                             <Form.Control.Feedback />
                         </Form.Group>
-                    </Col>                    
+                    </Col>
+                    <Col xs={2} md={2}>
+                        <input type="button" className='gs-button bordered' value="ADD" onClick={this.insertItemIntoMoreBucket}/>
+                    </Col>
                 </Row>
             )
         }
@@ -1967,14 +1976,14 @@ class BillCreation extends Component {
                         for(let i=0; i<moreDetails.length; i++) {
                             rows.push(
                                 <Row className="customer-info-display-row" key={i}>
-                                    <Col xs={6} md={6} style={{paddingLeft: '10px'}}>
+                                    <Col xs={5} md={5} style={{paddingLeft: '10px'}}>
                                         {moreDetails[i]['field']}
                                     </Col>
                                     <Col xs={5} md={5} style={{paddingLeft: '10px'}}>
                                         {moreDetails[i]['val']}
                                     </Col>
                                     { !this.isExistingCustomer() &&
-                                    <Col xs={1} md={1} className='sub-actions-div'>
+                                    <Col xs={2} md={2} className='sub-actions-div'>
                                         <span className='icon edit-icon' onClick={(e) => this.onEditDetailIconClick(i)}><FontAwesomeIcon icon="edit" /></span>
                                         <span className='icon' onClick={(e) => this.onDeleteDetailIconClick(i)}><FontAwesomeIcon icon="trash" /></span>
                                     </Col>
@@ -2112,7 +2121,7 @@ class BillCreation extends Component {
                     <span className='horizontal-dashed-line'></span>
                 </div>
                 <Collapse isOpened={this.state.showMoreInputs}>
-                    <Row>
+                    <Row style={{marginTop: '25px'}}>
                         <Col xs={3} md={3} className='center-align-content'>
                             Customer Information
                         </Col>
@@ -2122,7 +2131,7 @@ class BillCreation extends Component {
                         </Col>
                     </Row>
                     <Row>
-                        <div style={{width: '97%', margin: '7px auto', paddingTop: '7px', borderTop: '1px solid lightgrey'}}></div>
+                        <div style={{width: '97%', margin: '25px auto 0 auto', paddingTop: '7px', borderTop: '1px solid lightgrey'}}></div>
                         <Col xs={3} md={3} className='center-align-content'>
                             Bill Notes
                         </Col>
@@ -2131,7 +2140,7 @@ class BillCreation extends Component {
                         </Col>
                     </Row>
                     <Row>
-                        <div style={{width: '97%', margin: '7px auto', paddingTop: '7px', borderTop: '1px solid lightgrey'}}></div>
+                        <div style={{width: '97%', margin: '25px auto 0 auto', paddingTop: '7px', borderTop: '1px solid lightgrey'}}></div>
                         <Col xs={3} md={3} className='center-align-content'>
                             Pledged For
                         </Col>
@@ -2140,7 +2149,7 @@ class BillCreation extends Component {
                         </Col>
                     </Row>
                     <Row>
-                        <div style={{width: '97%', margin: '7px auto', paddingTop: '7px', borderTop: '1px solid lightgrey'}}></div>
+                        <div style={{width: '97%', margin: '25px auto 0 auto', paddingTop: '7px', borderTop: '1px solid lightgrey'}}></div>
                         <Col xs={3} md={3} className='center-align-content'>
                             Secondary Jewel Redeemer
                         </Col>

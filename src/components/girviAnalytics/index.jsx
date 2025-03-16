@@ -112,7 +112,10 @@ const GirviAnalytics = () => {
 
     const filterCallbacks = {
         date: async (startDate, endDate) => {
-            let edate = new Date(endDate)
+            let edate = new Date(endDate);
+            edate.setHours(23);
+            edate.setMinutes(59);
+            edate.setSeconds(59);
             setDates({sd: new Date(startDate), ed: edate});
         },
     }
@@ -254,6 +257,7 @@ const GirviAnalytics = () => {
                 </Col>
             </Row>
             <Row>
+                <h4>Live Bill insights</h4>
                 <Col xs={4} md={4}>
                     {parsedAnalyticsData && 
                     <div className="gs-card">
