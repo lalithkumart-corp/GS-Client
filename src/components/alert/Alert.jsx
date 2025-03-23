@@ -119,7 +119,8 @@ function AlertComp(props) { // {...row}
 
     let getAlertPopoverDOM = () => {
         return (        
-            <Row style={{paddingTop: '10px'}}>
+            <Row style={{paddingTop: '10px'}}
+            onClick={(e) => e.stopPropagation()}>
                 <Col>
                     <Row style={{paddingBottom: '6px'}}> 
                         <Col xs={2}>
@@ -176,12 +177,16 @@ function AlertComp(props) { // {...row}
         )
     }
 
+    const handleLockIconClick = (e, flag) => {
+        e.stopPropagation();
+        setReadOnlyMode(flag);
+    }
 
     return (
         <div className= {`alert-panel arrow-box right ${readOnlyMode?'read-mode':''}`} ref={alertRef}>
             <span className={`alert-msg ${notifObj.class} ${notifObj.show?'show':'hidden'}`}>{notifObj.msg}</span>
             <span className="lock-symbol-style">
-                {readOnlyMode ? <FaLock onClick={()=> setReadOnlyMode(false)} />: <FaLockOpen onClick={()=> setReadOnlyMode(true)} />}
+                {readOnlyMode ? <FaLock onClick={(e)=> handleLockIconClick(e, false)} />: <FaLockOpen onClick={(e)=> handleLockIconClick(e, true)} />}
             </span>
             {getAlertPopoverDOM()}
         </div>
