@@ -1,0 +1,109 @@
+.jewellery-tag-template-4-label {
+    background-color: lightgray;
+    font-family: auto;
+    width: 302px;
+    max-height: 45px;
+    line-height: 7px;
+    font-family: sans-serif;
+    font-weight: bold;
+    position: relative;
+    .label-content-section {
+        width: 204px;
+        max-height: 45px;
+        margin-left: 2mm;
+        .section-1 {
+            width: 102px;
+            display: inline-block;
+            vertical-align: top;
+            font-size: 10px;
+            .part-1 {
+                width: 44px;
+                transform: rotate(270deg); 
+                transform-origin: 54% 286%;
+                display: inline-block;
+                text-align: center;
+            }
+            .part-2 {
+                margin-top: -8px;
+                width: 90px;
+                display: inline-block;
+                padding-left: 12px;
+                .row-1 {
+                    height: 20px;
+                    text-align: center;
+                    .barcode-div {
+                        width: 100%;
+                        display: inline-block;
+                        .barcode-span {
+                            svg {
+                                height: 20px;
+                                width: 65px;
+                                padding: 0 0 0 0;
+                            }
+                            // g {
+                            //     transform: translateX(10px); //translate(0,0);
+                            // }
+                            svg > rect:first-child {
+                                height: 32px;
+                                // fill: lightgray;
+                            }
+                            .huid {
+                                position: absolute;
+                                top: 17px !important;
+                                left: 21px;
+                                font-size: 9px;
+                                max-width: 70px;
+                                text-align: center;
+                                min-width: 70px;
+                            }
+                        }
+                    }
+                }
+                .row-2 {
+                    height: 24.5px;
+                    text-align: center;
+                    line-height: 10px;
+                }
+            }
+        }
+        .section-2 {
+            width: 102px;
+            display: inline-block;
+            font-size: 10px;
+            letter-spacing: 1px;
+            .part-1 {
+                transform: rotate(270deg);
+                width: 44px;
+                transform-origin: 38% 247%;          
+            }
+            .part-2 {
+                margin-left: 13px;
+                margin-top: -3px;
+                .row-1 {
+                    height: 18.5px;
+                }
+                .row-2 {
+                    height: 20.5px;
+                    font-size: 16px;
+                }
+            }
+        }
+    }
+}
+
+// Custom CSS for tag - when displaying on TagSetup page 
+.jewellery-tag-template-setup-container {
+    .jewellery-tag-template-4-label {
+        .label-content-section {
+            .section-1 {
+                .row-1 {
+                    .barcode-span {
+                        svg > rect:first-child {
+                            fill: lightgray !important;
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

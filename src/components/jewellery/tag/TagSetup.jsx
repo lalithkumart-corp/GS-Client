@@ -16,8 +16,8 @@ const TagSetup = () => {
 
     const [templatesList, setTemplatesList] = useState([]);
 
-    const [storeName, setStoreNameAbbr] = useState('STR');
-    const [division, setDivision] = useState('916KDM');
+    const [storeName, setStoreNameAbbr] = useState(null);
+    const [division, setDivision] = useState('22K');
     const [grams, setGrams] = useState(1.240);
     const [size, setSize] = useState(22);
     const [itemName, setItemName] = useState('Kamal Tops');
@@ -25,9 +25,13 @@ const TagSetup = () => {
     const [productId, setProductId] = useState('RN2');
     const [trackId, setTrackId] = useState('104');
     const [wsgPct, setWsgPct] = useState('14%');
+    const [bisLogoVisibility, setBisLogoVisibility] = useState(false);
     
     const [selectedTemplateId, setSelectedTemplateId] = useState(null);
 
+    const onToggleBisLogoCheckbox = (e) => {
+        setBisLogoVisibility(!bisLogoVisibility);
+    }
 
     useEffect(() => {
         fetchAvlTemplates();
@@ -83,6 +87,7 @@ const TagSetup = () => {
         let tagContext = [{
             storeName: storeName,
             division: division,
+            displayBisLogo: bisLogoVisibility,
             grams: grams,
             size: size,
             itemName: itemName,
@@ -96,12 +101,14 @@ const TagSetup = () => {
         }];
         _.each(templatesList, (aTemplate) => {
             let checked = false;
-            console.log('CONDITINO CHeck', selectedTemplateId);
             if(aTemplate.template_id == selectedTemplateId) {
                 checked = true;
-                console.log('CHECKED = ', aTemplate.template_id );
-                if(aTemplate.store_name_abbr && aTemplate.store_name_abbr != storeName)
-                    setStoreNameAbbr(aTemplate.store_name_abbr);
+                if(!storeName) {
+                    if(aTemplate.store_name_abbr)
+                        setStoreNameAbbr(aTemplate.store_name_abbr);
+                    else
+                        setStoreNameAbbr('STR');
+                }
             }
             let labelStr = aTemplate.template_id;
             let paramertsJson = safeParseJson(aTemplate.parameters_json);
@@ -109,7 +116,7 @@ const TagSetup = () => {
                 labelStr = `${paramertsJson.labelWidth}MM X ${paramertsJson.labelHeight}MM`;
             }
             list.push(
-                <Col xs={6} md={6}>
+                <Col xs={4} md={4}>
                     <div className="jewellery-tag-radio-btn-label">
                         <input type="radio" id={`jewellery-tag-template-id-${aTemplate.template_id}`} name="jewellery-tag-template" onChange={(e)=>onChangeTemplateSelection(e, aTemplate.template_id)} value={aTemplate.template_id} checked={checked}/>
                         <label for={`jewellery-tag-template-id-${aTemplate.template_id}`} style={{marginLeft: '7px'}}>
@@ -180,6 +187,14 @@ const TagSetup = () => {
                         </Col>
                         <Col xs={2}>
                             <input type="text" className="gs-input-cell" value={division} onChange={(e) => setDivision(e.target.value)}/>
+                        </Col>
+                    </Row>
+                    <Row>
+                        <Col xs={1}>
+                            Show BIS Logo
+                        </Col>
+                        <Col xs={2}>
+                            <input type='checkbox' value={''} checked={bisLogoVisibility} onChange={(e) => onToggleBisLogoCheckbox(e)}/>
                         </Col>
                     </Row>
                     <Row>
