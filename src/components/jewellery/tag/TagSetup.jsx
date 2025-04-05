@@ -17,6 +17,7 @@ const TagSetup = () => {
     const [templatesList, setTemplatesList] = useState([]);
 
     const [storeName, setStoreNameAbbr] = useState(null);
+    const [storeNameFull, setStoreNameFull] = useState(null);
     const [division, setDivision] = useState('22K');
     const [grams, setGrams] = useState(1.240);
     const [size, setSize] = useState(22);
@@ -36,6 +37,25 @@ const TagSetup = () => {
     useEffect(() => {
         fetchAvlTemplates();
     }, []);
+
+    useEffect(() => {
+        _.each(templatesList, (aTemplate) => {
+            if(aTemplate.template_id == selectedTemplateId) {
+                if(!storeName) {
+                    if(aTemplate.store_name_abbr)
+                        setStoreNameAbbr(aTemplate.store_name_abbr);
+                    else
+                        setStoreNameAbbr('STR');
+                }
+                if(!storeNameFull) {
+                    if(aTemplate.store_name_full)
+                        setStoreNameFull(aTemplate.store_name_full);
+                    else
+                        setStoreNameFull('MY STORE NAME');
+                }
+            }
+        });
+    }, [templatesList, selectedTemplateId]);
 
     useEffect(()=> {
         _.each(templatesList, (aTemplate) => {
@@ -62,12 +82,13 @@ const TagSetup = () => {
 
     const onClickUpdate = async () => {
         try {
-            let resp = await axiosMiddleware.put(UPDATE_JEWELLERY_TAG_SETTINGS, {selectedTemplateId, storeNameAbbr: storeName});
+            let resp = await axiosMiddleware.put(UPDATE_JEWELLERY_TAG_SETTINGS, {selectedTemplateId, storeNameAbbr: storeName, storeNameFull: storeNameFull});
             if(resp && resp.data && resp.data.STATUS == 'SUCCESS') {
                 toast.success('Updated Successfully!');
                 let tagTemplateSettings = getJewelleryTagTemplateSettings();
                 tagTemplateSettings.selected_tag_template_id = selectedTemplateId;
                 tagTemplateSettings.store_name_abbr = storeName;
+                tagTemplateSettings.store_name_full = storeNameFull;
                 saveJewelleryTagTemplateSettings(tagTemplateSettings);
             } else {
                 console.log(e);
@@ -86,6 +107,7 @@ const TagSetup = () => {
         let list = [];
         let tagContext = [{
             storeName: storeName,
+            storeNameFull: storeNameFull,
             division: division,
             displayBisLogo: bisLogoVisibility,
             grams: grams,
@@ -103,12 +125,6 @@ const TagSetup = () => {
             let checked = false;
             if(aTemplate.template_id == selectedTemplateId) {
                 checked = true;
-                if(!storeName) {
-                    if(aTemplate.store_name_abbr)
-                        setStoreNameAbbr(aTemplate.store_name_abbr);
-                    else
-                        setStoreNameAbbr('STR');
-                }
             }
             let labelStr = aTemplate.template_id;
             let paramertsJson = safeParseJson(aTemplate.parameters_json);
@@ -116,7 +132,7 @@ const TagSetup = () => {
                 labelStr = `${paramertsJson.labelWidth}MM X ${paramertsJson.labelHeight}MM`;
             }
             list.push(
-                <Col xs={4} md={4}>
+                <Col xs={6} md={6} className='a-tag-preview'>
                     <div className="jewellery-tag-radio-btn-label">
                         <input type="radio" id={`jewellery-tag-template-id-${aTemplate.template_id}`} name="jewellery-tag-template" onChange={(e)=>onChangeTemplateSelection(e, aTemplate.template_id)} value={aTemplate.template_id} checked={checked}/>
                         <label for={`jewellery-tag-template-id-${aTemplate.template_id}`} style={{marginLeft: '7px'}}>
@@ -142,107 +158,127 @@ const TagSetup = () => {
                 <Col className="gs-card-content">
                     <h4 style={{marginBottom: '20px'}}>Tag Templates</h4>
                     <Row>
-                        <Col xs={1}>
-                            StoreName: 
+                        <Col xs={3}>
+                            <Row>
+                                <Col xs={6}>
+                                    StoreName: 
+                                </Col>
+                                <Col xs={6}>
+                                    <input type="text" className="gs-input-cell" value={storeName} onChange={(e) => setStoreNameAbbr(e.target.value)}/>
+                                </Col>
+                            </Row>
+                            <Row>
+                                <Col xs={6}>
+                                    StoreName Full: 
+                                </Col>
+                                <Col xs={6}>
+                                    <input type="text" className="gs-input-cell" value={storeNameFull} onChange={(e) => setStoreNameFull(e.target.value)}/>
+                                </Col>
+                            </Row>
+                            <div className='tag-variable-input-items'>
+                                <Row>
+                                    <Col xs={6}>
+                                        Track Id: 
+                                    </Col>
+                                    <Col xs={6}>
+                                        <input type="text" className="gs-input-cell" value={trackId} onChange={(e) => setTrackId(e.target.value)}/>
+                                    </Col>
+                                </Row>
+                                <Row>
+                                    <Col xs={6}>
+                                        Product Id: 
+                                    </Col>
+                                    <Col xs={6}>
+                                        <input type="text" className="gs-input-cell" value={productId} onChange={(e) => setProductId(e.target.value)}/>
+                                    </Col>
+                                </Row>
+                                <Row>
+                                    <Col xs={6}>
+                                        HUID: 
+                                    </Col>
+                                    <Col xs={6}>
+                                        <input type="text" className="gs-input-cell" value={huid} onChange={(e) => setHuid(e.target.value)}/>
+                                    </Col>
+                                </Row>
+                                <Row>
+                                    <Col xs={6}>
+                                        Item Name: 
+                                    </Col>
+                                    <Col xs={6}>
+                                        <input type="text" className="gs-input-cell" value={itemName} onChange={(e) => setItemName(e.target.value)}/>
+                                    </Col>
+                                </Row>
+                                <Row>
+                                    <Col xs={6}>
+                                        Division: 
+                                    </Col>
+                                    <Col xs={6}>
+                                        <input type="text" className="gs-input-cell" value={division} onChange={(e) => setDivision(e.target.value)}/>
+                                    </Col>
+                                </Row>
+                                <Row>
+                                    <Col xs={6}>
+                                        Show BIS Logo
+                                    </Col>
+                                    <Col xs={6}>
+                                        <input type='checkbox' 
+                                        style={{
+                                            marginTop: '8px',
+                                            marginBottom: '7px',
+                                            marginLeft: 0
+                                        }}
+                                        value={''} checked={bisLogoVisibility} onChange={(e) => onToggleBisLogoCheckbox(e)}/>
+                                    </Col>
+                                </Row>
+                                <Row>
+                                    <Col xs={6}>
+                                        grams: 
+                                    </Col>
+                                    <Col xs={6}>
+                                        <input type="text" className="gs-input-cell" value={grams} onChange={(e) => setGrams(e.target.value)}/>
+                                    </Col>
+                                </Row>
+                                <Row>
+                                    <Col xs={6}>
+                                        size: 
+                                    </Col>
+                                    <Col xs={6}>
+                                        <input type="text" className="gs-input-cell" value={size} onChange={(e) => setSize(e.target.value)}/>
+                                    </Col>
+                                </Row>
+                                <Row>
+                                    <Col xs={6}>
+                                        Wsg %: 
+                                    </Col>
+                                    <Col xs={6}>
+                                        <input type="text" className="gs-input-cell" value={wsgPct} onChange={(e) => setWsgPct(e.target.value)}/>
+                                    </Col>
+                                </Row>
+                                <Row>
+                                    <Col xs={6}>
+                                        HUID: 
+                                    </Col>
+                                    <Col xs={6}>
+                                        <input type="text" className="gs-input-cell" value={huid} onChange={(e) => setHuid(e.target.value)}/>
+                                    </Col>
+                                </Row>
+                            </div>
                         </Col>
-                        <Col xs={2}>
-                            <input type="text" className="gs-input-cell" value={storeName} onChange={(e) => setStoreNameAbbr(e.target.value)}/>
+                        <Col xs={9}>
+                            <Row style={{marginTop: '20px'}}>
+                                {getTemplateListContainer()}
+                            </Row>
                         </Col>
                     </Row>
                     <Row>
-                        <Col xs={1}>
-                            Track Id: 
-                        </Col>
-                        <Col xs={2}>
-                            <input type="text" className="gs-input-cell" value={trackId} onChange={(e) => setTrackId(e.target.value)}/>
-                        </Col>
-                    </Row>
-                    <Row>
-                        <Col xs={1}>
-                            Product Id: 
-                        </Col>
-                        <Col xs={2}>
-                            <input type="text" className="gs-input-cell" value={productId} onChange={(e) => setProductId(e.target.value)}/>
-                        </Col>
-                    </Row>
-                    <Row>
-                        <Col xs={1}>
-                            HUID: 
-                        </Col>
-                        <Col xs={2}>
-                            <input type="text" className="gs-input-cell" value={huid} onChange={(e) => setHuid(e.target.value)}/>
-                        </Col>
-                    </Row>
-                    <Row>
-                        <Col xs={1}>
-                            Item Name: 
-                        </Col>
-                        <Col xs={2}>
-                            <input type="text" className="gs-input-cell" value={itemName} onChange={(e) => setItemName(e.target.value)}/>
-                        </Col>
-                    </Row>
-                    <Row>
-                        <Col xs={1}>
-                            Division: 
-                        </Col>
-                        <Col xs={2}>
-                            <input type="text" className="gs-input-cell" value={division} onChange={(e) => setDivision(e.target.value)}/>
-                        </Col>
-                    </Row>
-                    <Row>
-                        <Col xs={1}>
-                            Show BIS Logo
-                        </Col>
-                        <Col xs={2}>
-                            <input type='checkbox' value={''} checked={bisLogoVisibility} onChange={(e) => onToggleBisLogoCheckbox(e)}/>
-                        </Col>
-                    </Row>
-                    <Row>
-                        <Col xs={1}>
-                            grams: 
-                        </Col>
-                        <Col xs={2}>
-                            <input type="text" className="gs-input-cell" value={grams} onChange={(e) => setGrams(e.target.value)}/>
-                        </Col>
-                    </Row>
-                    <Row>
-                        <Col xs={1}>
-                            size: 
-                        </Col>
-                        <Col xs={2}>
-                            <input type="text" className="gs-input-cell" value={size} onChange={(e) => setSize(e.target.value)}/>
-                        </Col>
-                    </Row>
-                    <Row>
-                        <Col xs={1}>
-                            Wsg %: 
-                        </Col>
-                        <Col xs={2}>
-                            <input type="text" className="gs-input-cell" value={wsgPct} onChange={(e) => setWsgPct(e.target.value)}/>
-                        </Col>
-                    </Row>
-                    <Row>
-                        <Col xs={1}>
-                            HUID: 
-                        </Col>
-                        <Col xs={2}>
-                            <input type="text" className="gs-input-cell" value={huid} onChange={(e) => setHuid(e.target.value)}/>
-                        </Col>
-                    </Row>
-                    <Row style={{marginTop: '20px'}}>
-                        {getTemplateListContainer()}
-                    </Row>
-                    <Row>
-                        <Col xs={6} style={{textAlign: 'left'}}>
+                        <Col xs={{span: 6, offset: 6}} style={{textAlign: 'right'}}>
                             <ReactToPrint 
                                 ref={(domElm) => {btnRef = domElm}}
                                 trigger={() => <a href="#"></a>}
                                 content={() => selectedTagRef}
                             />
-                            <input type="button" className="gs-button" value="PRINT" onClick={onClickPrintBtn} />
-                        </Col>
-                        <Col xs={6} style={{textAlign: 'right'}}>
-                            <input type="button" className='gs-button' value="UPDATE" onClick={onClickUpdate}/>
+                            <input type="button" className="gs-button bordered" value="PRINT PREVIEW" onClick={onClickPrintBtn} />
+                            <input type="button" className='gs-button bordered' style={{marginLeft: '10px'}} value="UPDATE" onClick={onClickUpdate}/>
                         </Col>
                     </Row>
                 </Col>

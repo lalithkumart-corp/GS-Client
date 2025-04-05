@@ -71,6 +71,9 @@ const Template3 = ({
         textAlign: 'center',
         paddingLeft: `${displayBisLogo?'15px':'0'}`
     }
+    const section2Part2 = {
+        marginTop: size?'-3px':'3px'
+    }
     return (
         <>
             <div className="jewellery-tag-template-3-label" style={panelCss}>
@@ -99,17 +102,15 @@ const Template3 = ({
                         
                     </div>
                     <div className='section-2'>
-                        {size && 
-                            <div className="part-1">
-                                s- {size}
-                            </div>
-                        }
-                        <div className="part-2">
+                        <div className="part-1">
+                            {size && `S- ${size}`}
+                        </div>
+                        <div className="part-2" style={section2Part2}>
                             <div className='row-1'>
                                 <div style={{textTransform: 'uppercase'}}>{itemName}</div>
                             </div>    
                             <div className='row-2'>
-                                Wt: {grams}
+                                wt: {grams}
                             </div>
                         </div>
                     </div>

@@ -2,7 +2,7 @@ import './Template4.scss';
 import Barcode from "react-barcode";
 
 const Template4 = ({
-    storeName, division, 
+    storeName, storeNameFull, division, 
     grams, size, itemName, huid, config, productId, trackId, wsgPct, customization, displayBisLogo=true
 }) => {
     config = config || {};
@@ -69,6 +69,9 @@ const Template4 = ({
         textAlign: 'center',
         paddingLeft: `${displayBisLogo?'15px':'0'}`
     }
+    const section2Part2 = {
+        marginTop: size?'-3px':'3px'
+    }
     return (
         <>
             <div className="jewellery-tag-template-4-label" style={panelCss}>
@@ -91,23 +94,23 @@ const Template4 = ({
                                 </div>
                             </div>
                             <div className='row-2'>
-                                {storeName}
+                                {storeNameFull}
                             </div>
                         </div>
                         
                     </div>
                     <div className='section-2'>
-                        {size && 
-                            <div className="part-1">
-                                s- {size}
-                            </div>
-                        }
-                        <div className="part-2">
+                        
+                        <div className="part-1">
+                            {size && `S- ${size}`}
+                        </div>
+                        
+                        <div className="part-2" style={section2Part2}>
                             <div className='row-1'>
                                 <div style={{textTransform: 'uppercase'}}>{itemName}</div>
                             </div>    
                             <div className='row-2'>
-                                Wt: {grams}
+                                wt: {grams}
                             </div>
                         </div>
                     </div>

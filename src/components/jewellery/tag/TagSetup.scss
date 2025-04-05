@@ -2,4 +2,16 @@
     .gs-input-cell {
         border-bottom: 1px solid lightgray;
     }
+    .a-tag-preview {
+        margin-bottom: 15px;
+        input[type=radio] {
+            margin: 0;
+        }
+    }
+    .tag-variable-input-items {
+        border: 1px solid lightgray;
+        padding: 5px;
+        margin-top: 20px;
+        border-radius: 10px;
+    }
 }
