@@ -72,7 +72,8 @@ const Template3 = ({
         paddingLeft: `${displayBisLogo?'15px':'0'}`
     }
     const section2Part2 = {
-        marginTop: size?'-3px':'3px'
+        marginTop: size?'-3px':'3px',
+        marginLeft: size?'13px':'2px'
     }
     return (
         <>
@@ -107,10 +108,12 @@ const Template3 = ({
                         </div>
                         <div className="part-2" style={section2Part2}>
                             <div className='row-1'>
-                                <div style={{textTransform: 'uppercase'}}>{itemName}</div>
+                                <div style={{lineHeight: '14px'}}>{itemName}</div>
                             </div>    
                             <div className='row-2'>
-                                wt: {grams}
+                                <span style={{lineHeight: '14px'}}>
+                                    Wt<span style={{fontWeight: 'normal'}}>:</span>{grams}
+                                </span>
                             </div>
                         </div>
                     </div>

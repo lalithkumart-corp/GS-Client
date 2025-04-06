@@ -73,17 +73,21 @@
             .part-1 {
                 transform: rotate(270deg);
                 width: 44px;
-                transform-origin: 38% 247%;          
+                transform-origin: 58% 267%;
+                font-size: 12px;
+                text-align: center;        
             }
             .part-2 {
                 margin-left: 13px;
                 margin-top: -3px;
                 .row-1 {
                     height: 18.5px;
+                    text-align: center;
                 }
                 .row-2 {
                     height: 20.5px;
                     font-size: 16px;
+                    text-align: center;
                 }
             }
         }
