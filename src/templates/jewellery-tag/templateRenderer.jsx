@@ -3,6 +3,7 @@ import Template1 from './template1/Template1';
 import Template2 from './template2/Template2';
 import Template3 from './template3/Template3';
 import Template4 from './template4/Template4';
+import Template5 from './template5/Template5';
 import { getJewelleryTagTemplateSettings } from '../../core/storage';
 
 export default class TemplateRenderer extends Component {
@@ -39,6 +40,9 @@ export default class TemplateRenderer extends Component {
                 break;
             case 4:
                 theDom.push(<Template4 {...tag} />);
+                break;
+            case 5:
+                theDom.push(<Template5 {...tag} />);
                 break;
             default:
                 theDom.push(<Template1 {...tag} />);
