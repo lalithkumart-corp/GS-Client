@@ -1,7 +1,7 @@
-import './Template5.scss';
+import './Template6.scss';
 import Barcode from "react-barcode";
 
-const Template5 = ({
+const Template6 = ({
     storeName, storeNameFull, division, 
     grams, size, itemName, huid, config, productId, trackId, wsgPct, customization, displayBisLogo=true
 }) => {
@@ -69,51 +69,46 @@ const Template5 = ({
         textAlign: 'center',
         paddingLeft: `${displayBisLogo?'15px':'0'}`
     }
-    const section2Part2 = {
-        marginTop: size?'-3px':'3px',
-        marginLeft: size?'13px':'2px'
-    }
+    // const section2Part2 = {
+    //     marginTop: size?'-3px':'3px',
+    //     marginLeft: size?'13px':'2px'
+    // }
     return (
         <>
-            <div className="jewellery-tag-template-5-label" style={panelCss}>
+            <div className="jewellery-tag-template-6-label" style={panelCss}>
                 <div  className='label-content-section'>
                     <div className='section-1'>
                         <div className='part-1'>
-                            <div className='division-label-div'>
-                                <span className='hallmark-logo-span' style={hallmarkLogoSpanStyles}>
-                                    <img className='hallmark-logo' style={hallmarkLogoStyles} src='/images/bis.jpg' />
-                                </span>
-                                <span style={divisionStyles}>
-                                    {division}
-                                </span>
-                            </div>
-                        </div>
-                        <div className='part-2'>
                             <div className='row-1'>
-                                <div className='barcode-div'>
-                                    {getBarCode()}
+                                <div>
+                                    <div style={{textAlign: 'left', display: 'inline-block', width: '34px', fontSize: '13px'}}>
+                                        {storeName}
+                                    </div>
+                                    <div style={{textAlign: 'right', display: 'inline-block', width: '54px', fontSize: '13px'}}>
+                                        {size && `${size}`}
+                                    </div>
                                 </div>
                             </div>
-                            <div className='row-2'>
-                                {storeNameFull}
+                            <div className='row-2' style={{letterSpacing: '2px'}}>
+                                <span style={{lineHeight: '14px'}}>
+                                    <span style={{fontSize: '11px'}}>Wt</span>
+                                    <span style={{fontWeight: 'normal'}}>:</span>
+                                    <span style={{fontSize: '15px'}}>{grams}</span>
+                                </span>
                             </div>
                         </div>
                         
                     </div>
                     <div className='section-2'>
                         <div className="part-1">
-                            {size && `S- ${size}`}
-                        </div>
-                        
-                        <div className="part-2" style={section2Part2}>
-                            <div className='row-1'>
-                                <div style={{lineHeight: '14px', textTransform: 'uppercase'}}>{itemName}</div>
+                            <div className='row-1' style={{lineHeight: '16px'}}>
+                                <span style={{fontWeight: 800}}>{itemName}</span>
                             </div>    
-                            <div className='row-2'>
+                            <div className='row-2' style={{letterSpacing: '2px'}}>
                                 <span style={{lineHeight: '14px'}}>
                                     <span style={{fontSize: '11px'}}>Wt</span>
                                     <span style={{fontWeight: 'normal'}}>:</span>
-                                    <span style={{fontSize: '14px'}}>{grams}</span>
+                                    <span style={{fontSize: '15px'}}>{grams}</span>
                                 </span>
                             </div>
                         </div>
@@ -124,4 +119,4 @@ const Template5 = ({
     )
 }
 
-export default Template5;
+export default Template6;

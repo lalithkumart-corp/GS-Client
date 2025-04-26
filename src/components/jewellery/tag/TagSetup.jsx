@@ -21,7 +21,7 @@ const TagSetup = () => {
     const [division, setDivision] = useState('22K');
     const [grams, setGrams] = useState(1.240);
     const [size, setSize] = useState(22);
-    const [itemName, setItemName] = useState('Kamal Tops');
+    const [itemName, setItemName] = useState('RING');
     const [huid, setHuid] = useState('HJ7l5K');
     const [productId, setProductId] = useState('RN2');
     const [trackId, setTrackId] = useState('104');

@@ -107,12 +107,13 @@ const Template4 = ({
                         
                         <div className="part-2" style={section2Part2}>
                             <div className='row-1'>
-                                <div style={{lineHeight: '14px', textTransform: 'uppercase'}}>{itemName}</div>
+                                <div style={{lineHeight: '14px', textTransform: 'uppercase', fontWeight: 800}}>{itemName}</div>
                             </div>    
                             <div className='row-2'>
-                                <span style={{lineHeight: '14px'}}>
-                                    <span style={{fontSize: '10px'}}>Wt</span>
-                                    <span style={{fontWeight: 'normal'}}>:</span>{grams}
+                                <span style={{lineHeight: '16px'}}>
+                                    <span style={{fontSize: '11px'}}>Wt</span>
+                                    <span style={{fontWeight: 'normal'}}>:</span>
+                                    <span style={{fontSize: '15px'}}>{grams}</span>
                                 </span>
                             </div>
                         </div>

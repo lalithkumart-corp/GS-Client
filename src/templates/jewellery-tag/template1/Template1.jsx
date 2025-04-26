@@ -2,7 +2,7 @@ import './Template1.scss';
 
 const Template1 = ({
     storeName, division, 
-    grams, size, itemName, huid, config
+    grams, size, itemName, huid, config, displayBisLogo=true
 }) => {
     config = config || {};
     let showSize = size?true:false;
@@ -31,6 +31,7 @@ const Template1 = ({
         marginTop: '3px'
     };
     const hallmarkLogoStyles = {
+        display: displayBisLogo?'inline-block':'none',
         height: '100%',
         marginTop: '-6px'
     };
@@ -38,7 +39,7 @@ const Template1 = ({
         fontSize: '14px'
     }
     const weightValueStyles = {
-        fontSize: '15px',
+        fontSize: '17px',
         fontWeight: 'bold'
     };
     const itemNameStyles = {
@@ -63,7 +64,7 @@ const Template1 = ({
     return (
         <>
             <div className="jewellery-tag-template-1-label">
-                <div  className='label-content-section'>
+                <div  className='label-content-section' style={{marginLeft: '2.5mm'}}>
                     <div className='section-1'>
                         <div className='row-1'>
                             <span className='store-name-abbr' style={storeNameStyles}>{storeName}</span>
@@ -87,7 +88,7 @@ const Template1 = ({
                         </div>
                         <div className='row-2'>
                             <span style={{fontWeight: 'bold', paddingLeft: '3px'}}>
-                                <span style={weightLabelStyles}>wt: </span>
+                                <span style={weightLabelStyles}>wt:</span>
                                 <span style={weightValueStyles}>{grams}</span>
                             </span>
                         </div>
