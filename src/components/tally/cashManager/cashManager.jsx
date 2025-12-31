@@ -56,7 +56,7 @@ export default class CashManager extends Component {
     }
 
     editTransaction(transactionData) {
-        if(transactionData.cash_in)
+        if(parseFloat(transactionData.cash_in) > 0)
             this.setState({cashInEditMode: true, editContentForCashIn: transactionData});
         else
             this.setState({cashOutEditMode: true, editContentForCashOut: transactionData});

@@ -1479,7 +1479,7 @@ class Pledgebook extends Component {
                             let ornData = JSON.parse(row.Orn) || {};
                             return(
                                 <Container className='gs-card arrow-box right' style={{minWidth: '600px', padding: '10px'}}>
-                                    <Row>
+                                    <Row onClick={(e) => e.stopPropagation()}>
                                         <h4 style={{textAlign: 'center'}}>Ornaments</h4>
                                         <Col xs={{span: 9}} className="orn-display-dom">
                                             {this.constructOrnInfoTable(ornData)}
