@@ -1,7 +1,7 @@
-import './Template4.scss';
+import './Template5.scss';
 import Barcode from "react-barcode";
 
-const Template4 = ({
+const Template5 = ({
     storeName, storeNameFull, division, 
     grams, size, itemName, huid, config, productId, trackId, wsgPct, customization, displayBisLogo=true
 }) => {
@@ -71,11 +71,11 @@ const Template4 = ({
     }
     const section2Part2 = {
         marginTop: size?'-3px':'3px',
-        marginLeft: size?'11px':'0'
+        marginLeft: size?'13px':'2px'
     }
     return (
         <>
-            <div className="jewellery-tag-template-4-label" style={panelCss}>
+            <div className="jewellery-tag-template-5-label" style={panelCss}>
                 <div  className='label-content-section'>
                     <div className='section-1'>
                         <div className='part-1'>
@@ -123,4 +123,4 @@ const Template4 = ({
     )
 }
 
-export default Template4;
+export default Template5;

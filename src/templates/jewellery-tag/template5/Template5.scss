@@ -1,4 +1,4 @@
-.jewellery-tag-template-4-label {
+.jewellery-tag-template-5-label {
     background-color: lightgray;
     font-family: auto;
     width: 302px;
@@ -82,13 +82,13 @@
                 margin-left: 13px;
                 margin-top: -3px;
                 .row-1 {
-                    text-align: center;
+                    text-align: left;
                     height: 18.5px;
                 }
                 .row-2 {
                     height: 20.5px;
                     font-size: 14px;
-                    text-align: center;
+                    text-align: left;
                 }
             }
         }
@@ -97,7 +97,7 @@
 
 // Custom CSS for tag - when displaying on TagSetup page 
 .jewellery-tag-template-setup-container {
-    .jewellery-tag-template-4-label {
+    .jewellery-tag-template-5-label {
         .label-content-section {
             .section-1 {
                 .row-1 {
