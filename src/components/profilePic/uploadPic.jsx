@@ -1,5 +1,4 @@
 import React from 'react';
-import ImageUploader from 'react-images-upload';
  
 class UploadPicDemo extends React.Component {
  
