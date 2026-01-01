@@ -34,9 +34,10 @@ const LoanOverviewCard = (props) => {
     }, [props.loanDetail]);
 
     const calcPaymentsMade = (paymentsListByBill) => {
-        let arr = ['interest' , 'principal'];
+        // let arr = ['interest' , 'principal'];
+        let arrExcl = ['girvi'];
         return paymentsListByBill.reduce((sum, anObj) => {
-            if(arr.indexOf(anObj.category.trim().toLowerCase()) >= 0) {
+            if(arrExcl.indexOf(anObj.category.trim().toLowerCase()) == -1) {
                 let cashIn = parseFloat(anObj.cash_in);
                     cashIn = isNaN(cashIn)?0:cashIn;
                 let cashOut = parseFloat(anObj.cash_out);
