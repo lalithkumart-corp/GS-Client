@@ -1230,6 +1230,15 @@ class BillCreation extends Component {
         return isExistingCustomer;
     }
 
+    canUpdateCustomerOtherDetail() {
+        let flag = true;
+        if(this.state.selectedCustomer && Object.keys(this.state.selectedCustomer).length != 0)
+            flag = false;
+        if(this.props.loadedInPledgebook)
+            flag = false;
+        return flag;
+    }
+
     updateOrnTotalWeight() {
         let newState2 = {...this.state};
         let wt = 0.00;
@@ -1982,7 +1991,7 @@ class BillCreation extends Component {
                                     <Col xs={5} md={5} style={{paddingLeft: '10px'}}>
                                         {moreDetails[i]['val']}
                                     </Col>
-                                    { !this.isExistingCustomer() &&
+                                    { this.canUpdateCustomerOtherDetail() &&
                                     <Col xs={2} md={2} className='sub-actions-div'>
                                         <span className='icon edit-icon' onClick={(e) => this.onEditDetailIconClick(i)}><FontAwesomeIcon icon="edit" /></span>
                                         <span className='icon' onClick={(e) => this.onDeleteDetailIconClick(i)}><FontAwesomeIcon icon="trash" /></span>
@@ -2126,7 +2135,7 @@ class BillCreation extends Component {
                             Customer Information
                         </Col>
                         <Col xs={9} md={9}>
-                            {!this.isExistingCustomer() && getCustomerInforAdderDom()}
+                            {this.canUpdateCustomerOtherDetail() && getCustomerInforAdderDom()}
                             {getCustomerInfoDisplayDom()}
                         </Col>
                     </Row>
