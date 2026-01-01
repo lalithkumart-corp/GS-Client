@@ -56,14 +56,14 @@
   },
   "scripts": {
     "analyze": "source-map-explorer 'build/static/js/*.js'",
-    "start": "react-scripts start",
-    "build:development": "env-cmd -f .env.development react-scripts build",
-    "build:staging": "env-cmd -f .env.staging react-scripts build",
-    "build:offlineprod_linux": "GENERATE_SOURCEMAP=false env-cmd -f .env.offlineprod react-scripts build",
-    "build:offlineprod_win": "set \"GENERATE_SOURCEMAP=false\" && env-cmd -f .env.offlineprod react-scripts build",
-    "build:production": "env-cmd -f .env.production react-scripts build",
-    "test": "react-scripts test --env=jsdom",
-    "eject": "react-scripts eject",
+    "start": "craco start",
+    "build:development": "env-cmd -f .env.development craco build",
+    "build:staging": "env-cmd -f .env.staging craco build",
+    "build:offlineprod_linux": "GENERATE_SOURCEMAP=false env-cmd -f .env.offlineprod craco build",
+    "build:offlineprod_win": "set \"GENERATE_SOURCEMAP=false\" && env-cmd -f .env.offlineprod craco build",
+    "build:production": "env-cmd -f .env.production craco build",
+    "test": "craco test --env=jsdom",
+    "eject": "craco eject",
     "lint": "eslint --ext .js --ext .jsx ./src",
     "lint-fix": "eslint --ext .js --ext .jsx --fix ./src",
     "lint-output": "eslint --ext .js --ext .jsx -o ./lint-output.txt ./src"
@@ -81,14 +81,21 @@
     ]
   },
   "devDependencies": {
+    "@craco/craco": "^7.1.0",
+    "@svgr/webpack": "^8.1.0",
     "eslint": "^8.18.0",
     "eslint-config-airbnb": "^19.0.4",
     "eslint-plugin-import": "^2.26.0",
     "eslint-plugin-jsx-a11y": "^6.5.1",
     "eslint-plugin-react": "^7.30.0",
     "eslint-plugin-react-hooks": "^4.6.0",
-    "node-sass": "^8.0.0",
+    "npm-force-resolutions": "0.0.10",
+    "sass": "^1.69.5",
     "source-map-explorer": "^2.5.2",
+    "url-loader": "^4.1.1",
     "webpack-bundle-analyzer": "^4.4.0"
+  },
+  "resolutions": {
+    "ajv": "8.17.1"
   }
 }
