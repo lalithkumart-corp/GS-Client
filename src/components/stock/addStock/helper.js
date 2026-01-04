@@ -1,3 +1,5 @@
+import _ from 'lodash';
+
 const LABOUR_UNIT_MAP = {
     "fixed": "FX",
     "percent": "PC"

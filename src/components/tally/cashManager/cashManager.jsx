@@ -6,6 +6,8 @@ import CashBook from '../cashBook/cashBook';
 import { fetchMyAccountsList } from '../../../utilities/apiUtils';
 import { CashIn } from './cashIn';
 import { CashOut } from './cashOut';
+import _ from 'lodash';
+
 export default class CashManager extends Component {
     constructor(props) {
         super(props);

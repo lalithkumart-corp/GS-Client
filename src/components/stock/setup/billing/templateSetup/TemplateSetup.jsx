@@ -190,8 +190,11 @@ export default function TemplateSetup(props) {
             if(resp && resp.data && resp.data.STATUS == 'SUCCESS') {
                 toast.success('Updated Successfully!');
                 let allSettings = getJewelleryBillTemplateSettings();
+                allSettings = allSettings || {};
+                allSettings.gst = allSettings.gst || {};
                 allSettings.gst.selectedTemplate = apiParams.gst.selectedTemplate;
                 allSettings.gst.customArgs = apiParams.gst.customArgs;
+                allSettings.estimate = allSettings.estimate || {};
                 allSettings.estimate.selectedTemplate = apiParams.estimate.selectedTemplate;
                 saveJewelleryBillTemplateSettings(allSettings);
             }
