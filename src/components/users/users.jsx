@@ -46,8 +46,8 @@ export default class Users extends Component {
             formatter: (column, columnIndex, row, rowIndex) => {
                 return (
                     <span>
-                        <span className='icon edit-icon' onClick={(e) => this.onEditDetailIconClick(e, row)}><FontAwesomeIcon icon="edit" /></span>
-                        <span className='icon delete-icon' onClick={(e) => this.onEditDetailIconClick(e, row)}><FontAwesomeIcon icon="trash" /></span>
+                        <span className='icon edit-icon' onClick={(e) => this.onEditDetailIconClick(e, row)}><FontAwesomeIcon icon="edit" className=""/></span>
+                        <span className='icon delete-icon' onClick={(e) => this.onEditDetailIconClick(e, row)}><FontAwesomeIcon icon="trash" className=""/></span>
                     </span>
                 )
             }

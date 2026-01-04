@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Container, Row, Col, FormGroup, FormLabel, FormControl, HelpBlock, InputGroup, Button, Glyphicon, Tabs, Tab } from 'react-bootstrap';
+import { Container, Row, Col, Tabs, Tab } from 'react-bootstrap';
 import GSTable from '../gs-table/GSTable';
 import _ from 'lodash';
 import ImageZoom from 'react-medium-image-zoom';
@@ -9,7 +9,7 @@ import { calculateData } from '../redeem/helper';
 import moment from 'moment';
 import {Popover, ArrowContainer} from 'react-tiny-popover';
 import { MdEdit, MdOutlineTableChart } from 'react-icons/md';
-import ReactQuill from 'react-quill';
+import ReactQuill from 'react-quill-new';
 
 class LoanHistory extends Component {
     constructor(props) {

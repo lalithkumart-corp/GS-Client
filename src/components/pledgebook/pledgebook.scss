@@ -102,12 +102,12 @@
 	// }
 }
 .my-pledgebook-table {
+	table-layout: fixed;
 	.inner-header {
 		input[type="text"] {
 			width: 100%;
 		}
 	}
-	table-layout: fixed;
 	thead {
 		background-color: #f5f5f5;
 	}

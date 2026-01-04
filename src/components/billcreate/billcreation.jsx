@@ -3,9 +3,9 @@
     - Bill number should be unique (do this from backend)
  */
 
-import React, { Component } from 'react';
+import React, { Component, useState, useRef, useEffect } from 'react';
 import { connect } from 'react-redux';
-import { Container, Row, Col, Form, InputGroup, HelpBlock, Button, Card } from 'react-bootstrap';
+import { Container, Row, Col, Form, InputGroup, Button, Card } from 'react-bootstrap';
 import DatePicker from 'react-datepicker';
 //import DatePicker from 'react-16-bootstrap-date-picker';
 import 'react-datepicker/dist/react-datepicker.css';
@@ -13,7 +13,7 @@ import './billcreation.css';
 import './picture-upload.css';
 import moment from 'moment';
 //import Autosuggest, { ItemAdapter } from 'react-bootstrap-autosuggest' //https://affinipay.github.io/react-bootstrap-autosuggest/#playground
-import * as ReactAutosuggest from 'react-autosuggest';
+import ReactAutosuggest from 'react-autosuggest';
 import _ from 'lodash';
 import axios from "axios";
 import { PLEDGEBOOK_METADATA, SAVE_BASE64_IMAGE_AND_GET_ID, SAVE_BINARY_IMAGE_AND_GET_ID, DEL_IMAGE_BY_ID, ORNAMENT_LIST } from '../../core/sitemap';
@@ -33,7 +33,7 @@ import BillHistoryView from './billHistoryView';
 import {Popover} from 'react-tiny-popover';
 import BillTemplate from './billTemplate2';
 import LoanBillMainTemplate from '../../templates/loanBill/LoanBillMainTemplate';
-import ReactToPrint from 'react-to-print';
+import {useReactToPrint} from 'react-to-print';
 import { FaEdit, FaBan } from 'react-icons/fa';
 import CommonModal from '../common-modal/commonModal';
 import GeneralInfo from '../customerPortal/generalInfo';
@@ -42,8 +42,8 @@ import { fetchMyAccountsList, fetchAllBanksList } from '../../utilities/apiUtils
 import { format } from 'currency-formatter';
 import { PAYMENT_MODE, LOAN_BILL_EXPIRY_DAYS } from '../../constants';
 import CustomerPickerInput from '../customerPanel/CustomerPickerInput';
-import ReactQuill from 'react-quill';
-import 'quill/dist/quill.snow.css';
+import ReactQuill from 'react-quill-new';
+// import 'react-quill-new/dist/quill.snow.css';
 
 const ENTER_KEY = 13;
 const SPACE_KEY = 32;
@@ -1330,7 +1330,8 @@ class BillCreation extends Component {
 
     printReceipt() {
         if(this.domElmns.printBtn) {
-            this.domElmns.printBtn.handlePrint();
+            // this.domElmns.printBtn.handlePrint();
+            this.domElmns.printBtn.click();
         } else {
             alert("Couldn't able to print receipt! Please try again.");
         }
@@ -1993,8 +1994,8 @@ class BillCreation extends Component {
                                     </Col>
                                     { this.canUpdateCustomerOtherDetail() &&
                                     <Col xs={2} md={2} className='sub-actions-div'>
-                                        <span className='icon edit-icon' onClick={(e) => this.onEditDetailIconClick(i)}><FontAwesomeIcon icon="edit" /></span>
-                                        <span className='icon' onClick={(e) => this.onDeleteDetailIconClick(i)}><FontAwesomeIcon icon="trash" /></span>
+                                        <span className='icon edit-icon' onClick={(e) => this.onEditDetailIconClick(i)}><FontAwesomeIcon icon="edit" className=""/></span>
+                                        <span className='icon' onClick={(e) => this.onDeleteDetailIconClick(i)}><FontAwesomeIcon icon="trash" className=""/></span>
                                     </Col>
                                     }
                                 </Row>
@@ -2044,7 +2045,7 @@ class BillCreation extends Component {
                                 <p>{cust.mobile}</p>
                             </Col>
                             <Col xs={1}>
-                                <span className='close-icon gs-button rounded' onClick={this.clearPledgeForCustomer}><FontAwesomeIcon icon="times" /></span>
+                                <span className='close-icon gs-button rounded' onClick={this.clearPledgeForCustomer}><FontAwesomeIcon icon="times" className=""/></span>
                             </Col>
                         </Row>
             } else {
@@ -2064,7 +2065,7 @@ class BillCreation extends Component {
                                 <p>{cust.mobile}</p>
                             </Col>
                             <Col xs={1}>
-                                <span className='close-icon gs-button rounded' onClick={this.clearSelectedJewelRedeemCustomer}><FontAwesomeIcon icon="times" /></span>
+                                <span className='close-icon gs-button rounded' onClick={this.clearSelectedJewelRedeemCustomer}><FontAwesomeIcon icon="times" className=""/></span>
                             </Col>
                         </Row>
             } else {
@@ -2578,12 +2579,12 @@ class BillCreation extends Component {
                                     )
                                 }}
                                 >
-                                    <>
+                                <span>
                                     <span className='amount-display-text' style={{fontWeight: 'bold', fontSize: '20px'}} onClick={(e) => this.amtPopoverTrigger()}>RS: {currencyFormatter(this.state.formData.amount.inputVal) || 0.00}</span>
                                     {this.state.formData.amount.landedCost > 0 && 
                                         <span style={{paddingLeft: "15px", fontSize: "14px"}}> ({format(this.state.formData.amount.landedCost || 0, {code: 'INR'})}) </span>
                                     }
-                                    </>
+                                </span>
                             </Popover>
                         </Col>
                         <Col xs={6} md={6} style={{paddingTop: '4px', textAlign: 'right'}}>
@@ -2803,12 +2804,20 @@ class BillCreation extends Component {
                             { !this.props.loadedInPledgebook &&
                                 
                                 <>
-                                    <ReactToPrint
+                                    {/* <ReactToPrint
                                         ref={(domElm) => {this.domElmns.printBtn = domElm}}
                                         trigger={() => <a href="#"></a>}
                                         content={() => this.componentRef}
                                         className="print-hidden-btn"
+                                    /> */}
+
+                                    <LoanBillPrintBtn 
+                                        myBtnRef={(domElm) => {this.domElmns.printBtn = domElm}}
+                                        className = {'print-hidden-btn'}
+                                        printCb = {this.onPrintClick} 
+                                        currBillContent = {this.state.printContent} 
                                     />
+                                    
                                     <input 
                                         type="button"
                                         className='gs-button bordered'
@@ -2845,7 +2854,7 @@ class BillCreation extends Component {
                 </Row>
                 <EditDetailsDialog {...this.state.editModalContent} update={this.updateItemInMoreDetail} />
                 {/* <BillTemplate ref={el => (this.componentRef = el)} data={this.state.printContent} /> */}
-                <LoanBillMainTemplate ref={el => (this.componentRef = el)} currBillContent={this.state.printContent}/>
+                {/* <LoanBillMainTemplate ref={el => (this.componentRef = el)} currBillContent={this.state.printContent}/> */}
                 <CommonModal modalOpen={this.state.showCustomerEditModal} handleClose={this.handleCustomerEditModalClose} wrapperClassName="bill-creation-customer-edit-modal-wrapper">
                     <GeneralInfo selectedCust={Object.assign({}, this.state.selectedCustomer)} loadedInModal={true} handleClose={this.handleCustomerEditModalClose} afterUpdate={this.afterUpdateCustomerDetail}/>
                 </CommonModal>
@@ -2864,3 +2873,33 @@ const mapStateToProps = (state) => {
 };
 
 export default connect(mapStateToProps, {insertNewBill, updateBill, updateClearEntriesFlag, showEditDetailModal, hideEditDetailModal, getBillNoFromDB, disableReadOnlyMode, updateBillNoInStore})(BillCreation);
+
+
+
+const LoanBillPrintBtn = (props) => {
+  const contentRef = useRef(null);
+
+  const reactToPrintFn = useReactToPrint({ 
+    contentRef
+  });
+
+  const [currBillContent, setCurrBillContent] = useState(null);
+
+  useEffect(() => {
+    setCurrBillContent(props.currBillContent);
+  }, [props.currBillContent]);
+
+  return (
+    <div style={{ display: 'inline-block' }}>
+      <input 
+        ref={(domElm) => props.myBtnRef(domElm)}
+        type="button"
+        className={props.className ? props.className : "gs-button bordered "}
+        onClick={reactToPrintFn}
+        value='Print'
+        disabled={props.disabled}
+      />
+      <LoanBillMainTemplate innerRef={contentRef} currBillContent={currBillContent}/>
+    </div>
+  );
+}

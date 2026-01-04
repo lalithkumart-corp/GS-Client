@@ -1,6 +1,6 @@
 import React, { Component, useState, useRef, useEffect } from 'react';
 import {Container,  Row, Col, Form } from 'react-bootstrap';
-import * as ReactAutosuggest from 'react-autosuggest';
+import ReactAutosuggest from 'react-autosuggest';
 import DatePicker from 'react-datepicker';
 import axiosMiddleware from '../../../core/axios';
 import { fetchCategorySuggestions, fetchMyAccountsList, fetchAllBanksList } from '../../../utilities/apiUtils';
@@ -12,6 +12,7 @@ import { UPI_INDEX_ID } from '../../../constants';
 import { MdPerson, MdEdit, MdClear } from 'react-icons/md';
 import CustomerPicker from '../../customerPanel/CustomerPickerModal';
 import CommonModal from '../../common-modal/commonModal';
+import _ from 'lodash';
 
 let DEFAULT_PAYMENT_DETAIL = {
     online: {

@@ -1,14 +1,14 @@
 import { useState, useRef, useEffect } from 'react';
 // import { useReactToPrint } from 'react-to-print';
 import { Row, Col } from 'react-bootstrap';
-import ReactToPrint from 'react-to-print';
+import {useReactToPrint} from 'react-to-print';
 import { GET_JEWELLERY_BILL_SETTINGS, FETCH_AVL_JEWELLERY_BILL_TEMPLATES, UPDATE_JEWELLERY_BILL_SETTINGS } from '../../../../../core/sitemap';
 import { getAccessToken, getJewelleryBillTemplateSettings, saveJewelleryBillTemplateSettings } from '../../../../../core/storage';
 import CommonModal from '../../../../common-modal/commonModal';
 import axiosMiddleware from '../../../../../core/axios';
 import { constructApiAssetUrl } from '../../../../../utilities/utility';
 import ImageZoom from 'react-medium-image-zoom';
-
+import _ from 'lodash';
 import TemplateRenderer from '../../../../../templates/jewellery-gstBill/templateRenderer';
 import './TemplateSetup.scss';
 import { template1, template2, template3 } from './sampleTemplateContent';
@@ -37,6 +37,13 @@ export default function TemplateSetup(props) {
 
     let [gstCustomArgs, setGstCustomArgs] = useState(props.gstBillSettings.customArgs || {});
     let [displayGstNumber, setDisplayGstNumber] = useState(null);
+
+    const gstBillContentRef = useRef(null);
+    const gstBillReactToPrintFn = useReactToPrint({ contentRef: gstBillContentRef });
+
+
+    const estBillContentRef = useRef(null);
+    const estBillReactToPrintFn = useReactToPrint({ contentRef: estBillContentRef });
 
     useEffect(() => {
         // fetchSettings();
@@ -214,28 +221,31 @@ export default function TemplateSetup(props) {
                                 <input type="button" className="gs-button" value="Preview" onClick={onClickPreviewBtn}/>
                             </div> */}
                             <CommonModal modalOpen={previewVisibility} handleClose={handlePreviewClose} secClass="jewellery-bill-template-preview-modal">
-                                <ReactToPrint 
+                                {/* <ReactToPrint 
                                     ref={(domElm) => {btnRef = domElm}}
                                     trigger={() => <a href="#"></a>}
                                     content={() => componentRef}
-                                />
-                                <input type="button" className="gs-button" value="Print - Sample GST Bill" onClick={onClickPrintGstBill} />
-                                <TemplateRenderer 
-                                    ref={(el) => (componentRef = el)} 
-                                    templateId={props.gstBillSettings.selectedTemplate} 
-                                    content={templateContent}
-                                    customArgs={props.gstBillSettings.customArgs}/>
-                                
-                                <ReactToPrint 
+                                /> */}
+                                <input type="button" className="gs-button" value="Print - Sample GST Bill" onClick={gstBillReactToPrintFn} />
+                                <div ref={gstBillContentRef}>
+                                    <TemplateRenderer 
+                                        // ref={(el) => (componentRef = el)} 
+                                        templateId={props.gstBillSettings.selectedTemplate} 
+                                        content={templateContent}
+                                        customArgs={props.gstBillSettings.customArgs}/>
+                                </div>
+                                {/* <ReactToPrint 
                                     ref={(domElm) => {estimateBtnRef = domElm}}
                                     trigger={() => <a href="#"></a>}
                                     content={() => estimateInvoiceComponentRef}
-                                />
-                                <input type="button" className="gs-button" value="Print - Sample Estimate Bill" onClick={onClickPrintEstimateBill} />
-                                <EstimateBillTemplateRenderer 
-                                    ref={(el) => (estimateInvoiceComponentRef = el)} 
-                                    templateId={props.estimateBillSettings.selectedTemplate} 
-                                    content={templateContent}/>
+                                /> */}
+                                <input type="button" className="gs-button" value="Print - Sample Estimate Bill" onClick={estBillReactToPrintFn} />
+                                <div ref={estBillContentRef}>
+                                    <EstimateBillTemplateRenderer 
+                                        // ref={(el) => (estimateInvoiceComponentRef = el)} 
+                                        templateId={props.estimateBillSettings.selectedTemplate} 
+                                        content={templateContent}/>
+                                </div>
                             </CommonModal>
                         </Col>
                     </Row>

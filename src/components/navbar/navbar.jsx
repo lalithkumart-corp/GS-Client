@@ -166,7 +166,7 @@ class NavbarComp extends Component {
                                 <NavDropdown.Item as={Link} to="/reset-pwd">Reset Password</NavDropdown.Item>
                                 <NavDropdown.Item as={Link} to="/logout">Logout</NavDropdown.Item>
                             </NavDropdown>
-                            <span className="right-side-trigger-icon"><FontAwesomeIcon icon="list-ul" onClick={this.onClickSideTrigger}/></span>
+                            <span className="right-side-trigger-icon"><FontAwesomeIcon icon="list-ul" onClick={this.onClickSideTrigger} className=""/></span>
                             <span className={`new-notif-identifier ${this.props.rightSideBar.newNotificationsAvl?'has-new':''}`}></span>
                         </Nav>
                     </Navbar.Collapse>

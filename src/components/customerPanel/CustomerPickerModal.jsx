@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { Container, Row, Col, Form } from 'react-bootstrap';
-import * as ReactAutosuggest from 'react-autosuggest';
+import ReactAutosuggest from 'react-autosuggest';
 import axiosMiddleware from '../../core/axios';
 import { DoublyLinkedList } from '../../utilities/doublyLinkedList';
 import { fetchCustomerMetaData, fetchOrnList } from '../billcreate/helper';

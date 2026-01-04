@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, { Component, useState, useEffect, useRef } from 'react';
 import { Container, Row, Col, Form } from 'react-bootstrap';
 import { connect } from 'react-redux';
 import axiosMiddleware from '../../../../core/axios';
@@ -10,9 +10,9 @@ import { constructApiAssetUrl } from '../../../../utilities/utility';
 import LoanBillMainTemplate from '../../../../templates/loanBill/LoanBillMainTemplate';
 import './loanBillTemplateSettings.scss';
 import CommonModal from '../../../common-modal/commonModal.jsx';
-import ReactToPrint from 'react-to-print';
+import { useReactToPrint } from 'react-to-print';
 import ImageZoom from 'react-medium-image-zoom';
-
+import _ from 'lodash';
 
 const sampleBillContent = {
     amount: 10000,
@@ -346,14 +346,18 @@ export default class LoanBillTemplateSettings extends Component {
                                     <input type='button' className='gs-button' value='PREVIEW' onClick={this.showPreview}/>
                                 </Col>
                                 <CommonModal modalOpen={this.state.showPreview} handleClose={this.handlePreviewClose} secClass="bill-template-preview-modal">
-                                    <ReactToPrint
+                                    <LoanTemplatePrintBtn 
+                                        currBillContent={this.state.currBillContent}
+                                        handlePreviewClose={this.handlePreviewClose}
+                                    />
+                                    {/* <ReactToPrint
                                         ref={(domElm) => {this.domElmns.printBtn = domElm}}
                                         trigger={() => <a href="#"></a>}
                                         content={() => this.componentRef}
                                         className="print-hidden-btn"
-                                    />
-                                    <input type="button" className="gs-button" onClick={this.printClick} value="PRINT" />
-                                    <LoanBillMainTemplate ref={el => (this.componentRef = el)} currBillContent={this.state.currBillContent} handleClose={this.handlePreviewClose}/>
+                                    /> */}
+                                    {/* <input type="button" className="gs-button" onClick={this.printClick} value="PRINT" /> */}
+                                    {/* <LoanBillMainTemplate ref={el => (this.componentRef = el)} currBillContent={this.state.currBillContent} handleClose={this.handlePreviewClose}/> */}
                                 </CommonModal>
                             </Row>
                             <Row>
@@ -626,4 +630,35 @@ export default class LoanBillTemplateSettings extends Component {
             </div>
         )
     }
+}
+
+
+
+const LoanTemplatePrintBtn = (props) => {
+  const contentRef = useRef(null);
+
+  const reactToPrintFn = useReactToPrint({ 
+    contentRef
+  });
+
+  const [currBillContent, setCurrBillContent] = useState(null);
+
+  useEffect(() => {
+    setCurrBillContent(props.currBillContent);
+  }, [props.currBillContent]);
+
+  return (
+    <div style={{ display: 'inline-block' }}>
+      <input 
+        type="button"
+        className={props.className ? props.className : "gs-button bordered "}
+        onClick={reactToPrintFn}
+        value='Print'
+      />
+
+      <div ref={contentRef}>
+            <LoanBillMainTemplate currBillContent={props.currBillContent} handleClose={props.handlePreviewClose}/>
+        </div>
+    </div>
+  );
 }

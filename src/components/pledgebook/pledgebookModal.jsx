@@ -1,7 +1,7 @@
-import React, { Component, useState, useEffect } from 'react';
+import React, { Component, useState, useEffect, useRef } from 'react';
 import { useSelector, useDispatch } from 'react-redux'
 import BillCreation from '../billcreate/billcreation';
-import {Row, Col, FormGroup, FormLabel, FormControl, HelpBlock, InputGroup, Button, Glyphicon } from 'react-bootstrap';
+import {Row, Col, FormControl, InputGroup } from 'react-bootstrap';
 import "./pledgebookModal.css";
 import { connect } from 'react-redux';
 import GSTable from '../gs-table/GSTable';
@@ -13,20 +13,22 @@ import axios from 'axios';
 import { toast } from 'react-toastify';
 import { calculateData, getRequestParams, getReopenRequestParams, getTypeBasedOnOrn } from '../redeem/helper';
 import moment from 'moment';
-import ReactToPrint from 'react-to-print';
+// import ReactToPrint from 'react-to-print';
+import { useReactToPrint } from "react-to-print";
 import LoanBillMainTemplate from '../../templates/loanBill/LoanBillMainTemplate';
 import RedeemPreview from '../redeem/redeem-preview';
-import { FaPencilAlt, FaTrash, FaArrowLeft } from 'react-icons/fa';
-import PaymentIn from '../payment/paymentIn';
+import { FaArrowLeft } from 'react-icons/fa';
 import axiosMiddleware from '../../core/axios';
 import { CashIn } from '../tally/cashManager/cashIn';
 import {Tooltip} from 'react-tippy';
 import { PaymentSelectionCard } from '../payment/paymentSelectionCard';
 import _ from 'lodash';
-import { CASH_TRNS_GIRVI, DEFAULT_PAYMENT_OBJ_FOR_CASH_IN, DEFAULT_PAYMENT_OBJ_FOR_CASH_OUT, LOAN_BILL_EXPIRY_DAYS, IN, OUT } from '../../constants';
+import { DEFAULT_PAYMENT_OBJ_FOR_CASH_IN, DEFAULT_PAYMENT_OBJ_FOR_CASH_OUT, LOAN_BILL_EXPIRY_DAYS, IN, OUT } from '../../constants';
 import { InterestInputComponent } from './InterestInputComponent';
 import { InterestCalcComp } from './InterestCalcComp';
 import LoanOverviewCard from '../loanOverviewCard/LoanOverviewCard';
+// import LoanBillPrintBtn from '../../templates/loanBill/LoanBillMainTemplatePrintBtn';
+// import LoanBillBodyTemplateWrapper from '../../templates/loanBill/LoanBillMainTemplate';
 class PledgebookModal extends Component {
     constructor(props) {
         super(props);
@@ -209,7 +211,7 @@ class PledgebookModal extends Component {
             printModel: this.getPrintModel()
         }
         await this.setState({printContent: templateData});
-        this.printBtn.handlePrint();
+        // this.printBtn.handlePrint();
     }
 
     onRenewalClick() {
@@ -297,13 +299,19 @@ class PledgebookModal extends Component {
                                 value='Payment'
                                 disabled={this.canDisableBtn('payment')}
                                 />
-                            <input 
+                            <LoanBillPrintBtn 
+                                className = {'gs-button bordered'}
+                                printCb = {this.onPrintClick} 
+                                currBillContent = {this.state.printContent} 
+                                disabled = {this.canDisableBtn('print')}
+                            />
+                            {/* <input 
                                 type="button"
                                 className={"gs-button bordered "}
                                 onClick={(e) => this.onPrintClick()}
                                 value='Print'
                                 disabled={this.canDisableBtn('print')}
-                                />
+                                /> */}
                             <input 
                                 type="button"
                                 className={"gs-button bordered "}
@@ -360,14 +368,14 @@ class PledgebookModal extends Component {
 
                     <BillCreation loadedInPledgebook={true} billData={this.props.currentBillData} onUpdateCallback={this.props.refresh} />
 
-                    <ReactToPrint
-                        ref={(domElm) => {this.printBtn = domElm}}
+                    {/* <ReactToPrint
                         trigger={() => <a href="#"></a>}
                         content={() => this.componentRef}
+                        ref={el => { this.printBtn = el }}
                         className="print-hidden-btn"
                     />
 
-                    {<LoanBillMainTemplate ref={el => (this.componentRef = el)} currBillContent={this.state.printContent}/>}
+                    {<LoanBillMainTemplate innerRef={el => (this.componentRef = el)} currBillContent={this.state.printContent}/>} */}
                     </div>
                 }
                 {this.state.paymentScreenVisibility && 
@@ -850,4 +858,57 @@ export const RenewalScreen = (props) => {
             </>
         </div>
     )
+}
+
+const LoanBillPrintBtn = (props) => {
+  const [isPrinting, setIsPrinting] = useState(false);
+
+  const contentRef = useRef(null);
+
+  // We store the resolve Promise being used in `onBeforePrint` here
+  const promiseResolveRef = useRef(null);
+
+
+  useEffect(() => {
+    if (isPrinting && promiseResolveRef.current) {
+      // Resolves the Promise, letting `react-to-print` know that the DOM updates are completed
+      promiseResolveRef.current();
+    }
+  }, [isPrinting]);
+
+
+  const reactToPrintFn = useReactToPrint({ 
+    contentRef,
+    onBeforePrint: () => {
+      return new Promise(async (resolve) => {
+        await props.printCb();
+        promiseResolveRef.current = resolve;
+        setIsPrinting(true);
+      });
+    },
+    onAfterPrint: () => {
+      // Reset the Promise resolve so we can print again
+      promiseResolveRef.current = null;
+      setIsPrinting(false);
+    }
+  });
+
+  const [currBillContent, setCurrBillContent] = useState(null);
+
+  useEffect(() => {
+    setCurrBillContent(props.currBillContent);
+  }, [props.currBillContent]);
+
+  return (
+    <div style={{ display: 'inline-block' }}>
+      <input 
+        type="button"
+        className={props.className ? props.className : "gs-button bordered "}
+        onClick={reactToPrintFn}
+        value='Print'
+        disabled={props.disabled}
+      />
+      <LoanBillMainTemplate innerRef={contentRef} currBillContent={currBillContent} />
+    </div>
+  );
 }

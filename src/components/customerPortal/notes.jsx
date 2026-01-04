@@ -1,9 +1,7 @@
 import React, { Component, useEffect, useState } from 'react';
-import { Container, Row, Col, FormGroup, FormLabel, FormControl, HelpBlock, InputGroup, Button, Glyphicon, Tabs, Tab } from 'react-bootstrap';
-import { useQuill } from 'react-quilljs';
-import ReactQuill from 'react-quill';
-import 'quill/dist/quill.snow.css'; // Add css for snow theme
-// or import 'quill/dist/quill.bubble.css'; // Add css for bubble theme
+import { Container, Row, Col } from 'react-bootstrap';
+import ReactQuill from 'react-quill-new';
+// import 'react-quill-new/dist/quill.snow.css';
 
 import { getAccessToken } from '../../core/storage';
 import axios from 'axios';
@@ -71,7 +69,7 @@ class Notes extends Component {
 
     async saveNewNoteContent(noteHtmlContent) {
         try {
-            let resp = await axiosMiddleware.post(INSERT_NOTE, {content: noteHtmlContent, custKey: '', content: noteHtmlContent, customerId: this.state.custDetail.customerId });
+            let resp = await axiosMiddleware.post(INSERT_NOTE, {content: noteHtmlContent, custKey: '', customerId: this.state.custDetail.customerId });
             if(resp.data && resp.data.STATUS == 'ERROR') {
                 toast.error('Error: while saving notes');
             } else if(resp.data && resp.data.STATUS == 'EXCEPTION') {
@@ -318,46 +316,46 @@ function NoteCard(props) {
     )
 }
 
-function NewNoteOld(props) {
-    const { quill, quillRef } = useQuill();
+// function NewNoteOld(props) {
+//     const { quill, quillRef } = useQuill();
 
-    console.log(quill);    // undefined > Quill Object
-    console.log(quillRef); // { current: undefined } > { current: Quill Editor Reference }
+//     console.log(quill);    // undefined > Quill Object
+//     console.log(quillRef); // { current: undefined } > { current: Quill Editor Reference }
   
-    useEffect(()=> {
-        if (quill == null) return;
-        const handler = (delta, oldDelta, source) => {
-            // console.log(delta);
-            // console.log(quill.getText()); // Get text only
-            // console.log(quill.getContents()); // Get delta contents
-            // console.log(quill.root.innerHTML); // Get innerHTML using quill
-            // console.log(quillRef.current.firstChild.innerHTML); // Get innerHTML using quillRef
-        }
-        quill.on("text-change", handler);
-        return () => {
-            quill.off("text-change", handler)
-        }
-    }, [quill] );
+//     useEffect(()=> {
+//         if (quill == null) return;
+//         const handler = (delta, oldDelta, source) => {
+//             // console.log(delta);
+//             // console.log(quill.getText()); // Get text only
+//             // console.log(quill.getContents()); // Get delta contents
+//             // console.log(quill.root.innerHTML); // Get innerHTML using quill
+//             // console.log(quillRef.current.firstChild.innerHTML); // Get innerHTML using quillRef
+//         }
+//         quill.on("text-change", handler);
+//         return () => {
+//             quill.off("text-change", handler)
+//         }
+//     }, [quill] );
 
-    const saveNoteContent = () => {
-        props.saveNoteContent(quill.root.innerHTML);
-    }
+//     const saveNoteContent = () => {
+//         props.saveNoteContent(quill.root.innerHTML);
+//     }
 
-    const discardNewNote = () => {
-        props.discardCb();
-    }
+//     const discardNewNote = () => {
+//         props.discardCb();
+//     }
 
-    return (
-        <>
-            <div className="new-quill-paper">
-                <div style={{ width: `100%` , height: 100 }}>
-                    <div ref={quillRef} />
-                </div>
-                <div style={{marginTop: '45px'}}>
-                    <input type="button" value="SAVE" className="gs-button" onClick={saveNoteContent} />
-                    <input type="button" value="DISCARD" className="gs-button" onClick={discardNewNote}/>
-                </div>
-            </div>
-        </>
-    );
-}
+//     return (
+//         <>
+//             <div className="new-quill-paper">
+//                 <div style={{ width: `100%` , height: 100 }}>
+//                     <div ref={quillRef} />
+//                 </div>
+//                 <div style={{marginTop: '45px'}}>
+//                     <input type="button" value="SAVE" className="gs-button" onClick={saveNoteContent} />
+//                     <input type="button" value="DISCARD" className="gs-button" onClick={discardNewNote}/>
+//                 </div>
+//             </div>
+//         </>
+//     );
+// }

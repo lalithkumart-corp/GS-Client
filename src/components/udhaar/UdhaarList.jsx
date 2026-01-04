@@ -14,6 +14,7 @@ import { debounce, DebouncedFunc } from 'lodash';
 import EditUdhaar from './EditUdhaar';
 import {Tooltip} from 'react-tippy';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import _ from 'lodash';
 
 function UdhaarListComp() {
 
@@ -388,7 +389,7 @@ function UdhaarListComp() {
                     }}
                     >
                         <div className={'filter-popover-trigger action-btn'} onClick={() => setFilterPopoverOpen(true)}>
-                            <FontAwesomeIcon icon='filter'/>
+                            <FontAwesomeIcon icon='filter' className=""/>
                         </div>
                 </Popover>
             </div> );

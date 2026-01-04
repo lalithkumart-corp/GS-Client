@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Container, Row, Col, FormGroup, FormLabel, FormControl, HelpBlock, InputGroup, Button, Glyphicon, Tabs, Tab } from 'react-bootstrap';
+import { Row, Col } from 'react-bootstrap';
 import GSTable from '../gs-table/GSTable';
 import _ from 'lodash';
 import ImageZoom from 'react-medium-image-zoom';
@@ -22,7 +22,6 @@ const JewelleryHistory = (props) => {
             id: 'invoiceDate',
             displayText: 'Inv. Date',
             isFilterable: false,
-            width: '10%',
             formatter: (column, columnIndex, row, rowIndex) => {
                 return (
                     <Tooltip title={convertToLocalTime(row[column.id])}

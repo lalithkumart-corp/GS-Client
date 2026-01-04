@@ -9,6 +9,7 @@ import { BarChart, Bar, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend, Resp
 import ImageZoom from 'react-medium-image-zoom';
 import './index.scss';
 import ReactPaginate from 'react-paginate';
+import _ from 'lodash';
 
 const GirviAnalytics = () => {
     

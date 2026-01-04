@@ -1,6 +1,6 @@
 import React, { Component, useState, useRef, useEffect } from 'react';
 import {Container,  Row, Col, Form } from 'react-bootstrap';
-import * as ReactAutosuggest from 'react-autosuggest';
+import ReactAutosuggest from 'react-autosuggest';
 import DatePicker from 'react-datepicker';
 import axiosMiddleware from '../../../core/axios';
 import { fetchMyAccountsList, fetchCategorySuggestions } from '../../../utilities/apiUtils';
@@ -11,6 +11,7 @@ import './cashIn.scss';
 import { MdPerson, MdEdit, MdClear } from 'react-icons/md';
 import CustomerPicker from '../../customerPanel/CustomerPickerModal';
 import CommonModal from '../../common-modal/commonModal';
+import _ from 'lodash';
 
 export const CashIn = (props) => {
     let [amount, setAmount] = useState('');

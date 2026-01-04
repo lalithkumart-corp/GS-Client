@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Container, Row, Col, FormGroup, FormLabel, FormControl, HelpBlock, InputGroup, Button, Glyphicon, Tabs, Tab } from 'react-bootstrap';
+import { Container, Row, Col, FormGroup, FormLabel, FormControl } from 'react-bootstrap';
 import { PLEDGEBOOK_METADATA, UPDATE_CUSTOMER_BY_MERGING, UPDATE_CUSTOMER_STATUS, UPDATE_CUSTOMER_BLACKLIST } from '../../core/sitemap';
 import { getAccessToken } from '../../core/storage';
 import axios from 'axios';

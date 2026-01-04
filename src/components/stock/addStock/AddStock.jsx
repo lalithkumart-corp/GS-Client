@@ -10,7 +10,7 @@ import _ from 'lodash';
 import { DoublyLinkedList } from '../../../utilities/doublyLinkedList';
 import { getAccessToken } from '../../../core/storage';
 import { FETCH_ORN_LIST_JEWELLERY, INSERT_NEW_STOCK_ITEM, FETCH_TOUCH_LIST, UPDATE_STOCK_ITEM, ANALYTICS } from '../../../core/sitemap';
-import * as ReactAutosuggest from 'react-autosuggest';
+import ReactAutosuggest from 'react-autosuggest';
 import axiosMiddleware from '../../../core/axios';
 import { constructItemObj, resetFormData } from './helper';
 import { toast } from 'react-toastify';

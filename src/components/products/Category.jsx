@@ -145,9 +145,9 @@ export default class Category extends Component {
         let dom = [];
         if(aCategory.childCategory) {
             if(aCategory.expanded)
-                dom.push(<span onClick={(e) => this.onToggleClick(false, aCategory.id)}><FontAwesomeIcon icon="minus"/></span>);
+                dom.push(<span onClick={(e) => this.onToggleClick(false, aCategory.id)}><FontAwesomeIcon icon="minus" className=""/></span>);
             else
-                dom.push(<span onClick={(e) => this.onToggleClick(true, aCategory.id)}><FontAwesomeIcon icon="plus"/></span>);
+                dom.push(<span onClick={(e) => this.onToggleClick(true, aCategory.id)}><FontAwesomeIcon icon="plus" className=""/></span>);
         }
         
         if(this.state.showCheckbox)

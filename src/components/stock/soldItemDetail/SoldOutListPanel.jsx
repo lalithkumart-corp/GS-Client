@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, { Component, useState, useEffect, useRef } from 'react';
 import { connect } from 'react-redux';
 import { Container, Row, Col, Form, Dropdown, DropdownButton } from 'react-bootstrap';
 import axios from '../../../core/axios';
@@ -12,13 +12,14 @@ import './SoldOutListPanel.scss';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {Tooltip} from 'react-tippy';
 import CommonModal from '../../common-modal/commonModal';
-import ReactToPrint from 'react-to-print';
+import { useReactToPrint } from 'react-to-print';
 import TemplateRenderer from '../../../templates/jewellery-gstBill/templateRenderer';
 import { getDataFromStorageRespObj } from './helper';
 import SellItemEditMode from '../sellItems/SellItemEditMode';
 import { GsScreen } from '../../gs-screen/GsScreen';
 import axiosMiddleware from '../../../core/axios';
 import {Popover} from 'react-tiny-popover';
+import _ from 'lodash';
 
 class SoldItems extends Component {
     constructor(props) {
@@ -228,7 +229,7 @@ class SoldItems extends Component {
                                 <Tooltip title="Invoice"
                                         position="top"
                                         trigger="mouseenter">
-                                    <span className="invoice-btn gs-icon"><FontAwesomeIcon icon={['fas', 'file-pdf']} onClick={(e) => this.onInvoiceClick(e, row)}/></span>
+                                    <span className="invoice-btn gs-icon"><FontAwesomeIcon icon={['fas', 'file-pdf']} onClick={(e) => this.onInvoiceClick(e, row)} className=""/></span>
                                 </Tooltip>
                             </span>
                         )
@@ -585,7 +586,7 @@ class SoldItems extends Component {
                                 >
                                     <div style={{display: 'inline-block'}}>
                                         <span className='stock-sold-page-filter-popover-trigger-btn' style={{display: 'inline-block'}} onClick={this.onFilterBtnClick}>
-                                            <FontAwesomeIcon icon='filter'/>
+                                            <FontAwesomeIcon icon='filter' className=""/>
                                         </span>
                                     </div>
                                 </Popover>
@@ -613,13 +614,17 @@ class SoldItems extends Component {
                         </Row>
                         <Row>
                             <CommonModal modalOpen={this.state.previewVisibility} handleClose={this.handlePreviewClose} secClass="jewellery-bill-template-preview-modal">
-                                <ReactToPrint
+                                <InvoicePrintBtn
+                                    gstTemplateSettings={this.state.gstTemplateSettings}
+                                    printContents={this.state.printContents}
+                                />
+                                {/* <ReactToPrint
                                     ref={(domElm) => {this.printBtn = domElm}}
                                     trigger={() => <a href="#"></a>}
                                     content={() => this.componentRef}
                                     className="print-hidden-btn"
-                                />
-                                <input type="button" className="gs-button" value="Print" onClick={this.onClickPrint} />
+                                /> */}
+                                {/* <input type="button" className="gs-button" value="Print" onClick={this.onClickPrint} />
                                 <div ref={(el) => (this.componentRef = el)}>
                                     {(() => {
                                         let invoiceTemplates = [];
@@ -630,7 +635,7 @@ class SoldItems extends Component {
                                         });
                                         return invoiceTemplates;
                                     })()}
-                                </div>
+                                </div> */}
                             </CommonModal>
                         </Row>
                     </Col>
@@ -650,3 +655,44 @@ const mapStateToProps = (state) => {
 };
 
 export default connect(mapStateToProps, {})(SoldItems);
+
+
+
+const InvoicePrintBtn = (props) => {
+  const contentRef = useRef(null);
+
+  const reactToPrintFn = useReactToPrint({
+    contentRef
+  });
+
+  const [printContents, setPrintContents] = useState([]);
+  const [gstTemplateSettings, setGstTemplateSettings] = useState(null);
+
+  useEffect(() => {
+    setPrintContents(props.printContents);
+    setGstTemplateSettings(props.gstTemplateSettings);
+  }, [props.printContents, props.gstTemplateSettings]);
+
+  return (
+    <div style={{ display: 'inline-block' }}>
+      <input 
+        type="button"
+        className={props.className ? props.className : "gs-button bordered "}
+        onClick={reactToPrintFn}
+        value='Print'
+      />
+
+      <div ref={contentRef}>
+            {(() => {
+                let invoiceTemplates = [];
+                _.each(printContents, (aPrintData, index) => {
+                    if(index && index%2 == 0)
+                        invoiceTemplates.push(<br></br>);
+                    invoiceTemplates.push(<TemplateRenderer templateId={gstTemplateSettings.selectedTemplate} content={aPrintData}/>);
+                });
+                return invoiceTemplates;
+            })()}
+        </div>
+    </div>
+  );
+}

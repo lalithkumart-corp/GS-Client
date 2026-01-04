@@ -9,7 +9,7 @@ export default class FontView extends Component {
     getIcon(name) {
         return (
             <span className="a-font-card">
-                <FontAwesomeIcon icon={name} />
+                <FontAwesomeIcon icon={name} className=""/>
             </span>
         )
     }

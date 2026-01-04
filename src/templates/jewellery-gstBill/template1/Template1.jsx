@@ -2,6 +2,7 @@ import {Component, useState, useEffect} from 'react';
 import { Container, Row, Col } from 'react-bootstrap';
 import GSCheckbox from '../../../components/ui/gs-checkbox/checkbox';
 import './Template1.scss';
+import _ from 'lodash';
 
 function GstBillTemplate1(props) {
     // let [gstNumber, setGstNumber] = useState(props.printContent.gstNumber || '');

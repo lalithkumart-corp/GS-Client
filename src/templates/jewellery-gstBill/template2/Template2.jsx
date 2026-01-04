@@ -1,7 +1,6 @@
 import {Component, useState, useEffect} from 'react';
 import { Container, Row, Col } from 'react-bootstrap';
 import Barcode from "react-barcode";
-import GSCheckbox from '../../../components/ui/gs-checkbox/checkbox';
 import _ from 'lodash';
 import './Template2.scss';
 import { convertDateObjToStr, currencyFormatter, formatNo } from '../../../utilities/utility';

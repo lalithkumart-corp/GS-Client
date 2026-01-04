@@ -5,6 +5,7 @@ import { GET_FUND_TRN_OVERVIEW, GET_FUND_TRNS_LIST_CONSOLIDATED } from '../../..
 import { getAccessToken } from '../../../core/storage';
 import axiosMiddleware from '../../../core/axios';
 import './balanceSheet.css';
+import _ from 'lodash';
 
 const GOLD = 'gold';
 const SILVER = 'silver';

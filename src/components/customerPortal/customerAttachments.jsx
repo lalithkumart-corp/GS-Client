@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Row, Col, FormGroup, FormLabel, FormControl, HelpBlock, InputGroup, Button, Glyphicon, Tabs, Tab } from 'react-bootstrap';
+import { Row, Col } from 'react-bootstrap';
 import { FaCross, FaEdit, FaSave, FaTrash } from 'react-icons/fa';
 
 import axiosMiddleware from '../../core/axios';

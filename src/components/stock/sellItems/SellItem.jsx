@@ -1,10 +1,10 @@
-import React, { Component } from 'react';
+import React, { Component, useState, useRef, useEffect } from 'react';
 import { connect } from 'react-redux';
 import { Container, Row, Col, Form, FormControl, InputGroup } from 'react-bootstrap';
-import * as ReactAutosuggest from 'react-autosuggest';
+import ReactAutosuggest from 'react-autosuggest';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
-
+import _ from 'lodash';
 import { getBillNoFromDB, storeOriginalBillingDataInDb, storeEstimateBillingDataInDb , setClearEntriesFlag } from '../../../actions/invoice';
 import { FETCH_PROD_IDS, FETCH_STOCKS_BY_PRODID, FETCH_STOCKS_BY_ID, SALE_ITEM, FETCH_JEWELLERY_BILLING_AUTO_SUGGESTIONS, ANALYTICS } from '../../../core/sitemap';
 import axiosMiddleware from '../../../core/axios';
@@ -18,7 +18,7 @@ import {calcPurchaseTotals, calculateExchangeTotals, calculatePaymentFormData, v
 import { toast } from 'react-toastify';
 import { DoublyLinkedList } from '../../../utilities/doublyLinkedList';
 import { formatNo, getCurrentDateTimeInUTCForDB, getMyDateObjInUTCForDB, selectInputBoxLetters } from '../../../utilities/utility';
-import ReactToPrint from 'react-to-print';
+import { useReactToPrint } from 'react-to-print';
 import TemplateRenderer from '../../../templates/jewellery-gstBill/templateRenderer';
 import EstimateBillTemplateRenderer from '../../../templates/jewellery-estimateBill/templateRenderer';
 
@@ -850,11 +850,11 @@ class SellItem extends Component {
         }
     }
    
-    triggerPrint(printContent) {
+    async triggerPrint(printContent) {
         try {
-            this.setState({printContent: printContent});
+            await this.setState({printContent: printContent});
             setTimeout(() => {
-                this.printBtn.handlePrint();
+                this.printBtn.click();
             }, 300);
         } catch(e) {
             console.log(e);
@@ -1202,8 +1202,8 @@ class SellItem extends Component {
                         <td>{formatNo(anItem.formData.discount,2)}</td>
                         <td>{formatNo(anItem.formData.finalPrice,2)}</td>
                         <td>
-                            <span onClick={(e) => this.deleteItemFromPurchaseItemPreview(anItem.prod_id)}><FontAwesomeIcon icon="backspace"/></span>
-                            <span onClick={(e) => this.enableEditView(index)} style={{paddingLeft: '10px'}}><FontAwesomeIcon icon="edit"/></span>                             
+                            <span onClick={(e) => this.deleteItemFromPurchaseItemPreview(anItem.prod_id)}><FontAwesomeIcon icon="backspace" className=""/></span>
+                            <span onClick={(e) => this.enableEditView(index)} style={{paddingLeft: '10px'}}><FontAwesomeIcon icon="edit" className=""/></span>                             
                         </td>
                     </tr> 
                 );
@@ -1498,7 +1498,7 @@ class SellItem extends Component {
                             <Col xs={3} className="customer-selection-panel">
                                 { this.doesSelectedCustomerExist() ?
                                     <Row style={{marginTop: '26px'}}>
-                                        <Col xs={2}><span onClick={this.changeCustomer} className="change-customer-icon"><FontAwesomeIcon icon="user-edit"/></span></Col>
+                                        <Col xs={2}><span onClick={this.changeCustomer} className="change-customer-icon"><FontAwesomeIcon icon="user-edit" className=""/></span></Col>
                                         <Col xs={9}>{this.state.selectedCustomer.cname}</Col>
                                     </Row>
                                     :
@@ -1647,13 +1647,21 @@ class SellItem extends Component {
                     </Col>
                 </Row>
                 <Row>
-                    <ReactToPrint
+                    <InvoicePrintBtn 
+                        billingType={this.state.billingType}
+                        selectedGstTemplateId={this.state.selectedGstTemplateId}
+                        selectedEstimateTemplateId={this.state.selectedEstimateTemplateId}
+                        printContent={this.state.printContent}
+                        gstCustomArgs={this.state.customArgs}
+                        myBtnRef={(domElm) => this.printBtn=domElm}
+                    />
+                    {/* <ReactToPrint
                         ref={(domElm) => {this.printBtn = domElm}}
                         trigger={() => <a href="#"></a>}
                         content={() => this.componentRef}
                         className="print-hidden-btn"
-                    />
-                    {this.state.billingType === ORIGINAL_BILLING?
+                    /> */}
+                    {/* {this.state.billingType === ORIGINAL_BILLING?
                     <TemplateRenderer 
                         ref={(el) => (this.componentRef = el)} 
                         templateId={this.state.selectedGstTemplateId} 
@@ -1664,7 +1672,7 @@ class SellItem extends Component {
                         ref={(el) => (this.componentRef = el)} 
                         templateId={this.state.selectedEstimateTemplateId} 
                         content={this.state.printContent}
-                        customArgs={this.state.gstCustomArgs}/>}
+                        customArgs={this.state.gstCustomArgs}/>} */}
                 </Row>
             </Container>
         )
@@ -1680,3 +1688,51 @@ const mapStateToProps = (state) => {
 };
 
 export default connect(mapStateToProps, {getBillNoFromDB, storeOriginalBillingDataInDb, storeEstimateBillingDataInDb , setClearEntriesFlag})(SellItem);
+
+
+
+const InvoicePrintBtn = (props) => {
+    const [billingType, setBillingType] = useState(null);
+    const [selectedGstTemplateId, setSelectedGstTemplateId] = useState(null);
+    const [selectedEstimateTemplateId, setSelectedEstimateTemplateId] = useState(null);
+    const [printContent, setPrintContent] = useState(null);
+    const [gstCustomArgs, setGstCustomArgs] = useState(null);
+
+    const contentRef = useRef(null);
+
+    const reactToPrintFn = useReactToPrint({ contentRef });
+
+    useEffect(() => {
+        console.log('PROPS received');
+        console.log(props.printContent);
+        setBillingType(props.billingType);
+        setSelectedGstTemplateId(props.selectedGstTemplateId);
+        setSelectedEstimateTemplateId(props.selectedEstimateTemplateId);
+        setPrintContent(props.printContent);
+        setGstCustomArgs(props.gstCustomArgs);
+    }, [props.billingType, props.selectedGstTemplateId, props.selectedEstimateTemplateId, props.printContent, props.gstCustomArgs]);
+
+    return (
+        <div style={{ display: 'inline-block' }}>
+            <input 
+                ref={(domElm) => props.myBtnRef(domElm)}
+                type="button"
+                className={"print-hidden-btn"}
+                onClick={reactToPrintFn}
+                value='Print'
+            />
+            <div ref={contentRef}>
+                {printContent && billingType === ORIGINAL_BILLING?
+                    <TemplateRenderer 
+                        templateId={selectedGstTemplateId} 
+                        content={printContent}
+                        customArgs={gstCustomArgs}/>
+                    :
+                    <EstimateBillTemplateRenderer 
+                        templateId={selectedEstimateTemplateId} 
+                        content={printContent}
+                        customArgs={gstCustomArgs}/>}
+            </div>
+        </div>
+    );
+}

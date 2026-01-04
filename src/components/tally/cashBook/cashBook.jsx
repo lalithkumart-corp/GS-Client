@@ -22,6 +22,7 @@ import { BiFilterAlt } from 'react-icons/bi';
 import { TAGS } from '../../../constants';
 import {TagInputComp, TagDisplayComp} from '../../gs-tag/tag';
 import {Tooltip} from 'react-tippy';
+import _ from 'lodash';
 
 export default class CashBook extends Component {
     constructor(props) {
@@ -1066,7 +1067,7 @@ export default class CashBook extends Component {
                         </Col>
                     </>
                     :
-                    <Col xs={12} md={12} xs={12}>
+                    <Col xs={12} md={12}>
                         <GSTable
                             className="consolidate-transactions-table"
                             columns={this.columnsForConsolView}

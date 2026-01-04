@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Container, Row, Col, FormGroup, FormLabel, FormControl, HelpBlock, InputGroup, Button, Glyphicon, Tabs, Tab } from 'react-bootstrap';
+import { Container, Row, Col, FormGroup, FormControl, Tabs, Tab } from 'react-bootstrap';
 import axios from 'axios';
 import { PLEDGEBOOK_METADATA, PLEDGEBOOK_FETCH_CUSTOMER_HISTORY, FETCH_JWL_CUST_INVOICES_LIST, FETCH_CUSTOMER_UDHAAR_HISTORY } from '../../core/sitemap';
 import { getAccessToken } from '../../core/storage';

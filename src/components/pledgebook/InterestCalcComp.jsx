@@ -1,6 +1,6 @@
 import React, { Component, useState, useRef } from 'react';
 import { useEffect } from 'react';
-import {Row, Col, FormGroup, FormLabel, FormControl, HelpBlock, InputGroup, Button, Glyphicon } from 'react-bootstrap';
+import {Row, Col, FormControl, InputGroup } from 'react-bootstrap';
 import { calculateData, calculateInterestBasedOnRate } from '../redeem/helper';
 import { getInterestRate } from '../../utilities/utility';
 import { format } from 'currency-formatter';

@@ -5,7 +5,7 @@
 
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import { Container, Row, Col, FormGroup, FormLabel, FormControl, HelpBlock, InputGroup, Button, Glyphicon } from 'react-bootstrap';
+import { Container, Row, Col, FormGroup, FormLabel, FormControl, InputGroup } from 'react-bootstrap';
 import DatePicker from 'react-datepicker';
 //import DatePicker from 'react-16-bootstrap-date-picker';
 import 'react-datepicker/dist/react-datepicker.css';
@@ -13,7 +13,7 @@ import './billcreation.css';
 import './picture-upload.css';
 import moment from 'moment';
 import Autosuggest, { ItemAdapter } from 'react-bootstrap-autosuggest' //https://affinipay.github.io/react-bootstrap-autosuggest/#playground
-import * as ReactAutosuggest from 'react-autosuggest';
+import ReactAutosuggest from 'react-autosuggest';
 import _ from 'lodash';
 import axios from "axios";
 import { PLEDGEBOOK_METADATA, SAVE_BASE64_IMAGE_AND_GET_ID, SAVE_BINARY_IMAGE_AND_GET_ID, DEL_IMAGE_BY_ID, ORNAMENT_LIST } from '../../core/sitemap';
@@ -1160,8 +1160,8 @@ class BillCreation extends Component {
                                     </Col>
                                     { !this.isExistingCustomer() &&
                                     <Col xs={1} md={1} className='sub-actions-div'>
-                                        <span className='icon edit-icon' onClick={(e) => this.onEditDetailIconClick(i)}><FontAwesomeIcon icon="edit" /></span>
-                                        <span className='icon' onClick={(e) => this.onDeleteDetailIconClick(i)}><FontAwesomeIcon icon="trash" /></span>
+                                        <span className='icon edit-icon' onClick={(e) => this.onEditDetailIconClick(i)}><FontAwesomeIcon icon="edit" className=""/></span>
+                                        <span className='icon' onClick={(e) => this.onDeleteDetailIconClick(i)}><FontAwesomeIcon icon="trash" className=""/></span>
                                     </Col>
                                     }
                                 </Row>

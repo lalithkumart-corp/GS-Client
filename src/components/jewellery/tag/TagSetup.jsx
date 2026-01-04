@@ -7,12 +7,12 @@ import TagTemplateRenderer from '../../../templates/jewellery-tag/templateRender
 import './TagSetup.scss';
 import _ from 'lodash';
 import { toast } from 'react-toastify';
-import ReactToPrint from 'react-to-print';
+import {useReactToPrint} from 'react-to-print';
 import { safeParseJson } from '../../../utilities/utility';
 
 const TagSetup = () => {
-    let btnRef = useRef();
-    let selectedTagRef = useRef(null);
+    // let btnRef = useRef();
+    // let selectedTagRef = useRef(null);
 
     const [templatesList, setTemplatesList] = useState([]);
 
@@ -29,6 +29,10 @@ const TagSetup = () => {
     const [bisLogoVisibility, setBisLogoVisibility] = useState(false);
     
     const [selectedTemplateId, setSelectedTemplateId] = useState(null);
+
+    const printPreviewContentRef = useRef(null);
+    const printPreviewReactToPrintFn = useReactToPrint({ contentRef: printPreviewContentRef });
+
 
     const onToggleBisLogoCheckbox = (e) => {
         setBisLogoVisibility(!bisLogoVisibility);
@@ -100,7 +104,7 @@ const TagSetup = () => {
     }
 
     const onClickPrintBtn = () => {
-        btnRef.handlePrint();
+        // btnRef.handlePrint();
     }
 
     const getTemplateListContainer = () => {
@@ -139,13 +143,15 @@ const TagSetup = () => {
                             {labelStr}
                         </label>
                     </div>
-                    <TagTemplateRenderer 
-                        ref={(el)=>{
-                            if(checked) selectedTagRef=el;
-                        }} 
-                        templateId={aTemplate.template_id} 
-                        content={tagContext}
-                        />
+                    <div ref={printPreviewContentRef}>
+                        <TagTemplateRenderer 
+                            // ref={(el)=>{
+                            //     if(checked) selectedTagRef=el;
+                            // }} 
+                            templateId={aTemplate.template_id} 
+                            content={tagContext}
+                            />
+                    </div>
                 </Col>
             )
         });
@@ -272,12 +278,12 @@ const TagSetup = () => {
                     </Row>
                     <Row>
                         <Col xs={{span: 6, offset: 6}} style={{textAlign: 'right'}}>
-                            <ReactToPrint 
+                            {/* <ReactToPrint 
                                 ref={(domElm) => {btnRef = domElm}}
                                 trigger={() => <a href="#"></a>}
                                 content={() => selectedTagRef}
-                            />
-                            <input type="button" className="gs-button bordered" value="PRINT PREVIEW" onClick={onClickPrintBtn} />
+                            /> */}
+                            <input type="button" className="gs-button bordered" value="PRINT PREVIEW" onClick={printPreviewReactToPrintFn} />
                             <input type="button" className='gs-button bordered' style={{marginLeft: '10px'}} value="UPDATE" onClick={onClickUpdate}/>
                         </Col>
                     </Row>

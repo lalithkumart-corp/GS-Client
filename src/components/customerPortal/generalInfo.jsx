@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Container, Row, Col, FormGroup, FormLabel, FormControl, HelpBlock, InputGroup, Button, Glyphicon, Tabs, Tab, Dropdown } from 'react-bootstrap';
+import { Container, Row, Col, FormGroup, FormLabel, FormControl } from 'react-bootstrap';
 import { DoublyLinkedList } from '../../utilities/doublyLinkedList';
 import { defaultPictureState, getPicData } from '../billcreate/helper';
 import { SAVE_BASE64_IMAGE_AND_GET_ID, SAVE_BINARY_IMAGE_AND_GET_ID, DEL_IMAGE_BY_ID } from '../../core/sitemap';
@@ -12,7 +12,6 @@ import { toast } from 'react-toastify';
 import _ from 'lodash';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 //import Autosuggest, { ItemAdapter } from 'react-bootstrap-autosuggest' //https://affinipay.github.io/react-bootstrap-autosuggest/#playground
-import * as ReactAutosuggest from 'react-autosuggest';
 import { Collapse } from 'react-collapse';
 import sh from 'shorthash';
 import DetailsEditDialog from '../billcreate/detailsEditDialog';
@@ -283,8 +282,8 @@ class GeneralInfo extends Component {
                                         {aDetail['val']}
                                     </Col>                                    
                                     <Col xs={2} md={2} className='sub-actions-div'>
-                                        <span className='icon edit-icon' onClick={(e) => this.onEditDetailIconClick(aDetail)}><FontAwesomeIcon icon="edit" /></span>
-                                        <span className='icon' onClick={(e) => this.onDeleteDetailIconClick(aDetail)}><FontAwesomeIcon icon="trash" /></span>
+                                        <span className='icon edit-icon' onClick={(e) => this.onEditDetailIconClick(aDetail)}><FontAwesomeIcon icon="edit" className="" /></span>
+                                        <span className='icon' onClick={(e) => this.onDeleteDetailIconClick(aDetail)}><FontAwesomeIcon icon="trash" className="" /></span>
                                     </Col>                                    
                                 </Row>
                             );

@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import moment from 'moment';
+// import moment from 'moment';
 import DateRangePicker from 'react-bootstrap-daterangepicker';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 let label;
@@ -75,7 +75,7 @@ class GsDateRangePicker extends Component {
                         <span>
                             {this.invalidate()}
                         </span>
-                        <span className="arrow-down-icon" style={{paddingLeft: '4px'}}><FontAwesomeIcon icon="angle-down" /></span>
+                        <span className="arrow-down-icon" style={{paddingLeft: '4px'}}><FontAwesomeIcon icon="angle-down" className=""/></span>
                     </div>
                 </button>
             </DateRangePicker>

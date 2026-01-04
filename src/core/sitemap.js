@@ -1,5 +1,6 @@
-let app = require('./app');
-let env = require('./environment');
+// let app = require('./app');
+// let env = require('./environment');
+
 // let config;
 
 // if(app.env === env.DEVELOPMENT) {
@@ -18,7 +19,7 @@ let env = require('./environment');
 //     }
 // }
 
-if(process.env.REACT_APP_ENV == 'offlineprod') {
+if(import.meta.env.VITE_ENV == 'offlineprod') {
     window.console = {
         log: () => {},
         error: () => {},
@@ -27,31 +28,31 @@ if(process.env.REACT_APP_ENV == 'offlineprod') {
 }
 
 
-console.log('NODE_ENV:', process.env.NODE_ENV);
-console.log('REACT ENV File:', process.env.REACT_APP_ENV);
+console.log('NODE_ENV:', import.meta.env.NODE_ENV);
+console.log('REACT ENV File:', import.meta.env.VITE_ENV);
 
 let port;
 if(window.location.protocol == "https:")
     port = 443;
 else
     port = 80;
-// port = window.location.port || process.env.REACT_APP_API_PORT;
+// port = window.location.port || import.meta.env.VITE_API_PORT;
 
-let hostName = process.env.REACT_APP_API_HOST;
+let hostName = import.meta.env.VITE_API_HOST;
 
-if(process.env.REACT_APP_ENV == 'development' || process.env.REACT_APP_ENV == "offlineprod") {
-    port = process.env.REACT_APP_API_PORT;
-    hostName = window.location.hostname;// process.env.REACT_APP_API_HOST
+if(import.meta.env.VITE_ENV == 'development' || import.meta.env.VITE_ENV == "offlineprod") {
+    port = import.meta.env.VITE_API_PORT;
+    hostName = window.location.hostname;// import.meta.env.VITE_API_HOST
 }
 
-const protocol = window.location.protocol.substring(0, window.location.protocol.indexOf(':')) || process.env.REACT_APP_API_PROTOCOL;
+const protocol = window.location.protocol.substring(0, window.location.protocol.indexOf(':')) || import.meta.env.VITE_API_PROTOCOL;
 
 export let config = {
     "proxy_api_host": hostName,
     "proxy_api_port": port,
     "proxy_protocol": protocol,
-    "restApiRoot": process.env.REACT_APP_API_ROOT,
-    "assetsRoot": process.env.REACT_APP_SERVER_ASSETS_ROOT || '',
+    "restApiRoot": import.meta.env.VITE_API_ROOT,
+    "assetsRoot": import.meta.env.VITE_SERVER_ASSETS_ROOT || '',
 };
 
 console.log(config);

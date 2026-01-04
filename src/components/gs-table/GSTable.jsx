@@ -172,12 +172,12 @@ class GSTable extends Component {
             if(row._expanded) {
                 theDom.push(
                     <span key={"angle-down"} className='expand-icon arrow-down' onClick={(e) => this.onExpandIconClick(e, column, colIndex, row, rowIndex)}>
-                        <FontAwesomeIcon icon="angle-down" />
+                        <FontAwesomeIcon icon="angle-down" className=""/>
                     </span>);
             } else {
                 theDom.push(
                     <span key={"angle-right"} className='expand-icon arrow-right' onClick={(e) => this.onExpandIconClick(e, column, colIndex, row, rowIndex)}>
-                        <FontAwesomeIcon icon="angle-right" />
+                        <FontAwesomeIcon icon="angle-right" className=""/>
                     </span>)
             }
             return theDom;
@@ -193,7 +193,7 @@ class GSTable extends Component {
             theDom.push(
                 <span key={colIndex+'-expand-icon'}>
                     <span key={expanIconName} className={expandIconClass + ' expand-icon'} onClick={(e) => this.onExpandIconClick(e, column, colIndex, row, rowIndex)}>
-                        <FontAwesomeIcon icon={expanIconName} />
+                        <FontAwesomeIcon icon={expanIconName} className=""/>
                     </span>
                     <span className="gstable-checkbox-container">
                         <GSCheckbox labelText="" 
@@ -215,7 +215,7 @@ class GSTable extends Component {
             }  
             theDom.push(                
                 <span key={expanIconName} className={expandIconClass + ' expand-icon'} onClick={(e) => this.onGlobalExpandIconClick(e, column, colIndex)}>
-                    <FontAwesomeIcon icon={expanIconName} />
+                    <FontAwesomeIcon icon={expanIconName} className=""/>
                 </span>                    
             );
 
@@ -233,7 +233,7 @@ class GSTable extends Component {
             theDom.push(
                 <span key={colIndex+'-expand-icon'}>
                     <span key={expanIconName} className={expandIconClass + ' expand-icon'} onClick={(e) => this.onGlobalExpandIconClick(e, column, colIndex)}>
-                        <FontAwesomeIcon icon={expanIconName} />
+                        <FontAwesomeIcon icon={expanIconName} className=""/>
                     </span>
                     <span className="gstable-checkbox-container">
                         <GSCheckbox labelText="" 

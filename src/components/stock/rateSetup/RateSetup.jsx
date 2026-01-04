@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import { Container, Row, Col, Form, InputGroup, FormGroup, FormLabel, FormControl, HelpBlock, ButtonToolbar, Button } from 'react-bootstrap';
+import { Container, Row, Col, Form, InputGroup, FormGroup, FormLabel, FormControl, ButtonToolbar, Button } from 'react-bootstrap';
 import { updateRates } from '../../../actions/rate';
 import { toast } from 'react-toastify';
 

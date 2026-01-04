@@ -184,13 +184,44 @@ function GstBillingDemo() {
     let [toolsVisibility, setToolsVisibility] = useState(true);
     let [displayGstNumber, setDisplayGstNumber] = useState(true);
 
+    const [isPrinting, setIsPrinting] = useState(false);
+
+    const contentRef = useRef(null);
+
+    // We store the resolve Promise being used in `onBeforePrint` here
+    const promiseResolveRef = useRef(null);
+
     useEffect(() => {
-        if(printFlag && templateContent) {
-            btnRef.handlePrint();
+        if (isPrinting && promiseResolveRef.current) {
+            // Resolves the Promise, letting `react-to-print` know that the DOM updates are completed
+            promiseResolveRef.current();
+        }
+    }, [isPrinting]);
+    
+    const reactToPrintFn = useReactToPrint({ 
+        contentRef,
+        onBeforePrint: () => {
+            return new Promise(async (resolve) => {
+                await setTemplateContent(constructPrintData());
+                promiseResolveRef.current = resolve;
+                setIsPrinting(true);
+            });
+        },
+        onAfterPrint: () => {
+            // Reset the Promise resolve so we can print again
+            promiseResolveRef.current = null;
+            setIsPrinting(false);
             axiosMiddleware.post(ANALYTICS, {module: 'GST_BILL_DEMO', ctx1: templateContent.billNo});
-            setPrintFlag(false);
-        };
-    }, [printFlag]);
+        }
+    });
+
+    // useEffect(() => {
+    //     if(printFlag && templateContent) {
+    //         btnRef.handlePrint();
+    //         axiosMiddleware.post(ANALYTICS, {module: 'GST_BILL_DEMO', ctx1: templateContent.billNo});
+    //         setPrintFlag(false);
+    //     };
+    // }, [printFlag]);
 
     useEffect(() => {
         calcGrandTotal();
@@ -1017,19 +1048,20 @@ function GstBillingDemo() {
                 </Col>
                 <Col xs={5}>
                     <input type="button" className="gs-button bordered" value="Preview" onClick={onClickPreview} />
-                    <input type="button" className="gs-button bordered" value="Print" onClick={onClickPrint} style={{marginLeft: '15px'}} />
+                    <input type="button" className="gs-button bordered" value="Print" onClick={reactToPrintFn} style={{marginLeft: '15px'}} />
                     <div className="gst-bill-preview" style={{transform: 'scale(0.68)', transformOrigin: "left top"}} >
                         <TemplateRenderer 
-                            ref={(el) => (componentRef = el)} 
+                            ref={contentRef}
+                            // ref={(el) => (componentRef = el)} 
                             templateId={templateId} 
                             content={templateContent} 
                             customArgs={{displayGstNumber}}/>
                     </div>
-                    <ReactToPrint 
+                    {/* <ReactToPrint 
                         ref={(domElm) => {btnRef = domElm}}
                         trigger={() => <a href="#"></a>}
                         content={() => componentRef}
-                    />
+                    /> */}
                 </Col>
             </Row>
         </Container>

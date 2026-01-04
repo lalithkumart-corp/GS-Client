@@ -1,8 +1,8 @@
 import React, { Component } from 'react';
-import { Container, Row, Col, Form, FormGroup, FormLabel, FormControl, HelpBlock, InputGroup, Button, Glyphicon } from 'react-bootstrap';
+import { Container, Row, Col, Form, FormGroup, FormLabel, FormControl, InputGroup } from 'react-bootstrap';
 import { Collapse } from 'react-collapse';
 //import Autosuggest, { ItemAdapter } from 'react-bootstrap-autosuggest';
-import * as ReactAutosuggest from 'react-autosuggest';
+import ReactAutosuggest from 'react-autosuggest';
 import { DoublyLinkedList } from '../../utilities/doublyLinkedList';
 import { getDateInUTC, convertToLocalTime } from '../../utilities/utility';
 //import DatePicker from 'react-16-bootstrap-date-picker';

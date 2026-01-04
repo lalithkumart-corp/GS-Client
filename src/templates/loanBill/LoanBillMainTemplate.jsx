@@ -31,7 +31,6 @@ const DEFAULTS = {
     BODY_TEMPLATE_ID: 1
 }
 
-
 export default class LoanBillMainTemplate extends Component {
     constructor(props) {
         super(props);
@@ -253,7 +252,7 @@ export default class LoanBillMainTemplate extends Component {
 
     render() {
         return (
-            <div className="template-main-card">
+            <div ref={this.props.innerRef} className="template-main-card">
                 <div>
                     {this.getHeaderDom()}
                     {this.getBodyDom()}

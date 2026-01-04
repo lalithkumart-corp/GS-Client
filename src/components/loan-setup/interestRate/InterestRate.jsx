@@ -178,7 +178,7 @@ class InterestRates extends Component {
                                     <span style={{lineHeight: '50px'}}><b>{anObj.rateOfInterest}</b></span>
                                 </Col>
                                 <Col xs={2} className='actions' style={{textAlign: 'right', color: 'red'}}>
-                                    <span style={{lineHeight: '50px', cursor: 'pointer'}} onClick={(e) => this.deleteInterestCard(anObj.id)}><FontAwesomeIcon icon="times" title="REMOVE"/></span>
+                                    <span style={{lineHeight: '50px', cursor: 'pointer'}} onClick={(e) => this.deleteInterestCard(anObj.id)}><FontAwesomeIcon icon="times" title="REMOVE" className=""/></span>
                                 </Col>
                             </Row>
                         </div>

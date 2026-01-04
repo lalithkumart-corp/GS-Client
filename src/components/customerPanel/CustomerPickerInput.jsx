@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { fetchCustomersList } from '../billcreate/helper';
 import { Row, Col, Form } from 'react-bootstrap';
-import * as ReactAutosuggest from 'react-autosuggest';
+import ReactAutosuggest from 'react-autosuggest';
 import { getLowerCase } from '../../utilities/utility';
 
 function CustomerPickerInput(props) {

@@ -2,10 +2,10 @@
     max-width: 100%;
 }
 .my-customer-invoices-list-table {
+    table-layout: fixed;
     input[type="text"] {
         width: 100%;
     }
-    table-layout: fixed;
     .invoice-customer-address {
         text-overflow: ellipsis;
         overflow: hidden;

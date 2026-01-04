@@ -3,7 +3,7 @@ import { getPledgebookData, getPledgebookData2, setRefreshFlag } from '../../act
 import { parseResponse, getCreateAlertParams, getUpdateAlertParams, getDeleteAlertParams, getFilterValFromLocalStorage } from './helper';
 import { connect } from 'react-redux';
 import _ from 'lodash';
-import { Container, Row, Col, FormGroup, FormLabel, FormControl, HelpBlock, InputGroup, Button, Glyphicon, FormCheck, Dropdown } from 'react-bootstrap';
+import { Container, Row, Col, Dropdown } from 'react-bootstrap';
 import Form from 'react-bootstrap/Form';
 import moment from 'moment';
 import './pledgebook.scss';
@@ -27,8 +27,9 @@ import axiosMiddleware from '../../core/axios';
 import { ARCHIVE_PLEDGEBOOK_BILLS, UNARCHIVE_PLEDGEBOOK_BILLS, TRASH_PLEDGEBOOK_BILLS, PERMANENTLY_DELETE_PLEDGEBOOK_BILLS, RESTORE_TRASHED_PLEDGEBOOK_BILLS, ANALYTICS } from '../../core/sitemap';
 import AlertComp from '../alert/Alert';
 import {Tooltip} from 'react-tippy';
-import EventEmitter from 'events';
-import ReactQuill from 'react-quill';
+import EventEmitter from 'eventemitter3';
+import ReactQuill from 'react-quill-new';
+import 'react-quill-new/dist/quill.snow.css';
 
 class Pledgebook extends Component {
     constructor(props) {
@@ -255,7 +256,7 @@ class Pledgebook extends Component {
                                 >
                                     
                                         <span className='status-popover-trigger-btn' onClick={this.onPopupTriggerClick}>
-                                            <FontAwesomeIcon icon='cog'/>
+                                            <FontAwesomeIcon icon='cog' className=""/>
                                         </span>                                    
                                 </Popover>
 
@@ -1543,7 +1544,7 @@ class Pledgebook extends Component {
                 <Row className='second-row'>
                     <Col xs={3} className='action-container'>
                         <div className='export-btn action-btn' onClick={this.onExportClick}>
-                            <FontAwesomeIcon icon='file-excel'/>
+                            <FontAwesomeIcon icon='file-excel' className=""/>
                         </div>
                         <Popover
                             containerClassName='more-filter-popover'
@@ -1573,7 +1574,7 @@ class Pledgebook extends Component {
                             }}
                             >
                                 <div className={(this.isAnyCustomFiltersEnabled()?'custom-filters ':'') + 'more-filter-popover-trigger action-btn'} onClick={this.onMoreFilterPopoverTrigger}>
-                                    <FontAwesomeIcon icon='filter'/>
+                                    <FontAwesomeIcon icon='filter' className=""/>
                                 </div>
                         </Popover>
                         { this.state.selectedIndexes.length>0 &&

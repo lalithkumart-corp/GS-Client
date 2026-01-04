@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, { Component, useState, useRef, useEffect } from 'react';
 import { Container, Row, Col, Form, Dropdown } from 'react-bootstrap';
 import axios from '../../../core/axios';
 import GSTable from '../../gs-table/GSTable';
@@ -18,7 +18,7 @@ import StockItemEdit from './StockItemEdit';
 import { getDataFromStorageRespObj } from './helper';
 import TagTemplateRenderer from '../../../templates/jewellery-tag/templateRenderer';
 import { getTagSettings } from '../../jewellery/tag/tagController';
-import ReactToPrint from 'react-to-print';
+import {useReactToPrint} from 'react-to-print';
 
 const DEFAULT_SELECTION = {
     rowObj: [],
@@ -383,7 +383,15 @@ export default class ViewStock extends Component {
                                 <Tooltip title="Print Tag"
                                         position="top"
                                         trigger="mouseenter">
-                                    <span className="tag-print-btn gs-icon"><FontAwesomeIcon icon='print' onClick={(e) => this.printClickListener(e, row)}/></span>
+                                    <TagPrintBtn 
+                                        className="tag-print-btn gs-icon"
+                                        printCb = { this.printClickListener }
+                                        jewelleryTagId={this.state.jewelleryTagId}
+                                        jewelleryTagContent={this.state.jewelleryTagContent}
+                                        row={row}
+                                        key={rowIndex+'_'+columnIndex}
+                                    />
+                                    
                                 </Tooltip>
                             </span>
                         )
@@ -514,16 +522,22 @@ export default class ViewStock extends Component {
         this.setState({jewelleryTagId: tagSettings.selected_tag_template_id, storeNameAbbr: tagSettings.store_name_abbr});
     }
 
-    handleTagPrint(arr) {
-        this.setState({
+    async handleTagPrint(arr) {
+        await  this.setState({
             jewelleryTagContent: this.constructTagDataForPrint(arr)
-        }, ()=> {
-            if(this.domElms.tagPrintBtn) {
-                this.domElms.tagPrintBtn.handlePrint();
-            } else {
-                alert('Error priting the tag');
-            }
         });
+        // if(this.domElms.tagPrintBtn) {
+        //     this.domElms.tagPrintBtn.handlePrint();
+
+        // this.setState({
+        //     jewelleryTagContent: this.constructTagDataForPrint(arr)
+        // }, ()=> {
+        //     if(this.domElms.tagPrintBtn) {
+        //         this.domElms.tagPrintBtn.handlePrint();
+        //     } else {
+        //         alert('Error priting the tag');
+        //     }
+        // });
     }
 
     constructTagDataForPrint(arr) {
@@ -547,9 +561,9 @@ export default class ViewStock extends Component {
         return dataArr;
     }
 
-    printClickListener(e, row) {
+    async printClickListener(e, row) {
         e.stopPropagation();
-        this.handleTagPrint([row]);
+        await this.handleTagPrint([row]);
     }
     expandRow = {
         renderer: (row) => {
@@ -903,7 +917,7 @@ export default class ViewStock extends Component {
                         >
                             <div style={{display: 'inline-block'}}>
                                 <span className='filter-popover-trigger-btn' style={{display: 'inline-block'}} onClick={this.onFilterBtnClick}>
-                                    <FontAwesomeIcon icon='filter'/>
+                                    <FontAwesomeIcon icon='filter' className=""/>
                                 </span>
                             </div>
                         </Popover>
@@ -956,15 +970,74 @@ export default class ViewStock extends Component {
                 <CommonModal secClass="edit-stock-common-modal" modalOpen={this.state.isItemEditModalOpen} handleClose={(e)=> {this.setState({isItemEditModalOpen: false, itemEditData: null})}}>
                     <StockItemEdit itemEditData={this.state.itemEditData}/>
                 </CommonModal>
-                <div className="tag-renderer-comp">
+                {/* <div className="tag-renderer-comp">
                     <TagTemplateRenderer ref={(el) => (this.componentRef = el)} templateId={this.state.jewelleryTagId} content={this.state.jewelleryTagContent}/>
-                </div>
-                <ReactToPrint 
+                </div> */}
+
+                {/* <ReactToPrint 
                     ref={(domElm) => {this.domElms.tagPrintBtn = domElm}}
                     trigger = {()=> <a href="#"></a>}
                     content={()=>this.componentRef}
-                />
+                /> */}
             </Container>
         )
     }
+}
+
+const TagPrintBtn = (props) => {
+    const [isPrinting, setIsPrinting] = useState(false);
+    
+    const contentRef = useRef(null);
+
+    const promiseResolveRef = useRef(null);
+
+    useEffect(() => {
+        if (isPrinting && promiseResolveRef.current) {
+            promiseResolveRef.current();
+        }
+    }, [isPrinting]);
+    
+    
+    const reactToPrintFn = useReactToPrint({ 
+        contentRef,
+        onBeforePrint: (e) => {
+          return new Promise(async (resolve) => {
+            promiseResolveRef.current = resolve;
+            setIsPrinting(true);
+          });
+        },
+        onAfterPrint: () => {
+          promiseResolveRef.current = null;
+          setIsPrinting(false);
+        }
+    });
+    
+    const [jewelleryTagContent, setJewelleryTagContent] = useState(null);
+    const [jewelleryTagId, setJewelleryTagId] = useState(null);
+    const [row, setRowData] = useState(null);
+    
+    useEffect(() => {
+        setJewelleryTagContent(props.jewelleryTagContent);
+        setJewelleryTagId(props.jewelleryTagId);
+        setRowData(props.row);
+    }, [props.jewelleryTagContent, props.setJewelleryTagId, props.setrow]);
+    
+    const onPrintClick = async (e, row) => {
+        e.stopPropagation();
+        await props.printCb(e, row);
+        reactToPrintFn();
+    }
+
+    return (
+        <div style={{ display: 'inline-block' }} key={props.key}>
+            <span className={props.className}>
+                <FontAwesomeIcon icon='print' onClick={(e) => onPrintClick(e, row)} className=""/>
+            </span>
+            <div className="tag-renderer-comp">
+                <div ref={contentRef}>
+                    <TagTemplateRenderer templateId={jewelleryTagId} content={jewelleryTagContent}/>
+                </div>
+            </div>
+        </div>
+    );
 }
