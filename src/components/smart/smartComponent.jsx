@@ -117,7 +117,7 @@ class SmartComponent extends Component {
                                     <ToastContainer position={'top-center'} hideProgressBar={false}/>
                                     <Routes>
                                     <Route exact path= '/' element={<ActivationPage />} />
-                                    {/* <Route path= '/signup' element={<SignUpPage />} /> */}
+                                    <Route path= '/signup' element={<SignUpPage />} />
                                     <Route path= '/logout' element={<Logout />} />
                                     </Routes>
                                 </div>
@@ -189,7 +189,7 @@ class SmartComponent extends Component {
                             <ToastContainer position={'top-center'} hideProgressBar={false}/>
                             <Routes>
                                 <Route exact path= '/' element={<LoginPage />} />
-                                {/* <Route path= '/signup' element={<SignUpPage />} /> */}
+                                <Route path= '/signup' element={<SignUpPage />} />
                                 <Route path= '/logout' element={<Logout />} />
                             </Routes>
                         </div>

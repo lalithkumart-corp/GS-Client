@@ -1,4 +1,4 @@
-@import '../../../app';
+@use '../../../app';
 
 .tools.card {
     padding: 15px;
@@ -9,7 +9,7 @@
 }
 .wastage-calc-tool {
     .gs-input-cell {
-        @include gs-input-cell-style1;
+        @include app.gs-input-cell-style1;
         width: calc(100% - 30px);
         padding-right: 0;
     }

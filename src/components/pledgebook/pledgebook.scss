@@ -1,4 +1,4 @@
-@import '../../app';
+@use '../../app';
 
 .pledgebook-page-content {
 	width: 100%;
@@ -82,8 +82,8 @@
 		background-color: grey;
 	}
 	.p-for-demo3 {
-		@include important-text;
-		@include bordered(blue, 1px);
+		@include app.important-text;
+		@include app.bordered(blue, 1px);
 	}
 }
 .bill-no-cell {
@@ -324,10 +324,10 @@
 	
 }
 .pledgebook-alert-popever {
-	@include popover-base-style;
+	@include app.popover-base-style;
 	overflow: visible !important;
 	.gs-input {
-		@include gs-input-style1;
+		@include app.gs-input-style1;
 	}
 	.title-input,
 	.msg-input {
