@@ -672,7 +672,7 @@ class JewelleryInvoicesList extends Component {
                                 className="print-hidden-btn"
                             /> */}
                             
-                            <div style={{textAlign: 'center', paddingBottom: '25px'}}>
+                            <div style={{paddingBottom: '25px'}}>
                                 <JwlInvPrintBtn 
                                     className={"gs-button bordered"}
                                     printContents={this.state.printContents}

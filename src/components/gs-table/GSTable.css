@@ -76,6 +76,18 @@ span.gstable-checkbox-container{
     position: relative;
 }
 
+
+.gs-table-match-word-filter .word-match-icon  {
+    color: grey;
+    position: absolute;
+    top: 6px;
+    left: 3px;
+    cursor: pointer;
+}
+.gs-table-match-word-filter .word-match-icon.is-enabled {
+    color: blue;
+}
+
 .gs-table.loading tbody:after {
     position: absolute;
     top: 0;

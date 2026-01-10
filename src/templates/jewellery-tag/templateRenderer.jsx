@@ -56,7 +56,6 @@ export default class TemplateRenderer extends Component {
     }
 
     render() {
-        console.log('---------Tag TemplateId', this.props.templateId);
         return (
             <div>
                 {(()=> {

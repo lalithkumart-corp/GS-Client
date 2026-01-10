@@ -88,7 +88,8 @@ class AddStock extends Component {
         this.state = {
             formData: {
                 date: {
-                    inputVal: moment().format('DD-MM-YYYY'),
+                    inputValOld: moment().format('DD-MM-YYYY'),
+                    inputVal: new Date(),
                     _inputVal: new Date().toISOString()
                 },
                 metal: 'G',
@@ -186,6 +187,9 @@ class AddStock extends Component {
         let newState = {...this.state};
         newState.formData.id = rowData.id;
         newState.formData.uid = rowData.uid;
+        newState.formData.date.inputVal = new Date(rowData.date);
+        newState.formData.date._inputVal = rowData.date;
+
         newState.formData.metal = rowData.metal;
         newState.formData.metalPrice = rowData.metalRate;
         newState.formData.metalPricePerGm = this.getMetalPricePerGm('G', rowData.metalRate),
@@ -240,8 +244,8 @@ class AddStock extends Component {
             let newState = {...this.state};
             switch(identifier) {
                 case 'date':
-                    newState.formData[identifier].inputVal = moment(val).format('DD-MM-YYYY');
-                    newState.formData[identifier]._inputVal = getDateInUTC(val);
+                    newState.formData[identifier].inputVal = val;
+                    newState.formData[identifier]._inputVal = getDateInUTC(val, {withSelectedTime: true});
                     break;
                 case DLR_STORE_NAME:
                 case DLR_PERSON_NAME:
@@ -848,10 +852,15 @@ class AddStock extends Component {
                                         <Form.Group className="bill-date-picker">
                                             <DatePicker
                                                 id="example-datepicker" 
-                                                value={this.state.formData.date.inputVal} 
+                                                // value={this.state.formData.date.inputVal} 
+                                                selected={this.state.formData.date.inputVal} 
                                                 onChange={(fullDateVal, dateVal) => {this.inputControls.onChange(null, fullDateVal, 'date', {currElmKey: 'date'})} }
                                                 onKeyUp = {(e) => this.handleKeyUp(e, {currElmKey: 'date'}) }
                                                 showMonthDropdown
+                                                showYearDropdown
+                                                timeInputLabel="Time:"
+                                                dateFormat="dd/MM/yyyy"
+                                                showTimeInput
                                                 className='gs-input-cell'
                                                 />
                                         </Form.Group>
@@ -1171,7 +1180,7 @@ class AddStock extends Component {
                                                     ref = {(domElm) => { this.domElmns[PROD_SUB_CATEG] = domElm?domElm.input:domElm; }}
                                                 />
                                             </Col>
-                                            <Col xs={{span:3}} className="no-padding">
+                                            <Col xs={{span:3}} className="no-padding item-size-input-col">
                                                 <ReactAutosuggest
                                                     suggestions={this.state.autoSuggestions.filteredItemDimentionList}
                                                     onSuggestionsFetchRequested={({value}) => this.reactAutosuggestControls.onSuggestionsFetchRequested({value}, PROD_DIM)}

@@ -20,6 +20,8 @@ import { GsScreen } from '../../gs-screen/GsScreen';
 import axiosMiddleware from '../../../core/axios';
 import {Popover} from 'react-tiny-popover';
 import _ from 'lodash';
+import ReactPaginate from 'react-paginate';
+
 
 class SoldItems extends Component {
     constructor(props) {
@@ -247,7 +249,7 @@ class SoldItems extends Component {
                 itemName: '',
                 itemCategory: '',
                 itemSubCategory: '',
-                showReturnedItems: true
+                showReturnedItems: false
             },
             filterPopupVisibility: false
         }
@@ -274,6 +276,7 @@ class SoldItems extends Component {
         this.onChangeItemsViewOption = this.onChangeItemsViewOption.bind(this);
         this.onFilterBtnClick = this.onFilterBtnClick.bind(this);
         this.refresh = this.refresh.bind(this);
+        this.handlePageClick = this.handlePageClick.bind(this);
     }
     setCurrentScreen(screenNo) {
         this.setState({currentScreen: screenNo});
@@ -537,13 +540,23 @@ class SoldItems extends Component {
         this.setState({filterPopupVisibility: !this.state.filterPopupVisibility});
     }
 
+    getPageCount() {
+        return this.state.totals.stockSoldItemsCount/this.state.pageLimit;
+    }
+
+    async handlePageClick(selectedPage) {
+        await this.setState({selectedPageIndex: selectedPage.selected, rowObj: [], indexes: []});        
+        this.refresh({fetchOnlyRows: true});
+    }
+
+
     render() {
         return (
             <Container className="sold-out-list-container">
                 <GsScreen showScreen={this.state.currentScreen==1?true:false} isMainScreen={true}>
                     <Col xs={12} md={12}>
                         <Row>
-                            <Col xs={3} md={3}>
+                            <Col xs={4} md={4}>
                                 <DateRangePicker 
                                     className = 'stock-sold-out-itens-date-filter'
                                     selectDateRange={this.filterCallbacks.date}
@@ -593,6 +606,32 @@ class SoldItems extends Component {
                                 <DropdownButton className="gs-dropdown action-dropdown-for-sold-out-jewellery-list" title="Actions" disabled={!this.state.selectedInfo.indexes.length}>
                                     <Dropdown.Item onClick={this.printMultipleInvoicesHandler}>Print Invoices</Dropdown.Item>
                                 </DropdownButton>
+                                {/* <Dropdown className="more-actions-dropdown action-btn">
+                                    <Dropdown.Toggle id="dropdown-more-actions" disabled={!this.state.selectedInfo.indexes.length}>
+                                        Actions 
+                                    </Dropdown.Toggle>
+                                    <Dropdown.Menu>
+                                        <Dropdown.Item onClick={this.printMultipleInvoicesHandler}>Print Invoices</Dropdown.Item>
+                                    </Dropdown.Menu>
+                                </Dropdown> */}
+                            </Col>
+                            <Col xs={3}>
+                                <ReactPaginate previousLabel={"<"}
+                                    nextLabel={">"}
+                                    breakLabel={"..."}
+                                    breakClassName={"break-me"}
+                                    pageCount={this.getPageCount()}
+                                    marginPagesDisplayed={2}
+                                    pageRangeDisplayed={5}
+                                    onPageChange={this.handlePageClick}
+                                    containerClassName={"gs-pagination pagination"}
+                                    subContainerClassName={"pages pagination"}
+                                    activeClassName={"active"}
+                                    forcePage={this.state.selectedPageIndex}
+                                />
+                            </Col>
+                            <Col xs={4} style={{textAlign: 'right'}}>
+                                <span className="no-of-items">No. Of StockItems Sold: {this.state.totals.stockSoldItemsCount}</span>
                             </Col>
                         </Row>
                         <Row>

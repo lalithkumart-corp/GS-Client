@@ -6,6 +6,7 @@
         }
     }
     .action-dropdown-for-sold-out-jewellery-list {
+        display: inline-block;
         button.dropdown-toggle {
             border: none;
             &:disabled {

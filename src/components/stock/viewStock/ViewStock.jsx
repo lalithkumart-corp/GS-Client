@@ -71,12 +71,21 @@ export default class ViewStock extends Component {
                     displayText: 'Tag',
                     isFilterable: true,
                     filterCallback: this.filterCallbacks.itemCode,
+                    matchSensitiveCallback: this.filterMatchWordCallbacks.itemCode,
                     className: 'stock-product-code-col',
                     formatter: (column, columnIndex, row, rowIndex) => {
                         return (
                             <span className='product-code-cell' onClick={(e)=>this.onClickItem(e, row)}>
                                 {row[column.id]}{row['itemCodeNumber']}
                             </span>
+                        )
+                    },
+                    filterFormatter: (column, columnIndex) => {
+                        return (
+                            <div style={{position: 'relative'}} className="gs-table-match-word-filter">
+                                <FontAwesomeIcon icon='equals' onClick={(e) => this.filterMatchWordCallbacks.itemCode(e)} className={this.state.filterMatchWord.prodId ? "word-match-icon is-enabled": 'word-match-icon'}/>
+                                <input type='text' value={undefined} onChange={(e) => this.filterCallbacks.itemCode(e)} style={{paddingLeft: '17px'}}/>
+                            </div>
                         )
                     },
                     width: '5%'
@@ -413,6 +422,14 @@ export default class ViewStock extends Component {
                 itemSubCategory: '',
                 dimension: ''
             },
+            filterMatchWord: {
+                prodId: false,
+                supplier: false,
+                itemName: false,
+                itemCategory: false,
+                itemSubCategory: false,
+                dimension: false
+            },
             filterPopupVisibility: false,
         }
         this.bindMethods();
@@ -425,6 +442,7 @@ export default class ViewStock extends Component {
         this.filterCallbacks.touch = this.filterCallbacks.touch.bind(this);
         this.filterCallbacks.supplier = this.filterCallbacks.supplier.bind(this);
         this.filterCallbacks.supplier = this.filterCallbacks.supplier.bind(this);
+        this.filterMatchWordCallbacks.itemCode = this.filterMatchWordCallbacks.itemCode.bind(this);
         this.handlePageClick = this.handlePageClick.bind(this);
         this.onFilterBtnClick = this.onFilterBtnClick.bind(this);
         this.onMetalCategoryFilterChange = this.onMetalCategoryFilterChange.bind(this);
@@ -516,6 +534,15 @@ export default class ViewStock extends Component {
         touch: async () => {
 
         }
+    }
+    filterMatchWordCallbacks = {
+        itemCode: async (e) => {
+            let newState = {...this.state};
+            newState.filterMatchWord.prodId = !newState.filterMatchWord.prodId;
+            newState.selectedInfo = DEFAULT_SELECTION;
+            await this.setState(newState);
+            this.refresh();
+        },
     }
     async fetchJewelleryTagSettings() {
         let tagSettings = await getTagSettings();
@@ -760,13 +787,14 @@ export default class ViewStock extends Component {
     async fetchTotals() {
         try {
             let args = this.getFilterParams();
+            args.filterMatchWord = this.state.filterMatchWord;
             let resp = await axios.get(`${FETCH_STOCK_TOTALS}?access_token=${getAccessToken()}&filters=${JSON.stringify(args)}`);
             if(resp.data && resp.data.TOTALS) {
                 let newState = {...this.state};
                 newState.totals.stockItems = resp.data.TOTALS.count;
-                newState.totals.netWt = resp.data.TOTALS.netWt;
-                newState.totals.soldNetWt = resp.data.TOTALS.soldNetWt;
-                newState.totals.avlNetWt = resp.data.TOTALS.avlNetWt;
+                newState.totals.netWt = parseFloat(resp.data.TOTALS.netWt);
+                newState.totals.soldNetWt = parseFloat(resp.data.TOTALS.soldNetWt);
+                newState.totals.avlNetWt = parseFloat(resp.data.TOTALS.avlNetWt);
 
                 if(newState.totals.netWt)
                     newState.totals.netWt = newState.totals.netWt.toFixed(3);
@@ -786,6 +814,10 @@ export default class ViewStock extends Component {
         try {
             let offsets = this.getOffsets();
             let args = this.getFilterParams();
+
+            args.filterMatchWord = this.state.filterMatchWord;
+
+
             args.offsetStart = offsets[0] || 0;
             args.offsetEnd = offsets[1] || 20;
 
@@ -810,27 +842,27 @@ export default class ViewStock extends Component {
                         supplierPersonName: aStockItem.SupplierPersonName,
                         metal: aStockItem.Metal,
                         metalRate: aStockItem.MetalRate,
-                        grossWt: aStockItem.GWt,
-                        netWt: aStockItem.NWt,
-                        pureWt: aStockItem.PWt,
+                        grossWt: aStockItem.GWt || 0,
+                        netWt: aStockItem.NWt || 0,
+                        pureWt: aStockItem.PWt || 0,
                         qty: aStockItem.Qty,
                         avlQty: aStockItem.AvlQty,
                         soldQty: aStockItem.SoldQty,
-                        avlGWt: aStockItem.AvlGWt,
-                        avlNWt: aStockItem.AvlNWt,
-                        avlPWt: aStockItem.AvlPWt,
-                        soldGWt: aStockItem.SoldGWt,
-                        soldNWt: aStockItem.SoldNWt,
-                        soldPWt: aStockItem.SoldPWt,
+                        avlGWt: aStockItem.AvlGWt || 0,
+                        avlNWt: aStockItem.AvlNWt || 0,
+                        avlPWt: aStockItem.AvlPWt || 0,
+                        soldGWt: aStockItem.SoldGWt || 0,
+                        soldNWt: aStockItem.SoldNWt || 0,
+                        soldPWt: aStockItem.SoldPWt || 0,
                         touch: aStockItem.PTouchName,
-                        pTouch: aStockItem.PTouchValue,
-                        iTouch: aStockItem.ITouchValue,
-                        labourCharge: aStockItem.LabourCharge,
+                        pTouch: aStockItem.PTouchValue || 0,
+                        iTouch: aStockItem.ITouchValue || 0,
+                        labourCharge: aStockItem.LabourCharge || 0,
                         labourChargeUnit: aStockItem.LabourChargeUnit,
                         labourChargeCalc: aStockItem.LabourAmtCalc,
-                        salesMakingCharge: aStockItem.SalesMakingCharge,
+                        salesMakingCharge: aStockItem.SalesMakingCharge || 0,
                         salesWsgPercent: aStockItem.SalesWsgPercent,
-                        amount: aStockItem.Amount,
+                        amount: aStockItem.Amount || 0,
                         cgstPercent: aStockItem.CgstPercent,
                         cgstAmt: aStockItem.CgstAmt,
                         sgstPercent: aStockItem.SgstPercent,
