@@ -65,6 +65,7 @@ domList.add('ornItem1', {type: 'rautosuggest', enabled: true});
 domList.add('ornNos1', {type: 'defaultInput', enabled: true});
 domList.add('ornGWt1', {type: 'defaultInput', enabled: true});
 domList.add('ornNWt1', {type: 'defaultInput', enabled: true});
+domList.add('ornTouch1', {type: 'defaultInput', enabled: true});
 domList.add('ornSpec1', {type: 'rautosuggest', enabled: true});
 domList.add('submitBtn', {type: 'defaultInput', enabled: true});
 domList.add('updateBtn', {type: 'defaultInput', enabled: false});
@@ -180,6 +181,7 @@ class BillCreation extends Component {
                             ornItem: '',
                             ornGWt: '',
                             ornNWt: '',
+                            ornTouch: '',
                             ornSpec: '',
                             ornNos: ''
                         }
@@ -187,11 +189,13 @@ class BillCreation extends Component {
                     list: ['Loading...'],
                     limitedList: ['Loading...'],
                     specList: ['Bend', 'Broken', 'w/o hook', 'Damage', 'Tread', 'w/o Thiruvani', 'w/o Stone', 'Full Stone'], //TODO: Map with Database
+                    specLimitedList: [],
+                    touchList: ['916', '916KDM', 'Sada', '75M', '80M', '916 w/o Seal'],
+                    touchLimitedList: [],
                     validCategoryList: ['G', 'S', 'B'],
                     category: 'U', //unknown
                     totalWeight: 0.00,
                     weightUnit: 'grams',
-                    specLimitedList: [],
                     rowCount: 1
                 },
                 moreDetails: {
@@ -966,6 +970,7 @@ class BillCreation extends Component {
                         domList.remove('ornNos'+index);
                         domList.remove('ornGWt'+index);
                         domList.remove('ornNWt'+index);
+                        domList.remove('ornTouch'+index);
                         domList.remove('ornSpec'+index);
                     }
                 });
@@ -978,7 +983,8 @@ class BillCreation extends Component {
                     domList.insertAfter('ornItem'+iteration, 'ornNos'+iteration, {type: 'defaultInput', enabled: true});
                     domList.insertAfter('ornNos'+iteration, 'ornGWt'+iteration, {type: 'defaultInput', enabled: true});
                     domList.insertAfter('ornGWt'+iteration, 'ornNWt'+iteration, {type: 'defaultInput', enabled: true});
-                    domList.insertAfter('ornNWt'+iteration, 'ornSpec'+iteration, {type: 'rautosuggest', enabled: true});
+                    domList.insertAfter('ornNWt'+iteration, 'ornTouch'+iteration, {type: 'rautosuggest', enabled: true});
+                    domList.insertAfter('ornTouch'+iteration, 'ornSpec'+iteration, {type: 'rautosuggest', enabled: true});
                     iteration++;
                 }
         }
@@ -1037,14 +1043,15 @@ class BillCreation extends Component {
         if(e.keyCode == 13) {
             let newState = {...this.state};
             newState.formData.orn.rowCount += 1;   
-            newState.formData.orn.inputs[nextSerialNo] = {ornItem: '', ornGWt: '', ornNWt: '', ornSpec: '', ornNos: ''};
+            newState.formData.orn.inputs[nextSerialNo] = {ornItem: '', ornGWt: '', ornNWt: '', ornTouch: '', ornSpec: '', ornNos: ''};
 
             let currentSerialNo = nextSerialNo-1;
             domList.insertAfter('ornSpec'+currentSerialNo, 'ornItem'+nextSerialNo, {type: 'rautosuggest', enabled: true});
             domList.insertAfter('ornItem'+nextSerialNo, 'ornNos'+nextSerialNo, {type: 'defaultInput', enabled: true});
             domList.insertAfter('ornNos'+nextSerialNo, 'ornGWt'+nextSerialNo, {type: 'defaultInput', enabled: true});
             domList.insertAfter('ornGWt'+nextSerialNo, 'ornNWt'+nextSerialNo, {type: 'defaultInput', enabled: true});
-            domList.insertAfter('ornNWt'+nextSerialNo, 'ornSpec'+nextSerialNo, {type: 'rautosuggest', enabled: true});
+            domList.insertAfter('ornNWt'+nextSerialNo, 'ornTouch'+nextSerialNo, {type: 'rautosuggest', enabled: true});
+            domList.insertAfter('ornTouch'+nextSerialNo, 'ornSpec'+nextSerialNo, {type: 'rautosuggest', enabled: true});
             
             await this.setState(newState);
         }
@@ -1061,6 +1068,7 @@ class BillCreation extends Component {
             domList.remove('ornNos'+serialNo);
             domList.remove('ornGWt'+serialNo);
             domList.remove('ornNWt'+serialNo);
+            domList.remove('ornTouch'+serialNo);
             domList.remove('ornSpec'+serialNo);
 
             await this.setState(newState);
@@ -1362,7 +1370,9 @@ class BillCreation extends Component {
                     printParams.userPicture = {url: this.getImageUrlForPrintData('user')};
                     printParams.ornPicture = {url: this.getImageUrlForPrintData('orn')};
                     await this.setState({printContent: JSON.parse(JSON.stringify(printParams))});
-                    this.printReceipt();
+                    setTimeout(() => {
+                        this.printReceipt();
+                    }, 300);
                 }
                 this.props.insertNewBill(requestParams);
             }
@@ -1533,6 +1543,12 @@ class BillCreation extends Component {
                     suggestionsList = suggestionsList.slice(0, 35);
                     newState.formData.orn.limitedList = suggestionsList;
                     break;
+                case 'ornTouch':
+                    var lowerCaseVal = value.toLowerCase();
+                    suggestionsList = this.state.formData.orn.touchList.filter(aSuggestion => aSuggestion.toLowerCase().indexOf(lowerCaseVal) != -1);
+                    suggestionsList = suggestionsList.slice(0, 35);
+                    newState.formData.orn.touchLimitedList = suggestionsList;
+                    break;
                 case 'ornSpec':
                     var lowerCaseVal = value.toLowerCase();
                     suggestionsList = this.state.formData.orn.specList.filter(aSuggestion => aSuggestion.toLowerCase().indexOf(lowerCaseVal) != -1);
@@ -1565,6 +1581,7 @@ class BillCreation extends Component {
                 case 'pincode':
                 case 'mobile':
                 case 'ornItem':
+                case 'ornTouch':
                 case 'ornSpec':
                 case 'moreCustomerDetailsField':
                     this.autuSuggestionControls.onChange(newValue, identifier, options);
@@ -1796,10 +1813,11 @@ class BillCreation extends Component {
             return (
                 <colgroup>
                     <col style={{width: '5%'}}/>
-                    <col style={{width: '35%'}}/>
+                    <col style={{width: '30%'}}/>
+                    <col style={{width: '7%'}}/>
                     <col style={{width: '10%'}}/>
-                    <col style={{width: '15%'}}/>
-                    <col style={{width: '15%'}}/>
+                    <col style={{width: '10%'}}/>
+                    <col style={{width: '20%'}}/>
                     <col style={{width: '20%'}}/>
                 </colgroup>
             )
@@ -1813,6 +1831,7 @@ class BillCreation extends Component {
                         <th>Nos</th>
                         <th>G-Wt</th>
                         <th>N-Wt</th>
+                        <th>Touch</th>
                         <th>Specification</th>
                     </tr>
                 </thead>
@@ -1848,7 +1867,7 @@ class BillCreation extends Component {
                         <input 
                             type="text" 
                             className="gs-input-cell orn-input-cell" 
-                            placeholder="Quantity"
+                            placeholder="0"
                             value={this.state.formData.orn.inputs[serialNo].ornNos}
                             ref= {(domElm) => {this.domElmns.orn['ornNos' + serialNo] = domElm; }}
                             onKeyUp = {(e) => this.handleKeyUp(e, {currElmKey: 'ornNos'+ serialNo, isOrnNosInput: true, nextSerialNo: serialNo+1}) }
@@ -1879,6 +1898,28 @@ class BillCreation extends Component {
                             onChange={ (e) => this.inputControls.onChange(null, e.target.value, 'ornNWt', {serialNo: serialNo}) }
                             readOnly={this.props.billCreation.loading}
                             />
+                    </td>
+                    <td>
+                        <div style={{position: 'relative'}} className='custom-autosuggest-wrapper'>
+                            <ReactAutosuggest
+                                suggestions={this.state.formData.orn.touchLimitedList}
+                                onSuggestionsFetchRequested={({value}) => this.reactAutosuggestControls.onSuggestionsFetchRequested({value}, 'ornTouch')}
+                                // onSuggestionsClearRequested={this.reactAutosuggestControls.onSuggestionsClearRequested}
+                                getSuggestionValue={(suggestion, e) => this.getSuggestionValue(suggestion, 'ornTouch')}
+                                renderSuggestion={(suggestion) => this.renderSuggestion(suggestion, 'ornTouch')}
+                                onSuggestionSelected={(event, { suggestion, suggestionValue, suggestionIndex, sectionIndex, method}) => this.reactAutosuggestControls.onSuggestionSelected(event, { suggestion, suggestionValue, suggestionIndex, sectionIndex, method }, 'ornTouch', {serialNo: serialNo})}
+                                inputProps={{
+                                    placeholder: '',
+                                    value: this.state.formData.orn.inputs[serialNo].ornTouch,
+                                    onChange: (e, {newValue, method}) => this.reactAutosuggestControls.onChange(e, {newValue, method}, 'ornTouch', {serialNo: serialNo}),
+                                    onKeyUp: (e) => this.reactAutosuggestControls.onKeyUp(e, {currElmKey: 'ornTouch'+ serialNo, isOrnTouchsInput: true, nextSerialNo: serialNo+1}),
+                                    className: "react-autosuggest__input orn spec gs-input-cell",
+                                    readOnly: this.props.billCreation.loading,
+                                    disabled: this.props.billCreation.loading
+                                }}
+                                ref = {(domElm) => { this.domElmns.orn['ornTouch' + serialNo] = domElm?domElm.input:domElm; }}
+                            />
+                        </div>
                     </td>
                     <td>
                         <div style={{position: 'relative'}} className='custom-autosuggest-wrapper'>

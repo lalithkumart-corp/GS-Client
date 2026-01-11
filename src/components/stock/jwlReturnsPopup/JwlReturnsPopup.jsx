@@ -10,6 +10,7 @@ import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import { getCurrentDateTimeInUTCForDB } from "../../../utilities/utility";
 import { getAccessToken } from "../../../core/storage";
+import _ from 'lodash';
 
 const JwlReturnPopup = (props) => {
     const [charges, setCharges] = useState(0);

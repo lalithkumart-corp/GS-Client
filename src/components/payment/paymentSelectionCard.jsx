@@ -4,6 +4,7 @@ import { Collapse } from 'react-collapse';
 import { Row, Col, Form } from 'react-bootstrap';
 import { DEFAULT_PAYMENT_OBJ_FOR_CASH_IN, DEFAULT_PAYMENT_OBJ_FOR_CASH_OUT, IN, OUT } from '../../constants';
 import _ from 'lodash';
+import '../payment/paymentIn.scss';
 
 export const PaymentSelectionCard = (props) => {
     const [defaultAccObj, setDefaultAccObj] = useState(null);

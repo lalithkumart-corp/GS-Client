@@ -307,6 +307,7 @@ export const resetState = (nextProps, newState) => {
                 ornItem: '',
                 ornGWt: '',
                 ornNWt: '',
+                ornTouch: '',
                 ornSpec: '',
                 ornNos: ''
             }};
@@ -339,7 +340,7 @@ export const resetState = (nextProps, newState) => {
             }
             if(index == 'amount')
                 anItem.landedCost = 0;
-        }            
+        }
     });
     newState.formData.payment = JSON.parse(JSON.stringify(defaultPaymentObj));
     let modes = ['cash', 'cheque', 'online'];

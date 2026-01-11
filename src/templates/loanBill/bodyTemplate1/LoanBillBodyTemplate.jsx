@@ -279,9 +279,10 @@ export default class LoanBillBodyTemplate extends Component {
                     footer.wt = parseFloat((footer.wt  + parseFloat(anOrn.ornNWt || 0)).toFixed(3));
                     footer.qty += parseInt(anOrn.ornNos) || 0;
                     this._totalWt = footer.wt;
+                    if(anOrn.ornTouch && anOrn.ornTouch.length > 0) anOrn.ornTouch = `${anOrn.ornTouch.trim()}`;
                     if(anOrn.ornSpec && anOrn.ornSpec.length > 0) anOrn.ornSpec = `${anOrn.ornSpec.trim()}`;
     
-                    let theItemName = `${this.enhanceOrnItemName(anOrn.ornItem, anOrn.ornNos)} ${anOrn.ornSpec?`(${anOrn.ornSpec})`:''}`;
+                    let theItemName = `${this.enhanceOrnItemName(anOrn.ornItem, anOrn.ornNos)} ${anOrn.ornTouch?`- ${anOrn.ornTouch}`:''} ${anOrn.ornSpec?`(${anOrn.ornSpec})`:''}`;
                     list.push(
                         <Row>
                             <Col xs={{span: 1}} md={{span: 1}} className="orn-table-body-cell sno">{index}</Col>
