@@ -155,6 +155,23 @@
 .tag-renderer-comp {
     display: none;
 }
+.action-btn {
+    cursor: pointer;
+    display: inline-block;
+    line-height: 30px;
+    margin-left: 10px;
+    color: #337ab7;
+}
+
+.action-btn:hover,
+.action-btn:focus {
+    color: #fba200;
+    outline: none;
+}
+
+.export-stock-data-popup.common-modal-content {
+    width: 40%;
+}
 
 @media print {
     .tag-renderer-comp {

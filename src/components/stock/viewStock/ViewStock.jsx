@@ -19,6 +19,7 @@ import { getDataFromStorageRespObj } from './helper';
 import TagTemplateRenderer from '../../../templates/jewellery-tag/templateRenderer';
 import { getTagSettings } from '../../jewellery/tag/tagController';
 import {useReactToPrint} from 'react-to-print';
+import StockDataExportPopup from './StockDataExportPopup';
 
 const DEFAULT_SELECTION = {
     rowObj: [],
@@ -450,6 +451,8 @@ export default class ViewStock extends Component {
         this.handleTagPrint = this.handleTagPrint.bind(this);
         this.constructTagDataForPrint = this.constructTagDataForPrint.bind(this);
         this.printClickListener = this.printClickListener.bind(this);
+        this.handleExportPopupClose = this.handleExportPopupClose.bind(this);
+        this.onExportClick = this.onExportClick.bind(this);
     }
     componentDidMount() {
         this.fetchTotals();
@@ -717,6 +720,14 @@ export default class ViewStock extends Component {
         this.setState(newState);
     }
 
+    onExportClick() {
+        this.setState({displayExportPopup: true});
+    }
+
+    handleExportPopupClose() {
+        this.setState({displayExportPopup: false});
+    }
+
     onFilterBtnClick() {
         this.setState({filterPopupVisibility: !this.state.filterPopupVisibility});
     }
@@ -901,6 +912,9 @@ export default class ViewStock extends Component {
                             endDate={this.state.filters.date.endDate}
                             showIcon= {false}
                         />
+                        <div className='export-btn action-btn' onClick={this.onExportClick}>
+                            <FontAwesomeIcon icon='file-excel' className=""/>
+                        </div>
                         <Popover
                             containerClassName='view-stock-filter-popover'
                             // padding={0}
@@ -1001,6 +1015,9 @@ export default class ViewStock extends Component {
                 </Row>
                 <CommonModal secClass="edit-stock-common-modal" modalOpen={this.state.isItemEditModalOpen} handleClose={(e)=> {this.setState({isItemEditModalOpen: false, itemEditData: null})}}>
                     <StockItemEdit itemEditData={this.state.itemEditData}/>
+                </CommonModal>
+                <CommonModal modalOpen={this.state.displayExportPopup} secClass="export-stock-data-popup" handleClose={this.handleExportPopupClose}>
+                    <StockDataExportPopup handleClose={this.handleExportPopupClose}/>
                 </CommonModal>
                 {/* <div className="tag-renderer-comp">
                     <TagTemplateRenderer ref={(el) => (this.componentRef = el)} templateId={this.state.jewelleryTagId} content={this.state.jewelleryTagContent}/>
