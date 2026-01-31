@@ -4,6 +4,7 @@ import { FETCH_INVOICE_DATA } from '../../../core/sitemap';
 import { getAccessToken } from '../../../core/storage';
 import { Row, Col } from 'react-bootstrap';
 import { currencyFormatter } from '../../../utilities/utility';
+import _ from 'lodash';
 
 const JwlBilleditemPreview = (props) => {
 
