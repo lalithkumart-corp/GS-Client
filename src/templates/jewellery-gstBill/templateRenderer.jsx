@@ -26,7 +26,7 @@ export default class TemplateRenderer extends Component {
 
     render() {
         return (
-            <div>
+            <div ref={this.props.innerRef}>
                 {this.getTemplateById()}    
             </div>
         )

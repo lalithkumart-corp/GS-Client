@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { useSelector } from 'react-redux'
 import { Container, FormGroup, FormLabel, FormControl, Row, Col } from 'react-bootstrap';
-import ReactToPrint from 'react-to-print';
+import {useReactToPrint} from 'react-to-print';
 import moment from 'moment';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
@@ -198,7 +198,7 @@ function GstBillingDemo() {
         }
     }, [isPrinting]);
     
-    const reactToPrintFn = useReactToPrint({ 
+    const reactToPrintFn = useReactToPrint({
         contentRef,
         onBeforePrint: () => {
             return new Promise(async (resolve) => {
@@ -1051,7 +1051,7 @@ function GstBillingDemo() {
                     <input type="button" className="gs-button bordered" value="Print" onClick={reactToPrintFn} style={{marginLeft: '15px'}} />
                     <div className="gst-bill-preview" style={{transform: 'scale(0.68)', transformOrigin: "left top"}} >
                         <TemplateRenderer 
-                            ref={contentRef}
+                            innerRef={contentRef}
                             // ref={(el) => (componentRef = el)} 
                             templateId={templateId} 
                             content={templateContent} 
