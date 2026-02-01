@@ -845,7 +845,7 @@ class BillCreation extends Component {
             return null;
     }
     getCustomerListSuggestions(value) {
-        const inputValue = value.trim().toLowerCase();
+        const inputValue = value?.trim().toLowerCase();
 
         const inputLength = inputValue.length;
           
@@ -1910,7 +1910,7 @@ class BillCreation extends Component {
                                 onSuggestionSelected={(event, { suggestion, suggestionValue, suggestionIndex, sectionIndex, method}) => this.reactAutosuggestControls.onSuggestionSelected(event, { suggestion, suggestionValue, suggestionIndex, sectionIndex, method }, 'ornTouch', {serialNo: serialNo})}
                                 inputProps={{
                                     placeholder: '',
-                                    value: this.state.formData.orn.inputs[serialNo].ornTouch,
+                                    value: this.state.formData.orn.inputs[serialNo].ornTouch || '',
                                     onChange: (e, {newValue, method}) => this.reactAutosuggestControls.onChange(e, {newValue, method}, 'ornTouch', {serialNo: serialNo}),
                                     onKeyUp: (e) => this.reactAutosuggestControls.onKeyUp(e, {currElmKey: 'ornTouch'+ serialNo, isOrnTouchsInput: true, nextSerialNo: serialNo+1}),
                                     className: "react-autosuggest__input orn spec gs-input-cell",
