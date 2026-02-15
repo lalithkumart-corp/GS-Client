@@ -549,7 +549,7 @@ export default class ViewStock extends Component {
     }
     async fetchJewelleryTagSettings() {
         let tagSettings = await getTagSettings();
-        this.setState({jewelleryTagId: tagSettings.selected_tag_template_id, storeNameAbbr: tagSettings.store_name_abbr});
+        this.setState({jewelleryTagId: tagSettings.selected_tag_template_id, storeNameAbbr: tagSettings.store_name_abbr, storeNameFull: tagSettings.store_name_full});
     }
 
     async handleTagPrint(arr) {
@@ -575,6 +575,7 @@ export default class ViewStock extends Component {
         _.each(arr, (row) => {
             dataArr.push({
                 storeName: this.state.storeNameAbbr,
+                storeNameFull: this.state.storeNameFull,
                 division: row.touch,
                 grams: row.avlNWt,
                 size: row.dimension,
