@@ -18,7 +18,7 @@ const TagSetup = () => {
 
     const [storeName, setStoreNameAbbr] = useState(null);
     const [storeNameFull, setStoreNameFull] = useState(null);
-    const [division, setDivision] = useState('22K');
+    const [division, setDivision] = useState('916KDM');
     const [grams, setGrams] = useState(1.240);
     const [size, setSize] = useState(22);
     const [itemName, setItemName] = useState('RING');
@@ -26,6 +26,8 @@ const TagSetup = () => {
     const [productId, setProductId] = useState('RN2');
     const [trackId, setTrackId] = useState('104');
     const [wsgPct, setWsgPct] = useState('14%');
+    const [amount, setAmount] = useState('25000');
+    const [supplierId, setSupplierId] = useState('KJ');
     const [bisLogoVisibility, setBisLogoVisibility] = useState(false);
     
     const [selectedTemplateId, setSelectedTemplateId] = useState(null);
@@ -118,6 +120,8 @@ const TagSetup = () => {
             size: size,
             itemName: itemName,
             huid: huid,
+            amount: amount,
+            supplierId: supplierId,
             config: {
                 showBis: true,
             },
@@ -208,6 +212,14 @@ const TagSetup = () => {
                                 </Row>
                                 <Row>
                                     <Col xs={6}>
+                                        Supplier ID: 
+                                    </Col>
+                                    <Col xs={6}>
+                                        <input type="text" className="gs-input-cell" value={supplierId} onChange={(e) => setSupplierId(e.target.value)}/>
+                                    </Col>
+                                </Row>
+                                <Row>
+                                    <Col xs={6}>
                                         Item Name: 
                                     </Col>
                                     <Col xs={6}>
@@ -220,6 +232,14 @@ const TagSetup = () => {
                                     </Col>
                                     <Col xs={6}>
                                         <input type="text" className="gs-input-cell" value={division} onChange={(e) => setDivision(e.target.value)}/>
+                                    </Col>
+                                </Row>
+                                <Row>
+                                    <Col xs={6}>
+                                        Amount: 
+                                    </Col>
+                                    <Col xs={6}>
+                                        <input type="text" className="gs-input-cell" value={amount} onChange={(e) => setAmount(e.target.value)}/>
                                     </Col>
                                 </Row>
                                 <Row>
@@ -258,14 +278,6 @@ const TagSetup = () => {
                                     </Col>
                                     <Col xs={6}>
                                         <input type="text" className="gs-input-cell" value={wsgPct} onChange={(e) => setWsgPct(e.target.value)}/>
-                                    </Col>
-                                </Row>
-                                <Row>
-                                    <Col xs={6}>
-                                        HUID: 
-                                    </Col>
-                                    <Col xs={6}>
-                                        <input type="text" className="gs-input-cell" value={huid} onChange={(e) => setHuid(e.target.value)}/>
                                     </Col>
                                 </Row>
                             </div>

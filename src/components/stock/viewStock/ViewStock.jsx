@@ -453,6 +453,7 @@ export default class ViewStock extends Component {
         this.printClickListener = this.printClickListener.bind(this);
         this.handleExportPopupClose = this.handleExportPopupClose.bind(this);
         this.onExportClick = this.onExportClick.bind(this);
+        this.printAllClickListener = this.printAllClickListener.bind(this);
     }
     componentDidMount() {
         this.fetchTotals();
@@ -553,7 +554,7 @@ export default class ViewStock extends Component {
     }
 
     async handleTagPrint(arr) {
-        await  this.setState({
+        await this.setState({
             jewelleryTagContent: this.constructTagDataForPrint(arr)
         });
         // if(this.domElms.tagPrintBtn) {
@@ -596,6 +597,12 @@ export default class ViewStock extends Component {
         e.stopPropagation();
         await this.handleTagPrint([row]);
     }
+
+    async printAllClickListener(e, rows) {
+        e.stopPropagation();
+        await this.handleTagPrint(rows);
+    }
+
     expandRow = {
         renderer: (row) => {
             let supplier = row.suplierName;
@@ -973,7 +980,13 @@ export default class ViewStock extends Component {
                                 More Actions 
                             </Dropdown.Toggle>
                             <Dropdown.Menu>
-                                <Dropdown.Item onClick={(e) => this.onMoreActionsDpdClick(e, 'printTag')}>Print Tag</Dropdown.Item>
+                                <Dropdown.Item ><DpdTagPrintBtn 
+                                        className="tag-print-btn gs-icon"
+                                        printCb = { this.printAllClickListener }
+                                        jewelleryTagId={this.state.jewelleryTagId}
+                                        jewelleryTagContent={this.state.jewelleryTagContent}
+                                        selectedRows={this.state.selectedInfo.rowObj}
+                                        /></Dropdown.Item>
                             </Dropdown.Menu>
                         </Dropdown>
                     </Col>
@@ -1032,6 +1045,65 @@ export default class ViewStock extends Component {
             </Container>
         )
     }
+}
+
+const DpdTagPrintBtn = (props) => {
+     const [isPrinting, setIsPrinting] = useState(false);
+    
+    const contentRef = useRef(null);
+
+    const promiseResolveRef = useRef(null);
+
+    useEffect(() => {
+        if (isPrinting && promiseResolveRef.current) {
+            promiseResolveRef.current();
+        }
+    }, [isPrinting]);
+    
+    
+    const reactToPrintFn = useReactToPrint({ 
+        contentRef,
+        onBeforePrint: (e) => {
+          return new Promise(async (resolve) => {
+            promiseResolveRef.current = resolve;
+            setIsPrinting(true);
+          });
+        },
+        onAfterPrint: () => {
+          promiseResolveRef.current = null;
+          setIsPrinting(false);
+        }
+    });
+    
+    const [jewelleryTagContent, setJewelleryTagContent] = useState(null);
+    const [jewelleryTagId, setJewelleryTagId] = useState(null);
+    const [selectedRows, setSelectedRowsData] = useState(null);
+    
+    useEffect(() => {
+        setJewelleryTagContent(props.jewelleryTagContent);
+        setJewelleryTagId(props.jewelleryTagId);
+        setSelectedRowsData(props.selectedRows);
+    }, [props.jewelleryTagContent, props.setJewelleryTagId, props.setSelectedRowsData]);
+    
+    const onPrintClick = async (e, row) => {
+        e.stopPropagation();
+        await props.printCb(e, row);
+        reactToPrintFn();
+    }
+
+    return (
+        <div style={{ display: 'inline-block' }} key={props.key}>
+            <span className={props.className} onClick={(e) => onPrintClick(e, selectedRows)}>
+                <FontAwesomeIcon icon='print' className=""/>
+                    Print Tag
+            </span>
+            <div className="tag-renderer-comp">
+                <div ref={contentRef}>
+                    <TagTemplateRenderer templateId={jewelleryTagId} content={jewelleryTagContent}/>
+                </div>
+            </div>
+        </div>
+    );
 }
 
 const TagPrintBtn = (props) => {

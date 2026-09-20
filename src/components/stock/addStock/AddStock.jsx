@@ -300,7 +300,11 @@ class AddStock extends Component {
                 case PROD_SUB_CATEG:
                 case PROD_DIM:
                 case PROD_CODE_SERIES:
-                    newState.formData[identifier] = newValue;
+                    try {
+                        newState.formData[identifier] = newValue.trim();
+                    } catch(e) {
+                        newState.formData[identifier] = newValue;
+                    }
                     break;
             }
             this.setState(newState);
