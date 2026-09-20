@@ -7,6 +7,7 @@ import moment from 'moment';
 import { calcMonthDiff } from '../redeem/helper';
 import { Row, Col } from 'react-bootstrap';
 import './billHistoryView.css';
+import { LOAN_BILL_EXPIRY_DAYS } from '../../constants';
 
 export default class BillHistoryView extends Component {
     constructor(props) {
@@ -44,12 +45,22 @@ export default class BillHistoryView extends Component {
                 let pledgedDate = moment.utc(aBill.Date).local().format('DD/MM/YYYY');
                 let today = moment().format('DD/MM/YYYY');
                 let diff = calcMonthDiff(pledgedDate, today);
+
+                let showIndicator = false;
+                let expiryDaysCnt = LOAN_BILL_EXPIRY_DAYS;
+                if(aBill.ExpiryDate && aBill.Date)
+                    expiryDaysCnt = moment(aBill.ExpiryDate).diff(moment(aBill.Date));
+                
+                let daysPassedBy = moment().diff(aBill.Date);
+                if(daysPassedBy > expiryDaysCnt)
+                    showIndicator = true;
+                
                 bucket.push(
                     <tr>
                         <td>{aBill.BillNo}</td>
                         <td>{pledgedDate}</td>
                         <td>{aBill.Amount}</td>
-                        <td>{diff}</td>
+                        <td className={showIndicator?'expired':''}>{diff}</td>
                     </tr>
                 )
             });

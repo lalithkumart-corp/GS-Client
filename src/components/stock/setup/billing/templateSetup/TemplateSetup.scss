@@ -1,0 +1,26 @@
+.jewellery-template-setup-container {
+    .screenshot-prview-container {
+        height: 250px;
+        margin-bottom: 30px;
+        .template-image-viewer {
+            height: 100%;
+        }
+    }
+    .screenshot-radio-btn-label {
+        margin-left: 20px;
+    }
+    .jewellery-bill-template-preview-modal {
+        .body {
+            padding-bottom: 50px;
+        }
+    }
+}
+
+.jewellery-bill-template-preview-modal .jewellery-gst-bill-paper,
+.jewellery-bill-template-preview-modal .jewellery-estimate-bill-paper {
+    display: block;
+    margin-left: 20px;
+    margin-bottom: 30px;
+    // transform: scale(0.7);
+    // margin-top: -70px;
+}

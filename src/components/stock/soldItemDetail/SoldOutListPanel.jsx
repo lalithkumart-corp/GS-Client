@@ -1,25 +1,42 @@
-import React, { Component } from 'react';
-import { Container, Row, Col } from 'react-bootstrap';
+import React, { Component, useState, useEffect, useRef } from 'react';
+import { connect } from 'react-redux';
+import { Container, Row, Col, Form, Dropdown, DropdownButton } from 'react-bootstrap';
 import axios from '../../../core/axios';
-import { getAccessToken } from '../../../core/storage';
+import { getAccessToken, getJewelleryBillTemplateSettings, getStockSoldListPageFilters, setStockSoldListPageFilters } from '../../../core/storage';
 import { toast } from 'react-toastify';
-import { FETCH_STOCK_SOLD_ITEM_TOTALS, FETCH_STOCK_SOLD_OUT_LIST } from '../../../core/sitemap';
+import { FETCH_STOCK_SOLD_ITEM_TOTALS, FETCH_STOCK_SOLD_OUT_LIST, FETCH_INVOICE_DATA } from '../../../core/sitemap';
 import GSTable from '../../gs-table/GSTable';
-import { convertToLocalTime, dateFormatter } from '../../../utilities/utility';
+import { convertToLocalTime, dateFormatter, convertDateObjToStr } from '../../../utilities/utility';
 import DateRangePicker from '../../dateRangePicker/dataRangePicker';
-import './SoldOutListPanel.css';
+import './SoldOutListPanel.scss';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import {Tooltip} from 'react-tippy';
+import CommonModal from '../../common-modal/commonModal';
+import { useReactToPrint } from 'react-to-print';
+import TemplateRenderer from '../../../templates/jewellery-gstBill/templateRenderer';
+import { getDataFromStorageRespObj } from './helper';
+import SellItemEditMode from '../sellItems/SellItemEditMode';
+import { GsScreen } from '../../gs-screen/GsScreen';
+import axiosMiddleware from '../../../core/axios';
+import {Popover} from 'react-tiny-popover';
+import _ from 'lodash';
+import ReactPaginate from 'react-paginate';
 
-export default class SoldItems extends Component {
+
+class SoldItems extends Component {
     constructor(props) {
         super(props);
         let todaysDate = new Date();
+        this.filtersFromLocal = getStockSoldListPageFilters();
         let past7daysStartDate = new Date();
         past7daysStartDate.setDate(past7daysStartDate.getDate()-730);
         todaysDate.setHours(0,0,0,0);
         let todaysEndDate = new Date();
         todaysEndDate.setHours(23,59,59,999);
         this.state = {
+            currentScreen: 1,
+            gstTemplateSettings: {},
+            previewVisibility: false,
             timeOut: 400,
             pageLimit: 10,
             selectedPageIndex: 0,
@@ -44,21 +61,6 @@ export default class SoldItems extends Component {
                     }
                 },
                 {
-                    id: 'CustomerName',
-                    displayText: 'Customer',
-                    isFilterable: true,
-                    filterCallback: this.filterCallbacks.customer,
-                    className: 'customer-name',
-                    formatter: (column, columnIndex, row, rowIndex) => {
-                        return (
-                            <span className='customer-name-cell'>
-                                {row[column.id]}
-                            </span>
-                        )
-                    },
-                    width: '7%'
-                },
-                {
                     id: 'ProdId',
                     displayText: 'Tag',
                     isFilterable: true,
@@ -67,6 +69,51 @@ export default class SoldItems extends Component {
                     formatter: (column, columnIndex, row, rowIndex) => {
                         return (
                             <span className='tag-id-cell'>
+                                {row[column.id]}
+                            </span>
+                        )
+                    },
+                    width: '7%'
+                },
+                {
+                    id: 'ProdHuid',
+                    displayText: 'HUID',
+                    isFilterable: true,
+                    filterCallback: this.filterCallbacks.huid,
+                    className: 'huid-id',
+                    formatter: (column, columnIndex, row, rowIndex) => {
+                        return (
+                            <span className='huid-cell'>
+                                {row[column.id]}
+                            </span>
+                        )
+                    },
+                    width: '7%'
+                },
+                {
+                    id: 'InvoiceNo',
+                    displayText: 'Invoice No',
+                    isFilterable: true,
+                    filterCallback: this.filterCallbacks.invoiceNo,
+                    className: 'invoice-no',
+                    formatter: (column, columnIndex, row, rowIndex) => {
+                        return (
+                            <span className='invoice-no-cell' onClick={(e)=>this.onClickItem(e, row)}>
+                                {row[column.id]}
+                            </span>
+                        )
+                    },
+                    width: '7%'
+                },
+                {
+                    id: 'CustomerName',
+                    displayText: 'Customer',
+                    isFilterable: true,
+                    filterCallback: this.filterCallbacks.customer,
+                    className: 'customer-name',
+                    formatter: (column, columnIndex, row, rowIndex) => {
+                        return (
+                            <span className='customer-name-cell'>
                                 {row[column.id]}
                             </span>
                         )
@@ -173,24 +220,45 @@ export default class SoldItems extends Component {
                         )
                     },
                     width: '7%'
+                },
+                {
+                    id: '',
+                    displayText: '',
+                    className: 'actions-col',
+                    formatter: (column, columnIndex, row, rowIndex) => {
+                        return (
+                            <span className='actions-cell'>
+                                <Tooltip title="Invoice"
+                                        position="top"
+                                        trigger="mouseenter">
+                                    <span className="invoice-btn gs-icon"><FontAwesomeIcon icon={['fas', 'file-pdf']} onClick={(e) => this.onInvoiceClick(e, row)} className=""/></span>
+                                </Tooltip>
+                            </span>
+                        )
+                    },
+                    width: '3%'
                 }
             ],
             filters: {
                 date: {
-                    startDate: past7daysStartDate,
-                    endDate: todaysEndDate
+                    startDate: getDataFromStorageRespObj('START_DATE', this.filtersFromLocal) || past7daysStartDate,
+                    endDate:  getDataFromStorageRespObj('END_DATE', this.filtersFromLocal) || todaysEndDate
                 },
                 prodId: '',
+                invoiceNo: '',
                 itemName: '',
                 itemCategory: '',
-                itemSubCategory: ''
-            }
+                itemSubCategory: '',
+                showReturnedItems: false
+            },
+            filterPopupVisibility: false
         }
         this.bindMethods();
     }
     componentDidMount() {
         this.fetchTotals();
         this.fetchRowsPerPage();
+        this.setTemplateId();
     }
     bindMethods() {
         this.handleCheckboxChangeListener = this.handleCheckboxChangeListener.bind(this);
@@ -201,6 +269,17 @@ export default class SoldItems extends Component {
         this.filterCallbacks.itemName = this.filterCallbacks.itemName.bind(this);
         this.filterCallbacks.itemCategory = this.filterCallbacks.itemCategory.bind(this);
         this.filterCallbacks.itemSubCategory = this.filterCallbacks.itemSubCategory.bind(this);
+        this.handlePreviewClose = this.handlePreviewClose.bind(this);
+        this.goToStockListScreen = this.goToStockListScreen.bind(this);
+        this.onClickPrint = this.onClickPrint.bind(this);
+        this.printMultipleInvoicesHandler = this.printMultipleInvoicesHandler.bind(this);
+        this.onChangeItemsViewOption = this.onChangeItemsViewOption.bind(this);
+        this.onFilterBtnClick = this.onFilterBtnClick.bind(this);
+        this.refresh = this.refresh.bind(this);
+        this.handlePageClick = this.handlePageClick.bind(this);
+    }
+    setCurrentScreen(screenNo) {
+        this.setState({currentScreen: screenNo});
     }
     async fetchTotals() {
         try {
@@ -222,8 +301,15 @@ export default class SoldItems extends Component {
             let args = this.getFilterParams();
             let params = {...args, offsetStart: offsets[0], offsetEnd: offsets[1]};
             let res = await axios.get(`${FETCH_STOCK_SOLD_OUT_LIST}?access_token=${getAccessToken()}&filters=${JSON.stringify(params)}`);
-            if(res && res.data && res.data.LIST)
-                this.setState({soldOutItemsList: res.data.LIST});
+            if(res && res.data && res.data.LIST) {
+                let parsedList = res.data.LIST.map((obj, index) => {
+                    return {
+                        ...obj,
+                        rowNumber: index
+                    }
+                });
+                this.setState({soldOutItemsList: parsedList});
+            }
             else
                 toast.warn('No list found');
         } catch(e) {
@@ -239,6 +325,14 @@ export default class SoldItems extends Component {
                 this.fetchTotals();
         }, this.timeOut);
     }
+    setTemplateId() {
+        let allSettings = getJewelleryBillTemplateSettings();
+        let gstSettingsObj = null;
+        if(allSettings.gst) gstSettingsObj = allSettings.gst;
+        if(!gstSettingsObj)
+            toast.error('GST Template Settings not found');
+        this.setState({gstTemplateSettings: gstSettingsObj});
+    }
     getFilterParams() {
         let endDate = new Date(this.state.filters.date.endDate);
         endDate.setHours(23,59,59,999);
@@ -246,7 +340,15 @@ export default class SoldItems extends Component {
             date: {
                 startDate: dateFormatter(this.state.filters.date.startDate),
                 endDate: dateFormatter(endDate)
-            }
+            },
+            invoiceNo: this.state.filters.invoiceNo,
+            customer: this.state.filters.customer,
+            prodId: this.state.filters.prodId,
+            prodHuid: this.state.filters.prodHuid,
+            itemName: this.state.filters.itemName,
+            itemCategory: this.state.filters.itemCategory,
+            itemSubCategory: this.state.filters.itemSubCategory,
+            showReturnedItems: this.state.filters.showReturnedItems
         }
         return filters;
     }
@@ -264,6 +366,14 @@ export default class SoldItems extends Component {
             newState.filters.date.endDate = new Date(endDate);
             await this.setState(newState);
             this.refresh();
+            setStockSoldListPageFilters(newState.filters);
+        },
+        invoiceNo: async (e, col, colIndex) => {
+            let val = e.target.value;
+            let newState = {...this.state};
+            newState.filters.invoiceNo = val;
+            await this.setState(newState);
+            this.refresh({fetchOnlyRows: true});
         },
         customer: async (e, col, colIndex) => {
             let val = e.target.value;
@@ -276,6 +386,13 @@ export default class SoldItems extends Component {
             let val = e.target.value;
             let newState = {...this.state};
             newState.filters.prodId = val;
+            await this.setState(newState);
+            this.refresh({fetchOnlyRows: true});
+        },
+        huid: async (e, col, colIndex) => {
+            let val = e.target.value;
+            let newState = {...this.state};
+            newState.filters.prodHuid = val;
             await this.setState(newState);
             this.refresh({fetchOnlyRows: true});
         },
@@ -301,21 +418,67 @@ export default class SoldItems extends Component {
             this.refresh({fetchOnlyRows: true});
         },
     }
+    async onInvoiceClick(e, row) {
+        e.stopPropagation();
+        console.log(row);
+        this.fetchInvoices([row.InvoiceRef]);
+    }
+
+    injectStoreMetaData(invoiceRespArr) {
+        for(let i in invoiceRespArr) {
+            invoiceRespArr[i].gstNumber = this.props.storeDetail.gstNo;
+            invoiceRespArr[i].storeName = this.props.storeDetail.storeName;
+            invoiceRespArr[i].address = this.props.storeDetail.address;
+            invoiceRespArr[i].place = this.props.storeDetail.place;
+            invoiceRespArr[i].city = this.props.storeDetail.city;
+            invoiceRespArr[i].pinCode = this.props.storeDetail.pincode;
+            invoiceRespArr[i].storeMobile1 = this.props.storeDetail.mobile;
+            invoiceRespArr[i].hsCode = 7113;
+            invoiceRespArr[i].dateVal = convertDateObjToStr(new Date(invoiceRespArr[i].dateVal), {excludeTime: true});
+        }
+        return invoiceRespArr;
+    }
+
+    async fetchInvoices(invoicesRefArr) {
+        try {
+            let at = getAccessToken();
+            let resp = await axios.get(`${FETCH_INVOICE_DATA}?access_token=${at}&invoice_keys=${JSON.stringify(invoicesRefArr)}`);
+            if(resp && resp.data && resp.data.STATUS == 'SUCCESS') {
+                this.injectStoreMetaData(resp.data.RESP);
+                this.setState({printContents: resp.data.RESP, previewVisibility: true});
+            }
+        } catch(e) {
+            console.log(e);
+        }
+    }
+
+    handlePreviewClose() {
+        this.setState({printContents: null, previewVisibility: false});
+    }
+    onClickPrint() {
+        this.printBtn.handlePrint();
+    }
+    async onClickItem(e, row) {
+        this.setState({currentScreen:2, invoiceDataForUpdate: row}); // isEditDialogOpen: true
+    }
+    goToStockListScreen() {
+        this.setState({currentScreen: 1, invoiceDataForUpdate: null}); // isEditDialogOpen: false
+    }
     handleCheckboxChangeListener(params) {
         let newState = {...this.state};
         if(params.isChecked) {
-            newState.selectedInfo.indexes.push(params.rowIndex);        
+            newState.selectedInfo.indexes.push(params.rowIndex);
             newState.selectedInfo.rowObj.push(params.row);
         } else {
             let rowIndex = newState.selectedInfo.indexes.indexOf(params.rowIndex);
             newState.selectedInfo.indexes.splice(rowIndex, 1);            
-            newState.selectedInfo.rowObj= newState.selectedInfo.rowObj.filter(
+            newState.selectedInfo.rowObj = newState.selectedInfo.rowObj.filter(
                 (anItem) => {
-                    if(newState.selectedInfo.indexes.indexOf(anItem.rowNumber) == -1)
+                    if(newState.selectedInfo.indexes.indexOf(anItem.rowNumber) != -1)
                         return true;                                                  
                 }
             );
-        }        
+        };
         this.setState(newState);
     }
 
@@ -333,6 +496,26 @@ export default class SoldItems extends Component {
         this.setState(newState);
     }
 
+    rowClassNameGetter(row) {
+        let className = '';
+        if(row && row.is_returned)
+            className += 'returned';
+        return className;
+    }
+
+    printMultipleInvoicesHandler() {
+        let newState = {...this.state};
+        if(newState.selectedInfo.rowObj.length < 0) {
+            toast.warn('Please select checkbox row/which invoices to print');
+            return;
+        }
+        let invoiceRefArr = [];
+        _.each(newState.selectedInfo.rowObj, (aRow, index) => {
+            invoiceRefArr.push(aRow.InvoiceRef);
+        });
+        this.fetchInvoices(invoiceRefArr);
+    }
+
     expandRow = {
         renderer: (row) => {
             return (
@@ -347,37 +530,208 @@ export default class SoldItems extends Component {
         expandByColumnOnly: true
     }
 
+    onChangeItemsViewOption(e) {
+        let newState = {...this.state};
+        newState.filters.showReturnedItems = e.target.checked;
+        this.setState(newState);
+    }
+
+    onFilterBtnClick() {
+        this.setState({filterPopupVisibility: !this.state.filterPopupVisibility});
+    }
+
+    getPageCount() {
+        return this.state.totals.stockSoldItemsCount/this.state.pageLimit;
+    }
+
+    async handlePageClick(selectedPage) {
+        await this.setState({selectedPageIndex: selectedPage.selected, rowObj: [], indexes: []});        
+        this.refresh({fetchOnlyRows: true});
+    }
+
+
     render() {
         return (
             <Container className="sold-out-list-container">
-                <Row>
-                    <Col>
-                        <DateRangePicker 
-                            className = 'stock-sold-out-itens-date-filter'
-                            selectDateRange={this.filterCallbacks.date}
-                            startDate={this.state.filters.date.startDate}
-                            endDate={this.state.filters.date.endDate}
-                            showIcon= {false}
-                        />
+                <GsScreen showScreen={this.state.currentScreen==1?true:false} isMainScreen={true}>
+                    <Col xs={12} md={12}>
+                        <Row>
+                            <Col xs={4} md={4}>
+                                <DateRangePicker 
+                                    className = 'stock-sold-out-itens-date-filter'
+                                    selectDateRange={this.filterCallbacks.date}
+                                    startDate={this.state.filters.date.startDate}
+                                    endDate={this.state.filters.date.endDate}
+                                    showIcon= {false}
+                                />
+                                <Popover
+                                    containerClassName='view-sold-stock-filter-popover'
+                                    // padding={0}
+                                    isOpen={this.state.filterPopupVisibility}
+                                    position={'bottom'} // preferred position
+                                    onClickOutside={() => this.setState({ filterPopupVisibility: false })}
+                                    content={({ position, targetRect, popoverRect }) => {
+                                        return (
+                                            <Container className='gs-card arrow-box left filter-popover-container'>
+                                                <Row className='filter-popover-content' >
+                                                    <Col>
+                                                        <Row>
+                                                            <Col xs={12} className="show-returned-stock-items">
+                                                                <span className="field-name">Display Returned Items</span>
+                                                                <Form>
+                                                                    <Form.Group>
+                                                                        <Form.Check id='show-returned-items' type='checkbox' checked={this.state.filters.showReturnedItems} value='' label="Show Returned Items" onChange={(e)=>this.onChangeItemsViewOption(e)}/>
+                                                                    </Form.Group>
+                                                                </Form>
+                                                            </Col>
+                                                        </Row>
+                                                        <Row>
+                                                            <Col style={{textAlign: 'center'}}>
+                                                                <input type="button" className="gs-button" value="APPLY" onClick={this.refresh}/>
+                                                            </Col>
+                                                        </Row>
+                                                    </Col>
+                                                </Row>
+                                            </Container>
+                                        )
+                                    }
+                                }
+                                >
+                                    <div style={{display: 'inline-block'}}>
+                                        <span className='stock-sold-page-filter-popover-trigger-btn' style={{display: 'inline-block'}} onClick={this.onFilterBtnClick}>
+                                            <FontAwesomeIcon icon='filter' className=""/>
+                                        </span>
+                                    </div>
+                                </Popover>
+                                <DropdownButton className="gs-dropdown action-dropdown-for-sold-out-jewellery-list" title="Actions" disabled={!this.state.selectedInfo.indexes.length}>
+                                    <Dropdown.Item onClick={this.printMultipleInvoicesHandler}>Print Invoices</Dropdown.Item>
+                                </DropdownButton>
+                                {/* <Dropdown className="more-actions-dropdown action-btn">
+                                    <Dropdown.Toggle id="dropdown-more-actions" disabled={!this.state.selectedInfo.indexes.length}>
+                                        Actions 
+                                    </Dropdown.Toggle>
+                                    <Dropdown.Menu>
+                                        <Dropdown.Item onClick={this.printMultipleInvoicesHandler}>Print Invoices</Dropdown.Item>
+                                    </Dropdown.Menu>
+                                </Dropdown> */}
+                            </Col>
+                            <Col xs={3}>
+                                <ReactPaginate previousLabel={"<"}
+                                    nextLabel={">"}
+                                    breakLabel={"..."}
+                                    breakClassName={"break-me"}
+                                    pageCount={this.getPageCount()}
+                                    marginPagesDisplayed={2}
+                                    pageRangeDisplayed={5}
+                                    onPageChange={this.handlePageClick}
+                                    containerClassName={"gs-pagination pagination"}
+                                    subContainerClassName={"pages pagination"}
+                                    activeClassName={"active"}
+                                    forcePage={this.state.selectedPageIndex}
+                                />
+                            </Col>
+                            <Col xs={4} style={{textAlign: 'right'}}>
+                                <span className="no-of-items">No. Of StockItems Sold: {this.state.totals.stockSoldItemsCount}</span>
+                            </Col>
+                        </Row>
+                        <Row>
+                            <Col>
+                                <GSTable 
+                                    columns={this.state.columns}
+                                    rowData={this.state.soldOutItemsList}
+                                    expandRow = { this.expandRow }
+                                    // isGlobalExpandIconExpanded = {this.shouldExpndAll()} //in case of filter, we can enable...to show the ornaments in expanded section
+                                    className= {"my-stock-sold-items-view-table"}
+                                    checkbox = {true}
+                                    IsGlobalCheckboxSelected = {false} //optional
+                                    checkboxOnChangeListener = {this.handleCheckboxChangeListener}
+                                    globalCheckBoxListener = {this.handleGlobalCheckboxChange}
+                                    selectedIndexes = {this.state.selectedInfo.indexes}
+                                    rowClassNameGetter={this.rowClassNameGetter}
+                                />
+                            </Col>
+                        </Row>
+                        <Row>
+                            <CommonModal modalOpen={this.state.previewVisibility} handleClose={this.handlePreviewClose} secClass="jewellery-bill-template-preview-modal">
+                                <InvoicePrintBtn
+                                    gstTemplateSettings={this.state.gstTemplateSettings}
+                                    printContents={this.state.printContents}
+                                />
+                                {/* <ReactToPrint
+                                    ref={(domElm) => {this.printBtn = domElm}}
+                                    trigger={() => <a href="#"></a>}
+                                    content={() => this.componentRef}
+                                    className="print-hidden-btn"
+                                /> */}
+                                {/* <input type="button" className="gs-button" value="Print" onClick={this.onClickPrint} />
+                                <div ref={(el) => (this.componentRef = el)}>
+                                    {(() => {
+                                        let invoiceTemplates = [];
+                                        _.each(this.state.printContents, (aPrintData, index) => {
+                                            if(index && index%2 == 0)
+                                                invoiceTemplates.push(<br></br>);
+                                            invoiceTemplates.push(<TemplateRenderer templateId={this.state.gstTemplateSettings.selectedTemplate} content={aPrintData}/>);
+                                        });
+                                        return invoiceTemplates;
+                                    })()}
+                                </div> */}
+                            </CommonModal>
+                        </Row>
                     </Col>
-                </Row>
-                <Row>
-                    <Col>
-                        <GSTable 
-                            columns={this.state.columns}
-                            rowData={this.state.soldOutItemsList}
-                            expandRow = { this.expandRow }
-                            // isGlobalExpandIconExpanded = {this.shouldExpndAll()} //in case of filter, we can enable...to show the ornaments in expanded section
-                            className= {"my-stock-sold-items-view-table"}
-                            checkbox = {true}
-                            IsGlobalCheckboxSelected = {false} //optional
-                            checkboxOnChangeListener = {this.handleCheckboxChangeListener}
-                            globalCheckBoxListener = {this.handleGlobalCheckboxChange}
-                            selectedIndexes = {this.state.selectedInfo.indexes}
-                        />
-                    </Col>
-                </Row>
+                </GsScreen>
+                <GsScreen showScreen={this.state.currentScreen==2?true:false} goBack={this.goToStockListScreen} secClass={'edit-invoice-screen-sec-class'}>
+                    <SellItemEditMode data={this.state.invoiceDataForUpdate}/>
+                </GsScreen>
             </Container>
         )
     }
+}
+
+const mapStateToProps = (state) => { 
+    return {
+        storeDetail: state.storeDetail
+    };
+};
+
+export default connect(mapStateToProps, {})(SoldItems);
+
+
+
+const InvoicePrintBtn = (props) => {
+  const contentRef = useRef(null);
+
+  const reactToPrintFn = useReactToPrint({
+    contentRef
+  });
+
+  const [printContents, setPrintContents] = useState([]);
+  const [gstTemplateSettings, setGstTemplateSettings] = useState(null);
+
+  useEffect(() => {
+    setPrintContents(props.printContents);
+    setGstTemplateSettings(props.gstTemplateSettings);
+  }, [props.printContents, props.gstTemplateSettings]);
+
+  return (
+    <div style={{ display: 'inline-block' }}>
+      <input 
+        type="button"
+        className={props.className ? props.className : "gs-button bordered "}
+        onClick={reactToPrintFn}
+        value='Print'
+      />
+
+      <div ref={contentRef}>
+            {(() => {
+                let invoiceTemplates = [];
+                _.each(printContents, (aPrintData, index) => {
+                    if(index && index%2 == 0)
+                        invoiceTemplates.push(<br></br>);
+                    invoiceTemplates.push(<TemplateRenderer templateId={gstTemplateSettings.selectedTemplate} content={aPrintData}/>);
+                });
+                return invoiceTemplates;
+            })()}
+        </div>
+    </div>
+  );
 }

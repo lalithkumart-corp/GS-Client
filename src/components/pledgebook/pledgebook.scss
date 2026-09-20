@@ -1,6 +1,10 @@
+@use '../../app';
+
 .pledgebook-page-content {
 	width: 100%;
+	min-width: 1000px;
 	max-width: calc(100% - 100px);
+	height: calc(100vh - 120px);
 	.second-row {
 		padding-top: 10px;
 		padding-bottom: 5px;
@@ -11,14 +15,14 @@
 			border: 1px solid;
 			padding: 0 10px;
 			vertical-align: top;
-			height: 31px;
+			height: 25px;
 			text-align: center;
 			float: right;
 			z-index: 1;
 			select {
 				border: none;
 				outline: none;
-				padding-top: 4px;
+				padding-top: 2px;
 				padding-bottom: 4px;
 				cursor: pointer;
 				&:hover {
@@ -30,21 +34,56 @@
 			}
 		}
 		.action-btn {
+			// padding: .375rem .75rem;
 			cursor: pointer;
+			display: inline-block;
+			line-height: 30px;
 			margin-left: 10px;
-			color: #337ab7;
 			color: #337ab7;
 			&:hover {
 				color: #fba200;
+				outline: none;
 			}
 			&:focus {
 				color: #fba200;
+				outline: none;
 			}
 		}
 		.pagination-container {
 			float: right;
 			z-index: 1;
 		}
+		.more-actions-dropdown {
+			display: inline-block !important;
+			padding: 0 !important;
+			&:focus {
+				outline: none;
+			}
+		}
+		#dropdown-more-actions {
+			color: #337ab7;
+			background-color: white;
+			border: none;
+			&:hover {
+				box-shadow: none;
+				outline: none;
+			}
+			&:focus {
+				box-shadow: none;
+				outline: none;
+			}
+		}
+	}
+	.p-for-demo {
+		color: blue;
+	}
+	.p-for-demo2 {
+		@extend .p-for-demo;
+		background-color: grey;
+	}
+	.p-for-demo3 {
+		@include app.important-text;
+		@include app.bordered(blue, 1px);
 	}
 }
 .bill-no-cell {
@@ -55,20 +94,64 @@
 	&:focus {
 		color: #2196f3;
 	}
+	// &.orn-categ-gold {
+	// 	border-left: 5px solid gold;
+	// }
+	// &.orn-categ-silver {
+	// 	border-left: 5px solid silver;
+	// }
 }
 .my-pledgebook-table {
+	table-layout: fixed;
 	.inner-header {
 		input[type="text"] {
 			width: 100%;
 		}
 	}
-	table-layout: fixed;
 	thead {
 		background-color: #f5f5f5;
 	}
+	.pledgebook-alert-icon {
+		font-size: 18px;
+		margin-right: 10px;
+		cursor: pointer;
+		color: #00000091;
+		.has-alert {
+			color: #337ab7;
+		}
+	}
+	tr.bill-archived {
+		color: darkgrey;
+		// text-decoration: line-through;
+	}
+	tr.bill-trashed {
+		color: darkgrey;
+		text-decoration: line-through;
+	}
+	.pb-billno-col {
+		&.gold-item{
+			border-left: 5px solid gold;
+		}
+		&.silver-item{
+			border-left: 5px solid silver;
+		}
+	}
+	// .orn-category-identifier {
+	// 	width: 10px;
+	// 	height: 10px;
+	// 	display: inline-block;
+	// 	border-radius: 50%;
+	// 	margin-left: 3px;
+	// 	&.dot-gold {
+	// 		background-color: gold;
+	// 	}
+	// 	&.dot-silver {
+	// 		background-color: silver;
+	// 	}
+	// }
 }
 .orn-display-dom {
-	width: 60%;
+	// width: 60%;
 	margin-left: 2%;
 	margin-top: 10px;
 	margin-bottom: 25px;
@@ -166,12 +249,15 @@
 }
 .gtr-input-val {
 	display: inline-block;
+	border-bottom: 1px solid lightgray;
 }
 .gtr-label-less {
 	display: inline-block;
+	padding: 6px;
 }
 .less-input-val {
 	display: inline-block;
+	border-bottom: 1px solid lightgray;
 }
 .custom-filter-popover-main {
 	width: 400px;
@@ -222,4 +308,87 @@
 	.mobile-cell {
 		font-size: 13px;
 	}
+}
+
+.status-popover {
+	padding-right: 20px;
+}
+.alert-panel {
+	width: 400px;
+	height: 235px;
+    padding: 15px;
+    // border: 10px solid orange;
+    background-color: white;
+}
+.alert-panel.read-mode {
+	
+}
+.pledgebook-alert-popever {
+	@include app.popover-base-style;
+	overflow: visible !important;
+	.gs-input {
+		@include app.gs-input-style1;
+	}
+	.title-input,
+	.msg-input {
+		width: 95%;
+	}
+	.msg-input {
+		height: 100px;
+	}
+	.alert-msg {
+		position: absolute;
+		width: 90%;
+		text-align: center;
+		z-index: 5;
+	}
+	.alert-msg.success {
+		color: green;
+		background-color: #b8eab8;
+	}
+	.alert-msg.error {
+		color: #ce3b3b;
+		background-color: #efb7b7;
+	}
+}
+.lock-symbol-style {
+	position: absolute;
+    right: 10px;
+    color: yellowgreen;
+    // filter: drop-shadow(1px 3px 1px lightgray);
+    font-size: 20px;
+	margin-top: -14px;
+	z-index: 5;
+}
+
+.pledgebook-notes-popover .gs-cls-readonly .ql-toolbar {
+	display: none;
+}
+.pledgebook-notes-popover .gs-cls-readonly .ql-container {
+	border: 0;
+}
+.pledgebook-bill-orn-icon,
+.pledgebook-bill-notes-icon.has-notes {
+	cursor: pointer;
+	&:hover {
+		color: #fba200;
+	}
+}
+
+.pb-actions-col {
+	padding: 0 !important;
+	.actions-cell {
+		text-align: center;
+	}
+}
+.pledgebook-bill-notes-icon.notes-empty {
+	// color: lightgrey;
+	color: #00000091;
+}
+.pledgebook-bill-notes-icon.has-notes {
+	color: #337ab7;
+}
+
+.pledgebook-bill-orn-icon {
+	color: #337ab7;
 }

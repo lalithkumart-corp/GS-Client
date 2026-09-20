@@ -12,7 +12,8 @@ class CommonModal extends Component {
         super(props);
         this.onModalClose = this.onModalClose.bind(this);
         this.state = {
-            secClass: this.props.secClass || ''
+            secClass: this.props.secClass || '',
+            wrapperClassName: this.props.wrapperClassName || ''
         }
     }
     componentDidUpdate() {
@@ -28,10 +29,10 @@ class CommonModal extends Component {
         return (
             <div>
                 { this.props.modalOpen?(
-                    <div className='common-modal-wrapper'>
+                    <div className={`common-modal-wrapper ${this.state.wrapperClassName}`}>
                         <div className={this.state.secClass + ' common-modal-content'}>
                             <div className='header'>
-                                <span className='close-icon gs-button rounded' onClick={this.onModalClose}><FontAwesomeIcon icon="times" /></span>
+                                <span className='close-icon gs-button rounded' onClick={this.onModalClose}><FontAwesomeIcon icon="times" className=""/></span>
                             </div>
                             <div className='body'>
                                 {this.props.children}

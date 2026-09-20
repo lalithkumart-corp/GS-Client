@@ -1,3 +1,6 @@
+.bill-creation-container .row+.row {
+    margin-top: 10px;
+}
 .bill-series {
     width: 10px;
 }
@@ -16,38 +19,72 @@
 
 /*START: Custom styles for the Date Picker(to make it bigger font size looking */
 .date-picker-container {
-    margin-top: 27px;
+    /* margin-top: 25px; */
     z-index: 3;
+    /* height: 34px; */
 }
-.react-datepicker {
+.bill-creation-container .date-picker-container {
+    /* padding: 6px 12px; */
+}
+.bill-creation-container .date-picker-container .form-group {
+    
+}
+.bill-creation-container .react-datepicker-wrapper {
+    width: 100%;
+    border-radius: 4px;
+    border: 1px solid #ccc;
+    box-shadow: inset 0 1px 1px rgb(0 0 0 / 8%);
+}
+.bill-creation-container .gs-input-cell {
+    padding-left: 8px;
+}
+.billcreation-datepicker.react-datepicker-popper {
+    /* width: 290px; */
+}
+.billcreation-datepicker-forBigFontSize .react-datepicker {
     font-size: 1em;
 }
-.react-datepicker__header {
+.billcreation-datepicker-forBigFontSize .react-datepicker__header {
     padding-top: 0.8em;
 }
-.react-datepicker__month {
+.billcreation-datepicker-forBigFontSize .react-datepicker__month {
     margin: 0.4em 1em;
 }
-.react-datepicker__day-name, .react-datepicker__day {
+.billcreation-datepicker-forBigFontSize .react-datepicker__day-name, .react-datepicker__day {
     width: 1.9em;
     line-height: 1.9em;
     margin: 0.166em;
 }
-.react-datepicker__current-month {
+.billcreation-datepicker-forBigFontSize .react-datepicker__current-month {
     font-size: 1em;
 }
-.react-datepicker__navigation {
+.billcreation-datepicker-forBigFontSize .react-datepicker__navigation {
     top: 1em;
     line-height: 1.7em;
     border: 0.45em solid transparent;
 }
-.react-datepicker__navigation--previous {
+.billcreation-datepicker-forBigFontSize .react-datepicker__navigation--previous {
     border-right-color: #ccc;
     left: 1em;
 }
-.react-datepicker__navigation--next {
+.billcreation-datepicker-forBigFontSize .react-datepicker__navigation--next {
     border-left-color: #ccc;
     right: 1em;
+}
+.billcreation-datepicker-forBigFontSize .react-datepicker__time-container .react-datepicker__time .react-datepicker__time-box ul.react-datepicker__time-list {
+    padding-left: 0;
+    padding-right: 0;
+}
+/* .billcreation-datepicker {
+    width: 340px;
+}
+.billcreation-datepicker .react-datepicker__time-container,
+.billcreation-datepicker .react-datepicker__time-box {
+    width: 90px !important;
+} */
+
+.date-picker-container.bill-creation .gs-input-cell:read-only {
+    color: lightgray;
 }
 /*END: Custom styles for the Date Picker(to make it bigger font size looking */
 
@@ -111,12 +148,32 @@
 .react-autosuggest__input.pincode:focus,
 .react-autosuggest__input.mobile:focus,
 .react-autosuggest__input.morecustdetail:focus,
-.ornament-dom-container .form-control:focus {
+.ornament-dom-container .form-control:focus,
+.pledge-for-customer-picker .react-autosuggest__input:focus,
+.secondary-jewel-redeem-customer-picker .react-autosuggest__input:focus {
     border-color: rgb(204, 204, 204);
     border-bottom: 2px solid #0acfee;
     box-shadow: none;
     outline: none;
 }
+
+.bill-creation-container .form-control[readonly]:focus,
+.react-autosuggest__input.cust-name[readonly]:focus,
+.react-autosuggest__input.guardian-name[readonly]:focus,
+.react-autosuggest__input.address[readonly]:focus,
+.react-autosuggest__input.place[readonly]:focus,
+.react-autosuggest__input.city[readonly]:focus,
+.react-autosuggest__input.pincode[readonly]:focus,
+.react-autosuggest__input.mobile[readonly]:focus,
+.react-autosuggest__input.morecustdetail[readonly]:focus,
+.ornament-dom-container .form-control[readonly]:focus,
+.pledge-for-customer-picker .react-autosuggest__input[readonly]:focus,
+.secondary-jewel-redeem-customer-picker .react-autosuggest__input[readonly]:focus {
+    border: none;
+    box-shadow: none;
+    outline: none;
+}
+
 
 .ornament-dom-container .input-group {
     width: calc(100% - 10px);
@@ -161,8 +218,8 @@
     padding-left: 0;
     padding-right: 0;
 }
-.bill-remarks-adder-dom {
-    margin-top: 15px;
+.bill-remarks-adder-dom .gs-cls-readonly .ql-toolbar {
+    display: none;
 }
 
 .submit-container {
@@ -176,7 +233,7 @@
 
 .sub-actions-div {
     padding-left: 0 !important;
-    text-align: right;
+    text-align: center;
 }
 .sub-actions-div .icon {
     color: #2196f3;
@@ -204,16 +261,18 @@
     max-height: 200px;
     max-width: 200px;
     max-width: 100%;
-    border-radius: 50%;
+    border-radius: 10%;
 }
 /* END: Picture */
 
-.bill-creation-container input[readonly]{
+.bill-creation-container input[readonly],
+.bill-creation-container select[readonly] {
     background-color: transparent;
     opacity: 1;
     border: none;
     box-shadow: none;
     outline: none;
+    cursor: default;
 }
 
 .bill-creation-container .autosuggest .show-all:after{
@@ -237,6 +296,7 @@
 .bill-creation-container .fourth-row,
 .bill-creation-container .fifth-row {
     margin-bottom: 10px;
+    margin-top: 10px;
 }
 .orn.gs-input-cell{
     border: none;
@@ -284,4 +344,108 @@
 #rupee-addon.readOnly{
     background-color: transparent;
     border-color: white;
+}
+
+.bill-creation-customer-edit-modal-wrapper {
+    z-index: 3 !important;
+}
+.bill-creation-customer-edit-modal-wrapper .common-modal-content {
+    width: 50%;
+}
+.bill-creation-customer-edit-modal-wrapper .common-modal-content .body {
+    padding-bottom: 40px;
+}
+.customer-shortuct-edit {
+    padding :2px 5px 5px 5px;
+}
+.bill-creation-container .a-payment-item {
+    display: inline-block;
+    padding: 2px 8px;
+    border: 1px solid lightgray;
+    border-radius: 6px;
+    margin-right: 5px;
+    cursor: pointer;
+    font-size: 13px;
+}
+.bill-creation-container .a-payment-item.choosen,
+.bill-creation-container .a-payment-item:focus {
+    background-color: #d3d3d382;
+}
+.bill-creation-container .interest-display-span,
+.bill-creation-container .landedcost-display-span,
+.bill-creation-container .payment-mode-selection-span {
+    font-size: 14px;
+    color: darkgray;
+    font-weight: 500;
+}
+.payment-option-input-div {
+    margin-top: 16px;
+}
+.interest-component,
+.misc-inputs-component {
+    border: 1px solid lightgray;
+}
+.interest-component-header,
+.misc-inputs-component-header {
+    padding-bottom: 5px;
+    border-bottom: 1px solid lightgray;
+    padding-left: 10px;
+    padding-top: 5px;
+    cursor: pointer;
+}
+.interest-component-body,
+.misc-inputs-component-body {
+    padding-left: 15px;
+}
+.interest-component-body-content,
+.misc-inputs-component-body-content {
+    margin-top: 10px;
+    margin-bottom: 10px;
+    padding-left: 10px;
+}
+
+
+.payment-component {
+    border: 1px solid lightgray;
+}
+.payment-component-header {
+    border-bottom: 1px solid lightgray;
+    padding-left: 5px;
+    padding-top: 5px;
+    padding-bottom: 5px;
+    cursor: pointer;
+}
+.payment-component-body-content {
+    margin-top: 10px;
+    padding-left: 10px;
+    padding-right: 10px;
+}
+.payment-component-body .form-control {
+    padding: 0;
+    height: auto;
+}
+
+.date-picker-container.bill-creation .live {
+    color: red;
+}
+
+.date-picker-container.bill-creation .offline {
+    color: lightgray;
+}
+
+.center-align-content {
+    align-items: center;
+    justify-content: center;
+    display: flex;
+}
+
+.bill-creation.blacklisted-customer-icon {
+    position: absolute;
+    right: 30%;
+    color: red;
+}
+
+.bill-creation-container.readonly-mode .react-datepicker-wrapper {
+    border: none;
+    box-shadow: none;
 }

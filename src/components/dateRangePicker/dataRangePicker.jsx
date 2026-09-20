@@ -4,7 +4,7 @@ import DateRangePicker from 'react-bootstrap-daterangepicker';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 let label;
 
-class DatePicker extends Component {
+class GsDateRangePicker extends Component {
     constructor(props) {
         super(props);
         let dates = this.getDateProps();
@@ -70,16 +70,16 @@ class DatePicker extends Component {
         return (
             <DateRangePicker className="dateRangebox" startDate={this.state.startDate} endDate={this.state.endDate} ranges={this.state.ranges} onApply={this.handleEvent}>
                 <button className={`selected-date-range-btn gs-button ${this.props.className}`}>
-                    {this.state.canShowCalendarIcon && <div className="calendar-icon-div pull-left"><FontAwesomeIcon icon="calendar" className='calendar-icon'/></div> }
+                    {this.state.canShowCalendarIcon && <div className="calendar-icon-div pull-left" style={{paddingRight: '4px'}}><FontAwesomeIcon icon="calendar" className='calendar-icon'/></div> }
                     <div className="pull-right">
                         <span>
                             {this.invalidate()}
                         </span>
-                        <span className="arrow-down-icon"><FontAwesomeIcon icon="angle-down" /></span>
+                        <span className="arrow-down-icon" style={{paddingLeft: '4px'}}><FontAwesomeIcon icon="angle-down" className=""/></span>
                     </div>
                 </button>
             </DateRangePicker>
         );
     }
 }
-export default DatePicker;
+export default GsDateRangePicker;

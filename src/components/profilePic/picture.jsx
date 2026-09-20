@@ -2,9 +2,10 @@ import React, { Component } from 'react';
 import Webcam from 'react-webcam';
 import { defaultPictureState } from '../billcreate/helper';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { Row, Col, FormGroup, FormLabel, FormControl, HelpBlock, InputGroup, Button, Glyphicon } from 'react-bootstrap';
+import { Row, Col, FormGroup, FormLabel, FormControl } from 'react-bootstrap';
 import { convertBufferToBase64 } from '../../utilities/utility';
 import ImageZoom from 'react-medium-image-zoom';
+import 'react-medium-image-zoom/dist/styles.css';
 
 class Picture extends Component {
     constructor(props) {
@@ -36,6 +37,7 @@ class Picture extends Component {
         this.picture.helpers.canShowClearBtn = this.picture.helpers.canShowClearBtn.bind(this);
         this.picture.helpers.canShowCancelBtn = this.picture.helpers.canShowCancelBtn.bind(this);
         this.picture.helpers.canshowSaveBtn = this.picture.helpers.canshowSaveBtn.bind(this);
+        this.onCaptionUpdate = this.onCaptionUpdate.bind(this);
     }
 
     getUploadMethod() {
@@ -246,21 +248,40 @@ class Picture extends Component {
         const imageSrc = this.webcam.getScreenshot();
         this.setState({imageSrc: imageSrc});
     }
+    onCaptionUpdate(e) {
+        let val = e.target.value;
+        let newState = {...this.state};
+        newState.picture.caption.inputVal = val;
+        this.setState(newState);
+        this.props.updatePictureData(newState.picture, 'caption');
+    }
     render() {        
         return (
             <div>
                <Row>
                     <Col xs={12} md={12}>
                         {
+                            this.state.picture.caption?.show && 
+                            <FormGroup
+                                className='caption-input-box'>
+                                <FormControl
+                                    type="text"
+                                    placeholder="Enter Image caption"
+                                    onChange={(e) => this.onCaptionUpdate(e)} 
+                                    value={this.state.picture.caption.inputVal}
+                                    style={{margin: '0 auto 5px auto', width: '90%'}}
+                                />
+                            </FormGroup>
+                        }
+                        {
                             this.state.picture.holder.show &&
-                            <ImageZoom
-                                image={{
-                                src: this.picture.helpers.getImageForHolder(),
-                                alt: 'Golden Gate Bridge',
-                                className: 'image-viewer',
-                                // style: { width: '50em' }
-                                }}
-                            />
+                            <ImageZoom>
+                                <img 
+                                    alt='Image not Found'
+                                    src= {this.picture.helpers.getImageForHolder()}
+                                    className={'image-viewer'}
+                                />
+                            </ImageZoom>
                             // <img src={this.picture.helpers.getImageForHolder()} className='image-viewer'/>
                         }
                         {
@@ -277,42 +298,42 @@ class Picture extends Component {
                                     className={'gs-button rounded icon ' + (this.picture.helpers.canShowCameraBtn()? '': 'hidden-btn')}
                                     onClick={(e) => this.picture.eventListeners.handleClick('turnOn')}
                                     title='Turn On Camera'>
-                                    <FontAwesomeIcon icon="camera" />
+                                    <FontAwesomeIcon icon="camera" className=""/>
                                 </span>
                                 <span
                                     className={'gs-button rounded icon ' + (this.picture.helpers.canShowCaptureBtn()? '': 'hidden-btn')}
                                     onClick={(e) => this.picture.eventListeners.handleClick('capture')}
                                     title='Capture image'>
-                                    <FontAwesomeIcon icon="check" />
+                                    <FontAwesomeIcon icon="check" className=""/>
                                 </span>
                                 <span
                                     className={'gs-button rounded icon ' + (this.picture.helpers.canshowSaveBtn()? '': 'hidden-btn')}
                                     onClick={(e) => this.picture.eventListeners.handleClick('save')}
                                     title='Save picture'>
-                                    <FontAwesomeIcon icon="save" />
+                                    <FontAwesomeIcon icon="save" className=""/>
                                 </span>
                                 <span
                                     className={'gs-button rounded icon ' + (this.picture.helpers.canShowCancelBtn()? '': 'hidden-btn')}
                                     onClick={(e) => this.picture.eventListeners.handleClick('exit')}
                                     title='Exit'>
-                                    <FontAwesomeIcon icon="times" />
+                                    <FontAwesomeIcon icon="times" className=""/>
                                 </span>
                                 <span
                                     className={'gs-button rounded icon ' + (this.picture.helpers.canShowClearBtn()? '': 'hidden-btn')}
                                     onClick={(e) => this.picture.eventListeners.handleClick('clear')}
                                     title='Clear picture'>
-                                    <FontAwesomeIcon icon="broom" />
+                                    <FontAwesomeIcon icon="trash" className=""/>
                                 </span>
                                 <span
                                     className={'gs-button rounded icon ' + (this.picture.helpers.canShowSpinner()? '': 'hidden-btn')}                                    
                                     title='Loading...'>
-                                    <FontAwesomeIcon icon="spinner" />
+                                    <FontAwesomeIcon icon="spinner" className=""/>
                                 </span>
                                 <div className="image-upload-btn-wrapper">                                        
                                     <span
                                         className={'image-upload-btn gs-button rounded icon ' + (this.picture.helpers.canShowUploadBtn()? '': 'hidden-btn')}
                                         title='Upload picture'>
-                                        <FontAwesomeIcon icon="upload" />
+                                        <FontAwesomeIcon icon="upload" className=""/>
                                     </span>
                                     <input type="file" name="myfile" onChange={(e) => this.picture.eventListeners.handleClick('upload', e)}
                                         encType="multipart/form-data" 

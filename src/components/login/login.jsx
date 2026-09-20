@@ -1,14 +1,15 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 
-import { Container, Row, Col, Form, FormGroup, FormLabel, FormControl, HelpBlock, ButtonToolbar, Button } from 'react-bootstrap';
+import { Container, Row, Col, Form, FormGroup, FormLabel, FormControl, ButtonToolbar, Button } from 'react-bootstrap';
 import { validateEmpty } from '../../utilities/validation';
 import _ from 'lodash';
 import { ClipLoader } from 'react-spinners';
+import { FaGoogle } from 'react-icons/fa';
 
 import { toast } from 'react-toastify';
 
-import { doAuthentication, enableLoader, isAccountActive } from '../../actions/login';
+import { doAuthentication, enableLoader, isAccountActive, doGoogleAuth } from '../../actions/login';
 import './login.css';
 
 const ENTER_KEY = 13;
@@ -26,7 +27,8 @@ class LoginPage extends Component {
                     val: '',
                     hasError: false
                 }
-            },            
+            },
+            canShowSignup: false,
         };
         this.bindMethods();
     }
@@ -36,6 +38,7 @@ class LoginPage extends Component {
         this.handleChange = this.handleChange.bind(this);
         this.validationEngine = this.validationEngine.bind(this);
         this.onLoginClick = this.onLoginClick.bind(this);
+        this.initGoogleAuth = this.initGoogleAuth.bind(this);
     }
 
     /* START: action listener's */
@@ -102,13 +105,17 @@ class LoginPage extends Component {
     }
     /* END: Helpers/utils */
 
+    initGoogleAuth() {
+        this.props.doGoogleAuth();
+    }
+
     render() {
         return (
             <Container className='login-container'>
                 <Row>
-                    <Col className='login-card' md={{span: 4, offset: 4}}>
+                    <Col className='login-card' md={{span: 4, offset: 4}} lg={{span: 4, offset: 4}} xs={{span: 4, offset: 4}}>
                         <Row>
-                            <Col md={{span: 10, offset: 1}}>
+                            <Col xs={{span: 10, offset: 1}} md={{span: 10, offset: 1}} lg={{span: 10, offset: 1}}>
                                 <FormGroup
                                     controlId="formBasicText"
                                     validationState= {this.state.formData.email.hasError ? "error" : "success"}
@@ -127,7 +134,7 @@ class LoginPage extends Component {
                             </Col>
                         </Row>
                         <Row>
-                            <Col md={{span: 10, offset: 1}}>
+                            <Col md={{span: 10, offset: 1}} lg={{span: 10, offset: 1}} xs={{span: 10, offset: 1}}>
                                 <FormGroup
                                     controlId="formBasicText"
                                     validationState= {this.state.formData.password.hasError ? "error" : "success"}
@@ -147,7 +154,7 @@ class LoginPage extends Component {
                             </Col>
                         </Row>
                         <Row>
-                            <Col md={{span: 4, offset: 1}}>
+                            <Col md={{span: 3, offset: 1}} lg={{span: 3, offset: 1}} xs={{span: 3, offset: 1}}>
                                 <ButtonToolbar>
                                     <Button onClick={this.onLoginClick} className={this.props.auth.loading?'loading':''}> 
                                         Login
@@ -161,8 +168,11 @@ class LoginPage extends Component {
                                     </Button>
                                 </ButtonToolbar>
                             </Col>
-                            <Col md={{span: 3, offset: 3}} className='gs-button'>
-                                <a href='/signup'>Sign Up</a>
+                            <Col md={{span: 2}} lg={{span: 2}} xs={{span: 2}}>
+                                <span className="gs-button sso-google-btn" onClick={this.initGoogleAuth}> <FaGoogle/> </span>
+                            </Col>
+                            <Col xs={{span: 3, offset: 3}} md={{span: 3, offset: 3}} lg={{span: 3, offset: 3}} className='gs-button'>
+                                {this.state.canShowSignup && <a href='/signup'>Sign Up</a>}
                             </Col>
                         </Row>
                     </Col>
@@ -178,4 +188,4 @@ const mapStateToProps = (state) => {
     };
 };
 
-export default connect(mapStateToProps, {doAuthentication, enableLoader, isAccountActive})(LoginPage);
+export default connect(mapStateToProps, {doAuthentication, enableLoader, isAccountActive, doGoogleAuth})(LoginPage);

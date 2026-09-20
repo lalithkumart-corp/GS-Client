@@ -1,9 +1,10 @@
 import axios from 'axios';
-import { getAccessToken, saveSession, clearSession, saveUserPreferences } from '../core/storage';
-import { LOGIN, LOGOUT, GET_APP_STATUS } from '../core/sitemap';
+import { getAccessToken, saveSession, clearSession, saveUserPreferences, setSsoUserFlag, storeAccessToken, saveLoanBillTemplateSettings, saveJewelleryBillTemplateSettings, saveJewelleryTagTemplateSettings } from '../core/storage';
+import { LOGIN, LOGOUT, GET_APP_STATUS, CHECK_EMAIL_EXISTANCE, SSO_LOGIN } from '../core/sitemap';
 import { toast } from 'react-toastify';
 import history from '../history';
 import axiosMiddleware from '../core/axios';
+import { getAuth, signInWithPopup, GoogleAuthProvider } from 'firebase/auth';
 
 export const enableLoader = (params) => {
     return (dispatch) => {
@@ -21,12 +22,17 @@ export const doAuthentication = (params) => {
                 let data = successResp.data;
                 // let accessToken = data.id;
                 // storeAccessToken(accessToken);
-                saveSession(data.session);
-                saveUserPreferences(data.userPreferences);
+                saveSession(data.RESP.session);
+                saveUserPreferences(data.RESP.userPreferences);
+                saveLoanBillTemplateSettings(data.RESP.loanBillTemplateSettings);
+                saveJewelleryBillTemplateSettings(data.RESP.jewelleryBillTemplateSettings);
+                if(data.RESP.jewelleryTagTemplateSettings)
+                    saveJewelleryTagTemplateSettings(data.RESP.jewelleryTagTemplateSettings);
+                
                 // history.push('/billcreate'); // TIP: Enable this line, if want to land directly on 'billCreation' page after successfull Login
                 dispatch({
                     type: 'AUTH_SUCCESS',
-                    data: data
+                    data: data.RESP
                 });
             },
             (errorResponse) => {
@@ -68,7 +74,7 @@ export const logout = (accessToken) => {
     let theAccessToken = getAccessToken();
     return (dispatch) => {
         if(theAccessToken) {
-            axios.post(LOGOUT+`?access_token=${theAccessToken}`)
+            axiosMiddleware.post(LOGOUT)
             .then(
                 (successResp) => {
                     clearSession(theAccessToken);
@@ -81,6 +87,10 @@ export const logout = (accessToken) => {
                 (errorResponse) => {
                     clearSession(theAccessToken);
                     //toast.error('Error occured while performing Logout!');
+                    dispatch({
+                        type: 'LOGGED_OUT',
+                        data: {}
+                    });
                     history.push('/');
                     console.log(errorResponse);
                 }
@@ -105,26 +115,34 @@ export const logout = (accessToken) => {
 export const isAccountActive = () => {
     return async (dispatch) => {
         let isActive = false;
+        let daysToExpire = 0;
+        let softwareLicenseValidTill;
         try {
             let accessToken = getAccessToken();
             if(!accessToken)
                 return;
             let resp = await axiosMiddleware.get(`${GET_APP_STATUS}?access_token=${accessToken}`);
-            if(resp && resp.data && resp.data.isActive)
-                isActive = true;
+            if(resp && resp.data) {
+                if(resp.data.isActive)
+                    isActive = true;
+                if(typeof resp.data.daysToExpire !== 'undefined')
+                    daysToExpire = resp.data.daysToExpire;
+                if(typeof resp.data.softwareLicenseValidTill !== 'undefined')
+                    softwareLicenseValidTill = new Date(resp.data.softwareLicenseValidTill).toLocaleString();
+            }
             else if(resp && resp.data && resp.data.STATUS == 'ERROR') {
-                let msg = resp.data.MSG || 'SESSION EXPIRED / Login Again';
+                let msg = resp.data.MSG || 'SESSION EXPIRED / Do Logout+Login Again';
                 toast.error(msg);
             }
             dispatch({
-                type: 'APPLICATION_FLAG',
-                data: isActive
+                type: 'APPLICATION_DATA',
+                data: {isActive, daysToExpire, softwareLicenseValidTill}
             });
         } catch (e) {
             console.log(e);
             dispatch({
-                type: 'APPLICATION_FLAG',
-                data: isActive
+                type: 'APPLICATION_DATA',
+                data: {isActive, daysToExpire, softwareLicenseValidTill}
             });
         }
     }
@@ -137,4 +155,66 @@ export const updateAccountStatus = (flag) => {
             data: flag
         });
     }
+}
+
+export const doGoogleAuth = () => async dispatch => {
+    const auth = getAuth();
+    let theGoogleAuthProvider= new GoogleAuthProvider();
+    theGoogleAuthProvider.addScope('https://www.googleapis.com/auth/drive.readonly')
+    const res = await signInWithPopup(auth, theGoogleAuthProvider);
+    let credential = GoogleAuthProvider.credentialFromResult(res);
+    const idToken = res.user.accessToken;
+    const user = res.user;
+    let vr = await checkForEmailExistance(user.email);
+      if(vr) {
+         if(vr.canSignup) {
+             dispatch({
+                 type: 'REGISTER_NEW_SSO_USER',
+                 data: {user, idToken}
+             });
+             history.push('/signup');
+         } else if(vr.userExists) {
+            let ssoLoginResp = await axiosMiddleware.post(SSO_LOGIN, {accessToken: idToken});
+            // storeAccessToken(ssoLoginResp.data.RESP.session.id);
+            // setSsoUserFlag(true);
+            saveSession(ssoLoginResp.data.RESP.session);
+            saveUserPreferences(ssoLoginResp.data.RESP.userPreferences);
+            dispatch({
+               type: 'AUTH_SUCCESS',
+               data: ssoLoginResp.data.RESP
+           });
+         }
+      }
+}
+
+const checkForEmailExistance = (email) => {
+    return new Promise((resolve, reject) => {
+       try {
+           axiosMiddleware.post(CHECK_EMAIL_EXISTANCE, {email: email})
+           .then((successResp) => {
+               if(successResp.data) {
+                   if(successResp.data.STATUS == 'SUCCESS') {
+                       if(successResp.data.USER_EXISTS == 0)
+                           return resolve({canSignup: true});
+                       else if(successResp.data.USER_EXISTS == 1)
+                           return resolve({canSignup: false, userExists: 1});
+                   } else {
+                       return resolve({canSignup: false, error: true});
+                   }
+               }
+           })
+           .catch((exception) => {
+               console.log(exception);
+           });
+       } catch(e) {
+           console.log(e);
+       }
+   });
+}
+
+export const storeAuthInRedux = (data) => dispatch => {
+    dispatch({
+        type: 'AUTH_SUCCESS',
+        data: data
+    });
 }

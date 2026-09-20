@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { Row, Col, Form, InputGroup, FormControl } from 'react-bootstrap';
 import { GET_INTEREST_RATES, UPDATE_INTEREST_RATES, ADD_NEW_INTEREST_RATE, DELETE_INTEREST_RATE } from '../../../core/sitemap';
-import { getAccessToken } from '../../../core/storage';
+import { getAccessToken, clearInterestRates } from '../../../core/storage';
 import { getInterestRate } from '../../../utilities/utility';
 import axios from 'axios';
 import axiosMiddleware from '../../../core/axios';
@@ -74,6 +74,7 @@ class InterestRates extends Component {
             let resp = await axios.delete(DELETE_INTEREST_RATE, {data: apiParams});
             //let resp = await axiosMiddleware.delete(`${DELETE_INTEREST_RATE}?accessToken=${apiParams.accessToken}&id=${apiParams.id}`);
             this.fetchInterestRates();
+            clearInterestRates();
         } catch(e) {
             toast.error('Exception');
         }
@@ -82,13 +83,14 @@ class InterestRates extends Component {
         try {
             let apiParams = {
                 accessToken: getAccessToken(),
-                metal: this.state.formData.metal.selected,
+                metal: this.state.formData.metal.selected.toLowerCase(),
                 rangeFrom: this.state.formData.rangeFrom.inputVal,
                 rangeTo: this.state.formData.rangeTo.inputVal,
                 interestVal: this.state.formData.interestVal.inputVal,
             }
             let resp = await axiosMiddleware.post(ADD_NEW_INTEREST_RATE, apiParams);
             if(resp && resp.data && resp.data.STATUS == 'SUCCESS') {
+                clearInterestRates();
                 this.fetchInterestRates();
             } else {
                 toast.error('ERROR!');
@@ -105,7 +107,7 @@ class InterestRates extends Component {
                     <Col xs={{span: 2}}>
                         <Form.Group>
                             <Form.Label>Category</Form.Label>
-                            <Form.Control as="select" onChange={(e) => this.onDropdownChange(e, 'metal-create')} value={this.state.formData.metal.selected}>
+                            <Form.Control as="select" onChange={(e) => this.onChange(e, 'metal-create')} value={this.state.formData.metal.selected}>
                                 <option key={1} selected={this.state.formData.metal.selected == 'gold'}>GOLD</option>
                                 <option key={2} selected={this.state.formData.metal.selected == 'silver'}>SILVER</option>
                                 <option key={3} selected={this.state.formData.metal.selected == 'diamond'}>DIAMOND</option>
@@ -176,7 +178,7 @@ class InterestRates extends Component {
                                     <span style={{lineHeight: '50px'}}><b>{anObj.rateOfInterest}</b></span>
                                 </Col>
                                 <Col xs={2} className='actions' style={{textAlign: 'right', color: 'red'}}>
-                                    <span style={{lineHeight: '50px', cursor: 'pointer'}} onClick={(e) => this.deleteInterestCard(anObj.id)}><FontAwesomeIcon icon="times" title="REMOVE"/></span>
+                                    <span style={{lineHeight: '50px', cursor: 'pointer'}} onClick={(e) => this.deleteInterestCard(anObj.id)}><FontAwesomeIcon icon="times" title="REMOVE" className=""/></span>
                                 </Col>
                             </Row>
                         </div>

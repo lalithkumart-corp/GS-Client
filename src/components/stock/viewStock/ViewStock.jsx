@@ -1,37 +1,43 @@
-import React, { Component } from 'react';
-import { Container, Row, Col, Form } from 'react-bootstrap';
+import React, { Component, useState, useRef, useEffect } from 'react';
+import { Container, Row, Col, Form, Dropdown } from 'react-bootstrap';
 import axios from '../../../core/axios';
 import GSTable from '../../gs-table/GSTable';
 import './ViewStock.css';
-import { FETCH_STOCK_LIST, FETCH_STOCK_TOTALS } from '../../../core/sitemap';
+import { FETCH_STOCK_LIST, FETCH_STOCK_TOTALS, ANALYTICS } from '../../../core/sitemap';
 import _ from 'lodash';
 import { toast } from 'react-toastify';
-import { getAccessToken } from '../../../core/storage';
+import { getAccessToken, getStockListPageFilters, setStockListPageFilters } from '../../../core/storage';
 import ReactPaginate from 'react-paginate';
-import { convertToLocalTime, dateFormatter } from '../../../utilities/utility';
+import { convertToLocalTime, dateFormatter, displayNo } from '../../../utilities/utility';
 import DateRangePicker from '../../dateRangePicker/dataRangePicker';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import Popover, {ArrowContainer} from 'react-tiny-popover'
+import {Popover, ArrowContainer} from 'react-tiny-popover';
 import {Tooltip} from 'react-tippy';
 import CommonModal from '../../common-modal/commonModal';
 import StockItemEdit from './StockItemEdit';
+import { getDataFromStorageRespObj } from './helper';
+import TagTemplateRenderer from '../../../templates/jewellery-tag/templateRenderer';
+import { getTagSettings } from '../../jewellery/tag/tagController';
+import {useReactToPrint} from 'react-to-print';
+import StockDataExportPopup from './StockDataExportPopup';
 
 const DEFAULT_SELECTION = {
     rowObj: [],
     indexes: []
 }
 export default class ViewStock extends Component {
+    domElms = {};
     constructor(props) {
         super(props);
+        this.filtersFromLocal = getStockListPageFilters();
         let todaysDate = new Date();
         let past7daysStartDate = new Date();
         past7daysStartDate.setDate(past7daysStartDate.getDate()-730);
         todaysDate.setHours(0,0,0,0);
         let todaysEndDate = new Date();
         todaysEndDate.setHours(23,59,59,999);        
+        this.timeOut = 400;
         this.state = {
-            lang: ['php', 'nodejs'],
-            timeOut: 400,
             pageLimit: 10,
             selectedPageIndex: 0,
             stockList: [],
@@ -51,21 +57,50 @@ export default class ViewStock extends Component {
                     isFilterable: false,
                     width: '10%',
                     formatter: (column, columnIndex, row, rowIndex) => {
+                        let timeForTooltip = convertToLocalTime(row[column.id]);
                         return (
-                            <span>{convertToLocalTime(row[column.id], {excludeTime: true})}</span>
+                            <Tooltip title={timeForTooltip}
+                                    position="top"
+                                    trigger="mouseenter">
+                                <span>{convertToLocalTime(row[column.id], {excludeTime: true})}</span>
+                            </Tooltip>
                         )
                     }
                 },
                 {
                     id: 'itemCode',
-                    displayText: 'Code',
+                    displayText: 'Tag',
                     isFilterable: true,
                     filterCallback: this.filterCallbacks.itemCode,
+                    matchSensitiveCallback: this.filterMatchWordCallbacks.itemCode,
                     className: 'stock-product-code-col',
                     formatter: (column, columnIndex, row, rowIndex) => {
                         return (
                             <span className='product-code-cell' onClick={(e)=>this.onClickItem(e, row)}>
                                 {row[column.id]}{row['itemCodeNumber']}
+                            </span>
+                        )
+                    },
+                    filterFormatter: (column, columnIndex) => {
+                        return (
+                            <div style={{position: 'relative'}} className="gs-table-match-word-filter">
+                                <FontAwesomeIcon icon='equals' onClick={(e) => this.filterMatchWordCallbacks.itemCode(e)} className={this.state.filterMatchWord.prodId ? "word-match-icon is-enabled": 'word-match-icon'}/>
+                                <input type='text' value={undefined} onChange={(e) => this.filterCallbacks.itemCode(e)} style={{paddingLeft: '17px'}}/>
+                            </div>
+                        )
+                    },
+                    width: '5%'
+                },
+                {
+                    id: 'itemHuid',
+                    displayText: 'HUID',
+                    isFilterable: true,
+                    filterCallback: this.filterCallbacks.itemHuid,
+                    className: 'stock-product-huid-col',
+                    formatter: (column, columnIndex, row, rowIndex) => {
+                        return (
+                            <span className='product-huid-cell' onClick={(e)=>this.onClickItem(e, row)}>
+                                {row[column.id]}
                             </span>
                         )
                     },
@@ -146,7 +181,7 @@ export default class ViewStock extends Component {
                     formatter: (column, columnIndex, row, rowIndex) => {
                         return (
                             <span className='product-touch-cell'>
-                                {row[column.id]}
+                                {displayNo(row[column.id],1)}
                             </span>
                         )
                     },
@@ -160,7 +195,7 @@ export default class ViewStock extends Component {
                     formatter: (column, columnIndex, row, rowIndex) => {
                         return (
                             <span className='i-touch-cell'>
-                                {row[column.id]}
+                                {displayNo(row[column.id], 1)}
                             </span>
                         )
                     },
@@ -187,7 +222,7 @@ export default class ViewStock extends Component {
                     formatter: (column, columnIndex, row, rowIndex) => {
                         return (
                             <span className='product-gross-wt-cell'>
-                                {row[column.id]}
+                                {displayNo(row[column.id], 3)}
                             </span>
                         )
                     },
@@ -200,13 +235,13 @@ export default class ViewStock extends Component {
                     formatter: (column, columnIndex, row, rowIndex) => {
                         return (
                             <span className='product-net-wt-cell'>
-                                {row[column.id]}
+                                {displayNo(row[column.id], 3)}
                             </span>
                         )
                     },
                     width: '5%',
                     footerClassName: 'stock-net-wt-footer-cell',
-                    footerFormatter: () => <span>{this.state?this.state.totals.netWt:''}</span>
+                    footerFormatter: () => <span>{this.state?displayNo(this.state.totals.netWt,3):''}</span>
                 },
                 {
                     id: 'pureWt',
@@ -217,7 +252,7 @@ export default class ViewStock extends Component {
                     formatter: (column, columnIndex, row, rowIndex) => {
                         return (
                             <span className='product-pure-wt-cell'>
-                                {row[column.id]}
+                                {displayNo(row[column.id],3)}
                             </span>
                         )
                     },
@@ -257,13 +292,13 @@ export default class ViewStock extends Component {
                     formatter: (column, columnIndex, row, rowIndex) => {
                         return (
                             <span className='product-sold-net-wt-cell'>
-                                {row[column.id]}
+                                {displayNo(row[column.id],3)}
                             </span>
                         )
                     },
                     width: '5%',
                     footerClassName: 'stock-sold-net-wt-footer-cell',
-                    footerFormatter: () => <span>{this.state?this.state.totals.soldNetWt:''}</span>
+                    footerFormatter: () => <span>{this.state?displayNo(this.state.totals.soldNetWt,3):''}</span>
                 },
                 // {
                 //     id: 'soldPWt',
@@ -313,13 +348,13 @@ export default class ViewStock extends Component {
                     formatter: (column, columnIndex, row, rowIndex) => {
                         return (
                             <span className='product-avl-net-wt-cell'>
-                                {row[column.id]}
+                                {displayNo(row[column.id],3)}
                             </span>
                         )
                     },
                     width: '5%',
                     footerClassName: 'stock-avl-net-wt-footer-cell',
-                    footerFormatter: () => <span>{this.state?this.state.totals.avlNetWt:''}</span>
+                    footerFormatter: () => <span>{this.state?displayNo(this.state.totals.avlNetWt,3):''}</span>
                 },
                 // {
                 //     id: 'avlPWt',
@@ -358,7 +393,15 @@ export default class ViewStock extends Component {
                                 <Tooltip title="Print Tag"
                                         position="top"
                                         trigger="mouseenter">
-                                    <span className="tag-print-btn gs-icon"><FontAwesomeIcon icon='print' onClick={(e) => this.printClickListener(row)}/></span>
+                                    <TagPrintBtn 
+                                        className="tag-print-btn gs-icon"
+                                        printCb = { this.printClickListener }
+                                        jewelleryTagId={this.state.jewelleryTagId}
+                                        jewelleryTagContent={this.state.jewelleryTagContent}
+                                        row={row}
+                                        key={rowIndex+'_'+columnIndex}
+                                    />
+                                    
                                 </Tooltip>
                             </span>
                         )
@@ -368,17 +411,25 @@ export default class ViewStock extends Component {
             ],
             filters: {
                 date: {
-                    startDate: past7daysStartDate,
-                    endDate: todaysEndDate
+                    startDate: getDataFromStorageRespObj('START_DATE', this.filtersFromLocal) || past7daysStartDate,
+                    endDate: getDataFromStorageRespObj('END_DATE', this.filtersFromLocal) || todaysEndDate
                 },
                 metalCategory: {gold: true, silver: true},
-                showOnlyAvlStockItems: true,
+                showOnlyAvlStockItems: getDataFromStorageRespObj('LIST_INCLUDES', this.filtersFromLocal),
                 prodId: '',
                 supplier: '',
                 itemName: '',
                 itemCategory: '',
                 itemSubCategory: '',
                 dimension: ''
+            },
+            filterMatchWord: {
+                prodId: false,
+                supplier: false,
+                itemName: false,
+                itemCategory: false,
+                itemSubCategory: false,
+                dimension: false
             },
             filterPopupVisibility: false,
         }
@@ -392,14 +443,30 @@ export default class ViewStock extends Component {
         this.filterCallbacks.touch = this.filterCallbacks.touch.bind(this);
         this.filterCallbacks.supplier = this.filterCallbacks.supplier.bind(this);
         this.filterCallbacks.supplier = this.filterCallbacks.supplier.bind(this);
+        this.filterMatchWordCallbacks.itemCode = this.filterMatchWordCallbacks.itemCode.bind(this);
         this.handlePageClick = this.handlePageClick.bind(this);
         this.onFilterBtnClick = this.onFilterBtnClick.bind(this);
         this.onMetalCategoryFilterChange = this.onMetalCategoryFilterChange.bind(this);
         this.refresh = this.refresh.bind(this);
+        this.handleTagPrint = this.handleTagPrint.bind(this);
+        this.constructTagDataForPrint = this.constructTagDataForPrint.bind(this);
+        this.printClickListener = this.printClickListener.bind(this);
+        this.handleExportPopupClose = this.handleExportPopupClose.bind(this);
+        this.onExportClick = this.onExportClick.bind(this);
+        this.printAllClickListener = this.printAllClickListener.bind(this);
     }
     componentDidMount() {
         this.fetchTotals();
         this.fetchStockListPerPage();
+        this.fetchJewelleryTagSettings();
+        this.createEvent();
+    }
+    createEvent() {
+        try {
+            axios.post(ANALYTICS, {module: 'JEWELLERY_ITEMS_VIEW_STOCK_LIST_PAGE_VISIT'});
+        } catch(e) {
+            console.log(e);
+        }
     }
     filterCallbacks = {
         date: async (startDate, endDate) => {
@@ -408,6 +475,7 @@ export default class ViewStock extends Component {
             newState.filters.date.endDate = new Date(endDate);
             newState.selectedInfo = DEFAULT_SELECTION;
             await this.setState(newState);
+            setStockListPageFilters(newState.filters);
             this.refresh();
         },
         supplier: async (e, col, colIndex) => {
@@ -416,7 +484,7 @@ export default class ViewStock extends Component {
             newState.filters.supplier = val;
             newState.selectedInfo = DEFAULT_SELECTION;
             await this.setState(newState);
-            this.refresh({fetchOnlyRows: true});
+            this.refresh();
         },
         itemCode: async (e) => {
             let val = e.target.value;
@@ -424,7 +492,15 @@ export default class ViewStock extends Component {
             newState.filters.prodId = val;
             newState.selectedInfo = DEFAULT_SELECTION;
             await this.setState(newState);
-            this.refresh({fetchOnlyRows: true});
+            this.refresh();
+        },
+        itemHuid: async (e) => {
+            let val = e.target.value;
+            let newState = {...this.state};
+            newState.filters.huid = val;
+            newState.selectedInfo = DEFAULT_SELECTION;
+            await this.setState(newState);
+            this.refresh();
         },
         itemName: async (e) => {
             let val = e.target.value;
@@ -432,7 +508,7 @@ export default class ViewStock extends Component {
             newState.filters.itemName = val;
             newState.selectedInfo = DEFAULT_SELECTION;
             await this.setState(newState);
-            this.refresh({fetchOnlyRows: true});
+            this.refresh();
         },
         itemCategory: async (e) => {
             let val = e.target.value;
@@ -440,7 +516,7 @@ export default class ViewStock extends Component {
             newState.filters.itemCategory = val;
             newState.selectedInfo = DEFAULT_SELECTION;
             await this.setState(newState);
-            this.refresh({fetchOnlyRows: true});
+            this.refresh();
         },
         itemSubCategory: async (e) => {
             let val = e.target.value;
@@ -448,7 +524,7 @@ export default class ViewStock extends Component {
             newState.filters.itemSubCategory = val;
             newState.selectedInfo = DEFAULT_SELECTION;
             await this.setState(newState);
-            this.refresh({fetchOnlyRows: true});
+            this.refresh();
         },
         dimension: async (e) => {
             let val = e.target.value;
@@ -456,16 +532,77 @@ export default class ViewStock extends Component {
             newState.filters.dimension = val;
             newState.selectedInfo = DEFAULT_SELECTION;
             await this.setState(newState);
-            this.refresh({fetchOnlyRows: true});
+            this.refresh();
         },
         iTouch: () => {},
         touch: async () => {
 
         }
     }
-    printClickListener(row) {
-
+    filterMatchWordCallbacks = {
+        itemCode: async (e) => {
+            let newState = {...this.state};
+            newState.filterMatchWord.prodId = !newState.filterMatchWord.prodId;
+            newState.selectedInfo = DEFAULT_SELECTION;
+            await this.setState(newState);
+            this.refresh();
+        },
     }
+    async fetchJewelleryTagSettings() {
+        let tagSettings = await getTagSettings();
+        this.setState({jewelleryTagId: tagSettings.selected_tag_template_id, storeNameAbbr: tagSettings.store_name_abbr, storeNameFull: tagSettings.store_name_full});
+    }
+
+    async handleTagPrint(arr) {
+        await this.setState({
+            jewelleryTagContent: this.constructTagDataForPrint(arr)
+        });
+        // if(this.domElms.tagPrintBtn) {
+        //     this.domElms.tagPrintBtn.handlePrint();
+
+        // this.setState({
+        //     jewelleryTagContent: this.constructTagDataForPrint(arr)
+        // }, ()=> {
+        //     if(this.domElms.tagPrintBtn) {
+        //         this.domElms.tagPrintBtn.handlePrint();
+        //     } else {
+        //         alert('Error priting the tag');
+        //     }
+        // });
+    }
+
+    constructTagDataForPrint(arr) {
+        let dataArr = [];
+        _.each(arr, (row) => {
+            dataArr.push({
+                storeName: this.state.storeNameAbbr,
+                storeNameFull: this.state.storeNameFull,
+                division: row.touch,
+                grams: row.avlNWt,
+                size: row.dimension,
+                itemName: row.itemName,
+                huid: row.itemHuid,
+                config: {
+                    showBis: true,
+                },
+                productId: `${row.itemCode}${row.itemCodeNumber}`,
+                wsgPct: row.salesWsgPercent || 0,
+                trackId: row.id || 0
+            });
+        });
+        return dataArr;
+    }
+
+    async printClickListener(e, row) {
+        e.stopPropagation();
+        await this.handleTagPrint([row]);
+    }
+
+    async printAllClickListener(e, rows) {
+        e.stopPropagation();
+        await this.handleTagPrint(rows);
+    }
+
     expandRow = {
         renderer: (row) => {
             let supplier = row.suplierName;
@@ -569,7 +706,7 @@ export default class ViewStock extends Component {
             newState.selectedInfo.indexes.splice(rowIndex, 1);            
             newState.selectedInfo.rowObj= newState.selectedInfo.rowObj.filter(
                 (anItem) => {
-                    if(newState.selectedInfo.indexes.indexOf(anItem.rowNumber) == -1)
+                    if(newState.selectedInfo.indexes.indexOf(anItem.rowNumber) != -1)
                         return true;                                                  
                 }
             );
@@ -591,6 +728,14 @@ export default class ViewStock extends Component {
         this.setState(newState);
     }
 
+    onExportClick() {
+        this.setState({displayExportPopup: true});
+    }
+
+    handleExportPopupClose() {
+        this.setState({displayExportPopup: false});
+    }
+
     onFilterBtnClick() {
         this.setState({filterPopupVisibility: !this.state.filterPopupVisibility});
     }
@@ -603,6 +748,15 @@ export default class ViewStock extends Component {
         let newState = {...this.state};
         newState.filters.showOnlyAvlStockItems = e.target.checked;
         this.setState(newState);
+        setStockListPageFilters({...newState.filters,  showOnlyAvlStockItems: e.target.checked});
+    }
+    
+    onMoreActionsDpdClick = (e, identifier) => {
+        switch(identifier) {
+            case 'printTag': 
+                this.handleTagPrint(this.state.selectedInfo.rowObj);
+                break;
+        }
     }
     
     shouldExpndAll() {
@@ -633,6 +787,7 @@ export default class ViewStock extends Component {
             },
             metalCategory: metalCategory,
             prodId: this.state.filters.prodId,
+            huid: this.state.filters.huid,
             itemName: this.state.filters.itemName,
             itemCategory: this.state.filters.itemCategory,
             itemSubCategory: this.state.filters.itemSubCategory,
@@ -651,13 +806,14 @@ export default class ViewStock extends Component {
     async fetchTotals() {
         try {
             let args = this.getFilterParams();
+            args.filterMatchWord = this.state.filterMatchWord;
             let resp = await axios.get(`${FETCH_STOCK_TOTALS}?access_token=${getAccessToken()}&filters=${JSON.stringify(args)}`);
             if(resp.data && resp.data.TOTALS) {
                 let newState = {...this.state};
                 newState.totals.stockItems = resp.data.TOTALS.count;
-                newState.totals.netWt = resp.data.TOTALS.netWt;
-                newState.totals.soldNetWt = resp.data.TOTALS.soldNetWt;
-                newState.totals.avlNetWt = resp.data.TOTALS.avlNetWt;
+                newState.totals.netWt = parseFloat(resp.data.TOTALS.netWt);
+                newState.totals.soldNetWt = parseFloat(resp.data.TOTALS.soldNetWt);
+                newState.totals.avlNetWt = parseFloat(resp.data.TOTALS.avlNetWt);
 
                 if(newState.totals.netWt)
                     newState.totals.netWt = newState.totals.netWt.toFixed(3);
@@ -677,6 +833,10 @@ export default class ViewStock extends Component {
         try {
             let offsets = this.getOffsets();
             let args = this.getFilterParams();
+
+            args.filterMatchWord = this.state.filterMatchWord;
+
+
             args.offsetStart = offsets[0] || 0;
             args.offsetEnd = offsets[1] || 20;
 
@@ -686,36 +846,42 @@ export default class ViewStock extends Component {
             if(resp.data.STOCK_LIST) {
                 _.each(resp.data.STOCK_LIST, (aStockItem, index) => {
                     newState.stockList.push({
+                        rowNumber: index,
+                        id: aStockItem.Id,
                         uid: aStockItem.UID,
                         itemCode: aStockItem.ItemCode || '',
                         itemCodeNumber: aStockItem.ItemCodeNumber,
+                        itemHuid: aStockItem.ItemHUID,
                         itemName: aStockItem.ItemName,
                         itemCategory: aStockItem.ItemCategory,
                         itemSubCategory: aStockItem.ItemSubCategory,
+                        huid: aStockItem.ItemHUID,
                         dimension: aStockItem.Dimension,
                         suplierName: aStockItem.Supplier,
                         supplierPersonName: aStockItem.SupplierPersonName,
                         metal: aStockItem.Metal,
                         metalRate: aStockItem.MetalRate,
-                        grossWt: aStockItem.GWt,
-                        netWt: aStockItem.NWt,
-                        pureWt: aStockItem.PWt,
+                        grossWt: aStockItem.GWt || 0,
+                        netWt: aStockItem.NWt || 0,
+                        pureWt: aStockItem.PWt || 0,
                         qty: aStockItem.Qty,
                         avlQty: aStockItem.AvlQty,
                         soldQty: aStockItem.SoldQty,
-                        avlGWt: aStockItem.AvlGWt,
-                        avlNWt: aStockItem.AvlNWt,
-                        avlPWt: aStockItem.AvlPWt,
-                        soldGWt: aStockItem.SoldGWt,
-                        soldNWt: aStockItem.SoldNWt,
-                        soldPWt: aStockItem.SoldPWt,
+                        avlGWt: aStockItem.AvlGWt || 0,
+                        avlNWt: aStockItem.AvlNWt || 0,
+                        avlPWt: aStockItem.AvlPWt || 0,
+                        soldGWt: aStockItem.SoldGWt || 0,
+                        soldNWt: aStockItem.SoldNWt || 0,
+                        soldPWt: aStockItem.SoldPWt || 0,
                         touch: aStockItem.PTouchName,
-                        pTouch: aStockItem.PTouchValue,
-                        iTouch: aStockItem.ITouchValue,
-                        labourCharge: aStockItem.LabourCharge,
+                        pTouch: aStockItem.PTouchValue || 0,
+                        iTouch: aStockItem.ITouchValue || 0,
+                        labourCharge: aStockItem.LabourCharge || 0,
                         labourChargeUnit: aStockItem.LabourChargeUnit,
                         labourChargeCalc: aStockItem.LabourAmtCalc,
-                        amount: aStockItem.Amount,
+                        salesMakingCharge: aStockItem.SalesMakingCharge || 0,
+                        salesWsgPercent: aStockItem.SalesWsgPercent,
+                        amount: aStockItem.Amount || 0,
                         cgstPercent: aStockItem.CgstPercent,
                         cgstAmt: aStockItem.CgstAmt,
                         sgstPercent: aStockItem.SgstPercent,
@@ -754,11 +920,14 @@ export default class ViewStock extends Component {
                             endDate={this.state.filters.date.endDate}
                             showIcon= {false}
                         />
+                        <div className='export-btn action-btn' onClick={this.onExportClick}>
+                            <FontAwesomeIcon icon='file-excel' className=""/>
+                        </div>
                         <Popover
-                            className='view-stock-filter-popover'
-                            padding={0}
+                            containerClassName='view-stock-filter-popover'
+                            // padding={0}
                             isOpen={this.state.filterPopupVisibility}
-                            position={'right'} // preferred position
+                            position={'bottom'} // preferred position
                             onClickOutside={() => this.setState({ filterPopupVisibility: false })}
                             content={({ position, targetRect, popoverRect }) => {
                                 return (
@@ -800,10 +969,26 @@ export default class ViewStock extends Component {
                             }
                         }
                         >
-                            <span className='filter-popover-trigger-btn' onClick={this.onFilterBtnClick}>
-                                <FontAwesomeIcon icon='filter'/>
-                            </span>                                    
+                            <div style={{display: 'inline-block'}}>
+                                <span className='filter-popover-trigger-btn' style={{display: 'inline-block'}} onClick={this.onFilterBtnClick}>
+                                    <FontAwesomeIcon icon='filter' className=""/>
+                                </span>
+                            </div>
                         </Popover>
+                        <Dropdown className="more-actions-dropdown action-btn">
+                            <Dropdown.Toggle id="dropdown-more-actions" disabled={!this.state.selectedInfo.indexes.length}>
+                                More Actions 
+                            </Dropdown.Toggle>
+                            <Dropdown.Menu>
+                                <Dropdown.Item ><DpdTagPrintBtn 
+                                        className="tag-print-btn gs-icon"
+                                        printCb = { this.printAllClickListener }
+                                        jewelleryTagId={this.state.jewelleryTagId}
+                                        jewelleryTagContent={this.state.jewelleryTagContent}
+                                        selectedRows={this.state.selectedInfo.rowObj}
+                                        /></Dropdown.Item>
+                            </Dropdown.Menu>
+                        </Dropdown>
                     </Col>
                     <Col xs={4}>
                         <ReactPaginate previousLabel={"<"}
@@ -817,7 +1002,8 @@ export default class ViewStock extends Component {
                             containerClassName={"gs-pagination pagination"}
                             subContainerClassName={"pages pagination"}
                             activeClassName={"active"}
-                            forcePage={this.state.selectedPageIndex} />
+                            forcePage={this.state.selectedPageIndex}
+                        />
                     </Col>
                     <Col xs={4} style={{textAlign: 'right'}}>
                         <span className="no-of-items">No. Of StockItems: {this.state.totals.stockItems}</span>
@@ -836,6 +1022,7 @@ export default class ViewStock extends Component {
                             checkboxOnChangeListener = {this.handleCheckboxChangeListener}
                             globalCheckBoxListener = {this.handleGlobalCheckboxChange}
                             selectedIndexes = {this.state.selectedInfo.indexes}
+                            selectedRowJson = {this.state.selectedInfo.rowObj} 
                             showFooter = {true}
                         />
                     </Col>
@@ -843,7 +1030,136 @@ export default class ViewStock extends Component {
                 <CommonModal secClass="edit-stock-common-modal" modalOpen={this.state.isItemEditModalOpen} handleClose={(e)=> {this.setState({isItemEditModalOpen: false, itemEditData: null})}}>
                     <StockItemEdit itemEditData={this.state.itemEditData}/>
                 </CommonModal>
+                <CommonModal modalOpen={this.state.displayExportPopup} secClass="export-stock-data-popup" handleClose={this.handleExportPopupClose}>
+                    <StockDataExportPopup handleClose={this.handleExportPopupClose}/>
+                </CommonModal>
+                {/* <div className="tag-renderer-comp">
+                    <TagTemplateRenderer ref={(el) => (this.componentRef = el)} templateId={this.state.jewelleryTagId} content={this.state.jewelleryTagContent}/>
+                </div> */}
+
+                {/* <ReactToPrint 
+                    ref={(domElm) => {this.domElms.tagPrintBtn = domElm}}
+                    trigger = {()=> <a href="#"></a>}
+                    content={()=>this.componentRef}
+                /> */}
             </Container>
         )
     }
+}
+
+const DpdTagPrintBtn = (props) => {
+     const [isPrinting, setIsPrinting] = useState(false);
+    
+    const contentRef = useRef(null);
+
+    const promiseResolveRef = useRef(null);
+
+    useEffect(() => {
+        if (isPrinting && promiseResolveRef.current) {
+            promiseResolveRef.current();
+        }
+    }, [isPrinting]);
+    
+    
+    const reactToPrintFn = useReactToPrint({ 
+        contentRef,
+        onBeforePrint: (e) => {
+          return new Promise(async (resolve) => {
+            promiseResolveRef.current = resolve;
+            setIsPrinting(true);
+          });
+        },
+        onAfterPrint: () => {
+          promiseResolveRef.current = null;
+          setIsPrinting(false);
+        }
+    });
+    
+    const [jewelleryTagContent, setJewelleryTagContent] = useState(null);
+    const [jewelleryTagId, setJewelleryTagId] = useState(null);
+    const [selectedRows, setSelectedRowsData] = useState(null);
+    
+    useEffect(() => {
+        setJewelleryTagContent(props.jewelleryTagContent);
+        setJewelleryTagId(props.jewelleryTagId);
+        setSelectedRowsData(props.selectedRows);
+    }, [props.jewelleryTagContent, props.setJewelleryTagId, props.setSelectedRowsData]);
+    
+    const onPrintClick = async (e, row) => {
+        e.stopPropagation();
+        await props.printCb(e, row);
+        reactToPrintFn();
+    }
+
+    return (
+        <div style={{ display: 'inline-block' }} key={props.key}>
+            <span className={props.className} onClick={(e) => onPrintClick(e, selectedRows)}>
+                <FontAwesomeIcon icon='print' className=""/>
+                    Print Tag
+            </span>
+            <div className="tag-renderer-comp">
+                <div ref={contentRef}>
+                    <TagTemplateRenderer templateId={jewelleryTagId} content={jewelleryTagContent}/>
+                </div>
+            </div>
+        </div>
+    );
+}
+
+const TagPrintBtn = (props) => {
+    const [isPrinting, setIsPrinting] = useState(false);
+    
+    const contentRef = useRef(null);
+
+    const promiseResolveRef = useRef(null);
+
+    useEffect(() => {
+        if (isPrinting && promiseResolveRef.current) {
+            promiseResolveRef.current();
+        }
+    }, [isPrinting]);
+    
+    
+    const reactToPrintFn = useReactToPrint({ 
+        contentRef,
+        onBeforePrint: (e) => {
+          return new Promise(async (resolve) => {
+            promiseResolveRef.current = resolve;
+            setIsPrinting(true);
+          });
+        },
+        onAfterPrint: () => {
+          promiseResolveRef.current = null;
+          setIsPrinting(false);
+        }
+    });
+    
+    const [jewelleryTagContent, setJewelleryTagContent] = useState(null);
+    const [jewelleryTagId, setJewelleryTagId] = useState(null);
+    const [row, setRowData] = useState(null);
+    
+    useEffect(() => {
+        setJewelleryTagContent(props.jewelleryTagContent);
+        setJewelleryTagId(props.jewelleryTagId);
+        setRowData(props.row);
+    }, [props.jewelleryTagContent, props.setJewelleryTagId, props.setrow]);
+    
+    const onPrintClick = async (e, row) => {
+        e.stopPropagation();
+        await props.printCb(e, row);
+        reactToPrintFn();
+    }
+
+    return (
+        <div style={{ display: 'inline-block' }} key={props.key}>
+            <span className={props.className}>
+                <FontAwesomeIcon icon='print' onClick={(e) => onPrintClick(e, row)} className=""/>
+            </span>
+            <div className="tag-renderer-comp">
+                <div ref={contentRef}>
+                    <TagTemplateRenderer templateId={jewelleryTagId} content={jewelleryTagContent}/>
+                </div>
+            </div>
+        </div>
+    );
 }

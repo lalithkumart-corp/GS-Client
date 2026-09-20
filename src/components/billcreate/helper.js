@@ -1,7 +1,9 @@
-import axios from "axios";
-import _ from 'lodash';
-import { PLEDGEBOOK_METADATA, ORNAMENT_LIST } from '../../core/sitemap';
+import _, { forEach } from 'lodash';
+import { PLEDGEBOOK_METADATA, ORNAMENT_LIST, FETCH_CUSTOMERS_BASIC_LIST } from '../../core/sitemap';
 import { getAccessToken } from '../../core/storage';
+import axiosMiddleware from '../../core/axios';
+import { LOAN_BILL_EXPIRY_DAYS } from '../../constants';
+import { addDays } from '../../utilities/utility';
 
 export const defaultPictureState = {
     holder: {
@@ -22,7 +24,11 @@ export const defaultPictureState = {
         clear: false,
     },
     status: 'UNSAVED',
-    uploadMethod: 'DIRECT_UPLOAD'
+    uploadMethod: 'DIRECT_UPLOAD',
+    caption: {
+        show: false,
+        inputVal: ''
+    }
 };
 
 export const defaultOrnPictureState = {
@@ -47,15 +53,39 @@ export const defaultOrnPictureState = {
     uploadMethod: 'DIRECT_UPLOAD'
 };
 
+const defaultPaymentObj = {
+    mode: 'cash',
+    cash: {fromAccountId: ''},
+    cheque: {fromAccountId: ''},
+    online: {
+        fromAccountId: '',
+        toAccount: {
+            toAccountId: '',
+            accNo: '',
+            upiId: '',
+            ifscCode: ''
+        }
+    }
+};
+
 export const buildRequestParams = (thatState = {}) => {
     let state = {...thatState}; //for preventing reference issue  
     state.selectedCustomer = state.selectedCustomer || {};  
+    let dateVal = state.formData.date._inputVal;
+    let expiryDateVal = addDays(dateVal, state.formData.expiryDayLimit).toISOString();
+    if(state.formData.date.isLive) { 
+        dateVal = new Date().toISOString();
+        expiryDateVal = addDays(new Date(), state.formData.expiryDayLimit).toISOString();
+    }
     let params = {
-        date: state.formData.date._inputVal.replace('T', ' ').slice(0,23),
+        date: dateVal.replace('T', ' ').slice(0,23),
+        expiryDate: expiryDateVal.replace('T', ' ').slice(0,23), // addDays(dateVal, LOAN_BILL_EXPIRY_DAYS).toISOString().replace('T', ' ').slice(0,23),
         billSeries: state.formData.billseries.inputVal,
         billNo: state.formData.billno.inputVal, //_getBillNo(thatState),
-        amount: state.formData.amount.inputVal,
+        amount: state.formData.amount.inputVal || 0,
+        presentValue: thatState.formData.presentValue.inputVal || 0,
         cname: state.selectedCustomer.name || state.formData.cname.inputVal,
+        guardianRelation: state.selectedCustomer.guardianRelation || state.formData.guardianRelation.inputVal,
         gaurdianName: state.selectedCustomer.gaurdianName || state.formData.gaurdianName.inputVal,
         address: state.selectedCustomer.address || state.formData.address.inputVal,
         place: !isNull(state.selectedCustomer.place)?(state.selectedCustomer.place):(state.formData.place.inputVal),
@@ -72,20 +102,34 @@ export const buildRequestParams = (thatState = {}) => {
         interestPercent: thatState.formData.interest.percent,
         interestValue: thatState.formData.interest.value,
         otherCharges: thatState.formData.interest.other,
-        landedCost: thatState.formData.amount.landedCost
+        landedCost: thatState.formData.amount.landedCost,
+        paymentMode: thatState.formData.payment.mode,
+        paymentDetails: state.formData.payment,
+        pledgedForCustomerId: !isNull(state.formData.moreDetails.pledgedFor.customerObj)?state.formData.moreDetails.pledgedFor.customerObj.customerId:null,
+        secJewelRedeemerCustomerId: !isNull(state.formData.moreDetails.secJewelRedeemer.customerObj)?state.formData.moreDetails.secJewelRedeemer.customerObj.customerId:null
+
     };
     return params;
 }
 
-export const buildRequestParamsForUpdate = (thatState = {}) => {    
+export const buildRequestParamsForUpdate = (thatState = {}) => {
     let state = {...thatState}; //for preventing reference issue
     state.selectedCustomer = state.selectedCustomer || {};
+    let dateVal = state.formData.date._inputVal;
+    let expiryDateVal = addDays(dateVal, state.formData.expiryDayLimit).toISOString();
+    if(state.formData.date.isLive) {
+        dateVal = new Date().toISOString();
+        expiryDateVal = addDays(new Date(), state.formData.expiryDayLimit).toISOString();
+    }
     let params = {
-        date: state.formData.date._inputVal.replace('T', ' ').slice(0,23),
+        date: dateVal.replace('T', ' ').slice(0,23),
+        expiryDate: expiryDateVal.replace('T', ' ').slice(0,23),// addDays(dateVal, LOAN_BILL_EXPIRY_DAYS).toISOString().replace('T', ' ').slice(0,23),
         billSeries: state.formData.billseries.inputVal,
         billNo: state.formData.billno.inputVal, //_getBillNo(thatState),     
-        amount: state.formData.amount.inputVal,
+        amount: state.formData.amount.inputVal || 0,
+        presentValue: state.formData.presentValue.inputVal || 0,
         cname: state.selectedCustomer.name || state.formData.cname.inputVal,
+        guardianRelation: state.selectedCustomer.guardianRelation || state.formData.guardianRelation.inputVal,
         gaurdianName: state.selectedCustomer.gaurdianName || state.formData.gaurdianName.inputVal,
         address: state.selectedCustomer.address || state.formData.address.inputVal,
         place: !isNull(state.selectedCustomer.place)?(state.selectedCustomer.place):(state.formData.place.inputVal),
@@ -102,7 +146,11 @@ export const buildRequestParamsForUpdate = (thatState = {}) => {
         billRemarks: _getBillRemarks(thatState),
         userPicture: getPicData(thatState),
         ornPicture: getOrnPicData(thatState),
-        uniqueIdentifier: state.uniqueIdentifier
+        paymentMode: state.formData.payment.mode,
+        paymentDetails: state.formData.payment,
+        uniqueIdentifier: state.uniqueIdentifier,
+        pledgedForCustomerId: !isNull(state.formData.moreDetails.pledgedFor.customerObj)?state.formData.moreDetails.pledgedFor.customerObj.customerId:null,
+        secJewelRedeemerCustomerId: !isNull(state.formData.moreDetails.secJewelRedeemer.customerObj)?state.formData.moreDetails.secJewelRedeemer.customerObj.customerId:null
     };
     return params;
 }
@@ -132,8 +180,10 @@ const _getMobileNumber = (state) => {
     let mobNo = null;
     if(state.formData.mobile.hasTextUpdated)
         mobNo = state.formData.mobile.inputVal || null;
-    else
+    else if(state.selectedCustomer)
         mobNo = state.selectedCustomer.mobile || null; 
+    else
+        mobNo = state.formData.mobile.inputVal || null;
 
     return mobNo;
     
@@ -141,7 +191,13 @@ const _getMobileNumber = (state) => {
 }
 
 const _getOrnamentsData = (thatState) => {
-    return thatState.formData.orn.inputs;
+    let ornBkt = {};
+    let ornRows = thatState.formData.orn.inputs;
+    Object.keys(ornRows).forEach((a) => {
+        if(ornRows[a].ornItem !== '' && ornRows[a].ornNos !== '')
+            ornBkt[a] = ornRows[a];
+    });
+    return ornBkt;
 } 
 
 const _getMoreData = (thatState) => {
@@ -152,16 +208,18 @@ const _getBillRemarks = (thatState) => {
     return thatState.formData.moreDetails.billRemarks;
 }
 
-export const getPicData = (thatState) => {    
-    let picData = null;
-    if(thatState.userPicture) {        
+export const getPicData = (thatState) => {
+    let picData = {};
+    if(thatState.userPicture && (thatState.userPicture.id || thatState.userPicture.url) )
         picData = {imageId: thatState.userPicture.id, url: thatState.userPicture.url}
-    } else if(thatState.selectedCustomer && thatState.selectedCustomer.image && thatState.selectedCustomer.image.id) {        
-        picData = {
-            imageId: thatState.selectedCustomer.image.id,
-            url: thatState.selectedCustomer.image.url
-        };        
-    }
+    else if(thatState.custDetail && thatState.custDetail.imageTableId)
+        picData = {imageId: thatState.custDetail.imageTableId};
+    // else if(thatState.selectedCustomer && thatState.selectedCustomer.userImagePath) {        
+    //     picData = {
+    //         // imageId: thatState.selectedCustomer.image.id,
+    //         url: thatState.selectedCustomer.userImagePath
+    //     };
+    // }
     return picData;
 }
 
@@ -249,6 +307,7 @@ export const resetState = (nextProps, newState) => {
                 ornItem: '',
                 ornGWt: '',
                 ornNWt: '',
+                ornTouch: '',
                 ornSpec: '',
                 ornNos: ''
             }};
@@ -257,12 +316,22 @@ export const resetState = (nextProps, newState) => {
             anItem.totalWeight = 0.00;
         } else if(index == 'moreDetails') {
             anItem.currCustomerInputKey = anItem.currCustomerInputField = anItem.currCustomerInputVal = anItem.billRemarks = '';                
-            anItem.customerInfo = [];            
+            anItem.customerInfo = [];    
+            anItem.pledgedFor = {
+                inputVal: 'self',
+                customerObj: null
+            }
         } else if(index == 'interest') {
             anItem.percent = 0;
             anItem.value = 0;
             anItem.other = 0;
             anItem.autoFetch = true;
+        } else if(index == 'paymentMode') {
+            newState.formData[index] = 'cash';
+        } else if (index == 'expiryDayLimit') {
+            newState.formData[index] = LOAN_BILL_EXPIRY_DAYS;
+        } else if (index == 'expiryDate') {
+            newState.formData[index] = addDays(new Date(), LOAN_BILL_EXPIRY_DAYS);
         } else {
             if(index !== 'date' && index !== 'billseries') {
                 anItem.hasError = false;
@@ -271,8 +340,14 @@ export const resetState = (nextProps, newState) => {
             }
             if(index == 'amount')
                 anItem.landedCost = 0;
-        }            
+        }
     });
+    newState.formData.payment = JSON.parse(JSON.stringify(defaultPaymentObj));
+    let modes = ['cash', 'cheque', 'online'];
+    _.each(modes, (aMode, index) => {
+        newState.formData.payment[aMode].fromAccountId = newState._defaultFundAcc;
+    });
+        
     newState.selectedCustomer = {};
     newState.showMoreInputs = false; //!newState.showMoreInputs;
     newState.userPicture = JSON.parse(JSON.stringify(defaultPictureState));
@@ -291,7 +366,8 @@ export const validateFormValues = (formValues) => {
         errors.push('Amount Value could not be empty');
     if(!formValues.cname)
         errors.push('Customer Name could not be empty');
-
+    if(!formValues.presentValue)
+        errors.push('Present value could not be empty');
     return {
         errors: errors
     };
@@ -300,13 +376,14 @@ export const validateFormValues = (formValues) => {
 export const fetchCustomerMetaData = () => {
     return new Promise( (resolve, reject) => {
         let accessToken = getAccessToken();
-        axios.get(PLEDGEBOOK_METADATA + `?access_token=${accessToken}&identifiers=["all", "otherDetails"]&filters=${JSON.stringify({onlyIsActive: true})}`)
+        axiosMiddleware.get(PLEDGEBOOK_METADATA + `?access_token=${accessToken}&identifiers=["all", "otherDetails"]&filters=${JSON.stringify({onlyIsActive: true})}`)
             .then(
                 (successResp) => {
                     //let newState = {...this.state};
                     let returnObj = {};
                     let results = successResp.data;
-                    returnObj.cnameList = results.customers.list;
+                    let parsedList = parseCustomerListData(results.customers.list);
+                    returnObj.cnameList = parsedList;
                     returnObj.gaurdianNameList = getGaurdianNameList(results.customers.list);
                     returnObj.addressList = getAddressList(results.customers.list);
                     returnObj.placeList = getPlaceList(results.customers.list);
@@ -332,10 +409,50 @@ export const fetchCustomerMetaData = () => {
     });
 }
 
+const parseCustomerListData = (customerList) => {
+    let parsed = [];
+    _.each(customerList, (aCustomerObj) => {
+        try {
+            aCustomerObj.otherDetails = JSON.parse(aCustomerObj.otherDetails);
+        } catch(e) {
+            
+        }
+        parsed.push(aCustomerObj);
+    });
+    return parsed;
+}
+
+export const fetchCustomersList = (optionalFilters) => {
+    return new Promise(async (resolve, reject) => {
+        try {
+            let at =  getAccessToken();
+            let params = {onlyIsActive: true};
+            if(optionalFilters && optionalFilters.customerIdArr) {
+                params.customerIdArr = optionalFilters.customerIdArr;
+            }
+            let resp = await axiosMiddleware.get(`${FETCH_CUSTOMERS_BASIC_LIST}?access_token=${at}&params=${JSON.stringify(params)}`);
+            if(resp && resp.data && resp.data.RESP) {
+                let returnObj = {};
+                returnObj.cnameList = resp.data.RESP.list;
+                returnObj.gaurdianNameList = getGaurdianNameList(resp.data.RESP.list);
+                returnObj.addressList = getAddressList(resp.data.RESP.list);
+                returnObj.placeList = getPlaceList(resp.data.RESP.list);
+                returnObj.cityList = getCityList(resp.data.RESP.list);
+                returnObj.pincodeList = getPincodeList(resp.data.RESP.list);
+                returnObj.mobileList = getMobileList(resp.data.RESP.list);
+                return resolve(returnObj);
+            }
+        } catch(e) {
+            console.log(e);
+            return resolve(null);
+        }
+    });
+}
+
 export const fetchOrnList = () => {
     return new Promise( (resolve, reject) => {
         let accessToken = getAccessToken();
-        axios.get(ORNAMENT_LIST+ `?access_token=${accessToken}`)
+        axiosMiddleware.get(ORNAMENT_LIST+ `?access_token=${accessToken}`)
             .then(
                 (successResp) => {
                     //let newState = {...this.state};

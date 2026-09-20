@@ -1,21 +1,26 @@
 import _ from 'lodash';
 import moment from 'moment';
+import { PAYMENT_MODE_KEY } from '../../constants';
 
 export const getRateOfInterest = (interestRatesDB, amount, options={}) => {
     let rateOfInterest = 0;
-    if(typeof interestRatesDB == 'string')
-        interestRatesDB = JSON.parse(interestRatesDB);
-    if(typeof amount == 'string')
-        amount = parseInt(amount);
-    let type = options.type;    
-    if(!type && options.orn)
-        type = getTypeBasedOnOrn(options.orn);
-    if(type) {
-        _.each(interestRatesDB, (aRateObj, index) => {
-            if(type == aRateObj.type && amount >= aRateObj.rangeFrom && amount <= aRateObj.rangeTo ) {
-                rateOfInterest = aRateObj.rateOfInterest;
-            }
-        });
+    if(options && options.interestDuringBillCreation) {
+        rateOfInterest = options.interestDuringBillCreation;
+    } else {
+        if(typeof interestRatesDB == 'string')
+            interestRatesDB = JSON.parse(interestRatesDB);
+        if(typeof amount == 'string')
+            amount = parseInt(amount);
+        let type = options.type;    
+        if(!type && options.orn)
+            type = getTypeBasedOnOrn(options.orn);
+        if(type) {
+            _.each(interestRatesDB, (aRateObj, index) => {
+                if(type == aRateObj.type && amount >= aRateObj.rangeFrom && amount <= aRateObj.rangeTo ) {
+                    rateOfInterest = aRateObj.rateOfInterest;
+                }
+            });
+        }
     }
     return rateOfInterest;
 }
@@ -44,13 +49,15 @@ export const getInterestPerMonth = (amount, roi) => {
 export const calculateInterestBasedOnRate = (interestPerMonth, amount) => { 
     interestPerMonth = parseFloat(interestPerMonth) || 0;
     amount = parseFloat(amount) || 0;
-    return parseFloat((interestPerMonth*100)/amount);
+    return parseFloat(((interestPerMonth*100)/amount).toFixed(2));
 }
 
-export const getRequestParams = (billData) => {
+export const getRequestParams = (billData, thatState) => {
     let requestParams = [];    
     let anObj = {
         //pledgeBookID: billData.PledgeBookID,
+        redeemUID: (+new Date()),
+        customerId: billData.CustomerId,
         pledgeBookUID: billData.UniqueIdentifier,
         billNo: billData.BillNo,
         pledgedDate: billData.Date.replace('T', ' ').slice(0,23),
@@ -63,17 +70,23 @@ export const getRequestParams = (billData) => {
         estimatedAmount: billData.Amount + billData._interestPerMonth,
         discountValue: billData._discountValue,
         paidAmount: billData._totalValue,
-        handedTo: billData.Name
+        handedTo: billData.Name,
+        paymentMode: billData._paymentMode, //|| thatState.payment.mode,
+        paymentDetails: thatState.formData.payment,
+        billRemarks: billData._billRemarks || ''
     };
     requestParams.push(anObj);
     return requestParams;
 }
 
 export const calculateData = (selectedBillData, options) => {
-    let todayDate = options.date; 
-    let pledgedDate = moment.utc(selectedBillData.Date).local().format('DD/MM/YYYY');    
-    let diffInMonths = calcMonthDiff(pledgedDate, todayDate);        
-    let roi = getRateOfInterest(options.interestRates, selectedBillData.Amount, {orn: selectedBillData.Orn});
+    let todayDate = options.date;
+    let pledgedDate = moment.utc(selectedBillData.Date).local().format('DD/MM/YYYY');
+    let diffInMonths = calcMonthDiff(pledgedDate, todayDate);
+    let roi = 0;
+    if(options.interestRates) roi = getRateOfInterest(options.interestRates, selectedBillData.Amount, {orn: selectedBillData.Orn, interestDuringBillCreation: selectedBillData.IntPercent});
+    else if(options.interestPercent) roi = options.interestPercent;
+    
     let interestPerMonth = getInterestPerMonth(selectedBillData.Amount, roi);
 
     selectedBillData._interestPerMonth = interestPerMonth;
@@ -121,7 +134,8 @@ export const getReopenRequestParams = (billData) => {
     let requestParams = [];    
     let anObj = {
         //pledgeBookID: billData.PledgeBookID,
-        pledgeBookUID: billData.UniqueIdentifier                
+        pledgeBookUID: billData.UniqueIdentifier,
+        closedBillReference: billData.uid
     };
     requestParams.push(anObj);
     return requestParams;

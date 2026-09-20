@@ -1,0 +1,67 @@
+.bill-creation-temlpate-setup {
+    margin: 0 -15px;
+    .card-heading-text-col {
+        margin-top: 20px;
+    }
+    .action-container1 {
+        text-align: right;
+    }
+    .first-line-header {
+        padding-bottom: 10px;
+    }
+    .second-line-header {
+        h5 {
+            padding: 8px 0 17px 0;
+            border-top: 1px dashed lightgrey;
+        }
+    }
+    .third-line-header {
+        h5 {
+            padding: 8px 0 17px 0;
+            border-top: 1px dashed lightgrey;
+        }
+    }
+    .fourth-line-header {
+        h5 {
+            padding: 8px 0 17px 0;
+            border-top: 1px dashed lightgrey;
+        }
+    }
+    .fifth-line-header {
+        h5 {
+            padding: 8px 0 17px 0;
+            border-top: 1px dashed lightgrey;
+        }
+    }
+    .template-list-col {
+        h5 {
+            border-top: 1px dashed lightgrey;
+            padding: 8px 0 17px 0;
+        }
+        .screenshot-prview-container {
+            height: 250px;
+            .template-image-viewer {
+                height: 100%;
+                width: 60%;
+            }
+        }
+        .screenshot-radio-btn-label {
+            text-align: center;
+            margin-top: 17px;
+            label {
+                padding-left: 10px;
+                font-size: 17px;
+            }
+        }
+    }
+    .bill-template-preview-modal {
+        .template-main-card {
+            display: block;
+            transform: scale(0.7);
+            margin-top: -140px;
+        }
+    }
+}
+.bill-template-preview-modal .body {
+    min-height: 1200px;
+}

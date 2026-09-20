@@ -1,8 +1,13 @@
+import { convertDateObjToStr, getCurrentDateTimeInUTCForDB, formatNo } from '../../../utilities/utility';
+import { getRoundOffVal } from '../../../utilities/mathUtils';
+import _ from 'lodash';
+
 export let defaultExchangeItemFormData = {
     exMetal: 'G',
     exGrossWt: "",
     exNetWt: "",
     exWastage: "",
+    exWastageVal: "",
     exOldRate: "",
     exPrice: ""
 }
@@ -40,24 +45,33 @@ export const calcPurchaseTotals = (billPreviewList) => {
         grossWt: 0,
         netWt: 0,
         wastage: 0,
+        wastageVal: 0,
         labour: 0,
+        initialPrice: 0, // price without tax, without discount (only with Wastage, labour)
         cgstPercent: 0,
         sgstPercent: 0,
         discount: 0,
-        price: 0
+        finalPrice: 0
     };
     _.each(billPreviewList, (anItem, index) => {
+        
+        let wastagePercentAvg = calcualteAvgWastagePercent(billPreviewList);
+        let cgstPercentAvg = calculateAvgCgstPercent(billPreviewList);
+        let sgstPercentAvg = calculateAvgSgstPercent(billPreviewList);
         totals.qty += anItem.formData.qty;
-        totals.grossWt += anItem.formData.grossWt;
-        totals.netWt += anItem.formData.netWt;
-        totals.wastage = calcualteAvgWastagePercent(billPreviewList);
-        totals.cgstPercent = calculateAvgCgstPercent(billPreviewList);
-        totals.sgstPercent = calculateAvgSgstPercent(billPreviewList);
+        totals.grossWt = totals.grossWt + anItem.formData.grossWt;
+        totals.netWt = totals.netWt + anItem.formData.netWt;
+        totals.wastageVal = totals.wastageVal + anItem.formData.wastageVal;
+        totals.wastage = wastagePercentAvg;
+        totals.cgstPercent = cgstPercentAvg;
+        totals.sgstPercent = sgstPercentAvg;
         totals.labour += anItem.formData.labour;
+        totals.initialPrice += anItem.formData.initialPrice; // with wastage and labout alone
         totals.discount += anItem.formData.discount;
-        totals.price += anItem.formData.price;
+        totals.finalPrice += anItem.formData.finalPrice; // Price with "Wastage + labour - discount + Tax"
     });
-    totals.price = formatLongToShortInt(totals.price);
+    
+    totals.finalPrice = formatLongToShortInt(totals.finalPrice);
     return totals;
 }
 
@@ -65,14 +79,21 @@ export const calculateExchangeTotals = (exchangeItemList) => {
     let totals = {
         grossWt: 0,
         netWt: 0,
-        price: 0
+        price: 0,
+        wastageVal: 0
     };
+    let oldRateSum = 0;
+    let oldRateCount = 0;
     _.each(exchangeItemList, (anItem, index) => {
         totals.grossWt += anItem.grossWt;
         totals.netWt += anItem.netWt;
+        totals.wastageVal += anItem.wastageVal || 0;
         totals.price += anItem.price;
+        oldRateSum += anItem.oldRate;
+        oldRateCount++;
     });
     totals.price = formatLongToShortInt(totals.price);
+    totals.oldRateAvg = oldRateSum/oldRateCount;
     return totals;
 }
 
@@ -97,21 +118,75 @@ export const getPriceOfExchangeItem = (stateObj) => {
 
 export const calculatePaymentFormData = (stateObj) => {
     let paymentFormData = {
-        totalPurchasePrice: stateObj.totalPurchasePrice || 0,
-        totalExchangePrice: stateObj.totalExchangePrice || 0,
+        totalInitialPrice: 0, // Wastage + Labour (No tax, No discount)
+        totalPurchaseFinalPrice: 0, //stateObj.totalPurchaseFinalPrice || 0,
+        totalExchangeFinalPrice: 0, //stateObj.totalExchangeFinalPrice || 0,
         sum: stateObj.paymentFormData.sum || 0,
         paymentMode: stateObj.paymentFormData.paymentMode || 'CASH',
         paymentDetails: stateObj.paymentFormData.paymentDetails || {},
         paid: stateObj.paymentFormData.paid || "",
         balance: stateObj.paymentFormData.balance || 0
     };
-    if(typeof stateObj.purchaseTotals.price !== "undefined")
-        paymentFormData.totalPurchasePrice = stateObj.purchaseTotals.price;
+    if(typeof stateObj.purchaseTotals.initialPrice !== 'undefined')
+        paymentFormData.totalInitialPrice = stateObj.purchaseTotals.initialPrice;
+    if(typeof stateObj.purchaseTotals.finalPrice !== "undefined")
+        paymentFormData.totalPurchaseFinalPrice = stateObj.purchaseTotals.finalPrice;
     if(typeof stateObj.exchangeItemsTotals.price !== "undefined")
-        paymentFormData.totalExchangePrice = stateObj.exchangeItemsTotals.price;
-    paymentFormData.sum = paymentFormData.totalPurchasePrice - paymentFormData.totalExchangePrice;
+        paymentFormData.totalExchangeFinalPrice = stateObj.exchangeItemsTotals.price;
+
+    paymentFormData.sum = paymentFormData.totalPurchaseFinalPrice - paymentFormData.totalExchangeFinalPrice;
+
+    // Rounding off logic
+    paymentFormData.roundOffVal = getRoundOffVal(paymentFormData.sum, stateObj.roundOffRangeSel);
+    /*let flooredVal = Math.floor(paymentFormData.sum);
+
+    let floaterVal = parseFloat((paymentFormData.sum - flooredVal).toFixed(2));
+    if(stateObj.roundOffRangeSel > 1)
+        floaterVal = (paymentFormData.sum - flooredVal)%stateObj.roundOffRangeSel;
+    
+    if(floaterVal) {
+        if(floaterVal <= stateObj.roundOffRangeSel/2)
+            paymentFormData.roundOffVal = -(floaterVal);
+        else
+            paymentFormData.roundOffVal = stateObj.roundOffRangeSel-floaterVal;
+
+        paymentFormData.roundOffVal = parseFloat(paymentFormData.roundOffVal.toFixed(2));
+    }*/
+
+    paymentFormData.sum = paymentFormData.sum + paymentFormData.roundOffVal;
+
 
     paymentFormData.balance = paymentFormData.sum - (paymentFormData.paid || 0);
+
+    //the below calc is done for passing to print template
+    let labourTotal = 0;
+    let cgstPercentSum = 0;
+    let sgstPercentSum = 0;
+    let cgstPercentAvg = 0;
+    let sgstPercentAvg = 0;
+    let cgstValTotal = 0;
+    let sgstValTotal = 0;
+    let discountTotal = 0;
+    _.each(stateObj.purchaseItemPreview, (anItem, index) => {
+        labourTotal += anItem.formData.labour || 0;
+        discountTotal += anItem.formData.discount || 0;
+        cgstPercentSum += anItem.formData.cgstPercent || 0;
+        sgstPercentSum += anItem.formData.sgstPercent || 0;
+        cgstValTotal += anItem.formData.cgstVal || 0;
+        sgstValTotal += anItem.formData.sgstVal || 0;
+    });
+    let totalNewItems = Object.keys(stateObj.purchaseItemPreview).length;
+        cgstPercentAvg = cgstPercentSum/totalNewItems;
+        sgstPercentAvg = sgstPercentSum/totalNewItems;
+
+    paymentFormData._labourTotal = labourTotal;
+    paymentFormData._discountTotal = discountTotal;
+    paymentFormData._cgstPercentAvg = cgstPercentAvg;
+    paymentFormData._sgstPercentAvg = sgstPercentAvg;
+    paymentFormData._cgstValTotal = cgstValTotal;
+    paymentFormData._sgstValTotal = sgstValTotal;
+    // paymentFormData._totalPurchaseFinalPriceWithoutTax = paymentFormData.totalInitialPrice;
+
     return paymentFormData;
 }
 
@@ -128,7 +203,7 @@ export const validate = (stateObj, propObj) => {
                 msg.push(`Check the Qty of item: ${index}.`);
             }
         });
-        if(stateObj.paymentFormData.paid > stateObj.paymentFormData.sum) {
+        if(stateObj.paymentFormData.paid > formatNo(stateObj.paymentFormData.sum,2)) {
             flag = false;
             msg.push('Paid amount is greater than the actual Total amount.');
         }
@@ -136,59 +211,211 @@ export const validate = (stateObj, propObj) => {
             flag = false;
             msg.push('Give retail price.');
         }
-        if(!propObj.rate.metalRate.gold) {
-            flag = false;
-            msg.push('Set the MetalRate in Stock-Setup page.');
-        }
+        // if(!propObj.rate.metalRate.gold) {
+        //     flag = false;
+        //     msg.push('Set the Gold-MetalRate in Stock-Setup page.');
+        // }
+        // if(!propObj.rate.metalRate.silver) {
+        //     flag = false;
+        //     msg.push('Set the Silver-MetalRate in Stock-Setup page.');
+        // }
     }
     return {flag, msg};
 }
 
 export const constructApiParams = (stateObj, propObj) => {
+    let itemType = 'G';
     let newProds = [];
     _.each(stateObj.purchaseItemPreview, (anItem, index) => {
+        itemType = anItem.formData.itemType;
         newProds.push({
+            title: anItem.item_name,
+            division: anItem.touch_name,
             prodId: anItem.prod_id, //TAGID
+            huid: anItem.huid,
             ornamentId: anItem.ornament,
             qty: anItem.formData.qty,
             grossWt: anItem.formData.grossWt,
             netWt: anItem.formData.netWt,
             pureWt: (anItem.formData.netWt * (anItem.pure_touch/100)).toFixed(3),
-            wastage: anItem.formData.wastage,
-            labour: anItem.formData.labour,
+            wastagePercent: anItem.formData.wastage,
+            wastageVal: (anItem.formData.netWt * anItem.formData.wastage)/100,
+            makingCharge: anItem.formData.labour,
+            initialPrice: anItem.formData.initialPrice, // price with Wastage + labourCharge
             cgstPercent: anItem.formData.cgstPercent,
+            cgstVal: anItem.formData.cgstVal || 0,
             sgstPercent: anItem.formData.sgstPercent,
+            sgstVal: anItem.formData.sgstVal || 0,
             discount: anItem.formData.discount,
-            price: anItem.formData.price
+            itemType: anItem.formData.itemType,
+            // amountWithTax: parseFloat((anItem.formData.initialPrice + anItem.formData.cgstVal + anItem.formData.sgstVal).toFixed(2)),
+            // amountWithTaxAndDiscount: parseFloat((anItem.formData.initialPrice + anItem.formData.cgstVal + anItem.formData.sgstVal - anItem.formData.discount).toFixed(2)),
+            finalPrice: anItem.formData.finalPrice // same as "amountWithTaxAndDiscount"
         });
     });
-    let exchangeProds = [];
-    _.each(stateObj.exchangeItems, (anItem, index) => {
-        exchangeProds.push({
-            name: anItem.name || 'some item',
-            grossWt: anItem.grossWt,
-            netWt: anItem.netWt,
-            pureWt: anItem.pureWt,
-            wastage: anItem.wastage,
-            oldRate: anItem.oldRate,
-            price: anItem.price
-        });
-    });
+    // let exchangeProds = [];
+    // _.each(stateObj.exchangeItems, (anItem, index) => {
+    //     exchangeProds.push({
+    //         name: anItem.name || 'some item',
+    //         grossWt: anItem.grossWt,
+    //         netWt: anItem.netWt,
+    //         pureWt: anItem.pureWt,
+    //         wastage: anItem.wastage,
+    //         oldRate: anItem.oldRate,
+    //         price: anItem.price
+    //     });
+    // });
+    let oldOrnaments = {};
+    if(stateObj.exchangeItemsTotals.netWt) {
+        oldOrnaments.itemType = stateObj.exchangeItems[1].metal
+        oldOrnaments.grossWt = stateObj.exchangeItemsTotals.grossWt;
+        oldOrnaments.wastageVal = stateObj.exchangeItemsTotals.wastageVal;
+        oldOrnaments.netWt = stateObj.exchangeItemsTotals.netWt;
+        oldOrnaments.pricePerGram = stateObj.exchangeItemsTotals.oldRateAvg;
+        oldOrnaments.netAmount = stateObj.exchangeItemsTotals.price;
+    }
     let paymentFormData = {
-        newItemPrice: stateObj.paymentFormData.totalPurchasePrice,
-        totalExchangePrice: stateObj.paymentFormData.totalExchangePrice,
+        newItemPrice: stateObj.paymentFormData.totalPurchaseFinalPrice,
+        totalExchangeFinalPrice: stateObj.paymentFormData.totalExchangeFinalPrice,
         sum: stateObj.paymentFormData.sum,
         paymentMode: stateObj.paymentFormData.paymentMode,
+        paymentObj: stateObj.paymentFormData.paymentObj,
         paid: stateObj.paymentFormData.paid,
         balance: stateObj.paymentFormData.balance
-    }
+    };
+    let calculations = {
+        // totalMakingCharge: stateObj.paymentFormData._labourTotal,
+        totalInitialPrice: stateObj.paymentFormData.totalInitialPrice,
+        totalDiscount: stateObj.paymentFormData._discountTotal,
+        cgstAvgPercent: stateObj.paymentFormData._cgstPercentAvg,
+        sgstAvgPercent: stateObj.paymentFormData._sgstPercentAvg,
+        totalCgstVal: stateObj.paymentFormData._cgstValTotal,
+        totalSgstVal: stateObj.paymentFormData._sgstValTotal,
+        // totalNetAmountWithTax: (stateObj.paymentFormData.totalInitialPrice + stateObj.paymentFormData._cgstValTotal + stateObj.paymentFormData._sgstValTotal),
+        
+        totalPurchaseFinalPrice: stateObj.paymentFormData.totalPurchaseFinalPrice,
+        totalExchangeFinalPrice: stateObj.paymentFormData.totalExchangeFinalPrice,
+        roundedOffVal: stateObj.paymentFormData.roundOffVal,
+        grandTotal: stateObj.paymentFormData.sum,
+    };
     return {
+        billingType: stateObj.billingType,
+        invoiceNo: stateObj.invoiceNo, // (stateObj.invoiceSeries?`${stateObj.invoiceSeries}.${stateObj.invoiceNo}`:stateObj.invoiceNo),
+        invoiceSeries: stateObj.invoiceSeries,
         customerId: stateObj.selectedCustomer.customerId,
         retailRate: stateObj.retailPrice || 0,
+        itemType,
         metalRate: propObj.rate.metalRate.gold || 0,
         newProds,
-        exchangeProds,
-        paymentFormData
+        oldOrnaments,
+        paymentFormData,
+        calculations,
+        date: stateObj.date.isLive?getCurrentDateTimeInUTCForDB():stateObj.date._inputVal,
+        paymentSelectionCardData: stateObj.paymentSelectionCardData
+    }
+}
+
+export const constructPrintContent = (stateObj, propObj) => {
+    let newProds = [];
+    let itemType = '';
+    let customerName = '';
+    let customerMobile = '';
+    let customerPanNo = '';
+    let customerAddr = '';
+    _.each(stateObj.purchaseItemPreview, (anItem, index) => {
+        newProds.push({
+            title: anItem.item_name,
+            huid: anItem.huid,
+            qty: anItem.formData.qty,
+            grossWt: anItem.formData.grossWt,
+            netWt: anItem.formData.netWt,
+            division: anItem.touch_name,
+            wastagePercent: anItem.formData.wastage,
+            pricePerGm: stateObj.retailPrice,
+            wastageVal: parseFloat(((anItem.formData.netWt * anItem.formData.wastage)/100).toFixed(3)),
+            makingCharge: anItem.formData.labour,
+            initialPrice: anItem.formData.initialPrice, // price with Wastage + labourCharge
+            cgstPercent: anItem.formData.cgstPercent || 0,
+            cgstVal: parseFloat((anItem.formData.cgstVal || 0).toFixed(2)),
+            sgstPercent: anItem.formData.sgstPercent || 0,
+            sgstVal: parseFloat((anItem.formData.sgstVal || 0).toFixed(2)),
+            discount: parseFloat(anItem.formData.discount?anItem.formData.discount.toFixed(2):0),
+            itemType: anItem.metal,
+            amountWithTax: parseFloat((anItem.formData.initialPrice + anItem.formData.cgstVal + anItem.formData.sgstVal).toFixed(2)),
+            // amountWithTaxAndDiscount: parseFloat((anItem.formData.initialPrice + anItem.formData.cgstVal + anItem.formData.sgstVal - anItem.formData.discount).toFixed(2)),
+            finalPrice: parseFloat((anItem.formData.initialPrice + anItem.formData.cgstVal + anItem.formData.sgstVal - anItem.formData.discount).toFixed(2)),
+        });
+        itemType = anItem.metal;
+    });
+
+    let oldOrnaments = {};
+    if(stateObj.exchangeItemsTotals.netWt) {
+        oldOrnaments.itemType = stateObj.exchangeItems[1].metal
+        oldOrnaments.grossWt = stateObj.exchangeItemsTotals.grossWt;
+        oldOrnaments.lessWt = stateObj.exchangeItemsTotals.wastageVal;
+        oldOrnaments.netWt = stateObj.exchangeItemsTotals.netWt;
+        oldOrnaments.pricePerGram = stateObj.exchangeItemsTotals.oldRateAvg;
+        oldOrnaments.netAmount = stateObj.exchangeItemsTotals.price;
+    }
+    if(stateObj.selectedCustomer && Object.keys(stateObj.selectedCustomer).length > 0 ) {
+        customerName = stateObj.selectedCustomer.cname;
+        customerMobile = stateObj.selectedCustomer.mobile;
+        customerAddr = stateObj.selectedCustomer.address;
+        if(stateObj.selectedCustomer.otherDetailsJson && stateObj.selectedCustomer.otherDetailsJson.length > 0) {
+            let filteredArr = stateObj.selectedCustomer.otherDetailsJson.filter((a) => a.field === 'Pan Card');
+            customerPanNo = filteredArr[0]?.val;
+        }
+    }
+
+    let paymentFormData = {
+        newItemPrice: stateObj.paymentFormData.totalPurchaseFinalPrice,
+        totalExchangeFinalPrice: stateObj.paymentFormData.totalExchangeFinalPrice,
+        sum: stateObj.paymentFormData.sum,
+        paymentMode: stateObj.paymentFormData.paymentMode,
+        paymentObj: stateObj.paymentFormData.paymentObj,
+        paid: stateObj.paymentFormData.paid,
+        balance: stateObj.paymentFormData.balance
+    };
+    return {
+        gstNumber: propObj.storeDetail.gstNo,
+        itemType: itemType,
+        storeName: propObj.storeDetail.storeName,
+        address: propObj.storeDetail.address,
+        place: propObj.storeDetail.place,
+        city: propObj.storeDetail.city,
+        pinCode: propObj.storeDetail.pincode,
+        storeMobile1: propObj.storeDetail.mobile,
+        storeMobile2: '',
+        hsCode: 7113,
+        goldRatePerGm: (itemType=='G'?stateObj.retailPrice:propObj.rate.retailRate.gold),
+        silverRatePerGm: (itemType=='S'?stateObj.retailPrice:propObj.rate.retailRate.silver),
+        billNo: stateObj.invoiceSeries?`${stateObj.invoiceSeries}.${stateObj.invoiceNo}`:stateObj.invoiceNo,
+        customerName: customerName,
+        customerMobile: customerMobile,
+        customerPanNo: customerPanNo,
+        customerAddr: customerAddr,
+        // dateVal: convertDateObjToStr(stateObj.date.isLive?new Date():stateObj.date.inputVal, {excludeTime: true}),
+        dateVal: convertDateObjToStr(stateObj.date.isLive?new Date():stateObj.date.inputVal, {format: 'MDY'}),
+        ornaments: newProds,
+        oldOrnaments,
+        calculations: {
+            totalMakingCharge: stateObj.paymentFormData._labourTotal,
+            totalInitialPrice: stateObj.paymentFormData.totalInitialPrice,
+            totalDiscount: stateObj.paymentFormData._discountTotal,
+            // cgstAvgPercent: stateObj.paymentFormData._cgstPercentAvg,
+            // sgstAvgPercent: stateObj.paymentFormData._sgstPercentAvg,
+            totalCgstVal: stateObj.paymentFormData._cgstValTotal,
+            totalSgstVal: stateObj.paymentFormData._sgstValTotal,
+            // totalNetAmountWithTax: (stateObj.paymentFormData.totalInitialPrice + stateObj.paymentFormData._cgstValTotal + stateObj.paymentFormData._sgstValTotal),
+            
+            // totalPurchaseNetAmountWithTaxAndDiscount: stateObj.paymentFormData.totalPurchaseFinalPrice,
+            totalPurchaseFinalPrice: stateObj.paymentFormData.totalPurchaseFinalPrice,
+            totalExchangeFinalPrice: stateObj.paymentFormData.totalExchangeFinalPrice,
+            roundedOffVal: stateObj.paymentFormData.roundOffVal,
+            grandTotal: stateObj.paymentFormData.sum,
+        },
+        paymentFormData,
+        paymentSelectionCardData: stateObj.paymentSelectionCardData
     }
 }
 
@@ -203,14 +430,15 @@ export const resetPageState = (stateObj) => {
         exchangeItems: {},
         exchangeItemsTotals: {},
         paymentFormData: {
-            totalPurchasePrice: 0,
-            totalExchangePrice: 0,
+            totalPurchaseFinalPrice: 0,
+            totalExchangeFinalPrice: 0,
             sum: 0,
             paymentMode: 'cash',
             paymentDetails: {},
             paid: 0,
             balance: 0
-        }
-    }
+        },
+        paymentCardResetActionFlag: true //for payment card
+    };
     return stateObj;
 }

@@ -1,0 +1,49 @@
+.gs-card-content.cash-out {
+    padding: 0;
+    .row+.row {
+        margin-top: 10px;
+    }
+    .cash-out-header {
+        padding-top: 5px;
+    }
+    .a-payment-mode {
+        display: inline-block;
+        padding: 2px 8px;
+        border: 1px solid lightgray;
+        border-radius: 6px;
+        margin-right: 5px;
+        cursor: pointer;
+        font-size: 13px;
+        margin-bottom: 15px;
+    }
+
+    .a-payment-mode.choosen,
+    .a-payment-mode:focus {
+        background-color: #d3d3d382;
+    }
+    .cust-edit-icon,
+    .cust-remove-icon{
+        padding-left: 3px;
+        padding-right: 5px;
+        cursor: pointer;
+    }
+    .transaction-date-picker .react-datepicker-wrapper {
+        padding-left: 5px;
+        margin-left: 10px;
+        border: 1px solid lightgray;
+        border-radius: 5px;
+    }
+}
+
+.cash-manager .cash-out .common-modal-content .body {
+    padding: 20px 20px 100px 20px;
+}
+
+.cash-manager .cash-out .common-modal-wrapper {
+    z-index: 3;
+}
+
+.cash-manager .cash-out.edit-mode {
+    background-color: 'aliceblue';
+}
+

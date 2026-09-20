@@ -1,5 +1,7 @@
 .add-stock-container {
+    margin-top: 50px;
     margin-bottom: 50px;
+    width: 82%;
 }
 
 .bill-meta-data-row .form-group {
@@ -115,7 +117,18 @@
 } */
 
 .add-stock-container .react-autosuggest__suggestions-container {
-    top: 33px;
+    width: 300px;
+}
+
+.add-stock-container .product-code-input-col .react-autosuggest__suggestions-container,
+.add-stock-container .item-name-input-col .react-autosuggest__suggestions-container {
+    top: 83px;
+}
+
+.add-stock-container .item-category1-input-col .react-autosuggest__suggestions-container,
+.add-stock-container .item-category2-input-col .react-autosuggest__suggestions-container,
+.add-stock-container .item-size-input-col .react-autosuggest__suggestions-container {
+    top: 118px;
 }
 
 /* .add-stock-container input {
@@ -142,7 +155,7 @@
 
 table.item-input-table {
     table-layout: fixed;
-    width: 100%;
+    /* width: 100%; */
 }
 .bill-meta-data-row th,
 .item-input-table th, 
@@ -152,7 +165,7 @@ table.item-input-table {
 }
 .bill-meta-data-row .gs-input-cell,
 .item-input-table .gs-input-cell {
-    border: none;
+    /* border: none; */
 }
 .bill-meta-data-row .form-control,
 .item-input-row .form-control {
@@ -176,4 +189,8 @@ table.item-input-table {
 
 .add-stock-container .preview-container-row .a-section .section-body {
     padding: 15px;
+}
+
+.edit-stock-common-modal .add-stock-container {
+    width: 100%;
 }

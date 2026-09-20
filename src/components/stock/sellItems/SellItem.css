@@ -1,14 +1,17 @@
 .sell-item-container {
     max-width: calc(100% - 20px);
 }
+.sell-item-container .cust-selection-modal .body {
+    padding: 20px;
+}
 .sell-item-container .customer-selection-parent-row {
-    height: 50px;
+    /* height: 50px; */
 }
 .sell-item-container .customer-selection-panel {
     border: 1px solid lightGray;
 }
 .sell-item-container .gold-rate-container {
-    border: 1px solid lightGray;
+    /* border: 1px solid lightGray; */
 }
 .sell-item-container .second-card {
     min-height: 500px;
@@ -104,7 +107,7 @@
 
 .sell-item-container .payment-column .field-val.amount-paid,
 .sell-item-container .payment-column .field-val.amount-bal {
-    border-color: lightgray;
+    border: 1px solid lightgray;
     width: 100px;
 }
 
@@ -116,3 +119,36 @@
     border: none;
     width: 100%;
 } */
+
+.sell-item-container .wastage-calc-tool .wt-col,
+.sell-item-container .wastage-calc-tool .rate-col {
+    padding-right: 0;
+}
+
+.sell-item-container .wastage-calc-tool .wsg-col {
+    padding: 0;
+}
+
+.sell-item-container .wastage-calc-tool .operator {
+    font-size: 16px;
+}
+
+.sell-item-container .round-off-selector {
+    color: #2196f3;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+.sell-item-container .date-picker-input {
+    padding-left: 5px;
+}
+
+.sell-item-container .change-customer-icon {
+    color: #2196f3;
+    cursor: pointer;
+}
+
+.react-autosuggest__input.tagid+.react-autosuggest__suggestions-container,
+.react-autosuggest__input.huid+.react-autosuggest__suggestions-container {
+    top: 52px;
+}

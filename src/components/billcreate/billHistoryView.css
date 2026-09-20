@@ -4,3 +4,6 @@
 .bill-history-view tbody {
     font-size: 13px;
 }
+.bill-history-view .expired {
+    color: red;
+}

@@ -1,0 +1,30 @@
+.cust-inv-container.full-screen {
+    max-width: 100%;
+}
+.my-customer-invoices-list-table {
+    table-layout: fixed;
+    input[type="text"] {
+        width: 100%;
+    }
+    .invoice-customer-address {
+        text-overflow: ellipsis;
+        overflow: hidden;
+        white-space: nowrap;
+    }
+}
+.cust-inv-container .invoice-return-popup {
+    width: 50%;
+}
+.jewellery-invoice-billno-col.gold-item {
+    border-left: 5px solid gold;
+}
+.jewellery-invoice-billno-col.silver-item {
+    border-left: 5px solid silver;
+}
+.my-customer-invoices-list-table tr.returned td {
+    color: grey;
+    text-decoration: line-through;
+}
+.jwl-invoices-list-filter-popover {
+    z-index: 3;
+}

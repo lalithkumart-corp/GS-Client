@@ -1,3 +1,5 @@
+import _ from 'lodash';
+
 const LABOUR_UNIT_MAP = {
     "fixed": "FX",
     "percent": "PC"
@@ -16,6 +18,7 @@ export const constructItemObj = (thatState, options) => {
         productCategory: fd.productCategory || "",
         productSubCategory: fd.productSubCategory || "",
         productDimension: fd.productDimension || "",
+        productHUID: fd.productHUID || "",
         productQty: fd.productQty,
         productGWt: fd.productGWt,
         productNWt: fd.productNWt,
@@ -29,6 +32,8 @@ export const constructItemObj = (thatState, options) => {
         productCalcLabourAmt: fd.calcLabourVal || 0,
        // productFlatAmt: fd.productFlatAmt,
         calcAmtWithLabour: fd.calcAmtWithLabour || 0,
+        productSalesWsgPercent: fd.productSalesWsgPercent || 0,
+        productSalesMakingCharge: fd.productSalesMakingCharge || 0,
         productCgstPercent: fd.productCgstPercent || 0,
         productCgstAmt: fd.productCgstAmt || 0,
         productSgstPercent: fd.productSgstPercent || 0,
@@ -93,6 +98,7 @@ export const resetFormData = (thatState) => {
         productCategory: '',
         productSubCategory: "",
         productDimension: '',
+        productHUID: "",
         productQty: "",
         productGWt: "",
         productNWt: "",
@@ -103,6 +109,8 @@ export const resetFormData = (thatState) => {
         calcAmtUptoIWt: "",
         productLabourCharges: '',
         productLabourCalcUnit: 'fixed',
+        productSalesMakingCharge: '',
+        productSalesWsgPercent: '',
         calcAmtWithLabour: "",
         //productCgstPercent: "",
         productCgstAmt: "",

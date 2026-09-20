@@ -1,9 +1,10 @@
 let defaultState = {
-    visibility: false
+    visibility: false,
+    newNotificationsAvl: false
 };
 export default function authReducer(state=defaultState, action) {
     let newState = { ...state };
-    switch(action.type){
+    switch(action.type) {
         case 'OPEN':
             newState.visibility = true;
             break;
@@ -12,6 +13,12 @@ export default function authReducer(state=defaultState, action) {
             break;
         case 'TOGGLE':
             newState.visibility = !newState.visibility;
+            break;
+        case 'NEW_NOTIFICATION_AVL':
+            newState.newNotificationsAvl = true;
+            break;
+        case 'NEW_NOTIFICATION_READ':
+            newState.newNotificationsAvl = false;
             break;
     }
     return newState;

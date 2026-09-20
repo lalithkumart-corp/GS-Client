@@ -1,0 +1,223 @@
+.jewellery-tag-template-7-label {
+    background-color: lightgray;
+    font-family: system-ui;
+    font-weight: 1000;
+    font-size: 11px;
+    width: 302px;
+    max-height: 45px;
+    line-height: 7px;
+    position: relative;
+    overflow: hidden;
+
+    .label-content-section {
+        display: flex;
+        width: 302px;
+        max-height: 45px;
+        box-sizing: border-box;
+        margin-left: 3mm;
+    }
+
+    .tag-body {
+        display: flex;
+        width: 182px;
+        max-height: 45px;
+        box-sizing: border-box;
+    }
+
+    .body-part {
+        height: 45px;
+        width: 91px;
+        display: inline-block;
+        vertical-align: top;
+        font-size: 10px;
+        box-sizing: border-box;
+        padding: 0;
+    }
+
+     .body-part-1 {
+        padding-left: 5px;
+    }
+
+    // .body-part + .body-part {
+    //     border-left: 1px solid rgba(0, 0, 0, 0.7);
+    // }
+
+    .row {
+        margin: 0;
+        display: block;
+        width: 100%;
+        min-width: 0;
+        text-align: left;
+        box-sizing: border-box;
+        line-height: 1.1;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+        padding-left: 0;
+        padding-right: 0;
+    }
+
+    .row-1 {
+        height: 12px;
+        line-height: 12px;
+        font-size: 10px;
+        letter-spacing: 0.5px;
+        text-transform: uppercase;
+    }
+
+    .row-2 {
+        height: 16px;
+        line-height: 16px;
+        padding-left: 0;
+        font-size: 13px;
+    }
+
+    .row-3 {
+        height: 12px;
+        line-height: 12px;
+        font-size: 10px;
+        letter-spacing: 0.3px;
+        text-transform: uppercase;
+    }
+    .body-part-1 .row-3 {
+        display: block;
+        padding-left: 2px;
+        padding-right: 2px;
+        box-sizing: border-box;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    .body-part-1 .row-3 .row-left {
+        display: inline;
+        padding: 0;
+    }
+
+    .body-part-1 .row-3 .row-right {
+        display: none;
+    }
+
+    .body-part-2 .row-3 {
+        display: flex;
+        align-items: center;
+        padding-left: 2px;
+        padding-right: 2px;
+        box-sizing: border-box;
+    }
+
+    .body-part-2 .row-3 .row-left {
+        flex: 0 0 60%;
+        max-width: 60%;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        text-align: left;
+        line-height: 12px;
+        padding-right: 2px;
+        box-sizing: border-box;
+        padding: 0;
+    }
+
+    .body-part-2 .row-3 .row-right {
+        flex: 0 0 40%;
+        max-width: 40%;
+        text-align: center;
+        white-space: nowrap;
+        line-height: 12px;
+        box-sizing: border-box;
+        padding: 0;
+    }
+    .body-part-1 .row-1 {
+        display: flex;
+        align-items: center;
+        padding-left: 2px;
+        padding-right: 2px;
+        box-sizing: border-box;
+        // gap: 4px;
+    }
+
+    /* fixed 60:40 split for first row (left:right) */
+    .body-part-1 .row-1 .row-left {
+        // flex: 0 0 60%;
+        max-width: 49px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        text-align: left;
+        line-height: 12px;
+        padding-right: 2px;
+        box-sizing: border-box;
+        padding: 0;
+    }
+
+    .body-part-1 .row-1 .row-right {
+        // flex: 0 0 40%;
+        max-width: 30px;
+        text-align: center;
+        white-space: nowrap;
+        line-height: 12px;
+        box-sizing: border-box;
+        padding: 0;
+    }
+
+    .barcode-span {
+        display: block;
+        width: 100%;
+        max-width: 100%;
+        overflow: hidden;
+        text-align: left;
+        margin: 0;
+        padding: 0;
+        padding-left: 6px;
+
+        svg {
+            display: block;
+            max-width: 100%;
+            width: auto;
+            height: 14px !important;
+            margin: 0 !important;
+            padding: 0 !important;
+            transform: none !important;
+
+            g {
+                transform: none !important;
+            }
+        }
+    }
+
+    .tag-tail {
+        position: relative;
+        width: 120px;
+        min-height: 45px;
+        background: rgba(255, 255, 255, 0.08);
+        box-sizing: border-box;
+    }
+
+    // .tag-tail::before {
+    //     content: '';
+    //     position: absolute;
+    //     top: 0;
+    //     left: -10px;
+    //     width: 0;
+    //     height: 0;
+    //     border-top: 22px solid transparent;
+    //     border-bottom: 22px solid transparent;
+    //     border-left: 10px solid lightgray;
+    // }
+}
+
+.jewellery-tag-template-setup-container {
+    .jewellery-tag-template-7-label {
+        .label-content-section {
+            .section-1 {
+                .row-1 {
+                    .barcode-span {
+                        svg > rect:first-child {
+                            fill: lightgray !important;
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

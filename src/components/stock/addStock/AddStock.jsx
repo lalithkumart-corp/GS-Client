@@ -8,10 +8,9 @@ import moment from 'moment';
 import { getDateInUTC } from '../../../utilities/utility';
 import _ from 'lodash';
 import { DoublyLinkedList } from '../../../utilities/doublyLinkedList';
-import axios from '../../../core/axios';
 import { getAccessToken } from '../../../core/storage';
-import { FETCH_ORN_LIST_JEWELLERY, INSERT_NEW_STOCK_ITEM, FETCH_TOUCH_LIST, UPDATE_STOCK_ITEM } from '../../../core/sitemap';
-import * as ReactAutosuggest from 'react-autosuggest';
+import { FETCH_ORN_LIST_JEWELLERY, INSERT_NEW_STOCK_ITEM, FETCH_TOUCH_LIST, UPDATE_STOCK_ITEM, ANALYTICS } from '../../../core/sitemap';
+import ReactAutosuggest from 'react-autosuggest';
 import axiosMiddleware from '../../../core/axios';
 import { constructItemObj, resetFormData } from './helper';
 import { toast } from 'react-toastify';
@@ -32,6 +31,7 @@ const PROD_NAME = 'productName';
 const PROD_CATEG = 'productCategory';
 const PROD_SUB_CATEG = 'productSubCategory';
 const PROD_DIM = 'productDimension';
+const PROD_HUID = 'productHUID';
 const PROD_QTY = 'productQty';
 const PROD_GWT = 'productGWt';
 const PROD_NWT = 'productNWt';
@@ -47,6 +47,8 @@ const PROD_SGST_AMT = 'productSgstAmt';
 const PROD_IGST_AMT = 'productIgstAmt';
 const PROD_SGST_PERCENT = 'productSgstPercent';
 const PROD_IGST_PERCENT = 'productIgstPercent';
+const PROD_SALES_WST_PERCENT = 'productSalesWsgPercent';
+const PROD_SALES_MAKING_CHARGE = 'productSalesMakingCharge';
 const ADD_ENTRY = 'addEntry';
 const CONFIRM_ADD = 'confirmAdd';
 const UPDATE_ENTRY = 'updateEntry';
@@ -63,6 +65,7 @@ domList.add(PROD_NAME, {type: 'rautosuggest', enabled: true});
 domList.add(PROD_CATEG, {type: 'rautosuggest', enabled: true});
 domList.add(PROD_SUB_CATEG, {type: 'rautosuggest', enabled: true});
 domList.add(PROD_DIM, {type: 'rautosuggest', enabled: true});
+domList.add(PROD_HUID, {type: 'rautosuggest', enabled: true});
 domList.add(PROD_QTY, {type: 'formControl', enabled: true});
 domList.add(PROD_GWT, {type: 'formControl', enabled: true});
 domList.add(PROD_NWT, {type: 'formControl', enabled: true});
@@ -70,6 +73,8 @@ domList.add(PROD_PTOUCH, {type: 'formControl', enabled: true});
 domList.add(PROD_ITOUCH, {type: 'formControl', enabled: true});
 domList.add(PROD_LAB_CHARGES, {type: 'formControl', enabled: true});
 domList.add(PROD_LAB_CALC_UNIT, {type: 'formControl', enabled: false});
+domList.add(PROD_SALES_WST_PERCENT, {type: 'formControl', enabled: true});
+domList.add(PROD_SALES_MAKING_CHARGE, {type: 'formControl', enabled: true});
 domList.add(PROD_CGST_PERCENT, {type: 'formControl', enabled: true});
 domList.add(PROD_SGST_PERCENT, {type: 'formControl', enabled: true});
 domList.add(PROD_IGST_PERCENT, {type: 'formControl', enabled: true});
@@ -83,7 +88,8 @@ class AddStock extends Component {
         this.state = {
             formData: {
                 date: {
-                    inputVal: moment().format('DD-MM-YYYY'),
+                    inputValOld: moment().format('DD-MM-YYYY'),
+                    inputVal: new Date(),
                     _inputVal: new Date().toISOString()
                 },
                 metal: 'G',
@@ -98,6 +104,7 @@ class AddStock extends Component {
                 productCategory: '',
                 productSubCategory: '',
                 productDimension: '',
+                productHUID: '',
                 productQty: null,
                 productGWt: null,
                 productNWt: null,
@@ -110,9 +117,11 @@ class AddStock extends Component {
                 productLabourCalcUnit: 'fixed',
                 calcLabourVal: '',
                 calcAmtWithLabour: '',
-                productCgstPercent: null,
+                productSalesWsgPercent: null,
+                productSalesMakingCharge: null,
+                productCgstPercent: 1.5,
                 productCgstAmt: null,
-                productSgstPercent: null,
+                productSgstPercent: 1.5,
                 productSgstAmt: null,
                 productIgstPercent: null,
                 productIgstAmt: null,
@@ -150,10 +159,12 @@ class AddStock extends Component {
         this.fetchOrnAutoSuggestionList();
         this.fetchTouchList();
         if(this.props.mode == "update" && this.props.rowData) {
-            console.log('=======================AA', this.props);
             this.populateDataFromProps(this.props);
             this.updateDomList('enableUpdateBtn');
+        } else {
+            this.updateDomList('enableAddBtn');
         }
+        this.createEvent();
     }
 
     componentWillReceiveProps(nextProps) {
@@ -163,11 +174,22 @@ class AddStock extends Component {
         }
     }
 
+    createEvent() {
+        try {
+            axiosMiddleware.post(ANALYTICS, {module: 'JEWELLERY_ITEMS_ADD_TO_STOCK_PAGE_VISIT'});
+        } catch(e) {
+            console.log(e);
+        }
+    }
+
     populateDataFromProps(propObj) {
         let rowData = propObj.rowData;
         let newState = {...this.state};
         newState.formData.id = rowData.id;
         newState.formData.uid = rowData.uid;
+        newState.formData.date.inputVal = new Date(rowData.date);
+        newState.formData.date._inputVal = rowData.date;
+
         newState.formData.metal = rowData.metal;
         newState.formData.metalPrice = rowData.metalRate;
         newState.formData.metalPricePerGm = this.getMetalPricePerGm('G', rowData.metalRate),
@@ -180,6 +202,7 @@ class AddStock extends Component {
         newState.formData.productCategory = rowData.itemCategory;
         newState.formData.productSubCategory = rowData.itemSubCategory;
         newState.formData.productDimension = rowData.dimension;
+        newState.formData.productHUID = rowData.huid;
         newState.formData.productQty = rowData.qty;
         newState.formData.productGWt = rowData.grossWt;
         newState.formData.productNWt = rowData.netWt;
@@ -192,6 +215,9 @@ class AddStock extends Component {
         newState.formData.productLabourCalcUnit = rowData.labourChargeUnit;
         newState.formData.calcLabourVal = rowData.labourChargeCalc;
         newState.formData.calcAmtWithLabour = null;//rowData.dealerStoreName;
+        
+        // TODO: for productSalesMakingCharge, productSalesWsgPercent
+        
         newState.formData.productCgstPercent = rowData.CgstPercent;
         newState.formData.productCgstAmt = rowData.CgstAmt;
         newState.formData.productSgstPercent = rowData.SgstPercent;
@@ -218,14 +244,15 @@ class AddStock extends Component {
             let newState = {...this.state};
             switch(identifier) {
                 case 'date':
-                    newState.formData[identifier].inputVal = moment(val).format('DD-MM-YYYY');
-                    newState.formData[identifier]._inputVal = getDateInUTC(val);
+                    newState.formData[identifier].inputVal = val;
+                    newState.formData[identifier]._inputVal = getDateInUTC(val, {withSelectedTime: true});
                     break;
                 case DLR_STORE_NAME:
                 case DLR_PERSON_NAME:
                 case PROD_CATEG:
                 case PROD_SUB_CATEG:
                 case PROD_DIM:
+                case PROD_HUID:
                 case PROD_QTY:
                 case PROD_GWT:
                 case PROD_NWT:
@@ -241,6 +268,8 @@ class AddStock extends Component {
                 case PROD_IGST_PERCENT:
                 case PROD_IGST_AMT:
                 case PROD_CODE_NO:
+                case PROD_SALES_WST_PERCENT:
+                case PROD_SALES_MAKING_CHARGE:
                     newState.formData[identifier] = val;
                     break;
                 case METAL_PRICE:
@@ -271,7 +300,11 @@ class AddStock extends Component {
                 case PROD_SUB_CATEG:
                 case PROD_DIM:
                 case PROD_CODE_SERIES:
-                    newState.formData[identifier] = newValue;
+                    try {
+                        newState.formData[identifier] = newValue.trim();
+                    } catch(e) {
+                        newState.formData[identifier] = newValue;
+                    }
                     break;
             }
             this.setState(newState);
@@ -450,7 +483,7 @@ class AddStock extends Component {
                 break;
         }
         newState = this.setAutoFillups(newState);
-        this.transferFocus(e, identifier);
+        // this.transferFocus(e, identifier);
         this.setState(newState);
     }
 
@@ -536,6 +569,10 @@ class AddStock extends Component {
                 domList.enable(UPDATE_ENTRY);
                 domList.disable(ADD_ENTRY);
                 break;
+            case 'enableAddBtn':
+                domList.disable(UPDATE_ENTRY);
+                domList.enable(ADD_ENTRY);
+                break;
         }
     }
 
@@ -548,9 +585,9 @@ class AddStock extends Component {
             fd.productITouch = fd.productPureTouch;
         if(fd.metalPrice && fd.metalPricePerGm && fd.productQty && fd.productNWt) {
             if(fd.productPureTouch)
-                fd.productPWt = ((fd.productNWt * fd.productPureTouch)/100).toFixed(3);
+                fd.productPWt = ((fd.productNWt * fd.productPureTouch)/100).toFixed(5);
             if(fd.productITouch)
-                fd.productIWt = ((fd.productNWt * fd.productITouch)/100).toFixed(3);
+                fd.productIWt = ((fd.productNWt * fd.productITouch)/100).toFixed(5);
             if(fd.productIWt)
                 fd.calcAmtUptoIWt = fd.metalPricePerGm * fd.productIWt;
             if(fd.productLabourCalcUnit && fd.productLabourCharges) {
@@ -573,11 +610,11 @@ class AddStock extends Component {
 
             // BEAUTIFY OR TRIMMING
             if(fd.calcAmtUptoIWt)
-                fd.calcAmtUptoIWt = parseFloat(fd.calcAmtUptoIWt.toFixed(3));
+                fd.calcAmtUptoIWt = parseFloat(fd.calcAmtUptoIWt.toFixed(2));
             if(fd.calcAmtWithLabour)
-                fd.calcAmtWithLabour = parseFloat(fd.calcAmtWithLabour.toFixed(3));
+                fd.calcAmtWithLabour = parseFloat(fd.calcAmtWithLabour.toFixed(2));
             if(fd.productTotalAmt)
-                fd.productTotalAmt = fd.productTotalAmt.toFixed(3);
+                fd.productTotalAmt = fd.productTotalAmt.toFixed(2);
         }
         return newState;
     }
@@ -585,7 +622,7 @@ class AddStock extends Component {
     async fetchOrnAutoSuggestionList() {
         try {
             let at = getAccessToken();
-            let resp = await axios.get(`${FETCH_ORN_LIST_JEWELLERY}?access_token=${at}`);
+            let resp = await axiosMiddleware.get(`${FETCH_ORN_LIST_JEWELLERY}?access_token=${at}`);
             let list = resp.data.RESPONSE;
             let itemCodeList = [], itemNameList = [], itemCategoryList = [], itemSubCategoryList = [], itemDimentionList = [];
             _.each(list, (anObj, index) => {
@@ -618,7 +655,7 @@ class AddStock extends Component {
     async fetchTouchList() {
         try {
             let at = getAccessToken();
-            let resp = await axios.get(`${FETCH_TOUCH_LIST}?access_token=${at}`);
+            let resp = await axiosMiddleware.get(`${FETCH_TOUCH_LIST}?access_token=${at}`);
             let list = resp.data.RESPONSE;
             let newState = {...this.state};
             newState.autoSuggestions = newState.autoSuggestions || {};
@@ -644,7 +681,8 @@ class AddStock extends Component {
                 return false;
             }
         } catch(e) {
-            toast.error('Error occured while inserting new stock item');
+            if(!e._IsDeterminedError)
+                toast.error('Error occured while inserting new stock item');
             return false;
         }
     }
@@ -799,7 +837,7 @@ class AddStock extends Component {
 
     render() {
         return (
-            <Container className="add-stock-container" style={{maxWidth: "100%"}}>
+            <Container className="add-stock-container">
                 <Row className="bill-meta-data-row">
                     <Col>
                         <table className="bill-metal-table">
@@ -807,8 +845,8 @@ class AddStock extends Component {
                                 <tr>
                                     <th>BillDate</th>
                                     <th>Metal</th>
-                                    <th>Price</th>
-                                    <th>SupplierShop</th>
+                                    <th>Metal Price (10gm)</th>
+                                    <th>Supplier Shop</th>
                                     <th>Supplier Person</th>
                                 </tr>
                             </thead>
@@ -818,10 +856,15 @@ class AddStock extends Component {
                                         <Form.Group className="bill-date-picker">
                                             <DatePicker
                                                 id="example-datepicker" 
-                                                value={this.state.formData.date.inputVal} 
+                                                // value={this.state.formData.date.inputVal} 
+                                                selected={this.state.formData.date.inputVal} 
                                                 onChange={(fullDateVal, dateVal) => {this.inputControls.onChange(null, fullDateVal, 'date', {currElmKey: 'date'})} }
                                                 onKeyUp = {(e) => this.handleKeyUp(e, {currElmKey: 'date'}) }
                                                 showMonthDropdown
+                                                showYearDropdown
+                                                timeInputLabel="Time:"
+                                                dateFormat="dd/MM/yyyy"
+                                                showTimeInput
                                                 className='gs-input-cell'
                                                 />
                                         </Form.Group>
@@ -837,7 +880,7 @@ class AddStock extends Component {
                                         <Form.Group className="border-right-none">
                                             <Form.Control
                                                 type="text"
-                                                placeholder="MetalPrice"
+                                                placeholder="Enter the MetalPrice"
                                                 onChange={(e) => this.inputControls.onChange(null, e.target.value, METAL_PRICE)} 
                                                 onKeyUp = {(e) => this.handleKeyUp(e, {currElmKey: METAL_PRICE}) }
                                                 value={this.state.formData.metalPrice}
@@ -875,23 +918,22 @@ class AddStock extends Component {
                     </Col>
                 </Row>
                 <Row className="item-input-row">
-                    <Col>
+                    <Col xs={12} md={12}>
                         <table className="item-input-table">
                             <colgroup>
-                                <col style={{width: "20%"}}></col>
-                                <col style={{width: "3%"}}></col>
-                                <col style={{width: "10%"}}></col>
-                                <col style={{width: "5%"}}></col>
-                                <col style={{width: "5%"}}></col>
+                                <col style={{width: "300px"}}></col>
+                                <col style={{width: "50px"}}></col>
+                                <col style={{width: "150px"}}></col>
+                                <col style={{width: "75px"}}></col>
+                                <col style={{width: "75px"}}></col>
                                 
-                                <col style={{width: "4%"}}></col>
-                                <col style={{width: "5%"}}></col>
-                                <col style={{width: "8%"}}></col>
-                                <col style={{width: "10%"}}></col>
-                                <col style={{width: "10%"}}></col>
-                                
-                                <col style={{width: "10%"}}></col>
-                                <col style={{width: "7%"}}></col>
+                                <col style={{width: "75px"}}></col>
+                                <col style={{width: "75px"}}></col>
+                                <col style={{width: "100px"}}></col>
+
+                                <col style={{width: "100px"}}></col>
+                                <col style={{width: "75px"}}></col>
+                                <col style={{width: "75px"}}></col>
                             </colgroup>
                             <thead>
                                 <tr>
@@ -903,12 +945,11 @@ class AddStock extends Component {
 
                                     <th>I-Touch</th>
                                     <th>I-wt</th>
-                                    <th>LAB</th>
-                                    <th>CGST</th>
-                                    <th>SGST</th>
+                                    <th>LAB/H.M Charge</th>
                                     
-                                    <th>IGST</th>
-                                    <th>Total</th>
+                                    <th>Sub Total</th>
+                                    <th>Sales Wsg %</th>
+                                    <th>Sales M.C</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -932,7 +973,7 @@ class AddStock extends Component {
                                                     ref = {(domElm) => { this.domElmns[PROD_CODE_SERIES] = domElm?domElm.input:domElm; }}
                                                 />
                                             </Col>
-                                            <Col xs={{span: 8}} className="no-padding">
+                                            <Col xs={{span: 8}} className="no-padding item-name-input-col">
                                                 <ReactAutosuggest
                                                     suggestions={this.state.autoSuggestions.filteredItemNameList}
                                                     onSuggestionsFetchRequested={({value}) => this.reactAutosuggestControls.onSuggestionsFetchRequested({value}, PROD_NAME)}
@@ -960,6 +1001,7 @@ class AddStock extends Component {
                                                 onKeyUp={(e) => this.handleKeyUp(e, {currElmKey: PROD_QTY})}
                                                 ref= {(domElm) => {this.domElmns[PROD_QTY] = domElm; }}
                                                 value={this.state.formData.productQty}
+                                                className="gs-input-cell"
                                             />
                                         </Form.Group>
                                     </td>
@@ -974,6 +1016,7 @@ class AddStock extends Component {
                                                         onKeyUp={(e) => this.handleKeyUp(e, {currElmKey: PROD_GWT})}
                                                         ref= {(domElm) => {this.domElmns[PROD_GWT] = domElm; }}
                                                         value={this.state.formData.productGWt}
+                                                        className="gs-input-cell"
                                                     />
                                                 </Form.Group>
                                             </Col>
@@ -986,6 +1029,7 @@ class AddStock extends Component {
                                                         onKeyUp={(e) => this.handleKeyUp(e, {currElmKey: PROD_NWT})}
                                                         ref= {(domElm) => {this.domElmns[PROD_NWT] = domElm; }}
                                                         value={this.state.formData.productNWt}
+                                                        className="gs-input-cell"
                                                     />
                                                 </Form.Group>
                                             </Col>
@@ -998,6 +1042,7 @@ class AddStock extends Component {
                                                 value={this.state.formData.productPureTouch}
                                                 onKeyUp={(e) => this.handleKeyUp(e, {currElmKey: PROD_PTOUCH})}
                                                 ref= {(domElm) => {this.domElmns[PROD_PTOUCH] = domElm; }}
+                                                className="gs-input-cell"
                                                 >
                                                 {this.getTouchDom()}
                                             </Form.Control>
@@ -1023,6 +1068,7 @@ class AddStock extends Component {
                                                 ref= {(domElm) => {this.domElmns[PROD_ITOUCH] = domElm; }}
                                                 value={this.state.formData.productITouch}
                                                 onFocus={(e)=> {e.target.select()}}
+                                                className="gs-input-cell"
                                             />
                                         </Form.Group>
                                     </td>
@@ -1041,7 +1087,7 @@ class AddStock extends Component {
                                             <Form.Control
                                                 type="text"
                                                 placeholder=""
-                                                className="product-labour-charges" //border-right-none 
+                                                className="product-labour-charges gs-input-cell" //border-right-none 
                                                 onChange={(e) => this.inputControls.onChange(null, e.target.value, PROD_LAB_CHARGES)}
                                                 onKeyUp={(e) => this.handleKeyUp(e, {currElmKey: PROD_LAB_CHARGES})} 
                                                 value={this.state.formData.productLabourCharges}
@@ -1050,7 +1096,7 @@ class AddStock extends Component {
                                             <Form.Control as="select"
                                                 onChange={(e) => this.onDropdownChange(e, PROD_LAB_CALC_UNIT)} 
                                                 value={this.state.formData.productLabourCalcUnit}
-                                                className="product-labour-charge-unit" //border-right-none 
+                                                className="product-labour-charge-unit gs-input-cell" //border-right-none 
                                                 onKeyUp={(e) => this.handleKeyUp(e, {currElmKey: PROD_LAB_CALC_UNIT})} 
                                                 ref= {(domElm) => {this.domElmns[PROD_LAB_CALC_UNIT] = domElm; }}>
                                                     <option key='fixed-option' value='fixed'>FX</option>
@@ -1058,91 +1104,41 @@ class AddStock extends Component {
                                             </Form.Control>
                                         </Form.Group>
                                     </td>
-                                    <td>
-                                        <Row className="no-margin">
-                                            <Col xs={{span: 4}} className="no-padding">
-                                                <Form.Group>
-                                                    <Form.Control
-                                                        type="text"
-                                                        placeholder="%"
-                                                        onChange={(e) => this.inputControls.onChange(null, e.target.value, PROD_CGST_PERCENT)}
-                                                        onKeyUp={(e) => this.handleKeyUp(e, {currElmKey: PROD_CGST_PERCENT})}
-                                                        value={this.state.formData.productCgstPercent}
-                                                        ref= {(domElm) => {this.domElmns[PROD_CGST_PERCENT] = domElm; }}
-                                                    />
-                                                </Form.Group>
-                                            </Col>
-                                            <Col xs={{span: 8}} className="no-padding">
-                                                <Form.Group>
-                                                    <Form.Control
-                                                        type="text"
-                                                        placeholder="0"
-                                                        value={this.state.formData.productCgstAmt}
-                                                        readOnly={true}
-                                                    />
-                                                </Form.Group>
-                                            </Col>
-                                        </Row>
-                                    </td>
-                                    <td>
-                                        <Row className="no-margin">
-                                            <Col xs={{span: 4}} className="no-padding">
-                                                <Form.Group>
-                                                    <Form.Control
-                                                        type="text"
-                                                        placeholder="%"
-                                                        onChange={(e) => this.inputControls.onChange(null, e.target.value, PROD_SGST_PERCENT)} 
-                                                        onKeyUp={(e) => this.handleKeyUp(e, {currElmKey: PROD_SGST_PERCENT})}
-                                                        ref= {(domElm) => {this.domElmns[PROD_SGST_PERCENT] = domElm; }}
-                                                        value={this.state.formData.productSgstPercent}
-                                                    />
-                                                </Form.Group>
-                                            </Col>
-                                            <Col xs={{span: 8}} className="no-padding">
-                                                <Form.Group>
-                                                    <Form.Control
-                                                        type="text"
-                                                        placeholder="0"
-                                                        value={this.state.formData.productSgstAmt}
-                                                        readOnly={true}
-                                                    />
-                                                </Form.Group>
-                                            </Col>
-                                        </Row>
-                                    </td>
-                                    <td>
-                                        <Row className="no-margin">
-                                            <Col xs={{span: 4}} className="no-padding">
-                                                <Form.Group>
-                                                    <Form.Control
-                                                        type="text"
-                                                        placeholder="%"
-                                                        onChange={(e) => this.inputControls.onChange(null, e.target.value, PROD_IGST_PERCENT)}
-                                                        onKeyUp={(e) => this.handleKeyUp(e, {currElmKey: PROD_IGST_PERCENT})}
-                                                        ref= {(domElm) => {this.domElmns[PROD_IGST_PERCENT] = domElm; }}
-                                                        value={this.state.formData.productIgstPercent}
-                                                    />
-                                                </Form.Group>
-                                            </Col>
-                                            <Col xs={{span: 8}} className="no-padding">
-                                                <Form.Group>
-                                                    <Form.Control
-                                                        type="text"
-                                                        placeholder="0"
-                                                        value={this.state.formData.productIgstAmt}
-                                                        readOnly={true}
-                                                    />
-                                                </Form.Group>
-                                            </Col>
-                                        </Row>
-                                    </td>
-                                    <td className="product-amt-total">
+                                    <td className="product-amt-upto-labor">
                                         <Form.Group>
                                             <Form.Control
                                                 type="text"
                                                 placeholder="0"
-                                                value={this.state.formData.productTotalAmt}
+                                                value={`₹ `+ (this.state.formData.calcAmtWithLabour||0.00)}
                                                 readOnly={true}
+                                            />
+                                        </Form.Group>
+                                    </td>
+                                    <td>
+                                        <Form.Group>
+                                            <Form.Control
+                                                type="text"
+                                                placeholder=""
+                                                onChange={(e) => this.inputControls.onChange(null, e.target.value, PROD_SALES_WST_PERCENT)} 
+                                                onKeyUp={(e) => this.handleKeyUp(e, {currElmKey: PROD_SALES_WST_PERCENT})}
+                                                ref= {(domElm) => {this.domElmns[PROD_SALES_WST_PERCENT] = domElm; }}
+                                                value={this.state.formData.productSalesWsgPercent}
+                                                onFocus={(e)=> {e.target.select()}}
+                                                className="gs-input-cell"
+                                            />
+                                        </Form.Group>
+                                    </td>
+                                    <td>
+                                        <Form.Group>
+                                            <Form.Control
+                                                type="text"
+                                                placeholder=""
+                                                onChange={(e) => this.inputControls.onChange(null, e.target.value, PROD_SALES_MAKING_CHARGE)} 
+                                                onKeyUp={(e) => this.handleKeyUp(e, {currElmKey: PROD_SALES_MAKING_CHARGE})}
+                                                ref= {(domElm) => {this.domElmns[PROD_SALES_MAKING_CHARGE] = domElm; }}
+                                                value={this.state.formData.productSalesMakingCharge}
+                                                onFocus={(e)=> {e.target.select()}}
+                                                className="gs-input-cell"
                                             />
                                         </Form.Group>
                                     </td>
@@ -1150,7 +1146,7 @@ class AddStock extends Component {
                                 <tr>
                                     <td>
                                         <Row className="no-margin">
-                                        <Col xs={{span: 5}} className="no-padding">
+                                        <Col xs={{span: 5}} className="no-padding item-category1-input-col">
                                                 <ReactAutosuggest
                                                     suggestions={this.state.autoSuggestions.filteredItemCategoryList}
                                                     onSuggestionsFetchRequested={({value}) => this.reactAutosuggestControls.onSuggestionsFetchRequested({value}, PROD_CATEG)}
@@ -1163,12 +1159,13 @@ class AddStock extends Component {
                                                         onChange: (e, {newValue, method}) => this.reactAutosuggestControls.onChange(e, {newValue, method}, PROD_CATEG),
                                                         onKeyUp: (e) => this.reactAutosuggestControls.onKeyUp(e, {currElmKey: PROD_CATEG}),
                                                         className: "react-autosuggest__input gs-input-cell",
-                                                        onFocus: (e)=> {e.target.select()}
+                                                        onFocus: (e)=> {e.target.select()},
+                                                        style: {padding: '6px'}
                                                     }}
                                                     ref = {(domElm) => { this.domElmns[PROD_CATEG] = domElm?domElm.input:domElm; }}
                                                 />
                                             </Col>
-                                            <Col xs={{span:3}} className="no-padding">
+                                            <Col xs={{span:4}} className="no-padding item-category2-input-col">
                                                 <ReactAutosuggest
                                                     suggestions={this.state.autoSuggestions.filteredItemSubCategoryList}
                                                     onSuggestionsFetchRequested={({value}) => this.reactAutosuggestControls.onSuggestionsFetchRequested({value}, PROD_SUB_CATEG)}
@@ -1181,12 +1178,13 @@ class AddStock extends Component {
                                                         onChange: (e, {newValue, method}) => this.reactAutosuggestControls.onChange(e, {newValue, method}, PROD_SUB_CATEG),
                                                         onKeyUp: (e) => this.reactAutosuggestControls.onKeyUp(e, {currElmKey: PROD_SUB_CATEG}),
                                                         className: "react-autosuggest__input gs-input-cell",
+                                                        style: {padding: '6px'},
                                                         onFocus: (e)=> {e.target.select()}
                                                     }}
                                                     ref = {(domElm) => { this.domElmns[PROD_SUB_CATEG] = domElm?domElm.input:domElm; }}
                                                 />
                                             </Col>
-                                            <Col xs={{span:4}} className="no-padding">
+                                            <Col xs={{span:3}} className="no-padding item-size-input-col">
                                                 <ReactAutosuggest
                                                     suggestions={this.state.autoSuggestions.filteredItemDimentionList}
                                                     onSuggestionsFetchRequested={({value}) => this.reactAutosuggestControls.onSuggestionsFetchRequested({value}, PROD_DIM)}
@@ -1199,6 +1197,7 @@ class AddStock extends Component {
                                                         onChange: (e, {newValue, method}) => this.reactAutosuggestControls.onChange(e, {newValue, method}, PROD_DIM),
                                                         onKeyUp: (e) => this.reactAutosuggestControls.onKeyUp(e, {currElmKey: PROD_DIM}),
                                                         className: "react-autosuggest__input gs-input-cell",
+                                                        style: {padding: '6px'},
                                                         onFocus: (e)=> {e.target.select()}
                                                     }}
                                                     ref = {(domElm) => { this.domElmns[PROD_DIM] = domElm?domElm.input:domElm; }}
@@ -1206,12 +1205,24 @@ class AddStock extends Component {
                                             </Col>
                                         </Row>
                                     </td>
-                                    <td colspan="5"></td>
-                                    <td>
+                                    {/* <td colspan="5">
                                         <Form.Group>
                                             <Form.Control
                                                 type="text"
-                                                value={this.state.formData.calcAmtUptoIWt}
+                                                value={this.state.formData.productHUID}
+                                                placeholder="HUID"
+                                                onChange={(e) => this.inputControls.onChange(null, e.target.value, PROD_HUID)}
+                                                onKeyUp={(e) => this.handleKeyUp(e, {currElmKey: PROD_HUID})}
+                                                ref= {(domElm) => {this.domElmns[PROD_HUID] = domElm; }}
+                                                className="gs-input-cell"
+                                            />
+                                        </Form.Group>
+                                    </td> */}
+                                    {/* <td>
+                                        <Form.Group>
+                                            <Form.Control
+                                                type="text"
+                                                value={`₹ `+ (this.state.formData.calcAmtUptoIWt||0)}
                                                 readOnly={true}
                                             />
                                         </Form.Group>
@@ -1220,7 +1231,7 @@ class AddStock extends Component {
                                         <Form.Group>
                                             <Form.Control
                                                 type="text"
-                                                value={this.state.formData.calcAmtWithLabour}
+                                                value={`₹ `+ (this.state.formData.calcAmtWithLabour||0)}
                                                 readOnly={true}
                                             />
                                         </Form.Group>
@@ -1233,22 +1244,150 @@ class AddStock extends Component {
                                                 readOnly={true}
                                             />
                                         </Form.Group>
+                                    </td> */}
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <Form.Group>
+                                            <Form.Control
+                                                type="text"
+                                                value={this.state.formData.productHUID}
+                                                placeholder="HUID"
+                                                onChange={(e) => this.inputControls.onChange(null, e.target.value, PROD_HUID)}
+                                                onKeyUp={(e) => this.handleKeyUp(e, {currElmKey: PROD_HUID})}
+                                                ref= {(domElm) => {this.domElmns[PROD_HUID] = domElm; }}
+                                                className="gs-input-cell"
+                                                style={{padding: '6px'}}
+                                            />
+                                        </Form.Group>
                                     </td>
                                 </tr>
                             </tbody>
                         </table>
                     </Col>
+                    <Col xs={{span: 6}} md={{span: 6}} style={{marginLeft: '450px'}}>
+                        <table className="item-tax-input-table">
+                            <colgroup>
+                                <col style={{width: "150px"}}></col>
+                                <col style={{width: "150px"}}></col>
+                                <col style={{width: "150px"}}></col>
+                                <col style={{width: "100px"}}></col>
+                            </colgroup>
+                            <thead>
+                                <tr>
+                                    <th>CGST</th>
+                                    <th>SGST</th>
+                                    <th>IGST</th>
+                                    <th>Total</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <td>
+                                    <Row className="no-margin">
+                                        <Col xs={{span: 4}} className="no-padding">
+                                            <Form.Group>
+                                                <Form.Control
+                                                    type="text"
+                                                    placeholder="%"
+                                                    onChange={(e) => this.inputControls.onChange(null, e.target.value, PROD_CGST_PERCENT)}
+                                                    onKeyUp={(e) => this.handleKeyUp(e, {currElmKey: PROD_CGST_PERCENT})}
+                                                    value={this.state.formData.productCgstPercent}
+                                                    ref= {(domElm) => {this.domElmns[PROD_CGST_PERCENT] = domElm; }}
+                                                    className="gs-input-cell"
+                                                />
+                                            </Form.Group>
+                                        </Col>
+                                        <Col xs={{span: 8}} className="no-padding">
+                                            <Form.Group>
+                                                <Form.Control
+                                                    type="text"
+                                                    placeholder="0"
+                                                    value={`₹ `+ (this.state.formData.productCgstAmt || 0)}
+                                                    readOnly={true}
+                                                />
+                                            </Form.Group>
+                                        </Col>
+                                    </Row>
+                                </td>
+                                <td>
+                                    <Row className="no-margin">
+                                        <Col xs={{span: 4}} className="no-padding">
+                                            <Form.Group>
+                                                <Form.Control
+                                                    type="text"
+                                                    placeholder="%"
+                                                    onChange={(e) => this.inputControls.onChange(null, e.target.value, PROD_SGST_PERCENT)} 
+                                                    onKeyUp={(e) => this.handleKeyUp(e, {currElmKey: PROD_SGST_PERCENT})}
+                                                    ref= {(domElm) => {this.domElmns[PROD_SGST_PERCENT] = domElm; }}
+                                                    value={this.state.formData.productSgstPercent}
+                                                    className="gs-input-cell"
+                                                />
+                                            </Form.Group>
+                                        </Col>
+                                        <Col xs={{span: 8}} className="no-padding">
+                                            <Form.Group>
+                                                <Form.Control
+                                                    type="text"
+                                                    placeholder="0"
+                                                    value={`₹ `+ (this.state.formData.productSgstAmt|| 0)}
+                                                    readOnly={true}
+                                                />
+                                            </Form.Group>
+                                        </Col>
+                                    </Row>
+                                </td>
+                                <td>
+                                    <Row className="no-margin">
+                                        <Col xs={{span: 4}} className="no-padding">
+                                            <Form.Group>
+                                                <Form.Control
+                                                    type="text"
+                                                    placeholder="%"
+                                                    onChange={(e) => this.inputControls.onChange(null, e.target.value, PROD_IGST_PERCENT)}
+                                                    onKeyUp={(e) => this.handleKeyUp(e, {currElmKey: PROD_IGST_PERCENT})}
+                                                    ref= {(domElm) => {this.domElmns[PROD_IGST_PERCENT] = domElm; }}
+                                                    value={this.state.formData.productIgstPercent}
+                                                    className="gs-input-cell"
+                                                />
+                                            </Form.Group>
+                                        </Col>
+                                        <Col xs={{span: 8}} className="no-padding">
+                                            <Form.Group>
+                                                <Form.Control
+                                                    type="text"
+                                                    placeholder="0"
+                                                    value={`₹ `+ (this.state.formData.productIgstAmt || 0)}
+                                                    readOnly={true}
+                                                />
+                                            </Form.Group>
+                                        </Col>
+                                    </Row>
+                                </td>
+                                <td className="product-amt-total">
+                                    <Form.Group>
+                                        <Form.Control
+                                            type="text"
+                                            placeholder="0"
+                                            value={`₹ `+ (this.state.formData.productTotalAmt||0.00)}
+                                            readOnly={true}
+                                        />
+                                    </Form.Group>
+                                </td>
+                            </tbody>
+                        </table>
+                    </Col>
                 </Row>
                 <Row className="action-container">
-                    <Col>
+                    <Col style={{textAlign: 'center'}}>
                         {this.props.mode == "update" &&
                             <input 
                                 type="button" 
                                 className="gs-button bordered" 
                                 value="Update" 
-                                // onKeyUp={(e) => this.handleKeyUp(e, {currElmKey: ADD_ENTRY})}
+                                // onKeyUp={(e) => this.handleKeyUp(e, {currElmKey: UPDATE_ENTRY})}
                                 ref= {(domElm) => {this.domElmns[UPDATE_ENTRY] = domElm; }}
                                 onClick={(e) => this.onButtonClicks(e, UPDATE_ENTRY)}
+                                style={{width: '60%', marginTop: '40px'}}
                             />
                         }
 
@@ -1256,10 +1395,11 @@ class AddStock extends Component {
                             <input 
                                 type="button" 
                                 className="gs-button bordered" 
-                                value="Add" 
+                                value="Add To Stock" 
                                 // onKeyUp={(e) => this.handleKeyUp(e, {currElmKey: ADD_ENTRY})}
                                 ref= {(domElm) => {this.domElmns[ADD_ENTRY] = domElm; }}
                                 onClick={(e) => this.onButtonClicks(e, ADD_ENTRY)}
+                                style={{width: '60%', marginTop: '40px'}}
                             />
                         }
                     </Col>

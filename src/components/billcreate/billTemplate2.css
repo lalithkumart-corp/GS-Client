@@ -8,7 +8,7 @@
 }
 
 @media print {
-    .billreceipt-print {
+    /* .billreceipt-print {
         display: block;
         max-width: 830px !important;
         min-width: 500px !important;
@@ -24,7 +24,6 @@
     .billreceipt-print .bill-receipt-content {
         padding: 15px 25px;
         border: none;
-        /* border: 1px solid lightgray; */
     }
     .billreceipt-print .header-logo1-div {
         height: 75px;
@@ -88,7 +87,6 @@
         margin-top: 20px;
     }
     .billreceipt-print .orn-info-col {
-        /* background-color: orange !important; */
         border: 1px solid lightgray;
         margin-right: 15px;
         padding-left: 5px;
@@ -119,7 +117,7 @@
         padding-left: 0;
     }
     .bill-receipt-content {
-        /* background-color: yellow !important; */
+        
     }
     .signature1-space,
     .signature2-space {
@@ -171,12 +169,11 @@
     }
 
     .orn-chit {
-        /* border: 1px solid lightgray; */
         padding: 2px 2px;
         margin: 0;
         font-size: 45px;
         letter-spacing: 10px;
         font-weight: 900;
         font-family: auto;
-    }
+    } */
 }

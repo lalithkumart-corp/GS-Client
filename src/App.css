@@ -33,7 +33,9 @@ html {
 .font-weight-bold {
   font-weight: bold;
 }
-
+.row+.row {
+  /* margin-top: 10px; */
+}
 .gs-button {  
   color: #2196f3;
   border: none;
@@ -45,6 +47,7 @@ html {
   transition: background-color 250ms cubic-bezier(0.4, 0, 0.2, 1) 0ms,box-shadow 250ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;
   /* background-color: #337ab7;
   border-color: #2e6da4; */
+  cursor: pointer;
 }
 .gs-button.red {
   color: #c73232;
@@ -150,7 +153,10 @@ html {
 
 /* CARD */
 .gs-card {
-  box-shadow: 0 2px 2px 0 rgba(0,0,0,0.14), 0 1px 5px 0 rgba(0,0,0,0.12), 0 3px 1px -2px rgba(0,0,0,0.2);
+  /* box-shadow: 0 2px 2px 0 rgba(0,0,0,0.14), 0 1px 5px 0 rgba(0,0,0,0.12), 0 3px 1px -2px rgba(0,0,0,0.2); */
+  box-shadow: 1px 0px 14px 2px rgba(165,156,156,0.75);
+  -webkit-box-shadow: 1px 0px 14px 2px rgba(165,156,156,0.75);
+  -moz-box-shadow: 1px 0px 14px 2px rgba(165,156,156,0.75);
   margin: 0.5rem 0 1rem 0;
   background-color: #fff;
   transition: box-shadow .25s;
@@ -170,6 +176,32 @@ html {
 }
 .gs-input-cell:focus {
     border-bottom: 2px solid #0acfee;
+}
+.read-mode .gs-input-cell:focus {
+    border: none;
+}
+.gs-input-cell[readonly] {
+  color: grey;
+}
+
+.gs-input-cell2 {  
+  width: calc(100% - 15px);
+  padding: 6px 12px 6px 0;
+  outline: none;
+}
+.gs-input-cell2:focus {
+  box-shadow: none;
+  border-color: #ced4da;
+  border-bottom: 2px solid #0acfee;
+}
+.read-mode .gs-input-cell2:focus {
+    border: none;
+}
+.gs-input-cell.compact {
+  padding: 0 4px;
+}
+.gs-input-cell.bordered {
+  border: 1px solid lightgray;
 }
 /*END: INPUT FIELD */
 
@@ -222,6 +254,10 @@ html {
   overflow-x: hidden;
   width: calc(100% - 25px);
 }
+.custom-autosuggest-wrapper .react-autosuggest__suggestions-container--open,
+.react-autosuggest-without-label .react-autosuggest__suggestions-container--open {
+  top: 35px;
+}
 
 .react-autosuggest__input--open {
   border-bottom-left-radius: 0;
@@ -244,12 +280,13 @@ div[validationstate="error"] {
 input[type=checkbox], input[type=radio] {
   margin-left: -1.25rem;
 }
-/* END: ootstrap issue (due to different versions exist among diff npm */
-
-.react-tiny-popover-container {
-  z-index: 3;
-  padding-right: 20px;
+a.nav-link:focus,
+a.nav-link:hover,
+a.dropdown-item:hover,
+a.dropdown-item:focus {
+  text-decoration: none;
 }
+/* END: ootstrap issue (due to different versions exist among diff npm */
 
 .gold-color {
   color: gold;
@@ -340,15 +377,21 @@ input[type=checkbox], input[type=radio] {
 /* arrow left */
 
 /* arrow right */
+.arrow-box.right {
+  margin-right: 1rem;
+}
 .arrow-box.right:after, .arrow-box.right:before {
-  left: 100%;
+  left: 101%;
   top: 50%;
 }
 .arrow-box.right:after {
-	border-left-color: white; /* #88b7d5; */
+  border-left-color: white; /* #88b7d5; */
+  margin-top: -21px;
+  left: 99%;
 }
 .arrow-box.right:before {
-	border-left-color: #c2e1f5;
+  border-left-color: #c2e1f5;
+  margin-top: -21px;
 }
 /* arrow right */
 
@@ -381,8 +424,19 @@ input[type=checkbox], input[type=radio] {
 .gs-icon {
   color: #2296f3;
   cursor: pointer;
+  width: auto;
+}
+.gs-icon:hover,
+.gs-icon:focus,
+.gs-icon.active {
+  color: #fba200;
 }
 
 .react-datepicker-popper {
   z-index: 3;
+}
+
+.form-check-input:checked[type=checkbox]:focus,
+.form-check-input:checked[type=radio]:focus {
+  outline: none;
 }

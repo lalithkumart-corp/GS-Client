@@ -1,0 +1,17 @@
+.home-image {
+    margin: 0 auto;
+    max-width: 40%;
+    margin-top: 5%;
+    margin-bottom: 5%;
+}
+.home-page {
+    .shortcut-section {
+        position: absolute;
+        padding-left: 10px;
+        .an-icon {
+            color: #2196f3;
+            cursor: pointer;
+            font-size: 20px;
+        }
+    }
+}

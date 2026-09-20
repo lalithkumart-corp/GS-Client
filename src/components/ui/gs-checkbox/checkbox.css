@@ -45,6 +45,11 @@
     background-color: transparent;
     border: none;
   }
+
+  .gs-checkbox-container.bordered input:checked ~ .checkmark {
+    background-color: transparent;
+    border: 2px solid #ddd;
+  }
   
   /* Create the checkmark/indicator (hidden when not checked) */
   .checkmark:after {
@@ -60,7 +65,7 @@
   
 /* Style the checkmark/indicator */
 .gs-checkbox-container .checkmark:after {
-    left: 9px;
+    left: 4px;
     top: 0px;
     width: 9px;
     height: 16px;

@@ -1,0 +1,58 @@
+.jewellery-tag-template-6-label {
+    background-color: lightgray;
+    font-family: auto;
+    width: 302px;
+    max-height: 45px;
+    line-height: 7px;
+    font-family: sans-serif;
+    font-weight: bold;
+    position: relative;
+    .label-content-section {
+        width: 204px;
+        max-height: 45px;
+        margin-left: 2.5mm;
+        .section-1 {
+            height: 45px;
+            width: 102px;
+            display: inline-block;
+            vertical-align: top;
+            font-size: 10px;
+            .part-1 {
+                width: 102px;
+                display: inline-block;
+                .row-1 {
+                    height: 22px;
+                    line-height: 20px;
+                    .barcode-div {
+                        width: 100%;
+                        display: inline-block;
+                    }
+                }
+                .row-2 {
+                    height: 22.5px;
+                    text-align: left;
+                    line-height: 20px;
+                }
+            }
+        }
+        .section-2 {
+            width: 102px;
+            display: inline-block;
+            font-size: 10px;
+            letter-spacing: 1px;
+            .part-1 {
+                margin-left: 13px;
+                .row-1 {
+                    text-align: left;
+                    height: 22px;
+                }
+                .row-2 {
+                    height: 22px;
+                    font-size: 14px;
+                    text-align: left;
+                }
+            }
+        }
+    }
+}
+
